@@ -21,6 +21,9 @@ from mokioclaw.core.session import (
 )
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.trace import TraceRecorder, normalize_trace_mode
+from mokioclaw.core.tool_policy import parse_bash_patterns, parse_tool_policies
+from mokioclaw.agents.registry import parse_subagent_configs, registered_subagents
+from mokioclaw.tools.mcp_tools import parse_mcp_servers
 from mokioclaw.graph.workflow import build_complex_workflow, build_entry_workflow
 
 
@@ -47,6 +50,16 @@ def create_runtime(
         checkpoint_mode=normalize_checkpoint_mode(checkpoint_mode or os.getenv("MOKIO_CHECKPOINT_MODE", "light")),
         resume_from=resume_from,
         trace_mode=normalize_trace_mode(trace_mode or os.getenv("MOKIO_TRACE_MODE", "on")),
+        tool_policies=parse_tool_policies(os.getenv("MOKIO_TOOL_POLICIES")),
+        bash_deny_patterns=parse_bash_patterns(os.getenv("MOKIO_BASH_DENY_PATTERNS"), variable="MOKIO_BASH_DENY_PATTERNS"),
+        bash_allow_patterns=parse_bash_patterns(os.getenv("MOKIO_BASH_ALLOW_PATTERNS"), variable="MOKIO_BASH_ALLOW_PATTERNS"),
+        tool_retry_limit=_env_int("MOKIO_TOOL_RETRY_LIMIT", 2),
+        context_output_limit_chars=_env_int("MOKIO_CONTEXT_OUTPUT_LIMIT_CHARS", 12000),
+        model_context_reserve_tokens=_env_int("MOKIO_MODEL_CONTEXT_RESERVE_TOKENS", 8192),
+        subagent_configs=parse_subagent_configs(os.getenv("MOKIO_SUBAGENTS")),
+        subagent_registry=registered_subagents(),
+        mcp_servers=parse_mcp_servers(os.getenv("MOKIO_MCP_SERVERS")),
+        mcp_timeout_seconds=_env_int("MOKIO_MCP_TIMEOUT_SECONDS", 30),
     )
 
 
@@ -60,7 +73,25 @@ def stream_agent_events(
     checkpoint_mode: str | None = None,
     resume_workspace: Path | None = None,
     trace_mode: str | None = None,
+    use_daemon: bool = False,
 ) -> Iterator[dict[str, Any]]:
+    if (use_daemon or os.getenv("MOKIO_USE_DAEMON") == "1") and os.getenv("MOKIO_DAEMON_WORKER") != "1":
+        from mokioclaw.core.daemon_client import run_via_daemon
+
+        yield from run_via_daemon(
+            "run",
+            task,
+            options={
+                "workspace": workspace,
+                "max_attempts": max_attempts,
+                "approval_mode": approval_mode,
+                "checkpoint_mode": checkpoint_mode,
+                "resume_workspace": resume_workspace,
+                "trace_mode": trace_mode,
+            },
+            approval_handler=approval_handler,
+        )
+        return
     resume_path = resume_workspace.expanduser() if resume_workspace is not None else None
     if resume_path is None:
         route = "workflow"
@@ -160,7 +191,25 @@ def stream_session_events(
     checkpoint_mode: str | None = None,
     resume_workspace: Path | None = None,
     trace_mode: str | None = None,
+    use_daemon: bool = False,
 ) -> Iterator[dict[str, Any]]:
+    if (use_daemon or os.getenv("MOKIO_USE_DAEMON") == "1") and os.getenv("MOKIO_DAEMON_WORKER") != "1":
+        from mokioclaw.core.daemon_client import run_via_daemon
+
+        yield from run_via_daemon(
+            "session",
+            task,
+            options={
+                "session_workspace": session_workspace,
+                "max_attempts": max_attempts,
+                "approval_mode": approval_mode,
+                "checkpoint_mode": checkpoint_mode,
+                "resume_workspace": resume_workspace,
+                "trace_mode": trace_mode,
+            },
+            approval_handler=approval_handler,
+        )
+        return
     workspace = (resume_workspace or session_workspace or default_workspace()).expanduser()
     workspace.mkdir(parents=True, exist_ok=True)
     session = load_or_create_session(workspace)

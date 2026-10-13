@@ -30,6 +30,21 @@ class RuntimeState:
     resume_from: Path | None = None
     trace_mode: str = "on"
     trace_id: str | None = None
+    tool_policies: dict[str, str] = field(default_factory=dict)
+    bash_deny_patterns: list[str] = field(default_factory=list)
+    bash_allow_patterns: list[str] = field(default_factory=list)
+    tool_retry_limit: int = 2
+    context_output_limit_chars: int = 12000
+    model_context_reserve_tokens: int = 8192
+    active_skill_tools: set[str] | None = None
+    active_skill_permissions: set[str] | None = None
+    active_agent_tools: set[str] | None = None
+    subagent_configs: dict[str, dict[str, Any]] = field(default_factory=dict)
+    subagent_registry: Any = None
+    mcp_servers: list[dict[str, Any]] = field(default_factory=list)
+    mcp_timeout_seconds: float = 30.0
+    tool_cache: dict[str, list[Any]] = field(default_factory=dict)
+    mcp_discovery_errors: list[dict[str, str]] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self.approval_mode = normalize_approval_mode(self.approval_mode)

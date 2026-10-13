@@ -14,6 +14,7 @@ class ApprovalRequest:
     command: str
     risk_reason: str
     tool_name: str = "BashTool"
+    tool_call_id: str = ""
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,16 @@ RISK_PATTERNS = [
     (r"(?:^|&&|\|\||;)\s*python\s+-m\s+http\.server\b", "Long-running development server"),
 ]
 
+DANGEROUS_PATTERNS = [
+    r"\brm\s+-rf\b",
+    r"\bRemove-Item\b.*\b-Recurse\b.*\b-Force\b",
+    r"\bdel\s+/[sq]\b",
+    r"\bformat\b",
+    r"\bshutdown\b",
+    r"\breboot\b",
+    r"(?:^|[^0-9])>\s*(?:[A-Za-z]:\\|/(?!dev/null\b))",
+]
+
 
 def normalize_approval_mode(mode: str | None) -> str:
     normalized = (mode or "inline").strip().lower()
@@ -45,6 +56,13 @@ def classify_command_risk(command: str) -> str | None:
     for pattern, reason in RISK_PATTERNS:
         if re.search(pattern, command, flags=re.IGNORECASE):
             return reason
+    return None
+
+
+def classify_dangerous_command(command: str) -> str | None:
+    for pattern in DANGEROUS_PATTERNS:
+        if re.search(pattern, command, flags=re.IGNORECASE):
+            return pattern
     return None
 
 

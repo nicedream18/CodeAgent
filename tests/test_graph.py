@@ -238,7 +238,7 @@ def test_context_compressor_removes_old_messages_and_preserves_state(monkeypatch
     monkeypatch.setattr("mokioclaw.graph.nodes.estimate_context_tokens", fake_estimate)
     monkeypatch.setattr(
         "mokioclaw.graph.nodes._compress_context_with_model",
-        lambda state: {
+        lambda state, **kwargs: {
             "summary": "compressed summary",
             "active_goal": "finish demo",
             "completed_work": "wrote file",

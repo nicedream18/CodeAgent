@@ -10,23 +10,13 @@ import time
 from pathlib import Path
 from typing import Any
 
-from mokioclaw.core.approval import ApprovalDecision, classify_command_risk, make_approval_request
+from mokioclaw.core.approval import ApprovalDecision, classify_command_risk, classify_dangerous_command, make_approval_request
 from mokioclaw.core.state import RuntimeState
+from mokioclaw.core.tool_context import current_tool_call_context
 
 DEFAULT_TIMEOUT_SECONDS = 120
 DEFAULT_MAX_TIMEOUT_SECONDS = 600
 DEFAULT_MAX_OUTPUT_CHARS = 6000
-
-DANGEROUS_PATTERNS = [
-    r"\brm\s+-rf\b",
-    r"\bRemove-Item\b.*\b-Recurse\b.*\b-Force\b",
-    r"\bdel\s+/[sq]\b",
-    r"\bformat\b",
-    r"\bshutdown\b",
-    r"\breboot\b",
-    r"(?:^|[^0-9])>\s*(?:[A-Za-z]:\\|/(?!dev/null\b))",
-]
-
 
 def bash_tool_description() -> str:
     system = platform.system().lower()
@@ -132,10 +122,7 @@ def _handle_workspace_query(state: RuntimeState, command: str) -> dict[str, Any]
 
 
 def _looks_dangerous(command: str) -> str | None:
-    for pattern in DANGEROUS_PATTERNS:
-        if re.search(pattern, command, re.IGNORECASE):
-            return pattern
-    return None
+    return classify_dangerous_command(command)
 
 
 def _decode_output(output: bytes | str | None) -> str:
@@ -179,7 +166,10 @@ def run_bash(
     if blocked:
         return {"ok": False, "error": f"blocked potentially dangerous command pattern: {blocked}"}
 
-    approval = _resolve_approval(state, normalized_command)
+    context = current_tool_call_context()
+    # Calls through execute_tool have already passed the unified policy gate.
+    # Direct calls to run_bash retain their standalone approval safeguard.
+    approval = None if context and context.tool_name == "BashTool" and context.permission_checked else _resolve_approval(state, normalized_command)
     if approval is not None and not approval.get("approved"):
         return approval
 
@@ -226,7 +216,16 @@ def _resolve_approval(state: RuntimeState, command: str) -> dict[str, Any] | Non
     if risk_reason is None:
         return None
 
+    context = current_tool_call_context()
     request = make_approval_request(command, risk_reason)
+    if context is not None:
+        request = type(request)(
+            id=request.id,
+            command=request.command,
+            risk_reason=request.risk_reason,
+            tool_name=request.tool_name,
+            tool_call_id=context.tool_call_id,
+        )
     base = {
         "requires_approval": True,
         "approval_id": request.id,

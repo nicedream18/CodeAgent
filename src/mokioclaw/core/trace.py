@@ -43,12 +43,15 @@ class TraceRecorder:
         self.tool_calls = 0
         self.failed_tool_calls = 0
         self.approval_count = 0
+        self.permission_decisions = {"requested": 0, "granted": 0, "denied": 0}
+        self.permission_call_ids: set[str] = set()
         self.checkpoint_count = 0
         self.handoff_count = 0
         self.final_status = ""
         self.timeline_head: list[str] = []
         self.timeline_tail: list[str] = []
         self.timeline_omitted = 0
+        self.stream_buffers: dict[str, list[str]] = {}
         if self.enabled:
             setattr(runtime, "trace_id", self.trace_id)
             self.root.mkdir(parents=True, exist_ok=True)
@@ -76,6 +79,14 @@ class TraceRecorder:
         if not self.enabled:
             return
         event_type = str(event.get("type", "custom_event"))
+        if event_type == "llm_stream_start":
+            self.stream_buffers[str(event.get("node", "model"))] = []
+        elif event_type == "llm_token":
+            self.stream_buffers.setdefault(str(event.get("node", "model")), []).append(str(event.get("text", "")))
+            return
+        elif event_type == "llm_stream_end":
+            node = str(event.get("node", "model"))
+            event = {**event, "text": "".join(self.stream_buffers.pop(node, []))}
         if event_type == "tool_call":
             self.tool_calls += 1
         elif event_type == "tool_result":
@@ -83,8 +94,19 @@ class TraceRecorder:
             if isinstance(result, dict):
                 if result.get("ok") is False:
                     self.failed_tool_calls += 1
-                if result.get("requires_approval"):
+                call_id = str(event.get("tool_call_id", ""))
+                if result.get("requires_approval") and call_id not in self.permission_call_ids:
                     self.approval_count += 1
+        elif event_type == "permission_requested":
+            self.permission_decisions["requested"] += 1
+            self.approval_count += 1
+            self.permission_call_ids.add(str(event.get("tool_call_id", "")))
+        elif event_type == "permission_granted":
+            self.permission_decisions["granted"] += 1
+            self.permission_call_ids.add(str(event.get("tool_call_id", "")))
+        elif event_type == "permission_denied":
+            self.permission_decisions["denied"] += 1
+            self.permission_call_ids.add(str(event.get("tool_call_id", "")))
         elif event_type == "handoff":
             self.handoff_count += 1
         elif event_type == "checkpoint_saved":
@@ -181,6 +203,7 @@ class TraceRecorder:
             "tool_calls": self.tool_calls,
             "failed_tool_calls": self.failed_tool_calls,
             "approval_count": self.approval_count,
+            "permission_decisions": dict(self.permission_decisions),
             "checkpoint_count": self.checkpoint_count,
             "handoff_count": self.handoff_count,
             "final_status": self.final_status,

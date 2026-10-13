@@ -1,3 +1,3 @@
-from mokioclaw.tools.registry import build_read_only_tools, build_tools
+from mokioclaw.tools.registry import ToolRegistry, ToolSpec, build_read_only_tools, build_tool, build_tools
 
-__all__ = ["build_read_only_tools", "build_tools"]
+__all__ = ["ToolRegistry", "ToolSpec", "build_read_only_tools", "build_tool", "build_tools"]

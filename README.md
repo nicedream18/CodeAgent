@@ -331,6 +331,14 @@ uv run mokioclaw --workspace .mokioclaw/workspaces/demo "帮我查阅明日方�
 
 更完整的 workspace 生命周期、checkpoint、shims、bash-outputs 讲解见 [docs/workspace-lifecycle.md](docs/workspace-lifecycle.md)。
 
+## Agent 能力扩展学习路线
+
+MokioClaw 在现有 MultiAgent、Context Engineering 和 Harness 能力上继续补充通用工具权限、失败重试、SKILL.md、可配置 Subagent、MCP stdio、模型 token streaming 与本机 daemon/IPC。每章包含概念、实验和验收步骤，见 [Agent 能力扩展路线](docs/agent-capability-roadmap.md)。
+
+CLI 和 TUI 会自动连接本机 daemon，任务事件会写入 daemon run event log；客户端断开后任务继续运行。可以用 `mokioclaw daemon status` 查看 daemon，用 `mokioclaw daemon stop` 停止。直接调用 `stream_agent_events()` 或 `stream_session_events()` 的 Python 代码仍在当前进程运行。
+
+workspace Skill 放在 `.mokioclaw/skills/<skill-name>/SKILL.md`；用户级 Skill 放在 `~/.mokioclaw/skills/<skill-name>/SKILL.md`。MCP stdio server 通过 `MOKIO_MCP_SERVERS` JSON 数组配置。工具策略、Subagent 调用上限等实验配置也收录在学习路线文档中。
+
 ## 运行方式
 
 `.env` 配置：
@@ -341,6 +349,18 @@ MODEL=...
 BASE_URL=...
 TAVILY_API_KEY=...
 MOKIO_CONTEXT_TOKEN_LIMIT=400000
+MOKIO_MODEL_CONTEXT_RESERVE_TOKENS=8192
+MOKIO_CONTEXT_OUTPUT_LIMIT_CHARS=12000
+MOKIO_TOOL_RETRY_LIMIT=2
+MOKIO_TOOL_POLICIES='{"FileWriteTool":"ask"}'
+MOKIO_BASH_DENY_PATTERNS='["\\bdeploy\\b"]'
+MOKIO_BASH_ALLOW_PATTERNS='["^pytest(?:\\s|$)"]'
+MOKIO_APPROVAL_TIMEOUT_SECONDS=300
+MOKIO_SUBAGENTS='{"searchAgent":{"max_tool_calls":3}}'
+MOKIO_MCP_SERVERS='[{"name":"example","command":".venv/bin/python","args":["examples/mcp/echo_server.py"]}]'
+MOKIO_MCP_TIMEOUT_SECONDS=30
+MOKIO_DAEMON_DIR=~/.mokioclaw/daemon
+MOKIO_DAEMON_PORT=8765
 MOKIO_BASH_DEFAULT_TIMEOUT_SECONDS=120
 MOKIO_BASH_MAX_TIMEOUT_SECONDS=600
 MOKIO_BASH_MAX_OUTPUT_CHARS=6000

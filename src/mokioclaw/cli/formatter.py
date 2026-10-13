@@ -10,6 +10,7 @@ from rich.table import Table
 from rich.text import Text
 
 console = Console()
+_active_llm_streams: set[str] = set()
 
 STATUS_SYMBOLS = {
     "pending": "[ ]",
@@ -58,6 +59,20 @@ def print_event(event: dict[str, Any]) -> None:
 
 def print_custom_event(event: dict[str, Any]) -> None:
     event_type = event.get("type")
+    if event_type == "llm_stream_start":
+        node = str(event.get("node", "model"))
+        _active_llm_streams.add(node)
+        console.print(f"[{node}] ", end="")
+        return
+    if event_type == "llm_token":
+        console.print(str(event.get("text", "")), end="")
+        return
+    if event_type == "llm_stream_end":
+        node = str(event.get("node", "model"))
+        if node in _active_llm_streams:
+            console.print()
+            _active_llm_streams.discard(node)
+        return
     if event_type == "intent_decision":
         render_intent_decision(event)
         return

@@ -8,6 +8,7 @@ dependencies = [
     "langchain>=1.2.15",
     "langchain-openai>=1.1.13",
     "langgraph>=1.1.6",
+    "mcp>=2.3.0,<3",
     "pillow>=11.0.0",
     "python-dotenv>=1.1.1",
     "tavily-python>=0.7.24",

@@ -8,7 +8,9 @@ from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import SEARCH_AGENT_PROMPT
 from mokioclaw.providers.openai_provider import create_model
-from mokioclaw.tools.web_search_tool import build_web_search_tool
+from mokioclaw.providers.openai_provider import invoke_streaming
+from mokioclaw.tools.execution import execute_tool
+from mokioclaw.tools.registry import build_tool
 
 
 Writer = Callable[[dict[str, Any]], None]
@@ -43,7 +45,7 @@ def run_search_agent(
     tool_events: list[dict[str, Any]] = []
 
     for _ in range(max_loops):
-        response = search_agent.invoke(messages)
+        response = invoke_streaming(search_agent, messages, writer=writer, node="searchAgent")
         produced_messages.append(response)
         messages.append(response)
         tool_calls = getattr(response, "tool_calls", None) or []
@@ -55,7 +57,7 @@ def run_search_agent(
             if query:
                 queries.append(query)
             writer({"type": "tool_call", "node": "searchAgent", "name": call.get("name"), "args": args})
-            tool_result = _execute_search_tool(call)
+            tool_result = _execute_search_tool(call, state=state, on_retry=writer)
             event = _tool_result_event(tool_result)
             tool_events.append(event)
             writer(event)
@@ -97,15 +99,16 @@ def run_search_agent(
     return result
 
 
-def _execute_search_tool(call: dict[str, Any]) -> ToolMessage:
-    tool = build_web_search_tool()
+def _execute_search_tool(call: dict[str, Any], *, state: MokioGraphState | None = None, on_retry=None) -> ToolMessage:
     name = call.get("name", "")
     args = call.get("args") or {}
-    if name != tool.name:
+    runtime = state.get("runtime") if state else None
+    tool = build_tool(runtime, name) if runtime is not None else None
+    if name != "WebSearchTool" or tool is None:
         result = {"ok": False, "error": f"unknown tool: {name}"}
     else:
         try:
-            result = tool.invoke(args)
+            result = execute_tool(runtime, tool, args, on_retry=on_retry, on_event=on_retry, tool_call_id=call.get("id"))
         except Exception as exc:
             result = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
     return ToolMessage(
@@ -117,7 +120,7 @@ def _execute_search_tool(call: dict[str, Any]) -> ToolMessage:
 
 def _tool_result_event(tool_message: ToolMessage) -> dict[str, Any]:
     parsed = _parse_tool_content(tool_message.content)
-    return {"type": "tool_result", "node": "searchAgent", "name": tool_message.name, "result": parsed}
+    return {"type": "tool_result", "node": "searchAgent", "name": tool_message.name, "tool_call_id": tool_message.tool_call_id, "result": parsed}
 
 
 def _parse_tool_content(content: Any) -> Any:

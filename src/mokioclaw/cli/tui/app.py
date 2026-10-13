@@ -19,6 +19,7 @@ from mokioclaw.cli.tui.logo import render_logo
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 from mokioclaw.core.agent import stream_session_events
 from mokioclaw.core.paths import default_workspace
+from mokioclaw.core.session import compact_session_history
 
 
 StreamFactory = Callable[..., Iterable[dict[str, Any]]]
@@ -231,6 +232,7 @@ class MokioClawTuiApp(App[None]):
         self.sidebar_text = ""
         self.todos: list[dict[str, Any]] = []
         self._state_lock = Lock()
+        self._llm_streams: dict[str, list[str]] = {}
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -249,7 +251,7 @@ class MokioClawTuiApp(App[None]):
             with Horizontal(id="input-row"):
                 yield Static("❯", id="prompt")
                 yield Input(placeholder="Chat or ask for coding work, then press Enter", id="task-input")
-                yield Static("Enter send · /new session · Ctrl+L clear", id="hint")
+                yield Static("Enter send · /new session · /compact memory · Ctrl+L clear", id="hint")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -269,9 +271,31 @@ class MokioClawTuiApp(App[None]):
         if task == "/new":
             self.start_new_session()
             return
+        if task == "/compact":
+            result = compact_session_history(self.session_workspace)
+            self.notify(f"Compacted {result['compacted']} turn(s); kept {result['kept']}.")
+            self._refresh_sidebar()
+            return
         self.start_task(task, None)
 
     def on_agent_event_message(self, message: AgentEventMessage) -> None:
+        envelope = message.event
+        payload = envelope.get("event") if envelope.get("type") == "custom_event" else None
+        if isinstance(payload, dict) and payload.get("type") in {"llm_stream_start", "llm_token", "llm_stream_end"}:
+            node = str(payload.get("node", "model"))
+            if payload["type"] == "llm_stream_start":
+                self._llm_streams[node] = []
+                return
+            if payload["type"] == "llm_token":
+                self._llm_streams.setdefault(node, []).append(str(payload.get("text", "")))
+                preview = "".join(self._llm_streams[node])[-180:]
+                self.query_one("#status", Static).update(f"{node} · {preview}")
+                return
+            content = "".join(self._llm_streams.pop(node, []))
+            if content:
+                self._mount_event_card(f"Model · {node}", content[-4000:], category="info", collapsed=False)
+            self.query_one("#status", Static).update("running")
+            return
         self._handle_event(message.event)
 
     def on_run_finished_message(self, message: RunFinishedMessage) -> None:
@@ -324,6 +348,7 @@ class MokioClawTuiApp(App[None]):
                 checkpoint_mode=self.checkpoint_mode,
                 resume_workspace=resume,
                 trace_mode=self.trace_mode,
+                use_daemon=True,
             ):
                 self.call_from_thread(self.post_message, AgentEventMessage(event))
         except KeyboardInterrupt:
@@ -400,7 +425,7 @@ class MokioClawTuiApp(App[None]):
     def _write_welcome(self) -> None:
         self._mount_event_card(
             "MokioClaw",
-            "Ask for a quick answer or coding work. Use /new to open a fresh workspace.",
+            "Ask for a quick answer or coding work. Use /new for a fresh workspace, /compact to summarize older session turns.",
             category="info",
             collapsed=True,
             detail="Persistent TUI sessions keep one workspace across turns. Workflow turns still use approval, checkpoint, trace, and layered memory.",
@@ -427,9 +452,11 @@ class MokioClawTuiApp(App[None]):
 
     def _refresh_sidebar(self) -> None:
         status = "running" if self.running else "ready"
-        workspace = shorten(self.latest_workspace or str(self.session_workspace), 80)
+        workspace_path = self.latest_workspace or str(self.session_workspace)
+        workspace = f"{Path(workspace_path).name} · {shorten(workspace_path, 64)}"
         checkpoint = shorten(self.latest_checkpoint or "(waiting)", 80)
-        trace = shorten(self.latest_trace or "(waiting)", 80)
+        trace_path = self.latest_trace or "(waiting)"
+        trace = f"{Path(trace_path).name} · {shorten(trace_path, 64)}" if self.latest_trace else trace_path
         tools = f"{self.tool_count} total / {self.failed_tool_count} failed"
         approvals = str(self.approval_count)
         todos = self._todo_sidebar_text()

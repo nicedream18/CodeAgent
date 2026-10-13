@@ -12,6 +12,8 @@ from typer.core import TyperGroup
 from mokioclaw.cli.formatter import print_event, safe_echo, safe_secho
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 from mokioclaw.core.agent import stream_agent_events
+from mokioclaw.core.session import compact_session_history
+from mokioclaw.core.daemon_client import daemon_status, stop_daemon
 
 
 class MokioClawGroup(TyperGroup):
@@ -47,6 +49,23 @@ app = typer.Typer(
     cls=MokioClawGroup,
     help='mokioclaw: a teaching-first mini CodeAgent. Use `mokioclaw "task"` for Rich output or `mokioclaw tui` for Textual TUI.',
 )
+daemon_app = typer.Typer(help="Manage the local MokioClaw Agent daemon.")
+app.add_typer(daemon_app, name="daemon")
+
+
+@daemon_app.command("status")
+def daemon_status_command() -> None:
+    status = daemon_status(start=False)
+    if status is None:
+        safe_echo("MokioClaw daemon is stopped.")
+        return
+    active_runs = sum(run_status == "running" for run_status in status.get("runs", {}).values())
+    safe_echo(f"MokioClaw daemon is running (pid {status.get('pid')}); active runs: {active_runs}.")
+
+
+@daemon_app.command("stop")
+def daemon_stop_command() -> None:
+    safe_echo("MokioClaw daemon stopped." if stop_daemon() else "MokioClaw daemon is already stopped.")
 
 
 def configure_console() -> None:
@@ -105,6 +124,7 @@ def main(
         checkpoint_mode=checkpoint_mode,
         resume_workspace=resume,
         trace_mode=trace_mode,
+        use_daemon=True,
     ):
         print_event(event)
 
@@ -152,12 +172,22 @@ def tui(
     ).run()
 
 
+@app.command("compact")
+def compact_command(
+    workspace: Annotated[Path, typer.Option("--workspace", "-w", help="Workspace whose saved session history should be compacted.")],
+    keep_recent: Annotated[int, typer.Option("--keep-recent", min=1, help="Number of recent turns to retain.")] = 4,
+) -> None:
+    """Compact a saved session's older turns into its durable summary."""
+    result = compact_session_history(workspace.expanduser(), keep_recent=keep_recent)
+    safe_echo(f"Compacted {result['compacted']} turn(s); kept {result['kept']} recent turn(s).")
+
+
 def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
     from mokioclaw.cli.formatter import console
 
     console.print(
         Panel(
-            f"Command:\n{request.command}\n\nRisk:\n{request.risk_reason}",
+            f"Requested operation:\n{request.command}\n\nReason:\n{request.risk_reason}",
             title=f"Human Approval · {request.tool_name}",
             border_style="yellow",
             box=box.ROUNDED,

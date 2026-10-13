@@ -80,3 +80,11 @@ def test_cli_passes_trace_mode(monkeypatch, tmp_path) -> None:
     assert result.exit_code == 0
     assert calls
     assert calls[0][1]["trace_mode"] == "off"
+
+
+def test_compact_command_creates_and_compacts_session(tmp_path) -> None:
+    runner = CliRunner()
+    result = runner.invoke(app, ["compact", "--workspace", str(tmp_path), "--keep-recent", "1"])
+    assert result.exit_code == 0
+    assert "Compacted 0" in result.output
+    assert (tmp_path / ".mokioclaw" / "session" / "session.json").exists()

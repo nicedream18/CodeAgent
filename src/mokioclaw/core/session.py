@@ -97,6 +97,26 @@ def save_session(workspace: Path, session: dict[str, Any]) -> dict[str, Any]:
     return session
 
 
+def compact_session_history(workspace: Path, *, keep_recent: int = 4) -> dict[str, Any]:
+    if keep_recent < 1:
+        raise ValueError("keep_recent must be at least 1")
+    session = load_or_create_session(workspace)
+    turns = list(session.get("recent_turns", []))
+    if len(turns) <= keep_recent:
+        return {"ok": True, "compacted": 0, "kept": len(turns), "summary": session.get("summary", "")}
+    older, kept = turns[:-keep_recent], turns[-keep_recent:]
+    additions = []
+    for turn in older:
+        role = turn.get("role", "")
+        route = f"/{turn.get('route')}" if turn.get("route") else ""
+        summary = turn.get("summary") or turn.get("content", "")
+        additions.append(f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}")
+    session["summary"] = trim_text("\n".join(part for part in [str(session.get("summary", "")), *additions] if part), MAX_SESSION_SUMMARY)
+    session["recent_turns"] = kept
+    save_session(workspace, session)
+    return {"ok": True, "compacted": len(older), "kept": len(kept), "summary": session.get("summary", "")}
+
+
 def build_session_context(workspace: Path, session: dict[str, Any] | None = None) -> str:
     session = _normalize_session(session or load_or_create_session(workspace), workspace)
     manifest = workspace_manifest(workspace, limit=40)

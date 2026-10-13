@@ -11,7 +11,10 @@ from mokioclaw.graph.memory import build_layered_memory, format_layered_memory_f
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import CODE_AGENT_PROMPT
 from mokioclaw.providers.openai_provider import create_model
+from mokioclaw.providers.openai_provider import invoke_streaming
 from mokioclaw.tools import build_tools
+from mokioclaw.tools.execution import execute_tool
+from mokioclaw.tools.skills import skill_summaries
 from mokioclaw.tools.todo_tool import persist_todos, update_todo
 
 
@@ -31,7 +34,10 @@ def run_code_agent(
     memory = build_layered_memory({**state, "todos": todos}, node="codeAgent")
     writer(memory_event(memory, node="codeAgent"))
     model = create_model()
-    code_agent = model.bind_tools(build_tools(runtime) + [_build_todo_update_tool(todos)])
+    registered_tools = build_tools(runtime)
+    for error in runtime.mcp_discovery_errors:
+        writer({"type": "mcp_discovery_error", **error})
+    code_agent = model.bind_tools(registered_tools + [_build_todo_update_tool(todos)])
 
     writer(
         {
@@ -51,7 +57,7 @@ def run_code_agent(
     tool_events: list[dict[str, Any]] = []
 
     for _ in range(max_loops):
-        response = code_agent.invoke(messages)
+        response = invoke_streaming(code_agent, messages, writer=writer, node="codeAgent")
         produced_messages.append(response)
         messages.append(response)
         tool_calls = getattr(response, "tool_calls", None) or []
@@ -66,7 +72,7 @@ def run_code_agent(
                     "args": call.get("args", {}),
                 }
             )
-            tool_result, todos = execute_code_agent_tool(runtime, todos, call)
+            tool_result, todos = execute_code_agent_tool(runtime, todos, call, on_retry=writer, on_event=writer)
             event = tool_result_event(tool_result, node="codeAgent")
             tool_events.append(event)
             writer(event)
@@ -104,11 +110,19 @@ def run_code_agent(
     }
 
 
-def execute_code_agent_tool(runtime: RuntimeState, todos: list[dict[str, str]], call: dict[str, Any]):
+def execute_code_agent_tool(runtime: RuntimeState, todos: list[dict[str, str]], call: dict[str, Any], *, on_retry=None, on_event=None):
     name = call.get("name", "")
     args = call.get("args") or {}
     if name == "TodoUpdateTool":
-        result = update_todo(todos, args.get("todo_id", ""), args.get("status", ""), args.get("note", ""))
+        tool = _build_todo_update_tool(todos)
+        result = execute_tool(
+            runtime,
+            tool,
+            args,
+            on_retry=on_retry,
+            on_event=on_event,
+            tool_call_id=call.get("id"),
+        )
         if result.get("ok"):
             todos = result["todos"]
     else:
@@ -118,7 +132,7 @@ def execute_code_agent_tool(runtime: RuntimeState, todos: list[dict[str, str]], 
             result = {"ok": False, "error": f"unknown tool: {name}"}
         else:
             try:
-                result = tool.invoke(args)
+                result = execute_tool(runtime, tool, args, on_retry=on_retry, on_event=on_event, tool_call_id=call.get("id"))
             except Exception as exc:
                 result = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
     tool_call_id = call.get("id") or f"{name}-call"
@@ -130,7 +144,7 @@ def tool_result_event(tool_message: ToolMessage, *, node: str) -> dict[str, Any]
         parsed = json.loads(str(tool_message.content))
     except json.JSONDecodeError:
         parsed = tool_message.content
-    return {"type": "tool_result", "node": node, "name": tool_message.name, "result": parsed}
+    return {"type": "tool_result", "node": node, "name": tool_message.name, "tool_call_id": tool_message.tool_call_id, "result": parsed}
 
 
 def _build_todo_update_tool(todos: list[dict[str, str]]) -> StructuredTool:
@@ -148,6 +162,7 @@ def _code_agent_input(state: MokioGraphState, instruction: str, memory: dict[str
     ]
     if state.get("session_context"):
         parts.append("Session context for this multi-turn coding session:\n" + str(state.get("session_context", "")))
+    parts.append("Discovered Skills (load a relevant one with LoadSkillTool):\n" + skill_summaries(state["runtime"]))
     parts.append("Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory))
     return "\n\n".join(parts)
 

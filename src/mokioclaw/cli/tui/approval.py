@@ -83,7 +83,7 @@ class ApprovalModal(ModalScreen[bool]):
             yield Static(f"Risk: {self.request.risk_reason}")
             yield Static(f"Workspace: {self.workspace}")
             yield Static(Text(self.request.command, overflow="fold"), id="approval-command")
-            yield Static("Approve this command?  y/Enter = approve · n/Esc = deny")
+            yield Static("Approve this tool call?  y/Enter = approve · n/Esc = deny")
             with Horizontal(id="approval-buttons"):
                 yield Button("Approve", variant="success", id="approve")
                 yield Button("Deny", variant="error", id="deny")

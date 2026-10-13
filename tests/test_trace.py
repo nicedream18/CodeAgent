@@ -63,6 +63,21 @@ def test_trace_recorder_counts_failed_tools_and_approvals(tmp_path: Path) -> Non
     assert event["approval_count"] == 1
 
 
+def test_trace_records_permission_lifecycle_for_one_tool_call(tmp_path: Path) -> None:
+    trace = TraceRecorder(RuntimeState(workspace=tmp_path, trace_mode="on"), task="demo")
+    trace.record_custom_event({"type": "permission_requested", "tool_call_id": "call-1", "tool_name": "FileWriteTool"})
+    trace.record_custom_event({"type": "permission_granted", "tool_call_id": "call-1", "tool_name": "FileWriteTool"})
+    trace.record_custom_event({"type": "tool_result", "tool_call_id": "call-1", "name": "FileWriteTool", "result": {"ok": True}})
+
+    summary = trace.end(status="finished")
+
+    assert summary is not None
+    assert summary["approval_count"] == 1
+    assert summary["permission_decisions"] == {"requested": 1, "granted": 1, "denied": 0}
+    log = (trace.root / "events.jsonl").read_text(encoding="utf-8")
+    assert '"call-1"' in log
+
+
 def test_trace_recorder_off_mode_does_not_create_files(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path, trace_mode="off")
     trace = TraceRecorder(runtime, task="demo")
