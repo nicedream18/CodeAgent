@@ -31,7 +31,11 @@ class MokioClawGroup(TyperGroup):
                 break
             if arg.startswith("-"):
                 remaining.append(arg)
-                if "=" not in arg and index + 1 < len(args) and not args[index + 1].startswith("-"):
+                if (
+                    "=" not in arg
+                    and index + 1 < len(args)
+                    and not args[index + 1].startswith("-")
+                ):
                     remaining.append(args[index + 1])
                     index += 2
                     continue
@@ -59,13 +63,21 @@ def daemon_status_command() -> None:
     if status is None:
         safe_echo("MokioClaw daemon is stopped.")
         return
-    active_runs = sum(run_status == "running" for run_status in status.get("runs", {}).values())
-    safe_echo(f"MokioClaw daemon is running (pid {status.get('pid')}); active runs: {active_runs}.")
+    active_runs = sum(
+        run_status == "running" for run_status in status.get("runs", {}).values()
+    )
+    safe_echo(
+        f"MokioClaw daemon is running (pid {status.get('pid')}); active runs: {active_runs}."
+    )
 
 
 @daemon_app.command("stop")
 def daemon_stop_command() -> None:
-    safe_echo("MokioClaw daemon stopped." if stop_daemon() else "MokioClaw daemon is already stopped.")
+    safe_echo(
+        "MokioClaw daemon stopped."
+        if stop_daemon()
+        else "MokioClaw daemon is already stopped."
+    )
 
 
 def configure_console() -> None:
@@ -80,19 +92,31 @@ def main(
     ctx: typer.Context,
     workspace: Annotated[
         Path | None,
-        typer.Option("--workspace", "-w", help="Workspace for generated files. Defaults to a fresh .mokioclaw/workspaces/workspace-* directory."),
+        typer.Option(
+            "--workspace",
+            "-w",
+            help="Workspace for generated files. Defaults to a fresh .mokioclaw/workspaces/workspace-* directory.",
+        ),
     ] = None,
     max_attempts: Annotated[
         int,
-        typer.Option("--max-attempts", help="Maximum planner/actor/verifier attempts before finalizing."),
+        typer.Option(
+            "--max-attempts",
+            help="Maximum planner/actor/verifier attempts before finalizing.",
+        ),
     ] = 3,
     approval_mode: Annotated[
         Literal["inline", "auto", "deny"],
-        typer.Option("--approval-mode", help="Human approval mode for high-risk BashTool commands: inline, auto, or deny."),
+        typer.Option(
+            "--approval-mode",
+            help="Human approval mode for high-risk BashTool commands: inline, auto, or deny.",
+        ),
     ] = "inline",
     checkpoint_mode: Annotated[
         Literal["light", "strict", "off"],
-        typer.Option("--checkpoint-mode", help="Checkpoint mode: light, strict, or off."),
+        typer.Option(
+            "--checkpoint-mode", help="Checkpoint mode: light, strict, or off."
+        ),
     ] = "light",
     trace_mode: Annotated[
         Literal["on", "off"],
@@ -113,7 +137,10 @@ def main(
         safe_echo(ctx.get_help())
         raise typer.Exit()
 
-    safe_secho("mokioclaw stage 5: MultiAgent + context/harness engineering", fg=typer.colors.MAGENTA)
+    safe_secho(
+        "mokioclaw stage 5: MultiAgent + context/harness engineering",
+        fg=typer.colors.MAGENTA,
+    )
     approval_handler = _inline_approval_handler if approval_mode == "inline" else None
     for event in stream_agent_events(
         task,
@@ -131,22 +158,34 @@ def main(
 
 @app.command("tui")
 def tui(
-    task: Annotated[str | None, typer.Argument(help="Optional initial task for the Textual TUI.")] = None,
+    task: Annotated[
+        str | None, typer.Argument(help="Optional initial task for the Textual TUI.")
+    ] = None,
     workspace: Annotated[
         Path | None,
-        typer.Option("--workspace", "-w", help="Workspace for the persistent TUI coding session."),
+        typer.Option(
+            "--workspace", "-w", help="Workspace for the persistent TUI coding session."
+        ),
     ] = None,
     max_attempts: Annotated[
         int,
-        typer.Option("--max-attempts", help="Maximum planner/actor/verifier attempts before finalizing."),
+        typer.Option(
+            "--max-attempts",
+            help="Maximum planner/actor/verifier attempts before finalizing.",
+        ),
     ] = 3,
     approval_mode: Annotated[
         Literal["inline", "auto", "deny"],
-        typer.Option("--approval-mode", help="Human approval mode for high-risk BashTool commands: inline, auto, or deny."),
+        typer.Option(
+            "--approval-mode",
+            help="Human approval mode for high-risk BashTool commands: inline, auto, or deny.",
+        ),
     ] = "inline",
     checkpoint_mode: Annotated[
         Literal["light", "strict", "off"],
-        typer.Option("--checkpoint-mode", help="Checkpoint mode: light, strict, or off."),
+        typer.Option(
+            "--checkpoint-mode", help="Checkpoint mode: light, strict, or off."
+        ),
     ] = "light",
     trace_mode: Annotated[
         Literal["on", "off"],
@@ -174,12 +213,24 @@ def tui(
 
 @app.command("compact")
 def compact_command(
-    workspace: Annotated[Path, typer.Option("--workspace", "-w", help="Workspace whose saved session history should be compacted.")],
-    keep_recent: Annotated[int, typer.Option("--keep-recent", min=1, help="Number of recent turns to retain.")] = 4,
+    workspace: Annotated[
+        Path,
+        typer.Option(
+            "--workspace",
+            "-w",
+            help="Workspace whose saved session history should be compacted.",
+        ),
+    ],
+    keep_recent: Annotated[
+        int,
+        typer.Option("--keep-recent", min=1, help="Number of recent turns to retain."),
+    ] = 4,
 ) -> None:
     """Compact a saved session's older turns into its durable summary."""
     result = compact_session_history(workspace.expanduser(), keep_recent=keep_recent)
-    safe_echo(f"Compacted {result['compacted']} turn(s); kept {result['kept']} recent turn(s).")
+    safe_echo(
+        f"Compacted {result['compacted']} turn(s); kept {result['kept']} recent turn(s)."
+    )
 
 
 def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
@@ -193,7 +244,11 @@ def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             box=box.ROUNDED,
         )
     )
-    answer = typer.prompt("Approve? [y/N]", default="n", show_default=False).strip().lower()
+    answer = (
+        typer.prompt("Approve? [y/N]", default="n", show_default=False).strip().lower()
+    )
     console.print()
     approved = answer in {"y", "yes"}
-    return ApprovalDecision(approved=approved, reason="" if approved else "Rejected by human operator.")
+    return ApprovalDecision(
+        approved=approved, reason="" if approved else "Rejected by human operator."
+    )

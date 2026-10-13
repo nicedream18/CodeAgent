@@ -38,7 +38,9 @@ class ToolSpec:
 def _file_read(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="FileReadTool",
-        func=lambda file_path, offset=0, limit=2000: read_file(state, file_path, offset, limit),
+        func=lambda file_path, offset=0, limit=2000: read_file(
+            state, file_path, offset, limit
+        ),
         description="Read a UTF-8 text file inside the workspace. Supports offset and limit.",
     )
 
@@ -54,7 +56,9 @@ def _file_write(state: RuntimeState) -> StructuredTool:
 def _file_edit(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="FileEditTool",
-        func=lambda file_path, old_text, new_text: edit_file(state, file_path, old_text, new_text),
+        func=lambda file_path, old_text, new_text: edit_file(
+            state, file_path, old_text, new_text
+        ),
         description="Edit an existing workspace file by replacing one unique old_text snippet.",
     )
 
@@ -62,8 +66,8 @@ def _file_edit(state: RuntimeState) -> StructuredTool:
 def _grep(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="GrepTool",
-        func=lambda pattern, path=".", glob=None, head_limit=50, ignore_case=False: grep(
-            state, pattern, path, glob, head_limit, ignore_case
+        func=lambda pattern, path=".", glob=None, head_limit=50, ignore_case=False: (
+            grep(state, pattern, path, glob, head_limit, ignore_case)
         ),
         description="Search workspace text files by regex pattern and return matching lines.",
     )
@@ -96,24 +100,91 @@ def _notepad_append(state: RuntimeState) -> StructuredTool:
 
 
 TOOL_SPECS: tuple[ToolSpec, ...] = (
-    ToolSpec("FileReadTool", _file_read, frozenset({"execution", "read_only"}), "Read a workspace file", frozenset({"filesystem_read"}), idempotent=True, read_only=True),
-    ToolSpec("FileWriteTool", _file_write, frozenset({"execution"}), "Write a workspace file", frozenset({"filesystem_write"})),
-    ToolSpec("FileEditTool", _file_edit, frozenset({"execution"}), "Edit a workspace file", frozenset({"filesystem_write"})),
-    ToolSpec("GrepTool", _grep, frozenset({"execution", "read_only"}), "Search workspace files", frozenset({"filesystem_read"}), idempotent=True, read_only=True),
-    ToolSpec("BashTool", _bash, frozenset({"execution", "read_only"}), "Run a workspace shell command", frozenset({"shell"})),
-    ToolSpec("NotepadReadTool", _notepad_read, frozenset({"execution", "read_only"}), "Read the workspace notepad", frozenset({"filesystem_read"}), idempotent=True, read_only=True),
-    ToolSpec("NotepadAppendTool", _notepad_append, frozenset({"execution"}), "Append to the workspace notepad", frozenset({"filesystem_write"})),
-    ToolSpec("LoadSkillTool", build_load_skill_tool, frozenset({"execution"}), "Load a discovered Skill"),
-    ToolSpec("WebSearchTool", lambda _state: build_web_search_tool(), frozenset({"read_only"}), "Search the web", frozenset({"network"}), idempotent=True, read_only=True),
+    ToolSpec(
+        "FileReadTool",
+        _file_read,
+        frozenset({"execution", "read_only"}),
+        "Read a workspace file",
+        frozenset({"filesystem_read"}),
+        idempotent=True,
+        read_only=True,
+    ),
+    ToolSpec(
+        "FileWriteTool",
+        _file_write,
+        frozenset({"execution"}),
+        "Write a workspace file",
+        frozenset({"filesystem_write"}),
+    ),
+    ToolSpec(
+        "FileEditTool",
+        _file_edit,
+        frozenset({"execution"}),
+        "Edit a workspace file",
+        frozenset({"filesystem_write"}),
+    ),
+    ToolSpec(
+        "GrepTool",
+        _grep,
+        frozenset({"execution", "read_only"}),
+        "Search workspace files",
+        frozenset({"filesystem_read"}),
+        idempotent=True,
+        read_only=True,
+    ),
+    ToolSpec(
+        "BashTool",
+        _bash,
+        frozenset({"execution", "read_only"}),
+        "Run a workspace shell command",
+        frozenset({"shell"}),
+    ),
+    ToolSpec(
+        "NotepadReadTool",
+        _notepad_read,
+        frozenset({"execution", "read_only"}),
+        "Read the workspace notepad",
+        frozenset({"filesystem_read"}),
+        idempotent=True,
+        read_only=True,
+    ),
+    ToolSpec(
+        "NotepadAppendTool",
+        _notepad_append,
+        frozenset({"execution"}),
+        "Append to the workspace notepad",
+        frozenset({"filesystem_write"}),
+    ),
+    ToolSpec(
+        "LoadSkillTool",
+        build_load_skill_tool,
+        frozenset({"execution"}),
+        "Load a discovered Skill",
+    ),
+    ToolSpec(
+        "WebSearchTool",
+        lambda _state: build_web_search_tool(),
+        frozenset({"read_only"}),
+        "Search the web",
+        frozenset({"network"}),
+        idempotent=True,
+        read_only=True,
+    ),
     # TodoUpdateTool is constructed per CodeAgent invocation because its tool
     # function closes over that invocation's TODO list.
     ToolSpec("TodoUpdateTool", None, frozenset(), "Update a CodeAgent todo"),
     # Planner orchestration tools are constructed from graph state, but their
     # authorization metadata still lives in this registry.
     ToolSpec("TodoWriteTool", None, frozenset(), "Publish planner TODOs"),
-    ToolSpec("CallSubagentTool", None, frozenset(), "Delegate to a registered Subagent"),
-    ToolSpec("CallSearchAgentTool", None, frozenset(), "Delegate research to searchAgent"),
-    ToolSpec("CallCodeAgentTool", None, frozenset(), "Delegate implementation to codeAgent"),
+    ToolSpec(
+        "CallSubagentTool", None, frozenset(), "Delegate to a registered Subagent"
+    ),
+    ToolSpec(
+        "CallSearchAgentTool", None, frozenset(), "Delegate research to searchAgent"
+    ),
+    ToolSpec(
+        "CallCodeAgentTool", None, frozenset(), "Delegate implementation to codeAgent"
+    ),
 )
 
 
@@ -126,7 +197,9 @@ class ToolRegistry:
 
     def register(self, tool: BaseTool, spec: ToolSpec) -> None:
         if tool.name != spec.name:
-            raise ValueError(f"tool name {tool.name!r} does not match spec {spec.name!r}")
+            raise ValueError(
+                f"tool name {tool.name!r} does not match spec {spec.name!r}"
+            )
         if tool.name in self._tools:
             raise ValueError(f"duplicate tool registration: {tool.name}")
         schema = getattr(tool, "args_schema", None)
@@ -149,11 +222,19 @@ class ToolRegistry:
         return self._specs.get(name)
 
     def tools(self, profile: ToolProfile) -> list[BaseTool]:
-        return [tool for name, tool in self._tools.items() if profile in self._specs[name].profiles]
+        return [
+            tool
+            for name, tool in self._tools.items()
+            if profile in self._specs[name].profiles
+        ]
 
     def tool_schemas(self, profile: ToolProfile) -> list[dict[str, Any]]:
         return [
-            {"name": spec.name, "description": spec.description or tool.description, "input_schema": spec.input_schema or {}}
+            {
+                "name": spec.name,
+                "description": spec.description or tool.description,
+                "input_schema": spec.input_schema or {},
+            }
             for name, tool in self._tools.items()
             if profile in (spec := self._specs[name]).profiles
         ]
@@ -164,7 +245,14 @@ def tool_spec_for(name: str) -> ToolSpec | None:
         if spec.name == name:
             return spec
     if name.startswith("MCP_"):
-        return ToolSpec(name, None, frozenset({"execution"}), "MCP server tool", frozenset({"mcp"}), "ask")
+        return ToolSpec(
+            name,
+            None,
+            frozenset({"execution"}),
+            "MCP server tool",
+            frozenset({"mcp"}),
+            "ask",
+        )
     return None
 
 

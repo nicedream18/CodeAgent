@@ -6,7 +6,13 @@ import re
 from typing import Any
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage, SystemMessage, ToolMessage
+from langchain_core.messages import (
+    AIMessage,
+    HumanMessage,
+    RemoveMessage,
+    SystemMessage,
+    ToolMessage,
+)
 from langchain_core.tools import StructuredTool
 from langgraph.config import get_stream_writer
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
@@ -31,7 +37,7 @@ from mokioclaw.prompts.stage4 import CONTEXT_COMPRESSION_PROMPT
 from mokioclaw.providers.openai_provider import create_model
 from mokioclaw.providers.openai_provider import invoke_streaming
 from mokioclaw.tools import build_read_only_tools
-from mokioclaw.tools.execution import execute_tool
+from mokioclaw.tools.execution import execute_tool, tool_failure_result
 from mokioclaw.tools.todo_tool import persist_todos, write_todos
 
 
@@ -96,11 +102,14 @@ def intent_router_node(state: MokioGraphState) -> dict[str, Any]:
     reason = "router fallback: default to workflow"
     confidence = 0.0
     try:
-        response = invoke_streaming(create_model(),
+        response = invoke_streaming(
+            create_model(),
             [
                 SystemMessage(content=INTENT_ROUTER_PROMPT),
                 HumanMessage(content=_router_input(state)),
-            ], writer=writer, node="intent_router"
+            ],
+            writer=writer,
+            node="intent_router",
         )
         parsed = _extract_json(str(response.content)) or {}
         candidate = str(parsed.get("route", "")).strip().lower()
@@ -110,7 +119,10 @@ def intent_router_node(state: MokioGraphState) -> dict[str, Any]:
             confidence = parsed_confidence
             reason = str(parsed.get("reason") or "")
         else:
-            reason = str(parsed.get("reason") or "router returned low-confidence or invalid route")
+            reason = str(
+                parsed.get("reason")
+                or "router returned low-confidence or invalid route"
+            )
             confidence = parsed_confidence
     except Exception as exc:
         reason = f"router error: {type(exc).__name__}: {exc}"
@@ -136,11 +148,14 @@ def intent_route_fn(state: MokioGraphState) -> str:
 def chat_responder_node(state: MokioGraphState) -> dict[str, Any]:
     writer = _get_writer()
     try:
-        response = invoke_streaming(create_model(),
+        response = invoke_streaming(
+            create_model(),
             [
                 SystemMessage(content=CHAT_RESPONDER_PROMPT),
                 HumanMessage(content=_chat_input(state)),
-            ], writer=writer, node="chat_responder"
+            ],
+            writer=writer,
+            node="chat_responder",
         )
         text = str(getattr(response, "content", "") or "").strip()
     except Exception as exc:
@@ -203,7 +218,11 @@ def planner_node(state: MokioGraphState) -> dict[str, Any]:
             produced_messages.append(tool_message)
             messages.append(tool_message)
     else:
-        produced_messages.append(AIMessage(content="planner stopped after the maximum supervisor tool loop count."))
+        produced_messages.append(
+            AIMessage(
+                content="planner stopped after the maximum supervisor tool loop count."
+            )
+        )
 
     metadata = dict(working_state.get("metadata", {}))
     metadata["planner_raw"] = _last_ai_content(produced_messages)
@@ -220,7 +239,9 @@ def planner_node(state: MokioGraphState) -> dict[str, Any]:
         "last_actor_summary": working_state.get("code_agent_summary", ""),
         "messages": produced_messages,
         "memory_snapshot": final_memory,
-        "history_summary": final_memory.get("history_summary_store", {}).get("history_summary", ""),
+        "history_summary": final_memory.get("history_summary_store", {}).get(
+            "history_summary", ""
+        ),
         "metadata": metadata,
         "context_next_node": "verifier",
     }
@@ -257,7 +278,14 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
         if not tool_calls:
             break
         for call in tool_calls:
-            writer({"type": "tool_call", "node": "verifier", "name": call.get("name"), "args": call.get("args", {})})
+            writer(
+                {
+                    "type": "tool_call",
+                    "node": "verifier",
+                    "name": call.get("name"),
+                    "args": call.get("args", {}),
+                }
+            )
             tool_message = _execute_read_only_tool(state, call, on_retry=writer)
             event = _tool_result_event(tool_message, node="verifier")
             tool_events.append(event)
@@ -301,7 +329,9 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
         todos = [
             {
                 **todo,
-                "status": "completed" if todo.get("status") != "blocked" else todo.get("status", "blocked"),
+                "status": "completed"
+                if todo.get("status") != "blocked"
+                else todo.get("status", "blocked"),
                 "note": todo.get("note") or "verified",
             }
             for todo in todos
@@ -315,7 +345,9 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
                 "verification_commands": state.get("verification_commands", []),
             }
         )
-    last_error = "" if passed else _format_verifier_error(reason, recommended, tool_events)
+    last_error = (
+        "" if passed else _format_verifier_error(reason, recommended, tool_events)
+    )
 
     return {
         "messages": produced_messages,
@@ -327,15 +359,21 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
         "last_error": last_error,
         "todos": todos,
         "memory_snapshot": memory,
-        "history_summary": memory.get("history_summary_store", {}).get("history_summary", ""),
-        "context_next_node": verifier_route({**state, "passed": passed, "attempts": attempts}),
+        "history_summary": memory.get("history_summary_store", {}).get(
+            "history_summary", ""
+        ),
+        "context_next_node": verifier_route(
+            {**state, "passed": passed, "attempts": attempts}
+        ),
     }
 
 
 def context_monitor_node(state: MokioGraphState) -> dict[str, Any]:
     writer = _get_writer()
     configured_limit = get_context_token_limit()
-    configured_reserve = int(getattr(state.get("runtime"), "model_context_reserve_tokens", 0) or 0)
+    configured_reserve = int(
+        getattr(state.get("runtime"), "model_context_reserve_tokens", 0) or 0
+    )
     reserve = min(max(0, configured_reserve), max(0, configured_limit // 5))
     token_limit = max(1, configured_limit - reserve)
     token_count = estimate_context_tokens(state)
@@ -436,8 +474,14 @@ def final_node(state: MokioGraphState) -> dict[str, Any]:
         f"- {check.get('name', 'check')}: {'PASS' if check.get('passed') else 'FAIL'} - {check.get('detail', '')}"
         for check in state.get("verification_checks", [])
     )
-    todos = "\n".join(f"- [{todo.get('status', '')}] {todo.get('content', '')}" for todo in state.get("todos", []))
-    sources = "\n".join(f"- {source.get('title', '')}: {source.get('url', '')}" for source in state.get("sources", []))
+    todos = "\n".join(
+        f"- [{todo.get('status', '')}] {todo.get('content', '')}"
+        for todo in state.get("todos", [])
+    )
+    sources = "\n".join(
+        f"- {source.get('title', '')}: {source.get('url', '')}"
+        for source in state.get("sources", [])
+    )
     compression_events = state.get("compression_events", [])
     compression_text = "(none)"
     if compression_events:
@@ -473,7 +517,9 @@ def get_context_token_limit() -> int:
 def estimate_context_tokens(state: MokioGraphState) -> int:
     messages = list(state.get("messages", []))
     payload = build_layered_memory(state, node="context_monitor")
-    payload_message = HumanMessage(content=json.dumps(payload, ensure_ascii=False, default=str))
+    payload_message = HumanMessage(
+        content=json.dumps(payload, ensure_ascii=False, default=str)
+    )
     try:
         model = create_model()
         return int(model.get_num_tokens_from_messages(messages + [payload_message]))
@@ -488,8 +534,15 @@ def _build_planner_tools(state: MokioGraphState, writer) -> list[StructuredTool]
     return [
         StructuredTool.from_function(
             name="TodoWriteTool",
-            func=lambda todos, acceptance_criteria, verification_commands, plan_summary="": _todo_write_tool(
-                state, writer, todos, acceptance_criteria, verification_commands, plan_summary
+            func=lambda todos, acceptance_criteria, verification_commands, plan_summary="": (
+                _todo_write_tool(
+                    state,
+                    writer,
+                    todos,
+                    acceptance_criteria,
+                    verification_commands,
+                    plan_summary,
+                )
             ),
             description=(
                 "Publish or revise plan state. Args: todos, acceptance_criteria, "
@@ -498,7 +551,9 @@ def _build_planner_tools(state: MokioGraphState, writer) -> list[StructuredTool]
         ),
         StructuredTool.from_function(
             name="CallSubagentTool",
-            func=lambda subagent_name, instruction: _call_registered_subagent_tool(state, writer, subagent_name, instruction),
+            func=lambda subagent_name, instruction: _call_registered_subagent_tool(
+                state, writer, subagent_name, instruction
+            ),
             description=(
                 "Delegate a bounded task to a registered serial Subagent. Registered Subagents: "
                 + ", ".join(registry.names())
@@ -507,7 +562,9 @@ def _build_planner_tools(state: MokioGraphState, writer) -> list[StructuredTool]
         ),
         StructuredTool.from_function(
             name="CallSearchAgentTool",
-            func=lambda instruction: _call_search_agent_tool(state, writer, instruction),
+            func=lambda instruction: _call_search_agent_tool(
+                state, writer, instruction
+            ),
             description="Delegate research work to searchAgent. Args: instruction.",
         ),
         StructuredTool.from_function(
@@ -518,14 +575,20 @@ def _build_planner_tools(state: MokioGraphState, writer) -> list[StructuredTool]
     ]
 
 
-def _call_registered_subagent_tool(state: MokioGraphState, writer, subagent_name: str, instruction: str) -> dict[str, Any]:
+def _call_registered_subagent_tool(
+    state: MokioGraphState, writer, subagent_name: str, instruction: str
+) -> dict[str, Any]:
     name = str(subagent_name)
-    writer({"type": "handoff", "from": "planner", "to": name, "instruction": instruction})
+    writer(
+        {"type": "handoff", "from": "planner", "to": name, "instruction": instruction}
+    )
     result = run_subagent(state, name, instruction, writer=writer)
     summary = str(result.get("summary", ""))
     if name == "searchAgent":
         state["research_notes"] = _join_notes(state.get("research_notes", ""), summary)
-        state["sources"] = _dedupe_sources(list(state.get("sources", [])) + list(result.get("sources", [])))
+        state["sources"] = _dedupe_sources(
+            list(state.get("sources", [])) + list(result.get("sources", []))
+        )
     elif name == "codeAgent":
         state["todos"] = result.get("todos", state.get("todos", []))
         state["code_agent_summary"] = summary
@@ -537,8 +600,21 @@ def _call_registered_subagent_tool(state: MokioGraphState, writer, subagent_name
         "result": summary,
     }
     state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
-    writer({"type": "handoff_result", "from": name, "to": "planner", "result": summary, "evidence": result.get("evidence", []), "unresolved": result.get("unresolved", [])})
-    return {key: value for key, value in result.items() if key not in {"messages", "tool_events"}}
+    writer(
+        {
+            "type": "handoff_result",
+            "from": name,
+            "to": "planner",
+            "result": summary,
+            "evidence": result.get("evidence", []),
+            "unresolved": result.get("unresolved", []),
+        }
+    )
+    return {
+        key: value
+        for key, value in result.items()
+        if key not in {"messages", "tool_events"}
+    }
 
 
 def _todo_write_tool(
@@ -551,7 +627,9 @@ def _todo_write_tool(
 ) -> dict[str, Any]:
     result = write_todos(todos, acceptance_criteria, verification_commands)
     if result.get("ok"):
-        state["plan_summary"] = plan_summary or state.get("plan_summary") or "MultiAgent plan"
+        state["plan_summary"] = (
+            plan_summary or state.get("plan_summary") or "MultiAgent plan"
+        )
         state["todos"] = _todo_items(result["todos"], existing=state.get("todos", []))
         state["acceptance_criteria"] = result["acceptance_criteria"]
         state["verification_commands"] = result["verification_commands"]
@@ -579,16 +657,29 @@ def _todo_write_tool(
     }
 
 
-def _call_search_agent_tool(state: MokioGraphState, writer, instruction: str) -> dict[str, Any]:
-    writer({"type": "handoff", "from": "planner", "to": "searchAgent", "instruction": instruction})
+def _call_search_agent_tool(
+    state: MokioGraphState, writer, instruction: str
+) -> dict[str, Any]:
+    writer(
+        {
+            "type": "handoff",
+            "from": "planner",
+            "to": "searchAgent",
+            "instruction": instruction,
+        }
+    )
     result = (
         run_subagent(state, "searchAgent", instruction, writer=writer)
         if run_search_agent is _DEFAULT_SEARCH_AGENT
         else run_search_agent(state, instruction, writer=writer)
     )
     existing_sources = list(state.get("sources", []))
-    state["research_notes"] = _join_notes(state.get("research_notes", ""), result.get("summary", ""))
-    state["sources"] = _dedupe_sources(existing_sources + list(result.get("sources", [])))
+    state["research_notes"] = _join_notes(
+        state.get("research_notes", ""), result.get("summary", "")
+    )
+    state["sources"] = _dedupe_sources(
+        existing_sources + list(result.get("sources", []))
+    )
     handoff = {
         "from_agent": "planner",
         "to_agent": "searchAgent",
@@ -596,7 +687,14 @@ def _call_search_agent_tool(state: MokioGraphState, writer, instruction: str) ->
         "result": result.get("summary", ""),
     }
     state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
-    writer({"type": "handoff_result", "from": "searchAgent", "to": "planner", "result": result.get("summary", "")})
+    writer(
+        {
+            "type": "handoff_result",
+            "from": "searchAgent",
+            "to": "planner",
+            "result": result.get("summary", ""),
+        }
+    )
     return {
         "ok": True,
         "summary": result.get("summary", ""),
@@ -605,8 +703,17 @@ def _call_search_agent_tool(state: MokioGraphState, writer, instruction: str) ->
     }
 
 
-def _call_code_agent_tool(state: MokioGraphState, writer, instruction: str) -> dict[str, Any]:
-    writer({"type": "handoff", "from": "planner", "to": "codeAgent", "instruction": instruction})
+def _call_code_agent_tool(
+    state: MokioGraphState, writer, instruction: str
+) -> dict[str, Any]:
+    writer(
+        {
+            "type": "handoff",
+            "from": "planner",
+            "to": "codeAgent",
+            "instruction": instruction,
+        }
+    )
     result = (
         run_subagent(state, "codeAgent", instruction, writer=writer)
         if run_code_agent is _DEFAULT_CODE_AGENT
@@ -622,23 +729,43 @@ def _call_code_agent_tool(state: MokioGraphState, writer, instruction: str) -> d
         "result": result.get("summary", ""),
     }
     state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
-    writer({"type": "handoff_result", "from": "codeAgent", "to": "planner", "result": result.get("summary", "")})
-    return {"ok": True, "summary": result.get("summary", ""), "todos": state.get("todos", [])}
+    writer(
+        {
+            "type": "handoff_result",
+            "from": "codeAgent",
+            "to": "planner",
+            "result": result.get("summary", ""),
+        }
+    )
+    return {
+        "ok": True,
+        "summary": result.get("summary", ""),
+        "todos": state.get("todos", []),
+    }
 
 
-def _execute_planner_tool(state: MokioGraphState, writer, call: dict[str, Any]) -> ToolMessage:
+def _execute_planner_tool(
+    state: MokioGraphState, writer, call: dict[str, Any]
+) -> ToolMessage:
     name = call.get("name", "")
     args = call.get("args") or {}
     writer({"type": "tool_call", "node": "planner", "name": name, "args": args})
     tools = {tool.name: tool for tool in _build_planner_tools(state, writer)}
     tool = tools.get(name)
     if tool is None:
-        result = {"ok": False, "error": f"unknown tool: {name}"}
+        result = tool_failure_result(f"unknown tool: {name}", tool_name=name)
     else:
         try:
-            result = execute_tool(state["runtime"], tool, args, on_retry=writer, on_event=writer, tool_call_id=call.get("id"))
+            result = execute_tool(
+                state["runtime"],
+                tool,
+                args,
+                on_retry=writer,
+                on_event=writer,
+                tool_call_id=call.get("id"),
+            )
         except Exception as exc:
-            result = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+            result = tool_failure_result(exc, tool_name=name)
     tool_message = ToolMessage(
         content=json.dumps(result, ensure_ascii=False),
         name=name,
@@ -648,18 +775,27 @@ def _execute_planner_tool(state: MokioGraphState, writer, call: dict[str, Any]) 
     return tool_message
 
 
-def _execute_read_only_tool(state: MokioGraphState, call: dict[str, Any], *, on_retry=None) -> ToolMessage:
+def _execute_read_only_tool(
+    state: MokioGraphState, call: dict[str, Any], *, on_retry=None
+) -> ToolMessage:
     name = call.get("name", "")
     args = call.get("args") or {}
     tools = {tool.name: tool for tool in build_read_only_tools(state["runtime"])}
     tool = tools.get(name)
     if tool is None:
-        result = {"ok": False, "error": f"unknown tool: {name}"}
+        result = tool_failure_result(f"unknown tool: {name}", tool_name=name)
     else:
         try:
-            result = execute_tool(state["runtime"], tool, args, on_retry=on_retry, on_event=on_retry, tool_call_id=call.get("id"))
+            result = execute_tool(
+                state["runtime"],
+                tool,
+                args,
+                on_retry=on_retry,
+                on_event=on_retry,
+                tool_call_id=call.get("id"),
+            )
         except Exception as exc:
-            result = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+            result = tool_failure_result(exc, tool_name=name)
     return ToolMessage(
         content=json.dumps(result, ensure_ascii=False),
         name=name,
@@ -667,25 +803,33 @@ def _execute_read_only_tool(state: MokioGraphState, call: dict[str, Any], *, on_
     )
 
 
-def _compress_context_with_model(state: MokioGraphState, *, writer=None) -> dict[str, Any]:
+def _compress_context_with_model(
+    state: MokioGraphState, *, writer=None
+) -> dict[str, Any]:
     memory = build_layered_memory(state, node="context_compressor")
     payload = {
         "context_summary": state.get("context_summary", ""),
         "memory": memory,
-        "messages": [_message_snapshot(message) for message in state.get("messages", [])],
+        "messages": [
+            _message_snapshot(message) for message in state.get("messages", [])
+        ],
     }
     messages = [
         SystemMessage(content=CONTEXT_COMPRESSION_PROMPT),
         HumanMessage(content=json.dumps(payload, ensure_ascii=False, default=str)),
     ]
     try:
-        response = invoke_streaming(create_model(), messages, writer=writer, node="context_compressor")
+        response = invoke_streaming(
+            create_model(), messages, writer=writer, node="context_compressor"
+        )
         parsed = _extract_json(str(response.content))
         if parsed:
             return parsed
     except Exception as exc:
         return _fallback_compression(state, error=f"{type(exc).__name__}: {exc}")
-    return _fallback_compression(state, error="compressor model did not return valid JSON")
+    return _fallback_compression(
+        state, error="compressor model did not return valid JSON"
+    )
 
 
 def _fallback_compression(state: MokioGraphState, *, error: str = "") -> dict[str, Any]:
@@ -711,13 +855,18 @@ def _fallback_compression(state: MokioGraphState, *, error: str = "") -> dict[st
         ],
         "important_files": _important_files_from_state(state),
         "tool_findings": _short_text(state.get("last_error", ""), 1200),
-        "sources": [{"title": source.get("title", ""), "url": source.get("url", "")} for source in state.get("sources", [])],
+        "sources": [
+            {"title": source.get("title", ""), "url": source.get("url", "")}
+            for source in state.get("sources", [])
+        ],
         "next_steps": state.get("context_next_node", ""),
         "risks": error,
     }
 
 
-def _format_compressed_context(compressed: dict[str, Any], state: MokioGraphState) -> str:
+def _format_compressed_context(
+    compressed: dict[str, Any], state: MokioGraphState
+) -> str:
     payload = {
         "type": "mokio_context_summary",
         "task": state.get("task", ""),
@@ -773,16 +922,26 @@ def _planner_input(state: MokioGraphState, memory: dict[str, Any]) -> str:
         f"Attempt: {state.get('attempts', 0) + 1}",
     ]
     if state.get("session_context"):
-        parts.append("Session context for this multi-turn coding session:\n" + str(state.get("session_context", "")))
-    parts.append("Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory))
+        parts.append(
+            "Session context for this multi-turn coding session:\n"
+            + str(state.get("session_context", ""))
+        )
+    parts.append(
+        "Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory)
+    )
     return "\n\n".join(parts)
 
 
 def _verifier_input(state: MokioGraphState, memory: dict[str, Any]) -> str:
     parts = [f"Task: {state['task']}"]
     if state.get("session_context"):
-        parts.append("Session context for this multi-turn coding session:\n" + str(state.get("session_context", "")))
-    parts.append("Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory))
+        parts.append(
+            "Session context for this multi-turn coding session:\n"
+            + str(state.get("session_context", ""))
+        )
+    parts.append(
+        "Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory)
+    )
     parts.append("Inspect the workspace with tools and return only verifier JSON.")
     return "\n\n".join(parts)
 
@@ -812,16 +971,25 @@ def _default_plan(task: str) -> dict[str, Any]:
     return {
         "plan_summary": "Coordinate specialist agents to complete and verify the requested deliverable.",
         "todos": DEFAULT_TODOS,
-        "acceptance_criteria": ["The requested deliverable exists.", "The verifier model confirms completion."],
+        "acceptance_criteria": [
+            "The requested deliverable exists.",
+            "The verifier model confirms completion.",
+        ],
         "verification_commands": [],
     }
 
 
 def _apply_plan(state: MokioGraphState, plan: dict[str, Any]) -> None:
     state["plan_summary"] = str(plan.get("plan_summary", ""))
-    state["todos"] = _todo_items([str(item) for item in plan.get("todos", [])], existing=state.get("todos", []))
-    state["acceptance_criteria"] = [str(item) for item in plan.get("acceptance_criteria", [])]
-    state["verification_commands"] = _verification_commands_for_task(state["task"], plan)
+    state["todos"] = _todo_items(
+        [str(item) for item in plan.get("todos", [])], existing=state.get("todos", [])
+    )
+    state["acceptance_criteria"] = [
+        str(item) for item in plan.get("acceptance_criteria", [])
+    ]
+    state["verification_commands"] = _verification_commands_for_task(
+        state["task"], plan
+    )
 
 
 def _verification_commands_for_task(task: str, parsed: dict[str, Any]) -> list[str]:
@@ -830,7 +998,9 @@ def _verification_commands_for_task(task: str, parsed: dict[str, Any]) -> list[s
     return [str(item) for item in parsed.get("verification_commands") or []]
 
 
-def _todo_items(todos: list[str], *, existing: list[dict[str, Any]] | None = None) -> list[TodoItem]:
+def _todo_items(
+    todos: list[str], *, existing: list[dict[str, Any]] | None = None
+) -> list[TodoItem]:
     existing_by_content = {todo.get("content", ""): todo for todo in existing or []}
     items: list[TodoItem] = []
     for idx, todo in enumerate(todos, start=1):
@@ -873,10 +1043,18 @@ def _tool_result_event(tool_message: ToolMessage, *, node: str) -> dict[str, Any
         parsed = json.loads(str(tool_message.content))
     except json.JSONDecodeError:
         parsed = tool_message.content
-    return {"type": "tool_result", "node": node, "name": tool_message.name, "tool_call_id": tool_message.tool_call_id, "result": parsed}
+    return {
+        "type": "tool_result",
+        "node": node,
+        "name": tool_message.name,
+        "tool_call_id": tool_message.tool_call_id,
+        "result": parsed,
+    }
 
 
-def _tool_events_to_verification_results(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _tool_events_to_verification_results(
+    events: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     results = []
     for event in events:
         result = event.get("result", {})
@@ -910,7 +1088,9 @@ def _normalize_checks(raw: Any) -> list[VerificationCheck]:
     return checks
 
 
-def _format_verifier_error(reason: str, recommended: str, tool_events: list[dict[str, Any]]) -> str:
+def _format_verifier_error(
+    reason: str, recommended: str, tool_events: list[dict[str, Any]]
+) -> str:
     event_text = json.dumps(tool_events[-3:], ensure_ascii=False, default=str)[:1600]
     return (
         f"Verifier failed: {reason}\n"
@@ -982,7 +1162,12 @@ def _list_text(items: list[str]) -> str:
 
 def _is_amiya_task(task: str) -> bool:
     lowered = task.lower()
-    return "阿米娅" in task or "amiya" in lowered or "arknights" in lowered or "明日方舟" in task
+    return (
+        "阿米娅" in task
+        or "amiya" in lowered
+        or "arknights" in lowered
+        or "明日方舟" in task
+    )
 
 
 def _get_writer():

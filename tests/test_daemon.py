@@ -29,7 +29,9 @@ def test_daemon_requires_loopback_bind() -> None:
         AgentDaemon(Path("/tmp/unsafe-mokioclaw-daemon"), host="0.0.0.0")
 
 
-def test_daemon_runs_task_streams_events_and_roundtrips_approval(monkeypatch, tmp_path: Path) -> None:
+def test_daemon_runs_task_streams_events_and_roundtrips_approval(
+    monkeypatch, tmp_path: Path
+) -> None:
     import mokioclaw.core.agent as agent
 
     state_dir = tmp_path / "daemon"
@@ -39,27 +41,43 @@ def test_daemon_runs_task_streams_events_and_roundtrips_approval(monkeypatch, tm
 
     def fake_stream(task, *, approval_handler=None, **kwargs):
         assert task == "create a page"
-        decision = approval_handler(ApprovalRequest("approval-demo", "write page", "file write"))
+        decision = approval_handler(
+            ApprovalRequest("approval-demo", "write page", "file write")
+        )
         yield {"type": "workspace", "path": "/tmp/workspace"}
-        yield {"type": "custom_event", "event": {"type": "approval_result", "approved": decision.approved}}
+        yield {
+            "type": "custom_event",
+            "event": {"type": "approval_result", "approved": decision.approved},
+        }
 
     monkeypatch.setattr(agent, "stream_agent_events", fake_stream)
     approvals = []
     try:
-        events = list(run_via_daemon(
-            "run",
-            "create a page",
-            options={"approval_mode": "inline"},
-            approval_handler=lambda request: approvals.append(request) or ApprovalDecision(True),
-        ))
+        events = list(
+            run_via_daemon(
+                "run",
+                "create a page",
+                options={"approval_mode": "inline"},
+                approval_handler=lambda request: (
+                    approvals.append(request) or ApprovalDecision(True)
+                ),
+            )
+        )
         assert [event.get("type") for event in events] == ["workspace", "custom_event"]
         assert events[-1]["event"]["approved"] is True
         assert approvals and approvals[0].id == "approval-demo"
         status = daemon_status(start=False)
         assert status and len(status["runs"]) == 1
         run_dir = next((state_dir / "runs").iterdir())
-        persisted = [json.loads(line) for line in (run_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()]
-        assert any(item["event"].get("type") == "daemon_approval_request" for item in persisted)
+        persisted = [
+            json.loads(line)
+            for line in (run_dir / "events.jsonl")
+            .read_text(encoding="utf-8")
+            .splitlines()
+        ]
+        assert any(
+            item["event"].get("type") == "daemon_approval_request" for item in persisted
+        )
         assert [item["seq"] for item in persisted] == list(range(1, len(persisted) + 1))
     finally:
         stop_daemon()
@@ -87,12 +105,15 @@ def test_daemon_subscription_resumes_after_sequence(tmp_path: Path) -> None:
     run.status = "finished"
     daemon.runs[run.run_id] = run
     output = BytesIO()
-    response = daemon.dispatch({
-        "jsonrpc": "2.0",
-        "id": "subscribe-1",
-        "method": "subscribe",
-        "params": {"token": daemon.token, "run_id": run.run_id, "after_seq": 1},
-    }, output)
+    response = daemon.dispatch(
+        {
+            "jsonrpc": "2.0",
+            "id": "subscribe-1",
+            "method": "subscribe",
+            "params": {"token": daemon.token, "run_id": run.run_id, "after_seq": 1},
+        },
+        output,
+    )
     assert response is None
     messages = [json.loads(line) for line in output.getvalue().splitlines()]
     event_messages = [item for item in messages if item.get("method") == "event"]
@@ -100,20 +121,38 @@ def test_daemon_subscription_resumes_after_sequence(tmp_path: Path) -> None:
     assert messages[-1]["method"] == "stream_end"
 
 
-def test_daemon_rejects_approval_response_for_different_tool_call(tmp_path: Path) -> None:
+def test_daemon_rejects_approval_response_for_different_tool_call(
+    tmp_path: Path,
+) -> None:
     from mokioclaw.core.daemon import ApprovalWaiter, RunRecord
 
     daemon = AgentDaemon(tmp_path / "daemon")
     run = RunRecord("run-approval", tmp_path / "run-approval")
-    request = ApprovalRequest("approval-1", "file_path=page.html", "write", "FileWriteTool", "call-expected")
+    request = ApprovalRequest(
+        "approval-1", "file_path=page.html", "write", "FileWriteTool", "call-expected"
+    )
     run.waiters[request.id] = ApprovalWaiter(request)
     daemon.runs[run.run_id] = run
 
-    mismatch = daemon.resolve_approval({"run_id": run.run_id, "approval_id": request.id, "tool_call_id": "call-other", "approved": True})
+    mismatch = daemon.resolve_approval(
+        {
+            "run_id": run.run_id,
+            "approval_id": request.id,
+            "tool_call_id": "call-other",
+            "approved": True,
+        }
+    )
     assert mismatch["ok"] is False
     assert not run.waiters[request.id].event.is_set()
 
-    accepted = daemon.resolve_approval({"run_id": run.run_id, "approval_id": request.id, "tool_call_id": "call-expected", "approved": True})
+    accepted = daemon.resolve_approval(
+        {
+            "run_id": run.run_id,
+            "approval_id": request.id,
+            "tool_call_id": "call-expected",
+            "approved": True,
+        }
+    )
     assert accepted["ok"] is True
 
 
@@ -122,7 +161,9 @@ def test_daemon_disconnect_denies_pending_approval(tmp_path: Path, monkeypatch) 
 
     daemon = AgentDaemon(tmp_path / "daemon")
     run = RunRecord("run-disconnect", tmp_path / "run-disconnect")
-    request = ApprovalRequest("approval-disconnect", "command=deploy", "deploy", "BashTool", "call-deploy")
+    request = ApprovalRequest(
+        "approval-disconnect", "command=deploy", "deploy", "BashTool", "call-deploy"
+    )
     waiter = ApprovalWaiter(request)
     run.waiters[request.id] = waiter
     daemon.runs[run.run_id] = run
@@ -145,7 +186,9 @@ def test_daemon_disconnect_denies_pending_approval(tmp_path: Path, monkeypatch) 
     assert waiter.decision == ApprovalDecision(False, "Approval client disconnected.")
 
 
-def test_daemon_approval_timeout_denies_pending_call(monkeypatch, tmp_path: Path) -> None:
+def test_daemon_approval_timeout_denies_pending_call(
+    monkeypatch, tmp_path: Path
+) -> None:
     import mokioclaw.core.agent as agent
     from mokioclaw.core.daemon import RunRecord
 
@@ -153,8 +196,20 @@ def test_daemon_approval_timeout_denies_pending_call(monkeypatch, tmp_path: Path
     monkeypatch.setattr(threading.Event, "wait", lambda _self, timeout=None: False)
 
     def fake_stream(_task, *, approval_handler=None, **_kwargs):
-        decision = approval_handler(ApprovalRequest("approval-timeout", "write", "file write", "FileWriteTool", "call-timeout"))
-        yield {"type": "approval_result", "approved": decision.approved, "reason": decision.reason}
+        decision = approval_handler(
+            ApprovalRequest(
+                "approval-timeout",
+                "write",
+                "file write",
+                "FileWriteTool",
+                "call-timeout",
+            )
+        )
+        yield {
+            "type": "approval_result",
+            "approved": decision.approved,
+            "reason": decision.reason,
+        }
 
     monkeypatch.setattr(agent, "stream_agent_events", fake_stream)
     daemon = AgentDaemon(tmp_path / "daemon")
@@ -162,6 +217,10 @@ def test_daemon_approval_timeout_denies_pending_call(monkeypatch, tmp_path: Path
 
     daemon._run_task(record, "run", {"approval_mode": "inline", "task": "write a page"})
 
-    approval_result = next(item["event"] for item in record.events if item["event"].get("type") == "approval_result")
+    approval_result = next(
+        item["event"]
+        for item in record.events
+        if item["event"].get("type") == "approval_result"
+    )
     assert approval_result["approved"] is False
     assert approval_result["reason"] == "Approval request timed out."

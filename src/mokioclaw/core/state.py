@@ -35,6 +35,8 @@ class RuntimeState:
     trace_mode: str = "on"
     trace_id: str | None = None
     tool_policies: dict[str, str] = field(default_factory=dict)
+    bash_deny_patterns: list[str] = field(default_factory=list)
+    bash_allow_patterns: list[str] = field(default_factory=list)
     tool_retry_limit: int = 2
     context_output_limit_chars: int = 12000
     model_context_reserve_tokens: int = 8192

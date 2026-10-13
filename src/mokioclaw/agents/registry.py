@@ -24,23 +24,52 @@ class SubagentDefinition:
 def default_subagents() -> dict[str, SubagentDefinition]:
     return {
         "searchAgent": SubagentDefinition(
-            "searchAgent", "Research using web search", run_search_agent,
-            frozenset({"WebSearchTool"}), 4,
+            "searchAgent",
+            "Research using web search",
+            run_search_agent,
+            frozenset({"WebSearchTool"}),
+            4,
         ),
         "codeAgent": SubagentDefinition(
-            "codeAgent", "Implement and verify workspace changes", run_code_agent,
-            frozenset({"FileReadTool", "FileWriteTool", "FileEditTool", "GrepTool", "BashTool", "NotepadReadTool", "NotepadAppendTool", "LoadSkillTool", "TodoUpdateTool", "MCP_*"}), 10,
+            "codeAgent",
+            "Implement and verify workspace changes",
+            run_code_agent,
+            frozenset(
+                {
+                    "FileReadTool",
+                    "FileWriteTool",
+                    "FileEditTool",
+                    "GrepTool",
+                    "BashTool",
+                    "NotepadReadTool",
+                    "NotepadAppendTool",
+                    "LoadSkillTool",
+                    "TodoUpdateTool",
+                    "MCP_*",
+                }
+            ),
+            10,
         ),
     }
 
 
 class SubagentRegistry:
-    def __init__(self, definitions: dict[str, SubagentDefinition] | None = None) -> None:
+    def __init__(
+        self, definitions: dict[str, SubagentDefinition] | None = None
+    ) -> None:
         self._definitions = dict(definitions or {})
 
-    def register(self, definition: SubagentDefinition, *, replace: bool = False) -> None:
-        if not definition.name or not definition.allowed_tools or definition.max_tool_calls < 1:
-            raise ValueError("Subagent name, allowed_tools, and positive max_tool_calls are required")
+    def register(
+        self, definition: SubagentDefinition, *, replace: bool = False
+    ) -> None:
+        if (
+            not definition.name
+            or not definition.allowed_tools
+            or definition.max_tool_calls < 1
+        ):
+            raise ValueError(
+                "Subagent name, allowed_tools, and positive max_tool_calls are required"
+            )
         if definition.name in self._definitions and not replace:
             raise ValueError(f"Subagent is already registered: {definition.name}")
         self._definitions[definition.name] = definition
@@ -84,7 +113,9 @@ def parse_subagent_configs(raw: str | None) -> dict[str, dict[str, Any]]:
         if "max_tool_calls" in config:
             limit = int(config["max_tool_calls"])
             if not 1 <= limit <= 50:
-                raise ValueError(f"Subagent max_tool_calls for {name} must be between 1 and 50")
+                raise ValueError(
+                    f"Subagent max_tool_calls for {name} must be between 1 and 50"
+                )
             item["max_tool_calls"] = limit
         if "allowed_tools" in config:
             if not isinstance(config["allowed_tools"], list):
@@ -105,11 +136,23 @@ def run_subagent(
     registry = runtime.subagent_registry or _GLOBAL_REGISTRY
     definition = registry.get(name)
     if definition is None:
-        return {"ok": False, "error": f"unknown Subagent: {name}", "summary": "", "evidence": [], "unresolved": []}
+        return {
+            "ok": False,
+            "error": f"unknown Subagent: {name}",
+            "summary": "",
+            "evidence": [],
+            "unresolved": [],
+        }
     config = runtime.subagent_configs.get(name, {})
     configured_tools = set(config.get("allowed_tools", definition.allowed_tools))
     if not configured_tools.issubset(definition.allowed_tools):
-        return {"ok": False, "error": f"Subagent {name} requested tools outside its maximum scope", "summary": "", "evidence": [], "unresolved": []}
+        return {
+            "ok": False,
+            "error": f"Subagent {name} requested tools outside its maximum scope",
+            "summary": "",
+            "evidence": [],
+            "unresolved": [],
+        }
     previous_agent_tools = runtime.active_agent_tools
     previous_skill_tools = runtime.active_skill_tools
     previous_skill_permissions = runtime.active_skill_permissions
@@ -127,6 +170,16 @@ def run_subagent(
         **result,
         "agent": name,
         "summary": summary,
-        "evidence": result.get("evidence", result.get("sources", []) if name == "searchAgent" else result.get("tool_events", [])),
-        "unresolved": result.get("unresolved", [] if result.get("ok") else [str(result.get("error", "Subagent did not complete"))]),
+        "evidence": result.get(
+            "evidence",
+            result.get("sources", [])
+            if name == "searchAgent"
+            else result.get("tool_events", []),
+        ),
+        "unresolved": result.get(
+            "unresolved",
+            []
+            if result.get("ok")
+            else [str(result.get("error", "Subagent did not complete"))],
+        ),
     }

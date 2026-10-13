@@ -14,7 +14,15 @@ def create_model() -> ChatOpenAI:
     model = os.getenv("MODEL")
     base_url = os.getenv("BASE_URL")
 
-    missing = [name for name, value in {"API_KEY": api_key, "MODEL": model, "BASE_URL": base_url}.items() if not value]
+    missing = [
+        name
+        for name, value in {
+            "API_KEY": api_key,
+            "MODEL": model,
+            "BASE_URL": base_url,
+        }.items()
+        if not value
+    ]
     if missing:
         raise RuntimeError(f"missing required .env setting(s): {', '.join(missing)}")
 
@@ -26,7 +34,13 @@ def create_model() -> ChatOpenAI:
     )
 
 
-def invoke_streaming(runnable: Any, messages: list[Any], *, writer: Callable[[dict[str, Any]], None] | None = None, node: str = "") -> Any:
+def invoke_streaming(
+    runnable: Any,
+    messages: list[Any],
+    *,
+    writer: Callable[[dict[str, Any]], None] | None = None,
+    node: str = "",
+) -> Any:
     """Stream text chunks to runtime events while returning a normal message."""
     stream = getattr(runnable, "stream", None)
     if not callable(stream):
@@ -62,5 +76,9 @@ def _text_content(content: Any) -> str:
     if isinstance(content, str):
         return content
     if isinstance(content, list):
-        return "".join(str(item.get("text", "")) for item in content if isinstance(item, dict) and item.get("type") == "text")
+        return "".join(
+            str(item.get("text", ""))
+            for item in content
+            if isinstance(item, dict) and item.get("type") == "text"
+        )
     return ""

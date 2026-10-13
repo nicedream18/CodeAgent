@@ -38,7 +38,17 @@ def test_tui_options_are_accepted(monkeypatch) -> None:
 
     result = runner.invoke(
         app,
-        ["tui", "--trace-mode", "off", "--checkpoint-mode", "strict", "--approval-mode", "deny", "--workspace", "demo-workspace"],
+        [
+            "tui",
+            "--trace-mode",
+            "off",
+            "--checkpoint-mode",
+            "strict",
+            "--approval-mode",
+            "deny",
+            "--workspace",
+            "demo-workspace",
+        ],
     )
 
     assert result.exit_code == 0
@@ -82,7 +92,11 @@ def test_tui_renders_fake_stream_events(tmp_path) -> None:
     def fake_stream(*args, **kwargs):
         yield {
             "type": "custom_event",
-            "event": {"type": "session_started", "session_id": "session-demo", "workspace": str(tmp_path / "workspace-a")},
+            "event": {
+                "type": "session_started",
+                "session_id": "session-demo",
+                "workspace": str(tmp_path / "workspace-a"),
+            },
         }
         yield {"type": "workspace", "path": str(tmp_path / "workspace-a")}
         yield {
@@ -90,7 +104,9 @@ def test_tui_renders_fake_stream_events(tmp_path) -> None:
             "event": {
                 "type": "todo_update",
                 "plan_summary": "demo plan",
-                "todos": [{"id": "todo-1", "content": "write file", "status": "in_progress"}],
+                "todos": [
+                    {"id": "todo-1", "content": "write file", "status": "in_progress"}
+                ],
             },
         }
         yield {
@@ -160,18 +176,33 @@ def test_tui_chat_response_keeps_long_body_visible() -> None:
             app._handle_event(
                 {
                     "type": "custom_event",
-                    "event": {"type": "chat_response", "mode": "lightweight", "reason": "q&a", "response": body},
+                    "event": {
+                        "type": "chat_response",
+                        "mode": "lightweight",
+                        "reason": "q&a",
+                        "response": body,
+                    },
                 }
             )
             await pilot.pause(0.1)
             summary = summarize_event(
-                {"type": "custom_event", "event": {"type": "chat_response", "mode": "lightweight", "reason": "q&a", "response": body}}
+                {
+                    "type": "custom_event",
+                    "event": {
+                        "type": "chat_response",
+                        "mode": "lightweight",
+                        "reason": "q&a",
+                        "response": body,
+                    },
+                }
             )
             assert "DNSSEC" in app._compact_body(summary)
 
     asyncio.run(run())
 
-    summary = summarize_event({"type": "custom_event", "event": {"type": "chat_response", "response": body}})
+    summary = summarize_event(
+        {"type": "custom_event", "event": {"type": "chat_response", "response": body}}
+    )
     assert "DNSSEC" in summary.body
 
 
@@ -181,9 +212,28 @@ def test_tui_hides_low_level_entry_graph_updates() -> None:
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause(0.1)
             before = len(app.query_one("#events").children)
-            app._handle_event({"type": "graph_event", "event": {"intent_router": {"intent_route": "chat"}}})
-            app._handle_event({"type": "graph_event", "event": {"chat_responder": {"chat_response": "hi"}}})
-            app._handle_event({"type": "custom_event", "event": {"type": "session_turn_started", "turn": 1, "task": "hello"}})
+            app._handle_event(
+                {
+                    "type": "graph_event",
+                    "event": {"intent_router": {"intent_route": "chat"}},
+                }
+            )
+            app._handle_event(
+                {
+                    "type": "graph_event",
+                    "event": {"chat_responder": {"chat_response": "hi"}},
+                }
+            )
+            app._handle_event(
+                {
+                    "type": "custom_event",
+                    "event": {
+                        "type": "session_turn_started",
+                        "turn": 1,
+                        "task": "hello",
+                    },
+                }
+            )
             await pilot.pause(0.1)
             assert len(app.query_one("#events").children) == before
 
@@ -224,7 +274,9 @@ def test_tui_runs_multiple_tasks_in_same_session_workspace(tmp_path) -> None:
         yield {"type": "workspace", "path": str(kwargs["session_workspace"])}
 
     async def run() -> None:
-        app = MokioClawTuiApp(workspace=tmp_path / "session-workspace", stream_factory=fake_stream)
+        app = MokioClawTuiApp(
+            workspace=tmp_path / "session-workspace", stream_factory=fake_stream
+        )
         async with app.run_test(size=(100, 30)) as pilot:
             app.start_task("first")
             await pilot.pause(0.2)
@@ -242,7 +294,9 @@ def test_tui_runs_multiple_tasks_in_same_session_workspace(tmp_path) -> None:
 
 def test_tui_new_session_command_switches_workspace(tmp_path) -> None:
     async def run() -> None:
-        app = MokioClawTuiApp(workspace=tmp_path / "first", stream_factory=lambda *args, **kwargs: [])
+        app = MokioClawTuiApp(
+            workspace=tmp_path / "first", stream_factory=lambda *args, **kwargs: []
+        )
         async with app.run_test(size=(100, 30)) as pilot:
             old_workspace = app.session_workspace
             app.start_new_session()
@@ -254,7 +308,13 @@ def test_tui_new_session_command_switches_workspace(tmp_path) -> None:
 
 
 def test_approval_gate_returns_decision() -> None:
-    gate = ApprovalGate(ApprovalRequest(id="approval-demo", command="uv add fastapi", risk_reason="dependency change"))
+    gate = ApprovalGate(
+        ApprovalRequest(
+            id="approval-demo",
+            command="uv add fastapi",
+            risk_reason="dependency change",
+        )
+    )
 
     gate.resolve(True)
 

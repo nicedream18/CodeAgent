@@ -12,7 +12,9 @@ TEXT_ENCODINGS = ("utf-8", "utf-8-sig", "gbk")
 
 def _strip_workspace_prefix(file_path: str) -> str:
     normalized = file_path.replace("\\", "/").strip()
-    while normalized in {"workspace", "./workspace"} or normalized.startswith(("workspace/", "./workspace/")):
+    while normalized in {"workspace", "./workspace"} or normalized.startswith(
+        ("workspace/", "./workspace/")
+    ):
         if normalized in {"workspace", "./workspace"}:
             normalized = "."
         elif normalized.startswith("./workspace/"):
@@ -59,9 +61,15 @@ def read_file(
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
     if not path.exists():
-        return {"ok": False, "error": f"file does not exist: {display_path(state, path)}"}
+        return {
+            "ok": False,
+            "error": f"file does not exist: {display_path(state, path)}",
+        }
     if not path.is_file():
-        return {"ok": False, "error": f"path is not a file: {display_path(state, path)}"}
+        return {
+            "ok": False,
+            "error": f"path is not a file: {display_path(state, path)}",
+        }
     try:
         offset_value = int(offset)
         limit_value = int(limit)
@@ -79,7 +87,9 @@ def read_file(
     complete = offset_value == 0 and len(selected) == len(lines)
     state.record_read(path, complete=complete)
 
-    numbered = "\n".join(f"{offset_value + idx + 1}: {line}" for idx, line in enumerate(selected))
+    numbered = "\n".join(
+        f"{offset_value + idx + 1}: {line}" for idx, line in enumerate(selected)
+    )
     return {
         "ok": True,
         "path": display_path(state, path),
@@ -101,9 +111,15 @@ def write_file(state: RuntimeState, file_path: str, content: str) -> dict[str, A
     if existed:
         snapshot = state.snapshot_for(path)
         if snapshot is None:
-            return {"ok": False, "error": "file has not been read yet. Read it before overwriting."}
+            return {
+                "ok": False,
+                "error": "file has not been read yet. Read it before overwriting.",
+            }
         if path.stat().st_mtime_ns != snapshot.mtime_ns:
-            return {"ok": False, "error": "file changed after it was read. Read it again before writing."}
+            return {
+                "ok": False,
+                "error": "file changed after it was read. Read it again before writing.",
+            }
         original = read_text_lossy(path)
     else:
         original = ""
@@ -130,19 +146,30 @@ def write_file(state: RuntimeState, file_path: str, content: str) -> dict[str, A
     }
 
 
-def edit_file(state: RuntimeState, file_path: str, old_text: str, new_text: str) -> dict[str, Any]:
+def edit_file(
+    state: RuntimeState, file_path: str, old_text: str, new_text: str
+) -> dict[str, Any]:
     try:
         path = resolve_workspace_path(state, file_path)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
     if not path.exists():
-        return {"ok": False, "error": f"file does not exist: {display_path(state, path)}"}
+        return {
+            "ok": False,
+            "error": f"file does not exist: {display_path(state, path)}",
+        }
 
     snapshot = state.snapshot_for(path)
     if snapshot is None:
-        return {"ok": False, "error": "file has not been read yet. Read it before editing."}
+        return {
+            "ok": False,
+            "error": "file has not been read yet. Read it before editing.",
+        }
     if path.stat().st_mtime_ns != snapshot.mtime_ns:
-        return {"ok": False, "error": "file changed after it was read. Read it again before editing."}
+        return {
+            "ok": False,
+            "error": "file changed after it was read. Read it again before editing.",
+        }
     if not old_text:
         return {"ok": False, "error": "old_text must not be empty"}
 
@@ -151,7 +178,10 @@ def edit_file(state: RuntimeState, file_path: str, old_text: str, new_text: str)
     if count == 0:
         return {"ok": False, "error": "old_text was not found"}
     if count > 1:
-        return {"ok": False, "error": f"old_text matched {count} times. Provide a unique snippet."}
+        return {
+            "ok": False,
+            "error": f"old_text matched {count} times. Provide a unique snippet.",
+        }
 
     updated = original.replace(old_text, new_text, 1)
     path.write_text(updated, encoding="utf-8")

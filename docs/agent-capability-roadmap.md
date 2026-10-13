@@ -81,16 +81,25 @@ Python 扩展可以在创建 runtime 前注册自定义串行 Subagent：
 ```python
 from mokioclaw.agents.registry import SubagentDefinition, register_subagent
 
-def run_auditor(state, instruction, *, writer=None, max_loops=4):
-    return {"ok": True, "summary": f"Audited: {instruction}", "evidence": [], "unresolved": []}
 
-register_subagent(SubagentDefinition(
-    name="auditor",
-    description="Review a deliverable without modifying it",
-    runner=run_auditor,
-    allowed_tools=frozenset({"FileReadTool", "GrepTool"}),
-    max_tool_calls=4,
-))
+def run_auditor(state, instruction, *, writer=None, max_loops=4):
+    return {
+        "ok": True,
+        "summary": f"Audited: {instruction}",
+        "evidence": [],
+        "unresolved": [],
+    }
+
+
+register_subagent(
+    SubagentDefinition(
+        name="auditor",
+        description="Review a deliverable without modifying it",
+        runner=run_auditor,
+        allowed_tools=frozenset({"FileReadTool", "GrepTool"}),
+        max_tool_calls=4,
+    )
+)
 ```
 
 Planner 可通过 `CallSubagentTool` 按名称派发注册角色。内置 `CallSearchAgentTool` 和 `CallCodeAgentTool` 保留为兼容别名。

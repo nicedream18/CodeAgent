@@ -7,7 +7,9 @@ from mokioclaw.core.daemon import AgentDaemon
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the MokioClaw local Agent daemon.")
+    parser = argparse.ArgumentParser(
+        description="Run the MokioClaw local Agent daemon."
+    )
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)

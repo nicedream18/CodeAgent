@@ -22,7 +22,9 @@ def default_logo_path() -> Path:
     return find_project_root() / "assets" / "logo-no-words.png"
 
 
-def render_logo(path: Path | None = None, *, max_width: int = 36, max_rows: int = 12) -> Text:
+def render_logo(
+    path: Path | None = None, *, max_width: int = 36, max_rows: int = 12
+) -> Text:
     logo_path = path or default_logo_path()
     try:
         return _render_png_logo(str(logo_path), max_width=max_width, max_rows=max_rows)
@@ -85,7 +87,9 @@ def _pad_bottom(image: "Image.Image") -> "Image.Image":
     return padded
 
 
-def _pixel_char(upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]) -> str:
+def _pixel_char(
+    upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]
+) -> str:
     upper_visible = _visible(upper)
     lower_visible = _visible(lower)
     if upper_visible and lower_visible:
@@ -97,7 +101,9 @@ def _pixel_char(upper: tuple[int, int, int, int], lower: tuple[int, int, int, in
     return " "
 
 
-def _pixel_style(upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]) -> str:
+def _pixel_style(
+    upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]
+) -> str:
     upper_visible = _visible(upper)
     lower_visible = _visible(lower)
     if upper_visible and lower_visible:

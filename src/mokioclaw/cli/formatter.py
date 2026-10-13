@@ -37,7 +37,11 @@ def safe_secho(message: Any = "", **kwargs: Any) -> None:
 
 
 def _shorten(value: Any, limit: int = 260) -> str:
-    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, default=str)
+    text = (
+        value
+        if isinstance(value, str)
+        else json.dumps(value, ensure_ascii=False, default=str)
+    )
     if len(text) <= limit:
         return text
     return text[: limit - 3] + "..."
@@ -46,7 +50,14 @@ def _shorten(value: Any, limit: int = 260) -> str:
 def print_event(event: dict[str, Any]) -> None:
     event_type = event.get("type")
     if event_type == "workspace":
-        console.print(Panel(str(event["path"]), title="Workspace", border_style="blue", box=box.ROUNDED))
+        console.print(
+            Panel(
+                str(event["path"]),
+                title="Workspace",
+                border_style="blue",
+                box=box.ROUNDED,
+            )
+        )
         return
     if event_type == "custom_event":
         print_custom_event(event["event"])
@@ -119,10 +130,18 @@ def print_custom_event(event: dict[str, Any]) -> None:
         render_handoff_result(event)
         return
     if event_type == "search_results":
-        render_sources(event.get("sources", []), title=f"searchAgent · {event.get('query', '')}", answer=event.get("answer", ""))
+        render_sources(
+            event.get("sources", []),
+            title=f"searchAgent · {event.get('query', '')}",
+            answer=event.get("answer", ""),
+        )
         return
     if event_type == "search_summary":
-        render_sources(event.get("sources", []), title="searchAgent Summary", answer=event.get("summary", ""))
+        render_sources(
+            event.get("sources", []),
+            title="searchAgent Summary",
+            answer=event.get("summary", ""),
+        )
         return
     if event_type == "memory_snapshot":
         render_memory_snapshot(event)
@@ -152,7 +171,11 @@ def render_intent_decision(event: dict[str, Any]) -> None:
         f"reason: {_shorten(event.get('reason', ''), 600)}",
     ]
     style = "cyan" if event.get("route") == "chat" else "magenta"
-    console.print(Panel("\n".join(lines), title="Intent Router", border_style=style, box=box.ROUNDED))
+    console.print(
+        Panel(
+            "\n".join(lines), title="Intent Router", border_style=style, box=box.ROUNDED
+        )
+    )
 
 
 def render_chat_response(event: dict[str, Any]) -> None:
@@ -160,7 +183,9 @@ def render_chat_response(event: dict[str, Any]) -> None:
     reason = event.get("reason")
     if reason:
         lines.append(f"\nmode: {event.get('mode', 'lightweight')} | reason: {reason}")
-    console.print(Panel("\n".join(lines), title="MokioClaw", border_style="cyan", box=box.ROUNDED))
+    console.print(
+        Panel("\n".join(lines), title="MokioClaw", border_style="cyan", box=box.ROUNDED)
+    )
 
 
 def render_session_event(event: dict[str, Any]) -> None:
@@ -186,7 +211,9 @@ def render_session_event(event: dict[str, Any]) -> None:
             f"route: {event.get('route', '')}",
             f"summary: {event.get('summary_file', '')}",
         ]
-    console.print(Panel("\n".join(lines), title=title, border_style="cyan", box=box.ROUNDED))
+    console.print(
+        Panel("\n".join(lines), title=title, border_style="cyan", box=box.ROUNDED)
+    )
 
 
 def print_graph_event(payload: dict[str, Any]) -> None:
@@ -201,9 +228,17 @@ def print_graph_event(payload: dict[str, Any]) -> None:
         if node == "planner":
             render_plan(update, title="Planner", border_style="cyan")
         elif node in {"actor", "codeAgent"}:
-            summary = update.get("code_agent_summary") or update.get("last_actor_summary")
+            summary = update.get("code_agent_summary") or update.get(
+                "last_actor_summary"
+            )
             if summary:
-                console.print(Panel(_shorten(summary, 1200), title="codeAgent Summary", border_style="cyan"))
+                console.print(
+                    Panel(
+                        _shorten(summary, 1200),
+                        title="codeAgent Summary",
+                        border_style="cyan",
+                    )
+                )
         elif node == "verifier":
             render_verifier(update)
         elif node == "memory_snapshot":
@@ -215,10 +250,14 @@ def print_graph_event(payload: dict[str, Any]) -> None:
         elif node == "final":
             render_final(update)
         else:
-            console.print(Panel(_shorten(update, 1200), title=str(node), box=box.ROUNDED))
+            console.print(
+                Panel(_shorten(update, 1200), title=str(node), box=box.ROUNDED)
+            )
 
 
-def render_plan(update: dict[str, Any], *, title: str, border_style: str = "cyan") -> None:
+def render_plan(
+    update: dict[str, Any], *, title: str, border_style: str = "cyan"
+) -> None:
     plan = update.get("plan_summary", "")
     todos = update.get("todos", [])
     commands = update.get("verification_commands", [])
@@ -232,7 +271,9 @@ def render_plan(update: dict[str, Any], *, title: str, border_style: str = "cyan
         status = todo.get("status", "pending")
         table.add_row(
             todo.get("id", ""),
-            Text(STATUS_SYMBOLS.get(status, "[?]"), style=STATUS_STYLES.get(status, "")),
+            Text(
+                STATUS_SYMBOLS.get(status, "[?]"), style=STATUS_STYLES.get(status, "")
+            ),
             todo.get("content", ""),
             todo.get("note", ""),
         )
@@ -257,12 +298,20 @@ def render_verifier(update: dict[str, Any]) -> None:
     if checks:
         for check in checks:
             ok = bool(check.get("passed"))
-            status = Text("PASS" if ok else "FAIL", style="bold green" if ok else "bold red")
-            table.add_row(check.get("name", "check"), status, _shorten(check.get("detail", ""), 260))
+            status = Text(
+                "PASS" if ok else "FAIL", style="bold green" if ok else "bold red"
+            )
+            table.add_row(
+                check.get("name", "check"),
+                status,
+                _shorten(check.get("detail", ""), 260),
+            )
     else:
         for result in update.get("verification_results", []):
             ok = bool(result.get("ok"))
-            status = Text("PASS" if ok else "FAIL", style="bold green" if ok else "bold red")
+            status = Text(
+                "PASS" if ok else "FAIL", style="bold green" if ok else "bold red"
+            )
             output = result.get("stdout") or result.get("stderr") or ""
             table.add_row(result.get("command", ""), status, _shorten(output, 260))
     footer = f"passed={update.get('passed')} | attempts={update.get('attempts')}"
@@ -272,13 +321,23 @@ def render_verifier(update: dict[str, Any]) -> None:
         panel_grid.add_row(Text(_shorten(summary, 600), style="bold"))
     panel_grid.add_row(table)
     panel_grid.add_row(Text(footer, style="yellow"))
-    console.print(Panel(panel_grid, title="Verifier", border_style="green" if update.get("passed") else "red"))
+    console.print(
+        Panel(
+            panel_grid,
+            title="Verifier",
+            border_style="green" if update.get("passed") else "red",
+        )
+    )
 
 
 def render_final(update: dict[str, Any]) -> None:
     answer = update.get("final_answer", "")
     style = "green" if "PASSED" in answer else "red"
-    console.print(Panel(_shorten(answer, 2000), title="Final", border_style=style, box=box.ROUNDED))
+    console.print(
+        Panel(
+            _shorten(answer, 2000), title="Final", border_style=style, box=box.ROUNDED
+        )
+    )
 
 
 def render_context_monitor(update: dict[str, Any]) -> None:
@@ -318,7 +377,14 @@ def render_context_compression(update: dict[str, Any]) -> None:
     summary = event.get("summary")
     if summary:
         lines.append("summary:\n" + _shorten(summary, 900))
-    console.print(Panel("\n".join(lines), title="Context Compression", border_style="yellow", box=box.ROUNDED))
+    console.print(
+        Panel(
+            "\n".join(lines),
+            title="Context Compression",
+            border_style="yellow",
+            box=box.ROUNDED,
+        )
+    )
 
 
 def render_memory_snapshot(update: dict[str, Any]) -> None:
@@ -341,7 +407,9 @@ def render_memory_snapshot(update: dict[str, Any]) -> None:
     body = Table.grid(expand=True)
     body.add_row(table)
     body.add_row(Text(footer, style="yellow"))
-    console.print(Panel(body, title="Memory Snapshot", border_style="cyan", box=box.ROUNDED))
+    console.print(
+        Panel(body, title="Memory Snapshot", border_style="cyan", box=box.ROUNDED)
+    )
 
 
 def render_checkpoint_saved(event: dict[str, Any]) -> None:
@@ -357,7 +425,14 @@ def render_checkpoint_saved(event: dict[str, Any]) -> None:
     if event.get("git_error"):
         lines.append(f"git_error: {_shorten(event.get('git_error'), 180)}")
     style = "yellow" if event.get("status") == "interrupted" else "blue"
-    console.print(Panel("\n".join(lines), title="Checkpoint Saved", border_style=style, box=box.ROUNDED))
+    console.print(
+        Panel(
+            "\n".join(lines),
+            title="Checkpoint Saved",
+            border_style=style,
+            box=box.ROUNDED,
+        )
+    )
 
 
 def render_checkpoint_resumed(event: dict[str, Any]) -> None:
@@ -369,12 +444,23 @@ def render_checkpoint_resumed(event: dict[str, Any]) -> None:
     ]
     if event.get("reason"):
         lines.append(f"reason: {_shorten(event.get('reason'), 300)}")
-    console.print(Panel("\n".join(lines), title="Checkpoint Resumed", border_style="green", box=box.ROUNDED))
+    console.print(
+        Panel(
+            "\n".join(lines),
+            title="Checkpoint Resumed",
+            border_style="green",
+            box=box.ROUNDED,
+        )
+    )
 
 
 def render_trace_summary(event: dict[str, Any]) -> None:
-    node_visits = event.get("node_visits") if isinstance(event.get("node_visits"), dict) else {}
-    node_text = ", ".join(f"{node}:{count}" for node, count in node_visits.items()) or "(none)"
+    node_visits = (
+        event.get("node_visits") if isinstance(event.get("node_visits"), dict) else {}
+    )
+    node_text = (
+        ", ".join(f"{node}:{count}" for node, count in node_visits.items()) or "(none)"
+    )
     lines = [
         f"trace: {event.get('trace_id', '')}",
         f"status: {event.get('status', '')}",
@@ -390,7 +476,11 @@ def render_trace_summary(event: dict[str, Any]) -> None:
     if errors:
         lines.append("errors: " + _shorten(errors, 260))
     style = "green" if event.get("status") == "finished" else "yellow"
-    console.print(Panel("\n".join(lines), title="Trace Summary", border_style=style, box=box.ROUNDED))
+    console.print(
+        Panel(
+            "\n".join(lines), title="Trace Summary", border_style=style, box=box.ROUNDED
+        )
+    )
 
 
 def _format_args(args: Any) -> str:
@@ -444,15 +534,31 @@ def _format_tool_result(result: Any) -> str:
 
 def render_handoff(event: dict[str, Any]) -> None:
     title = f"Handoff · {event.get('from', 'agent')} -> {event.get('to', 'agent')}"
-    console.print(Panel(_shorten(event.get("instruction", ""), 900), title=title, border_style="blue", box=box.ROUNDED))
+    console.print(
+        Panel(
+            _shorten(event.get("instruction", ""), 900),
+            title=title,
+            border_style="blue",
+            box=box.ROUNDED,
+        )
+    )
 
 
 def render_handoff_result(event: dict[str, Any]) -> None:
     title = f"Return · {event.get('from', 'agent')} -> {event.get('to', 'agent')}"
-    console.print(Panel(_shorten(event.get("result", ""), 1200), title=title, border_style="cyan", box=box.ROUNDED))
+    console.print(
+        Panel(
+            _shorten(event.get("result", ""), 1200),
+            title=title,
+            border_style="cyan",
+            box=box.ROUNDED,
+        )
+    )
 
 
-def render_sources(sources: list[dict[str, Any]], *, title: str, answer: str = "") -> None:
+def render_sources(
+    sources: list[dict[str, Any]], *, title: str, answer: str = ""
+) -> None:
     table = Table(box=box.SIMPLE_HEAVY, header_style="bold")
     table.add_column("Title")
     table.add_column("URL")

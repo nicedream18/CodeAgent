@@ -56,7 +56,9 @@ class RunRecord:
 
 
 class AgentDaemon:
-    def __init__(self, state_dir: Path, host: str = "127.0.0.1", port: int = 8765) -> None:
+    def __init__(
+        self, state_dir: Path, host: str = "127.0.0.1", port: int = 8765
+    ) -> None:
         if host not in {"127.0.0.1", "localhost", "::1"}:
             raise ValueError("MokioClaw daemon only binds to loopback interfaces")
         self.state_dir = state_dir.expanduser()
@@ -75,7 +77,9 @@ class AgentDaemon:
                 pass
         self.runs: dict[str, RunRecord] = {}
         self.lock = threading.Lock()
-        self.executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="mokioclaw-run")
+        self.executor = ThreadPoolExecutor(
+            max_workers=4, thread_name_prefix="mokioclaw-run"
+        )
         self.server = None
 
     def run(self) -> None:
@@ -90,10 +94,28 @@ class AgentDaemon:
                     request = json.loads(line)
                     response = daemon.dispatch(request, self.wfile)
                     if response is not None:
-                        self.wfile.write(json.dumps(response, ensure_ascii=False, default=str).encode() + b"\n")
+                        self.wfile.write(
+                            json.dumps(
+                                response, ensure_ascii=False, default=str
+                            ).encode()
+                            + b"\n"
+                        )
                         self.wfile.flush()
                 except Exception as exc:
-                    self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": None, "error": {"code": -32603, "message": f"{type(exc).__name__}: {exc}"}}, ensure_ascii=False).encode() + b"\n")
+                    self.wfile.write(
+                        json.dumps(
+                            {
+                                "jsonrpc": "2.0",
+                                "id": None,
+                                "error": {
+                                    "code": -32603,
+                                    "message": f"{type(exc).__name__}: {exc}",
+                                },
+                            },
+                            ensure_ascii=False,
+                        ).encode()
+                        + b"\n"
+                    )
                     self.wfile.flush()
 
         class Server(socketserver.ThreadingTCPServer):
@@ -104,7 +126,9 @@ class AgentDaemon:
             self.server = server
             self.port = server.server_address[1]
             self.state_dir.mkdir(parents=True, exist_ok=True)
-            (self.state_dir / "address.json").write_text(json.dumps({"host": self.host, "port": self.port}), encoding="utf-8")
+            (self.state_dir / "address.json").write_text(
+                json.dumps({"host": self.host, "port": self.port}), encoding="utf-8"
+            )
             try:
                 (self.state_dir / "pid").write_text(str(os.getpid()), encoding="utf-8")
             except OSError:
@@ -123,7 +147,9 @@ class AgentDaemon:
         request_id = request.get("id")
         if request.get("jsonrpc") != "2.0" or not isinstance(request_id, (int, str)):
             return _error(request_id, -32600, "invalid JSON-RPC request")
-        params = request.get("params") if isinstance(request.get("params"), dict) else {}
+        params = (
+            request.get("params") if isinstance(request.get("params"), dict) else {}
+        )
         if not secrets.compare_digest(str(params.get("token", "")), self.token):
             return _error(request_id, -32001, "unauthorized local client")
         method = request.get("method")
@@ -135,7 +161,13 @@ class AgentDaemon:
         if method == "resolve_approval":
             return _result(request_id, self.resolve_approval(params))
         if method == "status":
-            return _result(request_id, {"pid": os.getpid(), "runs": {key: run.status for key, run in self.runs.items()}})
+            return _result(
+                request_id,
+                {
+                    "pid": os.getpid(),
+                    "runs": {key: run.status for key, run in self.runs.items()},
+                },
+            )
         if method == "shutdown":
             if self.server is not None:
                 threading.Thread(target=self.server.shutdown, daemon=True).start()
@@ -144,12 +176,19 @@ class AgentDaemon:
 
     def start_run(self, params: dict[str, Any]) -> str:
         mode = str(params.get("mode", "run"))
-        options = params.get("options") if isinstance(params.get("options"), dict) else {}
+        options = (
+            params.get("options") if isinstance(params.get("options"), dict) else {}
+        )
         run_id = f"run-{uuid4().hex[:12]}"
         record = RunRecord(run_id, self.runs_dir / run_id)
         with self.lock:
             self.runs[run_id] = record
-        (record.root / "run.json").write_text(json.dumps({"mode": mode, "options": options, "status": "running"}, indent=2), encoding="utf-8")
+        (record.root / "run.json").write_text(
+            json.dumps(
+                {"mode": mode, "options": options, "status": "running"}, indent=2
+            ),
+            encoding="utf-8",
+        )
         self.executor.submit(self._run_task, record, mode, options)
         return run_id
 
@@ -159,43 +198,67 @@ class AgentDaemon:
         def approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             waiter = ApprovalWaiter(request)
             record.waiters[request.id] = waiter
-            record.append({"type": "daemon_approval_request", "request": asdict(request)})
+            record.append(
+                {"type": "daemon_approval_request", "request": asdict(request)}
+            )
             try:
-                approval_timeout_seconds = max(1.0, float(os.getenv("MOKIO_APPROVAL_TIMEOUT_SECONDS", "300")))
+                approval_timeout_seconds = max(
+                    1.0, float(os.getenv("MOKIO_APPROVAL_TIMEOUT_SECONDS", "300"))
+                )
             except ValueError:
                 approval_timeout_seconds = 300.0
             if not waiter.event.wait(timeout=approval_timeout_seconds):
                 record.waiters.pop(request.id, None)
                 return ApprovalDecision(False, "Approval request timed out.")
             record.waiters.pop(request.id, None)
-            return waiter.decision or ApprovalDecision(False, "Approval was not resolved.")
+            return waiter.decision or ApprovalDecision(
+                False, "Approval was not resolved."
+            )
 
         try:
             from mokioclaw.core.agent import stream_agent_events, stream_session_events
 
-            path_options = {key: Path(value) if value else None for key, value in options.items() if key in {"workspace", "resume_workspace", "session_workspace"}}
-            common = {key: value for key, value in options.items() if key not in path_options and key != "task"}
-            common["approval_handler"] = approval_handler if common.get("approval_mode", "inline") == "inline" else None
+            path_options = {
+                key: Path(value) if value else None
+                for key, value in options.items()
+                if key in {"workspace", "resume_workspace", "session_workspace"}
+            }
+            common = {
+                key: value
+                for key, value in options.items()
+                if key not in path_options and key != "task"
+            }
+            common["approval_handler"] = (
+                approval_handler
+                if common.get("approval_mode", "inline") == "inline"
+                else None
+            )
             stream = stream_session_events if mode == "session" else stream_agent_events
             for event in stream(options.get("task"), **common, **path_options):
                 record.append(event)
             record.status = "finished"
         except BaseException as exc:
-            record.append({"type": "daemon_run_error", "error": f"{type(exc).__name__}: {exc}"})
+            record.append(
+                {"type": "daemon_run_error", "error": f"{type(exc).__name__}: {exc}"}
+            )
             record.status = "failed"
         finally:
             try:
                 metadata_path = record.root / "run.json"
                 payload = json.loads(metadata_path.read_text(encoding="utf-8"))
                 payload["status"] = record.status
-                metadata_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+                metadata_path.write_text(
+                    json.dumps(payload, indent=2), encoding="utf-8"
+                )
             except (OSError, json.JSONDecodeError):
                 pass
             record.append({"type": "daemon_run_finished", "status": record.status})
             with record.condition:
                 record.condition.notify_all()
 
-    def subscribe(self, request_id: Any, params: dict[str, Any], output) -> dict[str, Any] | None:
+    def subscribe(
+        self, request_id: Any, params: dict[str, Any], output
+    ) -> dict[str, Any] | None:
         run_id = str(params.get("run_id", ""))
         with self.lock:
             record = self.runs.get(run_id)
@@ -205,7 +268,13 @@ class AgentDaemon:
             record.subscribers += 1
         disconnected = False
         try:
-            output.write(json.dumps(_result(request_id, {"run_id": run_id, "status": record.status}), ensure_ascii=False).encode() + b"\n")
+            output.write(
+                json.dumps(
+                    _result(request_id, {"run_id": run_id, "status": record.status}),
+                    ensure_ascii=False,
+                ).encode()
+                + b"\n"
+            )
             output.flush()
             cursor = max(0, int(params.get("after_seq", 0)))
             while True:
@@ -221,11 +290,28 @@ class AgentDaemon:
                     pending = record.events[cursor:]
                     status = record.status
                 for item in pending:
-                    output.write(json.dumps({"jsonrpc": "2.0", "method": "event", "params": item}, ensure_ascii=False, default=str).encode() + b"\n")
+                    output.write(
+                        json.dumps(
+                            {"jsonrpc": "2.0", "method": "event", "params": item},
+                            ensure_ascii=False,
+                            default=str,
+                        ).encode()
+                        + b"\n"
+                    )
                     output.flush()
                     cursor = int(item["seq"])
                 if status != "running" and cursor >= len(record.events):
-                    output.write(json.dumps({"jsonrpc": "2.0", "method": "stream_end", "params": {"run_id": run_id, "status": status}}, ensure_ascii=False).encode() + b"\n")
+                    output.write(
+                        json.dumps(
+                            {
+                                "jsonrpc": "2.0",
+                                "method": "stream_end",
+                                "params": {"run_id": run_id, "status": status},
+                            },
+                            ensure_ascii=False,
+                        ).encode()
+                        + b"\n"
+                    )
                     output.flush()
                     return None
         except (BrokenPipeError, ConnectionError, OSError):
@@ -236,7 +322,9 @@ class AgentDaemon:
                 record.subscribers = max(0, record.subscribers - 1)
                 if disconnected and record.subscribers == 0:
                     for waiter in record.waiters.values():
-                        waiter.decision = ApprovalDecision(False, "Approval client disconnected.")
+                        waiter.decision = ApprovalDecision(
+                            False, "Approval client disconnected."
+                        )
                         waiter.event.set()
 
     def resolve_approval(self, params: dict[str, Any]) -> dict[str, Any]:
@@ -246,9 +334,18 @@ class AgentDaemon:
         if waiter is None:
             return {"ok": False, "error": "approval request is no longer pending"}
         tool_call_id = str(params.get("tool_call_id", ""))
-        if tool_call_id and waiter.request.tool_call_id and tool_call_id != waiter.request.tool_call_id:
-            return {"ok": False, "error": "approval response does not match the pending tool call"}
-        waiter.decision = ApprovalDecision(bool(params.get("approved")), str(params.get("reason", "")))
+        if (
+            tool_call_id
+            and waiter.request.tool_call_id
+            and tool_call_id != waiter.request.tool_call_id
+        ):
+            return {
+                "ok": False,
+                "error": "approval response does not match the pending tool call",
+            }
+        waiter.decision = ApprovalDecision(
+            bool(params.get("approved")), str(params.get("reason", ""))
+        )
         waiter.event.set()
         return {"ok": True}
 
@@ -258,6 +355,8 @@ def _result(request_id: Any, result: Any) -> dict[str, Any]:
 
 
 def _error(request_id: Any, code: int, message: str) -> dict[str, Any]:
-    return {"jsonrpc": "2.0", "id": request_id, "error": {"code": code, "message": message}}
-
-
+    return {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "error": {"code": code, "message": message},
+    }

@@ -92,8 +92,13 @@ def save_session(workspace: Path, session: dict[str, Any]) -> dict[str, Any]:
     session["updated_at"] = utc_now()
     path = session_file(workspace)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(session, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
-    session_summary_file(workspace).write_text(build_session_summary_markdown(workspace, session), encoding="utf-8")
+    path.write_text(
+        json.dumps(session, ensure_ascii=False, indent=2, default=str) + "\n",
+        encoding="utf-8",
+    )
+    session_summary_file(workspace).write_text(
+        build_session_summary_markdown(workspace, session), encoding="utf-8"
+    )
     return session
 
 
@@ -103,27 +108,49 @@ def compact_session_history(workspace: Path, *, keep_recent: int = 4) -> dict[st
     session = load_or_create_session(workspace)
     turns = list(session.get("recent_turns", []))
     if len(turns) <= keep_recent:
-        return {"ok": True, "compacted": 0, "kept": len(turns), "summary": session.get("summary", "")}
+        return {
+            "ok": True,
+            "compacted": 0,
+            "kept": len(turns),
+            "summary": session.get("summary", ""),
+        }
     older, kept = turns[:-keep_recent], turns[-keep_recent:]
     additions = []
     for turn in older:
         role = turn.get("role", "")
         route = f"/{turn.get('route')}" if turn.get("route") else ""
         summary = turn.get("summary") or turn.get("content", "")
-        additions.append(f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}")
-    session["summary"] = trim_text("\n".join(part for part in [str(session.get("summary", "")), *additions] if part), MAX_SESSION_SUMMARY)
+        additions.append(
+            f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}"
+        )
+    session["summary"] = trim_text(
+        "\n".join(
+            part for part in [str(session.get("summary", "")), *additions] if part
+        ),
+        MAX_SESSION_SUMMARY,
+    )
     session["recent_turns"] = kept
     save_session(workspace, session)
-    return {"ok": True, "compacted": len(older), "kept": len(kept), "summary": session.get("summary", "")}
+    return {
+        "ok": True,
+        "compacted": len(older),
+        "kept": len(kept),
+        "summary": session.get("summary", ""),
+    }
 
 
-def build_session_context(workspace: Path, session: dict[str, Any] | None = None) -> str:
-    session = _normalize_session(session or load_or_create_session(workspace), workspace)
+def build_session_context(
+    workspace: Path, session: dict[str, Any] | None = None
+) -> str:
+    session = _normalize_session(
+        session or load_or_create_session(workspace), workspace
+    )
     manifest = workspace_manifest(workspace, limit=40)
     files = [
         item.get("path", "")
         for item in manifest
-        if item.get("type") == "file" and not str(item.get("path", "")).startswith(".mokioclaw/session/")
+        if item.get("type") == "file"
+        and not str(item.get("path", "")).startswith(".mokioclaw/session/")
     ][:30]
     recent_turns = [
         {
@@ -146,10 +173,15 @@ def build_session_context(workspace: Path, session: dict[str, Any] | None = None
         "recent_turns": recent_turns,
         "recent_files": files,
     }
-    return trim_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), MAX_SESSION_CONTEXT)
+    return trim_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, default=str),
+        MAX_SESSION_CONTEXT,
+    )
 
 
-def session_started_event(workspace: Path, session: dict[str, Any], *, resumed: bool = False) -> dict[str, Any]:
+def session_started_event(
+    workspace: Path, session: dict[str, Any], *, resumed: bool = False
+) -> dict[str, Any]:
     return {
         "type": "session_started",
         "session_id": session.get("session_id", ""),
@@ -161,7 +193,9 @@ def session_started_event(workspace: Path, session: dict[str, Any], *, resumed: 
     }
 
 
-def session_turn_started_event(workspace: Path, session: dict[str, Any], *, turn: int, task: str) -> dict[str, Any]:
+def session_turn_started_event(
+    workspace: Path, session: dict[str, Any], *, turn: int, task: str
+) -> dict[str, Any]:
     return {
         "type": "session_turn_started",
         "session_id": session.get("session_id", ""),
@@ -171,7 +205,9 @@ def session_turn_started_event(workspace: Path, session: dict[str, Any], *, turn
     }
 
 
-def session_turn_saved_event(workspace: Path, session: dict[str, Any], *, turn: int, route: str) -> dict[str, Any]:
+def session_turn_saved_event(
+    workspace: Path, session: dict[str, Any], *, turn: int, route: str
+) -> dict[str, Any]:
     return {
         "type": "session_turn_saved",
         "session_id": session.get("session_id", ""),
@@ -203,7 +239,9 @@ def build_session_summary_markdown(workspace: Path, session: dict[str, Any]) -> 
     for turn in session.get("recent_turns", [])[-MAX_RECENT_TURNS:]:
         role = turn.get("role", "")
         route = f" / {turn.get('route')}" if turn.get("route") else ""
-        lines.append(f"- turn {turn.get('turn')}: {role}{route}: {trim_text(str(turn.get('content', '')), 260)}")
+        lines.append(
+            f"- turn {turn.get('turn')}: {role}{route}: {trim_text(str(turn.get('content', '')), 260)}"
+        )
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -250,14 +288,18 @@ def _compact_session(session: dict[str, Any]) -> None:
     turns = list(session.get("recent_turns", []))
     if len(turns) <= MAX_RECENT_TURNS:
         return
-    older = turns[: -MAX_RECENT_TURNS]
+    older = turns[:-MAX_RECENT_TURNS]
     kept = turns[-MAX_RECENT_TURNS:]
     additions = []
     for turn in older:
         role = turn.get("role", "")
         route = f"/{turn.get('route')}" if turn.get("route") else ""
         summary = turn.get("summary") or turn.get("content", "")
-        additions.append(f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}")
+        additions.append(
+            f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}"
+        )
     existing = str(session.get("summary", ""))
-    session["summary"] = trim_text("\n".join(part for part in [existing, *additions] if part), MAX_SESSION_SUMMARY)
+    session["summary"] = trim_text(
+        "\n".join(part for part in [existing, *additions] if part), MAX_SESSION_SUMMARY
+    )
     session["recent_turns"] = kept

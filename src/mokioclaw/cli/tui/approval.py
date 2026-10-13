@@ -28,7 +28,9 @@ class ApprovalGate:
 
     def wait(self) -> ApprovalDecision:
         self._ready.wait()
-        return self.decision or ApprovalDecision(approved=False, reason="Approval dialog closed.")
+        return self.decision or ApprovalDecision(
+            approved=False, reason="Approval dialog closed."
+        )
 
 
 class ApprovalModal(ModalScreen[bool]):
@@ -79,10 +81,14 @@ class ApprovalModal(ModalScreen[bool]):
 
     def compose(self) -> ComposeResult:
         with Container(id="approval-dialog"):
-            yield Static(f"Human Approval · {self.request.tool_name}", id="approval-title")
+            yield Static(
+                f"Human Approval · {self.request.tool_name}", id="approval-title"
+            )
             yield Static(f"Risk: {self.request.risk_reason}")
             yield Static(f"Workspace: {self.workspace}")
-            yield Static(Text(self.request.command, overflow="fold"), id="approval-command")
+            yield Static(
+                Text(self.request.command, overflow="fold"), id="approval-command"
+            )
             yield Static("Approve this tool call?  y/Enter = approve · n/Esc = deny")
             with Horizontal(id="approval-buttons"):
                 yield Button("Approve", variant="success", id="approve")

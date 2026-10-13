@@ -9,11 +9,20 @@ from langchain_core.tools import StructuredTool
 from mokioclaw.core.state import RuntimeState
 
 
-VALID_SKILL_PERMISSIONS = {"filesystem_read", "filesystem_write", "shell", "network", "mcp"}
+VALID_SKILL_PERMISSIONS = {
+    "filesystem_read",
+    "filesystem_write",
+    "shell",
+    "network",
+    "mcp",
+}
 
 
 def skill_roots(runtime: RuntimeState) -> list[Path]:
-    roots = [runtime.workspace / ".mokioclaw" / "skills", Path.home() / ".mokioclaw" / "skills"]
+    roots = [
+        runtime.workspace / ".mokioclaw" / "skills",
+        Path.home() / ".mokioclaw" / "skills",
+    ]
     return list(dict.fromkeys(root.resolve() for root in roots))
 
 
@@ -27,7 +36,13 @@ def discover_skills(runtime: RuntimeState) -> list[dict[str, Any]]:
             try:
                 skill = parse_skill(path)
             except (OSError, ValueError) as exc:
-                skills.append({"name": path.parent.name, "description": f"Invalid skill: {exc}", "valid": False})
+                skills.append(
+                    {
+                        "name": path.parent.name,
+                        "description": f"Invalid skill: {exc}",
+                        "valid": False,
+                    }
+                )
                 continue
             if skill["name"] not in seen:
                 seen.add(skill["name"])
@@ -81,16 +96,32 @@ def parse_skill(path: Path) -> dict[str, Any]:
 
 
 def load_skill(runtime: RuntimeState, name: str) -> dict[str, Any]:
-    skill = next((item for item in discover_skills(runtime) if item.get("valid") and item["name"] == name), None)
+    skill = next(
+        (
+            item
+            for item in discover_skills(runtime)
+            if item.get("valid") and item["name"] == name
+        ),
+        None,
+    )
     if skill is None:
-        return {"ok": False, "error": f"skill not found or invalid: {name}", "error_type": "invalid_input", "retryable": False}
+        return {
+            "ok": False,
+            "error": f"skill not found or invalid: {name}",
+            "error_type": "invalid_input",
+            "retryable": False,
+        }
     runtime.active_skill_tools = set(skill["tools"]) if skill["tools"] else None
-    runtime.active_skill_permissions = set(skill["permissions"]) if skill["permissions"] else None
+    runtime.active_skill_permissions = (
+        set(skill["permissions"]) if skill["permissions"] else None
+    )
     return {"ok": True, **skill}
 
 
 def skill_summaries(runtime: RuntimeState) -> str:
-    rows = [f"- {item['name']}: {item['description']}" for item in discover_skills(runtime)]
+    rows = [
+        f"- {item['name']}: {item['description']}" for item in discover_skills(runtime)
+    ]
     return "\n".join(rows) if rows else "(no Skills discovered)"
 
 

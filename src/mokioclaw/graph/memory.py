@@ -36,7 +36,9 @@ MAX_TEXT_CHARS = {
 }
 
 
-def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[str, Any]:
+def build_layered_memory(
+    state: dict[str, Any], *, node: str = "graph"
+) -> dict[str, Any]:
     runtime = state["runtime"]
     notepad = read_notepad(runtime)
     history = read_history_summary(runtime)
@@ -52,18 +54,28 @@ def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[
         "task": state.get("task", ""),
         "session_id": state.get("session_id", ""),
         "session_turn": state.get("session_turn", 0),
-        "session_context": _short_text(state.get("session_context", ""), MAX_TEXT_CHARS["session_context"]),
+        "session_context": _short_text(
+            state.get("session_context", ""), MAX_TEXT_CHARS["session_context"]
+        ),
         "plan_summary": state.get("plan_summary", ""),
         "todos": state.get("todos", []),
         "acceptance_criteria": state.get("acceptance_criteria", []),
         "verification_commands": state.get("verification_commands", []),
-        "research_notes": _short_text(state.get("research_notes", ""), MAX_TEXT_CHARS["research_notes"]),
+        "research_notes": _short_text(
+            state.get("research_notes", ""), MAX_TEXT_CHARS["research_notes"]
+        ),
         "sources": sources,
         "agent_handoffs": _trim_handoffs(state.get("agent_handoffs", [])),
-        "code_agent_summary": _short_text(state.get("code_agent_summary", ""), MAX_TEXT_CHARS["code_agent_summary"]),
-        "verifier_summary": _short_text(state.get("verifier_summary", ""), MAX_TEXT_CHARS["verifier_summary"]),
+        "code_agent_summary": _short_text(
+            state.get("code_agent_summary", ""), MAX_TEXT_CHARS["code_agent_summary"]
+        ),
+        "verifier_summary": _short_text(
+            state.get("verifier_summary", ""), MAX_TEXT_CHARS["verifier_summary"]
+        ),
         "verification_checks": state.get("verification_checks", []),
-        "last_error": _short_text(state.get("last_error", ""), MAX_TEXT_CHARS["last_error"]),
+        "last_error": _short_text(
+            state.get("last_error", ""), MAX_TEXT_CHARS["last_error"]
+        ),
         "attempts": state.get("attempts", 0),
         "max_attempts": state.get("max_attempts", 3),
         "context_next_node": state.get("context_next_node", ""),
@@ -72,11 +84,15 @@ def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[
     history_summary_store = {
         "history_path": HISTORY_SUMMARY_FILE,
         "history_exists": history.get("exists", False),
-        "history_summary": _short_text(history_summary, MAX_TEXT_CHARS["history_summary"]),
+        "history_summary": _short_text(
+            history_summary, MAX_TEXT_CHARS["history_summary"]
+        ),
         "notepad_path": NOTEPAD_FILE,
         "notepad_exists": notepad.get("exists", False),
         "notepad": _short_text(notepad.get("content", ""), MAX_TEXT_CHARS["notepad"]),
-        "context_summary": _short_text(state.get("context_summary", ""), MAX_TEXT_CHARS["context_summary"]),
+        "context_summary": _short_text(
+            state.get("context_summary", ""), MAX_TEXT_CHARS["context_summary"]
+        ),
         "compression_events": state.get("compression_events", [])[-3:],
     }
     return {
@@ -114,20 +130,36 @@ def memory_event(memory: dict[str, Any], *, node: str) -> dict[str, Any]:
 def read_history_summary(state: RuntimeState) -> dict[str, Any]:
     path = state.assert_workspace_path(state.workspace / HISTORY_SUMMARY_FILE)
     if not path.exists():
-        return {"ok": True, "path": HISTORY_SUMMARY_FILE, "content": "", "exists": False}
+        return {
+            "ok": True,
+            "path": HISTORY_SUMMARY_FILE,
+            "content": "",
+            "exists": False,
+        }
     content = read_text_lossy(path)
     state.record_read(path, complete=True)
-    return {"ok": True, "path": HISTORY_SUMMARY_FILE, "content": content, "exists": True}
+    return {
+        "ok": True,
+        "path": HISTORY_SUMMARY_FILE,
+        "content": content,
+        "exists": True,
+    }
 
 
 def persist_history_summary(state: RuntimeState, summary: str) -> dict[str, Any]:
     path = state.assert_workspace_path(state.workspace / HISTORY_SUMMARY_FILE)
     path.parent.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    content = f"# MokioClaw History Summary\n\n_Updated: {timestamp}_\n\n{summary.strip()}\n"
+    content = (
+        f"# MokioClaw History Summary\n\n_Updated: {timestamp}_\n\n{summary.strip()}\n"
+    )
     path.write_text(content, encoding="utf-8")
     state.record_read(path, complete=True)
-    return {"ok": True, "path": HISTORY_SUMMARY_FILE, "lines": len(content.splitlines())}
+    return {
+        "ok": True,
+        "path": HISTORY_SUMMARY_FILE,
+        "lines": len(content.splitlines()),
+    }
 
 
 def _event_layer_summary(layer: dict[str, Any]) -> str:
@@ -148,7 +180,10 @@ def _trim_handoffs(handoffs: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     str(handoff.get("instruction", "")),
                     MAX_TEXT_CHARS["agent_handoff_instruction"],
                 ),
-                "result": _short_text(str(handoff.get("result", "")), MAX_TEXT_CHARS["agent_handoff_result"]),
+                "result": _short_text(
+                    str(handoff.get("result", "")),
+                    MAX_TEXT_CHARS["agent_handoff_result"],
+                ),
             }
         )
     return trimmed

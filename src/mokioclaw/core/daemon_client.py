@@ -14,7 +14,9 @@ from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 
 
 def daemon_state_dir() -> Path:
-    return Path(os.getenv("MOKIO_DAEMON_DIR", str(Path.home() / ".mokioclaw" / "daemon"))).expanduser()
+    return Path(
+        os.getenv("MOKIO_DAEMON_DIR", str(Path.home() / ".mokioclaw" / "daemon"))
+    ).expanduser()
 
 
 def ensure_daemon(*, start: bool = True) -> dict[str, Any] | None:
@@ -42,7 +44,9 @@ def ensure_daemon(*, start: bool = True) -> dict[str, Any] | None:
             if not lock_path.exists():
                 return ensure_daemon(start=True)
             time.sleep(0.1)
-        raise RuntimeError(f"Timed out waiting for MokioClaw daemon startup lock: {lock_path}")
+        raise RuntimeError(
+            f"Timed out waiting for MokioClaw daemon startup lock: {lock_path}"
+        )
     os.close(lock_fd)
     host = "127.0.0.1"
     port = int(os.getenv("MOKIO_DAEMON_PORT", "8765"))
@@ -50,7 +54,17 @@ def ensure_daemon(*, start: bool = True) -> dict[str, Any] | None:
     try:
         with log_path.open("ab") as log_handle:
             subprocess.Popen(
-                [sys.executable, "-m", "mokioclaw.daemon", "--state-dir", str(state_dir), "--host", host, "--port", str(port)],
+                [
+                    sys.executable,
+                    "-m",
+                    "mokioclaw.daemon",
+                    "--state-dir",
+                    str(state_dir),
+                    "--host",
+                    host,
+                    "--port",
+                    str(port),
+                ],
                 stdin=subprocess.DEVNULL,
                 stdout=log_handle,
                 stderr=subprocess.STDOUT,
@@ -94,7 +108,10 @@ def run_via_daemon(
     approval_handler=None,
 ) -> Iterator[dict[str, Any]]:
     address = ensure_daemon(start=True)
-    serialized = {key: str(value) if isinstance(value, Path) else value for key, value in options.items()}
+    serialized = {
+        key: str(value) if isinstance(value, Path) else value
+        for key, value in options.items()
+    }
     serialized["task"] = task
     started = _request(address, "start_run", {"mode": mode, "options": serialized})
     run_id = started["run_id"]
@@ -102,9 +119,16 @@ def run_via_daemon(
     while True:
         request_id = uuid4().hex
         try:
-            with socket.create_connection((address["host"], int(address["port"])), timeout=5) as sock:
+            with socket.create_connection(
+                (address["host"], int(address["port"])), timeout=5
+            ) as sock:
                 stream = sock.makefile("rwb", buffering=0)
-                _write_request(stream, "subscribe", {"run_id": run_id, "after_seq": after_seq}, request_id)
+                _write_request(
+                    stream,
+                    "subscribe",
+                    {"run_id": run_id, "after_seq": after_seq},
+                    request_id,
+                )
                 while True:
                     line = stream.readline(4 * 1024 * 1024)
                     if not line:
@@ -114,27 +138,42 @@ def run_via_daemon(
                     message = json.loads(line)
                     if message.get("id") == request_id:
                         if "error" in message:
-                            raise RuntimeError(message["error"].get("message", "subscribe failed"))
+                            raise RuntimeError(
+                                message["error"].get("message", "subscribe failed")
+                            )
                         continue
                     if message.get("method") == "event":
                         item = message.get("params", {})
                         after_seq = max(after_seq, int(item.get("seq", 0)))
                         event = item.get("event", {})
-                        if isinstance(event, dict) and event.get("type") == "daemon_approval_request":
+                        if (
+                            isinstance(event, dict)
+                            and event.get("type") == "daemon_approval_request"
+                        ):
                             raw_request = event.get("request", {})
                             request = ApprovalRequest(**raw_request)
                             if approval_handler:
                                 decision = approval_handler(request)
-                                decision = decision if isinstance(decision, ApprovalDecision) else ApprovalDecision(bool(decision))
+                                decision = (
+                                    decision
+                                    if isinstance(decision, ApprovalDecision)
+                                    else ApprovalDecision(bool(decision))
+                                )
                             else:
-                                decision = ApprovalDecision(False, "No approval handler is connected.")
-                            _request(address, "resolve_approval", {
-                                "run_id": run_id,
-                                "approval_id": request.id,
-                                "tool_call_id": request.tool_call_id,
-                                "approved": decision.approved,
-                                "reason": decision.reason,
-                            })
+                                decision = ApprovalDecision(
+                                    False, "No approval handler is connected."
+                                )
+                            _request(
+                                address,
+                                "resolve_approval",
+                                {
+                                    "run_id": run_id,
+                                    "approval_id": request.id,
+                                    "tool_call_id": request.tool_call_id,
+                                    "approved": decision.approved,
+                                    "reason": decision.reason,
+                                },
+                            )
                             continue
                         yield event
                     elif message.get("method") == "stream_end":
@@ -143,16 +182,22 @@ def run_via_daemon(
             time.sleep(0.2)
             refreshed = ensure_daemon(start=False)
             if not refreshed:
-                raise RuntimeError("MokioClaw daemon disconnected while a task was running")
+                raise RuntimeError(
+                    "MokioClaw daemon disconnected while a task was running"
+                )
             address = refreshed
 
 
-def _request(address: dict[str, Any], method: str, params: dict[str, Any]) -> dict[str, Any]:
+def _request(
+    address: dict[str, Any], method: str, params: dict[str, Any]
+) -> dict[str, Any]:
     token_path = daemon_state_dir() / "auth.token"
     token = token_path.read_text(encoding="utf-8").strip()
     request_id = uuid4().hex
     params = {**params, "token": token}
-    with socket.create_connection((address["host"], int(address["port"])), timeout=10) as sock:
+    with socket.create_connection(
+        (address["host"], int(address["port"])), timeout=10
+    ) as sock:
         stream = sock.makefile("rwb", buffering=0)
         _write_request(stream, method, params, request_id)
         line = stream.readline(1024 * 1024)
@@ -164,8 +209,15 @@ def _request(address: dict[str, Any], method: str, params: dict[str, Any]) -> di
     return response.get("result", {})
 
 
-def _write_request(stream, method: str, params: dict[str, Any], request_id: str) -> None:
-    request = {"jsonrpc": "2.0", "id": request_id, "method": method, "params": {**params, "token": _token()}}
+def _write_request(
+    stream, method: str, params: dict[str, Any], request_id: str
+) -> None:
+    request = {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "method": method,
+        "params": {**params, "token": _token()},
+    }
     stream.write(json.dumps(request, ensure_ascii=False).encode() + b"\n")
 
 

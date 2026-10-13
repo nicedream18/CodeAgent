@@ -21,8 +21,18 @@ def test_render_plan_handles_todo_table(capsys) -> None:
         {
             "plan_summary": "demo plan",
             "todos": [
-                {"id": "todo-1", "content": "write tests", "status": "completed", "note": "done"},
-                {"id": "todo-2", "content": "implement", "status": "in_progress", "note": ""},
+                {
+                    "id": "todo-1",
+                    "content": "write tests",
+                    "status": "completed",
+                    "note": "done",
+                },
+                {
+                    "id": "todo-2",
+                    "content": "implement",
+                    "status": "in_progress",
+                    "note": "",
+                },
             ],
             "verification_commands": ["python -m pytest -q"],
         },
@@ -37,7 +47,13 @@ def test_render_plan_handles_todo_table(capsys) -> None:
 
 def test_render_sources_handles_source_table(capsys) -> None:
     render_sources(
-        [{"title": "Amiya", "url": "https://example.com/amiya", "content": "Arknights character"}],
+        [
+            {
+                "title": "Amiya",
+                "url": "https://example.com/amiya",
+                "content": "Arknights character",
+            }
+        ],
         title="searchAgent",
         answer="Amiya summary",
     )
@@ -53,7 +69,9 @@ def test_render_verifier_handles_model_checks(capsys) -> None:
             "passed": True,
             "attempts": 1,
             "verifier_summary": "looks good",
-            "verification_checks": [{"name": "html", "passed": True, "detail": "file exists"}],
+            "verification_checks": [
+                {"name": "html", "passed": True, "detail": "file exists"}
+            ],
         }
     )
 

@@ -36,7 +36,9 @@ class CheckpointManager:
     def __init__(self, runtime: Any, task: str = "") -> None:
         self.runtime = runtime
         self.workspace = runtime.workspace
-        self.mode = normalize_checkpoint_mode(getattr(runtime, "checkpoint_mode", "light"))
+        self.mode = normalize_checkpoint_mode(
+            getattr(runtime, "checkpoint_mode", "light")
+        )
         self.task = task
         self.root = checkpoint_dir(self.workspace)
 
@@ -64,9 +66,18 @@ class CheckpointManager:
 
         manifest = workspace_manifest(self.workspace)
         git_commit, git_error = snapshot_workspace_git(self.workspace, self.root)
-        payload = self._payload(state, status=status, latest_node=latest_node, manifest=manifest, git_commit=git_commit, git_error=git_error)
+        payload = self._payload(
+            state,
+            status=status,
+            latest_node=latest_node,
+            manifest=manifest,
+            git_commit=git_commit,
+            git_error=git_error,
+        )
         _write_json(self.root / CHECKPOINT_FILE, payload)
-        (self.root / RECOVERY_FILE).write_text(build_recovery_markdown(payload), encoding="utf-8")
+        (self.root / RECOVERY_FILE).write_text(
+            build_recovery_markdown(payload), encoding="utf-8"
+        )
 
         return checkpoint_saved_event(payload)
 
@@ -100,7 +111,9 @@ class CheckpointManager:
             "checkpoint_file": str(self.root / CHECKPOINT_FILE),
             "recovery_file": str(self.root / RECOVERY_FILE),
             "state_file": str(self.root / STATE_FILE) if self.mode == "strict" else "",
-            "events_file": str(self.root / EVENTS_FILE) if self.mode == "strict" else "",
+            "events_file": str(self.root / EVENTS_FILE)
+            if self.mode == "strict"
+            else "",
             "task": task,
             "latest_node": latest_node or "",
             "next_node": state.get("context_next_node", ""),
@@ -159,12 +172,16 @@ def load_resume_inputs(
     task: str | None = None,
     max_attempts: int = 3,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    requested_mode = normalize_checkpoint_mode(getattr(runtime, "checkpoint_mode", "light"))
+    requested_mode = normalize_checkpoint_mode(
+        getattr(runtime, "checkpoint_mode", "light")
+    )
     if requested_mode == "strict":
         try:
             state = load_strict_state(runtime, max_attempts=max_attempts)
         except Exception as exc:
-            inputs = build_light_resume_inputs(runtime, task=task, max_attempts=max_attempts)
+            inputs = build_light_resume_inputs(
+                runtime, task=task, max_attempts=max_attempts
+            )
             event = checkpoint_resumed_event(
                 workspace=runtime.workspace,
                 mode="light",
@@ -208,7 +225,9 @@ def load_strict_state(runtime: Any, *, max_attempts: int = 3) -> dict[str, Any]:
     return state
 
 
-def build_light_resume_inputs(runtime: Any, *, task: str | None = None, max_attempts: int = 3) -> dict[str, Any]:
+def build_light_resume_inputs(
+    runtime: Any, *, task: str | None = None, max_attempts: int = 3
+) -> dict[str, Any]:
     checkpoint = read_checkpoint(runtime.workspace)
     recovery = read_checkpoint_text(runtime.workspace, RECOVERY_FILE)
     todo = read_workspace_text(runtime.workspace, "TODO.md")
@@ -216,7 +235,9 @@ def build_light_resume_inputs(runtime: Any, *, task: str | None = None, max_atte
     history = read_workspace_text(runtime.workspace, "HISTORY_SUMMARY.md")
 
     original_task = str(checkpoint.get("task") or "").strip()
-    resume_task = normalize_resume_task(task.strip() if isinstance(task, str) and task.strip() else original_task)
+    resume_task = normalize_resume_task(
+        task.strip() if isinstance(task, str) and task.strip() else original_task
+    )
     if not resume_task:
         resume_task = "Continue the interrupted MokioClaw task from the checkpoint."
     else:
@@ -232,8 +253,12 @@ def build_light_resume_inputs(runtime: Any, *, task: str | None = None, max_atte
         "## HISTORY_SUMMARY.md",
         history,
     ]
-    context_summary = trim_text("\n\n".join(part for part in context_parts if part), MAX_RECOVERY_TEXT)
-    summary = checkpoint.get("summary") if isinstance(checkpoint.get("summary"), dict) else {}
+    context_summary = trim_text(
+        "\n\n".join(part for part in context_parts if part), MAX_RECOVERY_TEXT
+    )
+    summary = (
+        checkpoint.get("summary") if isinstance(checkpoint.get("summary"), dict) else {}
+    )
 
     inputs: dict[str, Any] = {
         "task": resume_task,
@@ -286,7 +311,9 @@ def read_checkpoint_text(workspace: Path, name: str) -> str:
     if not path.exists():
         return ""
     try:
-        return trim_text(path.read_text(encoding="utf-8", errors="replace"), MAX_RECOVERY_TEXT)
+        return trim_text(
+            path.read_text(encoding="utf-8", errors="replace"), MAX_RECOVERY_TEXT
+        )
     except OSError:
         return ""
 
@@ -331,7 +358,11 @@ def serialize_message(message: Any) -> dict[str, Any]:
 
 
 def deserialize_messages(messages: list[Any]) -> list[BaseMessage]:
-    typed_messages = [message for message in messages if isinstance(message, dict) and "type" in message and "data" in message]
+    typed_messages = [
+        message
+        for message in messages
+        if isinstance(message, dict) and "type" in message and "data" in message
+    ]
     if len(typed_messages) != len(messages):
         return []
     return list(messages_from_dict(typed_messages))
@@ -351,7 +382,10 @@ def state_summary(state: dict[str, Any]) -> dict[str, Any]:
         "sources": json_safe(sources[:10] if isinstance(sources, list) else []),
         "source_count": len(sources) if isinstance(sources, list) else 0,
         "research_notes": trim_text(state.get("research_notes", ""), 1600),
-        "code_agent_summary": trim_text(state.get("code_agent_summary", "") or state.get("last_actor_summary", ""), 1600),
+        "code_agent_summary": trim_text(
+            state.get("code_agent_summary", "") or state.get("last_actor_summary", ""),
+            1600,
+        ),
         "verifier_summary": trim_text(state.get("verifier_summary", ""), 1600),
         "last_error": trim_text(state.get("last_error", ""), 1600),
         "context_summary": trim_text(state.get("context_summary", ""), 1800),
@@ -362,11 +396,23 @@ def state_summary(state: dict[str, Any]) -> dict[str, Any]:
 
 def build_recovery_markdown(payload: dict[str, Any]) -> str:
     summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
-    manifest = payload.get("workspace_manifest") if isinstance(payload.get("workspace_manifest"), list) else []
+    manifest = (
+        payload.get("workspace_manifest")
+        if isinstance(payload.get("workspace_manifest"), list)
+        else []
+    )
     todos = summary.get("todos") if isinstance(summary.get("todos"), list) else []
     sources = summary.get("sources") if isinstance(summary.get("sources"), list) else []
-    commands = summary.get("verification_commands") if isinstance(summary.get("verification_commands"), list) else []
-    criteria = summary.get("acceptance_criteria") if isinstance(summary.get("acceptance_criteria"), list) else []
+    commands = (
+        summary.get("verification_commands")
+        if isinstance(summary.get("verification_commands"), list)
+        else []
+    )
+    criteria = (
+        summary.get("acceptance_criteria")
+        if isinstance(summary.get("acceptance_criteria"), list)
+        else []
+    )
 
     lines = [
         "# MokioClaw Recovery",
@@ -388,13 +434,24 @@ def build_recovery_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Todos",
     ]
-    lines.extend(_markdown_items([f"[{todo.get('status', '')}] {todo.get('content', '')}" for todo in todos]))
+    lines.extend(
+        _markdown_items(
+            [f"[{todo.get('status', '')}] {todo.get('content', '')}" for todo in todos]
+        )
+    )
     lines.extend(["", "## Acceptance Criteria"])
     lines.extend(_markdown_items(criteria))
     lines.extend(["", "## Verification Commands"])
     lines.extend(_markdown_items(commands))
     lines.extend(["", "## Sources"])
-    lines.extend(_markdown_items([f"{source.get('title', '')}: {source.get('url', '')}" for source in sources]))
+    lines.extend(
+        _markdown_items(
+            [
+                f"{source.get('title', '')}: {source.get('url', '')}"
+                for source in sources
+            ]
+        )
+    )
     lines.extend(
         [
             "",
@@ -407,11 +464,20 @@ def build_recovery_markdown(payload: dict[str, Any]) -> str:
             "## Recent Files",
         ]
     )
-    lines.extend(_markdown_items([f"{item.get('path', '')} ({item.get('size', 0)} bytes)" for item in manifest[:40]]))
+    lines.extend(
+        _markdown_items(
+            [
+                f"{item.get('path', '')} ({item.get('size', 0)} bytes)"
+                for item in manifest[:40]
+            ]
+        )
+    )
     return "\n".join(lines).rstrip() + "\n"
 
 
-def workspace_manifest(workspace: Path, *, limit: int = MAX_MANIFEST_ITEMS) -> list[dict[str, Any]]:
+def workspace_manifest(
+    workspace: Path, *, limit: int = MAX_MANIFEST_ITEMS
+) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     if not workspace.exists():
         return items
@@ -431,13 +497,17 @@ def workspace_manifest(workspace: Path, *, limit: int = MAX_MANIFEST_ITEMS) -> l
             {
                 "path": rel.as_posix(),
                 "size": stat.st_size,
-                "mtime": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+                "mtime": datetime.fromtimestamp(
+                    stat.st_mtime, tz=timezone.utc
+                ).isoformat(),
             }
         )
     return items
 
 
-def snapshot_workspace_git(workspace: Path, root: Path) -> tuple[str | None, str | None]:
+def snapshot_workspace_git(
+    workspace: Path, root: Path
+) -> tuple[str | None, str | None]:
     if shutil.which("git") is None:
         return None, "git executable not found"
 
@@ -448,7 +518,11 @@ def snapshot_workspace_git(workspace: Path, root: Path) -> tuple[str | None, str
     try:
         _git(workspace, git_dir, ["init", "-q"])
         _git(workspace, git_dir, ["config", "user.name", "MokioClaw Checkpoint"])
-        _git(workspace, git_dir, ["config", "user.email", "mokioclaw-checkpoint@example.local"])
+        _git(
+            workspace,
+            git_dir,
+            ["config", "user.email", "mokioclaw-checkpoint@example.local"],
+        )
         _ensure_git_excludes(git_dir)
         _git(workspace, git_dir, ["add", "-A", "--", "."])
         status = _git(workspace, git_dir, ["status", "--porcelain"]).stdout.strip()
@@ -498,7 +572,11 @@ def json_safe(value: Any) -> Any:
 
 
 def trim_text(value: Any, limit: int) -> str:
-    text = value if isinstance(value, str) else json.dumps(json_safe(value), ensure_ascii=False, default=str)
+    text = (
+        value
+        if isinstance(value, str)
+        else json.dumps(json_safe(value), ensure_ascii=False, default=str)
+    )
     if len(text) <= limit:
         return text
     return text[: limit - 3] + "..."
@@ -512,7 +590,14 @@ def should_skip_workspace_path(rel: Path) -> bool:
     parts = rel.parts
     if len(parts) >= 2 and parts[0] == ".mokioclaw" and parts[1] == "checkpoints":
         return True
-    skip_names = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
+    skip_names = {
+        ".git",
+        ".venv",
+        "venv",
+        "node_modules",
+        "__pycache__",
+        ".pytest_cache",
+    }
     return any(part in skip_names for part in parts)
 
 
@@ -539,11 +624,15 @@ def _markdown_items(items: list[Any]) -> list[str]:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    tmp.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
+    )
     tmp.replace(path)
 
 
-def _git(workspace: Path, git_dir: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
+def _git(
+    workspace: Path, git_dir: Path, args: list[str]
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", f"--git-dir={git_dir}", f"--work-tree={workspace}", *args],
         cwd=workspace,

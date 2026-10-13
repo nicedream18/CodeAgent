@@ -7,7 +7,11 @@ from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.graph.message import REMOVE_ALL_MESSAGES, add_messages
 
 from mokioclaw.core.state import RuntimeState
-from mokioclaw.graph.memory import build_layered_memory, persist_history_summary, read_history_summary
+from mokioclaw.graph.memory import (
+    build_layered_memory,
+    persist_history_summary,
+    read_history_summary,
+)
 from mokioclaw.graph.nodes import (
     AMIYA_COMMANDS,
     _call_code_agent_tool,
@@ -51,7 +55,9 @@ def test_model_verifier_passes_from_json(monkeypatch, tmp_path: Path) -> None:
     state = {
         "runtime": RuntimeState(workspace=tmp_path),
         "task": "demo",
-        "todos": [{"id": "todo-1", "content": "verify", "status": "in_progress", "note": ""}],
+        "todos": [
+            {"id": "todo-1", "content": "verify", "status": "in_progress", "note": ""}
+        ],
         "attempts": 0,
         "max_attempts": 3,
     }
@@ -65,7 +71,9 @@ def test_model_verifier_passes_from_json(monkeypatch, tmp_path: Path) -> None:
     assert verifier_route({**state, **result}) == "final"
 
 
-def test_model_verifier_invalid_json_fails_and_routes_back(monkeypatch, tmp_path: Path) -> None:
+def test_model_verifier_invalid_json_fails_and_routes_back(
+    monkeypatch, tmp_path: Path
+) -> None:
     class FakeBoundModel:
         def invoke(self, messages):
             return AIMessage(content="not json")
@@ -90,7 +98,9 @@ def test_model_verifier_invalid_json_fails_and_routes_back(monkeypatch, tmp_path
 
 
 def test_verifier_routes_to_final_at_max_attempts() -> None:
-    assert verifier_route({"passed": False, "attempts": 3, "max_attempts": 3}) == "final"
+    assert (
+        verifier_route({"passed": False, "attempts": 3, "max_attempts": 3}) == "final"
+    )
 
 
 def test_final_node_reports_multiagent_status() -> None:
@@ -120,7 +130,9 @@ def test_workflow_compiles_without_fixed_actor_node() -> None:
 def test_intent_router_routes_chat_with_model_json(monkeypatch) -> None:
     class FakeModel:
         def invoke(self, messages):
-            return AIMessage(content='{"route":"chat","reason":"greeting","confidence":0.92}')
+            return AIMessage(
+                content='{"route":"chat","reason":"greeting","confidence":0.92}'
+            )
 
     monkeypatch.setattr("mokioclaw.graph.nodes.create_model", lambda: FakeModel())
 
@@ -135,7 +147,9 @@ def test_intent_router_routes_chat_with_model_json(monkeypatch) -> None:
 def test_intent_router_routes_workflow_with_model_json(monkeypatch) -> None:
     class FakeModel:
         def invoke(self, messages):
-            return AIMessage(content='{"route":"workflow","reason":"needs files","confidence":0.88}')
+            return AIMessage(
+                content='{"route":"workflow","reason":"needs files","confidence":0.88}'
+            )
 
     monkeypatch.setattr("mokioclaw.graph.nodes.create_model", lambda: FakeModel())
 
@@ -180,7 +194,9 @@ def test_context_token_limit_defaults_and_env(monkeypatch) -> None:
     assert get_context_token_limit() == 1234
 
 
-def test_estimate_context_tokens_uses_model_counter(monkeypatch, tmp_path: Path) -> None:
+def test_estimate_context_tokens_uses_model_counter(
+    monkeypatch, tmp_path: Path
+) -> None:
     class FakeModel:
         def get_num_tokens_from_messages(self, messages):
             return 42 + len(messages)
@@ -197,9 +213,13 @@ def test_estimate_context_tokens_uses_model_counter(monkeypatch, tmp_path: Path)
     assert result == 44
 
 
-def test_context_monitor_does_not_compress_below_limit(monkeypatch, tmp_path: Path) -> None:
+def test_context_monitor_does_not_compress_below_limit(
+    monkeypatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("MOKIO_CONTEXT_TOKEN_LIMIT", "100")
-    monkeypatch.setattr("mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 10)
+    monkeypatch.setattr(
+        "mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 10
+    )
     result = context_monitor_node(
         {
             "runtime": RuntimeState(workspace=tmp_path),
@@ -215,7 +235,9 @@ def test_context_monitor_does_not_compress_below_limit(monkeypatch, tmp_path: Pa
 
 def test_context_monitor_compresses_at_limit(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setenv("MOKIO_CONTEXT_TOKEN_LIMIT", "100")
-    monkeypatch.setattr("mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 100)
+    monkeypatch.setattr(
+        "mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 100
+    )
     result = context_monitor_node(
         {
             "runtime": RuntimeState(workspace=tmp_path),
@@ -228,7 +250,9 @@ def test_context_monitor_compresses_at_limit(monkeypatch, tmp_path: Path) -> Non
     assert context_monitor_route(result) == "context_compressor"
 
 
-def test_context_compressor_removes_old_messages_and_preserves_state(monkeypatch, tmp_path: Path) -> None:
+def test_context_compressor_removes_old_messages_and_preserves_state(
+    monkeypatch, tmp_path: Path
+) -> None:
     calls = {"count": 0}
 
     def fake_estimate(state):
@@ -255,7 +279,9 @@ def test_context_compressor_removes_old_messages_and_preserves_state(monkeypatch
         "task": "demo",
         "messages": [HumanMessage(content="old " * 200)],
         "plan_summary": "plan",
-        "todos": [{"id": "todo-1", "content": "verify", "status": "pending", "note": ""}],
+        "todos": [
+            {"id": "todo-1", "content": "verify", "status": "pending", "note": ""}
+        ],
         "acceptance_criteria": ["done"],
         "verification_commands": ["python --version"],
         "research_notes": "research " * 100,
@@ -271,15 +297,23 @@ def test_context_compressor_removes_old_messages_and_preserves_state(monkeypatch
     assert result["compression_events"][0]["after_tokens"] == 50
     assert result["compression_events"][0]["removed_messages"] == 1
     assert "compressed summary" in result["history_summary"]
-    assert "compressed summary" in (tmp_path / "HISTORY_SUMMARY.md").read_text(encoding="utf-8")
-    assert result["todos"][0]["content"] == "verify" if "todos" in result else state["todos"][0]["content"] == "verify"
+    assert "compressed summary" in (tmp_path / "HISTORY_SUMMARY.md").read_text(
+        encoding="utf-8"
+    )
+    assert (
+        result["todos"][0]["content"] == "verify"
+        if "todos" in result
+        else state["todos"][0]["content"] == "verify"
+    )
     merged = add_messages(state["messages"], result["messages"])
     assert len(merged) == 1
     assert "compressed summary" in merged[0].content
     assert context_compressor_route({**state, **result}) == "verifier"
 
 
-def test_amiya_planner_uses_fixed_verifier_commands(monkeypatch, tmp_path: Path) -> None:
+def test_amiya_planner_uses_fixed_verifier_commands(
+    monkeypatch, tmp_path: Path
+) -> None:
     class FakeBoundModel:
         def invoke(self, messages):
             return AIMessage(content="plan ready")
@@ -328,14 +362,18 @@ def test_call_code_agent_tool_updates_state(monkeypatch, tmp_path: Path) -> None
     def fake_code_agent(state, instruction, *, writer=None, max_loops=10):
         return {
             "summary": "Created amiya_profile.html",
-            "todos": [{"id": "todo-1", "content": "write", "status": "completed", "note": ""}],
+            "todos": [
+                {"id": "todo-1", "content": "write", "status": "completed", "note": ""}
+            ],
         }
 
     monkeypatch.setattr("mokioclaw.graph.nodes.run_code_agent", fake_code_agent)
     state = {
         "task": "阿米娅",
         "runtime": RuntimeState(workspace=tmp_path),
-        "todos": [{"id": "todo-1", "content": "write", "status": "pending", "note": ""}],
+        "todos": [
+            {"id": "todo-1", "content": "write", "status": "pending", "note": ""}
+        ],
     }
 
     result = _call_code_agent_tool(state, lambda event: None, "write page")
@@ -348,7 +386,9 @@ def test_call_code_agent_tool_updates_state(monkeypatch, tmp_path: Path) -> None
 
 def test_layered_memory_splits_rules_working_and_history(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path)
-    (tmp_path / "NOTEPAD.md").write_text("# MokioClaw Notepad\n\nImportant durable note.\n", encoding="utf-8")
+    (tmp_path / "NOTEPAD.md").write_text(
+        "# MokioClaw Notepad\n\nImportant durable note.\n", encoding="utf-8"
+    )
     persist_history_summary(runtime, "Previous compressed history.")
 
     memory = build_layered_memory(
@@ -356,7 +396,9 @@ def test_layered_memory_splits_rules_working_and_history(tmp_path: Path) -> None
             "runtime": runtime,
             "task": "demo",
             "plan_summary": "demo plan",
-            "todos": [{"id": "todo-1", "content": "write", "status": "pending", "note": ""}],
+            "todos": [
+                {"id": "todo-1", "content": "write", "status": "pending", "note": ""}
+            ],
             "acceptance_criteria": ["file exists"],
             "verification_commands": ["python --version"],
             "research_notes": "research",
@@ -372,14 +414,22 @@ def test_layered_memory_splits_rules_working_and_history(tmp_path: Path) -> None
     assert memory["working_memory"]["sources"][0]["url"] == "https://example.com"
     assert memory["history_summary_store"]["notepad_exists"] is True
     assert "Important durable note" in memory["history_summary_store"]["notepad"]
-    assert "Previous compressed history" in memory["history_summary_store"]["history_summary"]
+    assert (
+        "Previous compressed history"
+        in memory["history_summary_store"]["history_summary"]
+    )
 
 
 def test_layered_memory_trims_long_history_and_handoffs(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path)
     (tmp_path / "NOTEPAD.md").write_text("note " * 1000, encoding="utf-8")
     handoffs = [
-        {"from_agent": "planner", "to_agent": "codeAgent", "instruction": "i" * 1000, "result": "r" * 1000}
+        {
+            "from_agent": "planner",
+            "to_agent": "codeAgent",
+            "instruction": "i" * 1000,
+            "result": "r" * 1000,
+        }
         for _ in range(8)
     ]
 

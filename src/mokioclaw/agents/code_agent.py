@@ -7,13 +7,17 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from langchain_core.tools import StructuredTool
 
 from mokioclaw.core.state import RuntimeState
-from mokioclaw.graph.memory import build_layered_memory, format_layered_memory_for_prompt, memory_event
+from mokioclaw.graph.memory import (
+    build_layered_memory,
+    format_layered_memory_for_prompt,
+    memory_event,
+)
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import CODE_AGENT_PROMPT
 from mokioclaw.providers.openai_provider import create_model
 from mokioclaw.providers.openai_provider import invoke_streaming
 from mokioclaw.tools import build_tools
-from mokioclaw.tools.execution import execute_tool
+from mokioclaw.tools.execution import execute_tool, tool_failure_result
 from mokioclaw.tools.skills import skill_summaries
 from mokioclaw.tools.todo_tool import persist_todos, update_todo
 
@@ -57,7 +61,9 @@ def run_code_agent(
     tool_events: list[dict[str, Any]] = []
 
     for _ in range(max_loops):
-        response = invoke_streaming(code_agent, messages, writer=writer, node="codeAgent")
+        response = invoke_streaming(
+            code_agent, messages, writer=writer, node="codeAgent"
+        )
         produced_messages.append(response)
         messages.append(response)
         tool_calls = getattr(response, "tool_calls", None) or []
@@ -72,7 +78,9 @@ def run_code_agent(
                     "args": call.get("args", {}),
                 }
             )
-            tool_result, todos = execute_code_agent_tool(runtime, todos, call, on_retry=writer, on_event=writer)
+            tool_result, todos = execute_code_agent_tool(
+                runtime, todos, call, on_retry=writer, on_event=writer
+            )
             event = tool_result_event(tool_result, node="codeAgent")
             tool_events.append(event)
             writer(event)
@@ -97,7 +105,9 @@ def run_code_agent(
             messages.append(tool_result)
     else:
         produced_messages.append(
-            AIMessage(content="codeAgent stopped after the maximum tool loop count; verifier will inspect current files.")
+            AIMessage(
+                content="codeAgent stopped after the maximum tool loop count; verifier will inspect current files."
+            )
         )
 
     summary = _last_ai_content(produced_messages)
@@ -110,7 +120,14 @@ def run_code_agent(
     }
 
 
-def execute_code_agent_tool(runtime: RuntimeState, todos: list[dict[str, str]], call: dict[str, Any], *, on_retry=None, on_event=None):
+def execute_code_agent_tool(
+    runtime: RuntimeState,
+    todos: list[dict[str, str]],
+    call: dict[str, Any],
+    *,
+    on_retry=None,
+    on_event=None,
+):
     name = call.get("name", "")
     args = call.get("args") or {}
     if name == "TodoUpdateTool":
@@ -129,14 +146,25 @@ def execute_code_agent_tool(runtime: RuntimeState, todos: list[dict[str, str]], 
         tools = {tool.name: tool for tool in build_tools(runtime)}
         tool = tools.get(name)
         if tool is None:
-            result = {"ok": False, "error": f"unknown tool: {name}"}
+            result = tool_failure_result(f"unknown tool: {name}", tool_name=name)
         else:
             try:
-                result = execute_tool(runtime, tool, args, on_retry=on_retry, on_event=on_event, tool_call_id=call.get("id"))
+                result = execute_tool(
+                    runtime,
+                    tool,
+                    args,
+                    on_retry=on_retry,
+                    on_event=on_event,
+                    tool_call_id=call.get("id"),
+                )
             except Exception as exc:
-                result = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+                result = tool_failure_result(exc, tool_name=name)
     tool_call_id = call.get("id") or f"{name}-call"
-    return ToolMessage(content=json.dumps(result, ensure_ascii=False), name=name, tool_call_id=tool_call_id), todos
+    return ToolMessage(
+        content=json.dumps(result, ensure_ascii=False),
+        name=name,
+        tool_call_id=tool_call_id,
+    ), todos
 
 
 def tool_result_event(tool_message: ToolMessage, *, node: str) -> dict[str, Any]:
@@ -144,7 +172,13 @@ def tool_result_event(tool_message: ToolMessage, *, node: str) -> dict[str, Any]
         parsed = json.loads(str(tool_message.content))
     except json.JSONDecodeError:
         parsed = tool_message.content
-    return {"type": "tool_result", "node": node, "name": tool_message.name, "tool_call_id": tool_message.tool_call_id, "result": parsed}
+    return {
+        "type": "tool_result",
+        "node": node,
+        "name": tool_message.name,
+        "tool_call_id": tool_message.tool_call_id,
+        "result": parsed,
+    }
 
 
 def _build_todo_update_tool(todos: list[dict[str, str]]) -> StructuredTool:
@@ -155,15 +189,25 @@ def _build_todo_update_tool(todos: list[dict[str, str]]) -> StructuredTool:
     )
 
 
-def _code_agent_input(state: MokioGraphState, instruction: str, memory: dict[str, Any]) -> str:
+def _code_agent_input(
+    state: MokioGraphState, instruction: str, memory: dict[str, Any]
+) -> str:
     parts = [
         f"Task: {state['task']}",
         f"Planner instruction:\n{instruction}",
     ]
     if state.get("session_context"):
-        parts.append("Session context for this multi-turn coding session:\n" + str(state.get("session_context", "")))
-    parts.append("Discovered Skills (load a relevant one with LoadSkillTool):\n" + skill_summaries(state["runtime"]))
-    parts.append("Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory))
+        parts.append(
+            "Session context for this multi-turn coding session:\n"
+            + str(state.get("session_context", ""))
+        )
+    parts.append(
+        "Discovered Skills (load a relevant one with LoadSkillTool):\n"
+        + skill_summaries(state["runtime"])
+    )
+    parts.append(
+        "Layered memory snapshot:\n" + format_layered_memory_for_prompt(memory)
+    )
     return "\n\n".join(parts)
 
 

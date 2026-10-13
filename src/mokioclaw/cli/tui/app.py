@@ -250,8 +250,14 @@ class MokioClawTuiApp(App[None]):
                     yield Static("", id="side-state")
             with Horizontal(id="input-row"):
                 yield Static("❯", id="prompt")
-                yield Input(placeholder="Chat or ask for coding work, then press Enter", id="task-input")
-                yield Static("Enter send · /new session · /compact memory · Ctrl+L clear", id="hint")
+                yield Input(
+                    placeholder="Chat or ask for coding work, then press Enter",
+                    id="task-input",
+                )
+                yield Static(
+                    "Enter send · /new session · /compact memory · Ctrl+L clear",
+                    id="hint",
+                )
         yield Footer()
 
     def on_mount(self) -> None:
@@ -273,27 +279,39 @@ class MokioClawTuiApp(App[None]):
             return
         if task == "/compact":
             result = compact_session_history(self.session_workspace)
-            self.notify(f"Compacted {result['compacted']} turn(s); kept {result['kept']}.")
+            self.notify(
+                f"Compacted {result['compacted']} turn(s); kept {result['kept']}."
+            )
             self._refresh_sidebar()
             return
         self.start_task(task, None)
 
     def on_agent_event_message(self, message: AgentEventMessage) -> None:
         envelope = message.event
-        payload = envelope.get("event") if envelope.get("type") == "custom_event" else None
-        if isinstance(payload, dict) and payload.get("type") in {"llm_stream_start", "llm_token", "llm_stream_end"}:
+        payload = (
+            envelope.get("event") if envelope.get("type") == "custom_event" else None
+        )
+        if isinstance(payload, dict) and payload.get("type") in {
+            "llm_stream_start",
+            "llm_token",
+            "llm_stream_end",
+        }:
             node = str(payload.get("node", "model"))
             if payload["type"] == "llm_stream_start":
                 self._llm_streams[node] = []
                 return
             if payload["type"] == "llm_token":
-                self._llm_streams.setdefault(node, []).append(str(payload.get("text", "")))
+                self._llm_streams.setdefault(node, []).append(
+                    str(payload.get("text", ""))
+                )
                 preview = "".join(self._llm_streams[node])[-180:]
                 self.query_one("#status", Static).update(f"{node} · {preview}")
                 return
             content = "".join(self._llm_streams.pop(node, []))
             if content:
-                self._mount_event_card(f"Model · {node}", content[-4000:], category="info", collapsed=False)
+                self._mount_event_card(
+                    f"Model · {node}", content[-4000:], category="info", collapsed=False
+                )
             self.query_one("#status", Static).update("running")
             return
         self._handle_event(message.event)
@@ -303,16 +321,24 @@ class MokioClawTuiApp(App[None]):
         self.resume = None
         self.query_one("#task-input", Input).disabled = False
         self.query_one("#task-input", Input).focus()
-        self.query_one("#status", Static).update(f"{message.status}; ready for next task")
+        self.query_one("#status", Static).update(
+            f"{message.status}; ready for next task"
+        )
         self._refresh_sidebar()
 
     def on_approval_requested_message(self, message: ApprovalRequestedMessage) -> None:
         workspace = self.latest_workspace or str(self.workspace or "")
-        self.push_screen(ApprovalModal(message.gate.request, workspace), self._resolve_approval(message.gate))
+        self.push_screen(
+            ApprovalModal(message.gate.request, workspace),
+            self._resolve_approval(message.gate),
+        )
 
     def action_cancel_or_quit(self) -> None:
         if self.running:
-            self.notify("A run is active. Press Ctrl+Q to quit and let checkpoint handle recovery.", severity="warning")
+            self.notify(
+                "A run is active. Press Ctrl+Q to quit and let checkpoint handle recovery.",
+                severity="warning",
+            )
             return
         self.exit()
 
@@ -333,12 +359,19 @@ class MokioClawTuiApp(App[None]):
         self.query_one("#status", Static).update("running")
         self._refresh_sidebar()
         self._write_run_start(task, resume)
-        self.run_worker(lambda: self._run_stream(task, resume), thread=True, exclusive=False, name=f"mokioclaw-run-{self.run_count}")
+        self.run_worker(
+            lambda: self._run_stream(task, resume),
+            thread=True,
+            exclusive=False,
+            name=f"mokioclaw-run-{self.run_count}",
+        )
 
     def _run_stream(self, task: str, resume: Path | None) -> None:
         status = "finished"
         try:
-            approval_handler = self._approval_handler if self.approval_mode == "inline" else None
+            approval_handler = (
+                self._approval_handler if self.approval_mode == "inline" else None
+            )
             for event in self.stream_factory(
                 task,
                 session_workspace=self.session_workspace,
@@ -355,7 +388,10 @@ class MokioClawTuiApp(App[None]):
             status = "interrupted"
         except Exception as exc:
             status = "failed"
-            error_event = {"type": "custom_event", "event": {"type": "tui_error", "error": f"{type(exc).__name__}: {exc}"}}
+            error_event = {
+                "type": "custom_event",
+                "event": {"type": "tui_error", "error": f"{type(exc).__name__}: {exc}"},
+            }
             self.call_from_thread(self.post_message, AgentEventMessage(error_event))
         finally:
             self.call_from_thread(self.post_message, RunFinishedMessage(status))
@@ -417,9 +453,13 @@ class MokioClawTuiApp(App[None]):
             self.session_turn = int(payload.get("turn_index", 0) or 0)
             self.latest_workspace = str(payload.get("workspace", self.latest_workspace))
         if payload.get("type") == "session_turn_started":
-            self.session_turn = int(payload.get("turn", self.session_turn) or self.session_turn)
+            self.session_turn = int(
+                payload.get("turn", self.session_turn) or self.session_turn
+            )
         if payload.get("type") == "session_turn_saved":
-            self.session_turn = int(payload.get("turn", self.session_turn) or self.session_turn)
+            self.session_turn = int(
+                payload.get("turn", self.session_turn) or self.session_turn
+            )
             self.last_route = str(payload.get("route", self.last_route))
 
     def _write_welcome(self) -> None:
@@ -432,7 +472,11 @@ class MokioClawTuiApp(App[None]):
         )
 
     def _write_run_start(self, task: str, resume: Path | None) -> None:
-        mode = f"resume: {resume}" if resume is not None else f"workspace: {self.session_workspace}"
+        mode = (
+            f"resume: {resume}"
+            if resume is not None
+            else f"workspace: {self.session_workspace}"
+        )
         self._mount_event_card(
             f"You · turn {self.run_count}",
             shorten(task, 500),
@@ -456,7 +500,11 @@ class MokioClawTuiApp(App[None]):
         workspace = f"{Path(workspace_path).name} · {shorten(workspace_path, 64)}"
         checkpoint = shorten(self.latest_checkpoint or "(waiting)", 80)
         trace_path = self.latest_trace or "(waiting)"
-        trace = f"{Path(trace_path).name} · {shorten(trace_path, 64)}" if self.latest_trace else trace_path
+        trace = (
+            f"{Path(trace_path).name} · {shorten(trace_path, 64)}"
+            if self.latest_trace
+            else trace_path
+        )
         tools = f"{self.tool_count} total / {self.failed_tool_count} failed"
         approvals = str(self.approval_count)
         todos = self._todo_sidebar_text()
@@ -496,8 +544,12 @@ class MokioClawTuiApp(App[None]):
         for todo in self.todos:
             status = str(todo.get("status", "pending"))
             counts[status] = counts.get(status, 0) + 1
-        current = next((todo for todo in self.todos if todo.get("status") == "in_progress"), None)
-        count_text = ", ".join(f"{key}:{value}" for key, value in sorted(counts.items()))
+        current = next(
+            (todo for todo in self.todos if todo.get("status") == "in_progress"), None
+        )
+        count_text = ", ".join(
+            f"{key}:{value}" for key, value in sorted(counts.items())
+        )
         if current:
             return f"{count_text}\n{shorten(current.get('content', current.get('description', '')), 120)}"
         return count_text
@@ -513,7 +565,10 @@ class MokioClawTuiApp(App[None]):
     ) -> None:
         events = self.query_one("#events", VerticalScroll)
         title_text = f"{self._category_marker(category)} {title}"
-        summary = Static(Text(body or " ", style=self._category_style(category)), classes="event-summary")
+        summary = Static(
+            Text(body or " ", style=self._category_style(category)),
+            classes="event-summary",
+        )
         detail_text = detail if detail is not None else body
         if collapsed:
             card = Collapsible(
@@ -525,7 +580,9 @@ class MokioClawTuiApp(App[None]):
             )
         else:
             card = Vertical(
-                Static(Text(title_text, style=f"bold {self._category_style(category)}")),
+                Static(
+                    Text(title_text, style=f"bold {self._category_style(category)}")
+                ),
                 summary,
                 classes=f"event-card {self._category_class(category)}",
             )
@@ -537,11 +594,15 @@ class MokioClawTuiApp(App[None]):
         title = summary.title
         body = summary.body or ""
         if summary.category == "session":
-            return self._first_matching_line(body, ("route:", "turn:", "workspace:", "session:")) or shorten(body, 140)
+            return self._first_matching_line(
+                body, ("route:", "turn:", "workspace:", "session:")
+            ) or shorten(body, 140)
         if summary.category == "intent":
             route = self._line_value(body, "route")
             reason = self._line_value(body, "reason")
-            return f"route {route or 'workflow'}" + (f" · {shorten(reason, 90)}" if reason else "")
+            return f"route {route or 'workflow'}" + (
+                f" · {shorten(reason, 90)}" if reason else ""
+            )
         if summary.category == "chat":
             return shorten(body.split("\nmode:")[0], 2400)
         if summary.category == "plan":
@@ -552,7 +613,9 @@ class MokioClawTuiApp(App[None]):
             return shorten(body, 160)
         if summary.category == "tool_result":
             ok = self._line_value(body, "ok")
-            path = self._line_value(body, "path") or self._line_value(body, "stdout_path")
+            path = self._line_value(body, "path") or self._line_value(
+                body, "stdout_path"
+            )
             pieces = [f"ok={ok}" if ok else "tool result"]
             if path:
                 pieces.append(path)
@@ -562,14 +625,23 @@ class MokioClawTuiApp(App[None]):
         if summary.category == "memory":
             return "memory snapshot updated"
         if summary.category == "context":
-            return self._first_matching_line(body, ("tokens:", "compress:", "next:")) or shorten(body, 160)
+            return self._first_matching_line(
+                body, ("tokens:", "compress:", "next:")
+            ) or shorten(body, 160)
         if summary.category == "checkpoint":
             status = self._line_value(body, "status") or self._line_value(body, "mode")
             return f"checkpoint {status}" if status else "checkpoint updated"
         if summary.category == "trace":
             status = self._line_value(body, "status")
             tools = self._line_value(body, "tools")
-            return " · ".join(part for part in [f"status {status}" if status else "", f"tools {tools}" if tools else ""] if part)
+            return " · ".join(
+                part
+                for part in [
+                    f"status {status}" if status else "",
+                    f"tools {tools}" if tools else "",
+                ]
+                if part
+            )
         if summary.category == "final":
             return shorten(body.splitlines()[0] if body.splitlines() else body, 220)
         if summary.category == "verifier":
@@ -584,7 +656,13 @@ class MokioClawTuiApp(App[None]):
             return "success"
         if summary.category in {"verifier", "tool_result"} and "FAIL" in summary.body:
             return "error"
-        if summary.category in {"plan", "tool_call", "handoff", "context", "checkpoint"}:
+        if summary.category in {
+            "plan",
+            "tool_call",
+            "handoff",
+            "context",
+            "checkpoint",
+        }:
             return "running"
         return "info"
 
@@ -596,7 +674,11 @@ class MokioClawTuiApp(App[None]):
             hidden_nodes = {"intent_router", "chat_responder"}
             return all(node in hidden_nodes for node in payload)
         if event.get("type") == "custom_event" and isinstance(payload, dict):
-            return payload.get("type") in {"session_started", "session_turn_started", "memory_snapshot"}
+            return payload.get("type") in {
+                "session_started",
+                "session_turn_started",
+                "memory_snapshot",
+            }
         return False
 
     def _detail_renderable(self, detail: str) -> Any:

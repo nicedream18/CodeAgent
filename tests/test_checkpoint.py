@@ -25,7 +25,14 @@ def sample_state(runtime: RuntimeState) -> dict:
         "runtime": runtime,
         "messages": [AIMessage(content="hello")],
         "plan_summary": "demo plan",
-        "todos": [{"id": "todo-1", "content": "write app", "status": "in_progress", "note": ""}],
+        "todos": [
+            {
+                "id": "todo-1",
+                "content": "write app",
+                "status": "in_progress",
+                "note": "",
+            }
+        ],
         "acceptance_criteria": ["app exists"],
         "verification_commands": ["python --version"],
         "sources": [{"title": "Docs", "url": "https://example.com"}],
@@ -40,7 +47,9 @@ def test_light_checkpoint_writes_recovery_and_checkpoint(tmp_path: Path) -> None
     runtime = RuntimeState(workspace=tmp_path, checkpoint_mode="light")
     (tmp_path / "TODO.md").write_text("todo content", encoding="utf-8")
 
-    event = CheckpointManager(runtime, task="build demo").save(sample_state(runtime), status="running", latest_node="planner")
+    event = CheckpointManager(runtime, task="build demo").save(
+        sample_state(runtime), status="running", latest_node="planner"
+    )
 
     root = tmp_path / CHECKPOINT_ROOT
     assert event is not None
@@ -57,7 +66,12 @@ def test_strict_checkpoint_writes_state_and_events(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path, checkpoint_mode="strict")
     manager = CheckpointManager(runtime, task="build demo")
 
-    manager.save(sample_state(runtime), status="running", latest_node="planner", event={"mode": "custom", "payload": {"type": "x"}})
+    manager.save(
+        sample_state(runtime),
+        status="running",
+        latest_node="planner",
+        event={"mode": "custom", "payload": {"type": "x"}},
+    )
 
     root = tmp_path / CHECKPOINT_ROOT
     assert (root / "state.json").exists()
@@ -89,7 +103,9 @@ def test_workspace_manifest_excludes_checkpoint_directory(tmp_path: Path) -> Non
     assert [item["path"] for item in manifest] == ["app.py"]
 
 
-def test_light_checkpoint_git_snapshot_handles_relative_workspace(tmp_path: Path, monkeypatch) -> None:
+def test_light_checkpoint_git_snapshot_handles_relative_workspace(
+    tmp_path: Path, monkeypatch
+) -> None:
     if shutil.which("git") is None:
         return
     workspace = tmp_path / "workspace"
@@ -98,7 +114,9 @@ def test_light_checkpoint_git_snapshot_handles_relative_workspace(tmp_path: Path
     monkeypatch.chdir(tmp_path)
     runtime = RuntimeState(workspace=Path("workspace"), checkpoint_mode="light")
 
-    event = CheckpointManager(runtime, task="relative workspace").save(sample_state(runtime), status="running", latest_node="planner")
+    event = CheckpointManager(runtime, task="relative workspace").save(
+        sample_state(runtime), status="running", latest_node="planner"
+    )
 
     assert event is not None
     assert event["git_error"] in {None, ""}
@@ -110,7 +128,9 @@ def test_light_resume_context_includes_workspace_memory(tmp_path: Path) -> None:
     (tmp_path / "TODO.md").write_text("TODO from disk", encoding="utf-8")
     (tmp_path / "NOTEPAD.md").write_text("Important note", encoding="utf-8")
     (tmp_path / "HISTORY_SUMMARY.md").write_text("History summary", encoding="utf-8")
-    CheckpointManager(runtime, task="original task").save(sample_state(runtime), status="interrupted", latest_node="verifier")
+    CheckpointManager(runtime, task="original task").save(
+        sample_state(runtime), status="interrupted", latest_node="verifier"
+    )
 
     inputs = build_light_resume_inputs(runtime, max_attempts=5)
 
@@ -129,23 +149,35 @@ def test_light_resume_normalizes_repeated_resume_prefix(tmp_path: Path) -> None:
         "Continue the interrupted MokioClaw task from the checkpoint: "
         "original task"
     )
-    CheckpointManager(runtime, task=repeated).save({**sample_state(runtime), "task": repeated}, status="interrupted", latest_node="planner")
+    CheckpointManager(runtime, task=repeated).save(
+        {**sample_state(runtime), "task": repeated},
+        status="interrupted",
+        latest_node="planner",
+    )
 
     inputs = build_light_resume_inputs(runtime)
 
-    assert inputs["task"] == "Continue this MokioClaw task from the checkpoint: original task"
+    assert (
+        inputs["task"]
+        == "Continue this MokioClaw task from the checkpoint: original task"
+    )
 
 
 def test_normalize_resume_task_strips_nested_prefixes() -> None:
-    assert normalize_resume_task(
-        "Continue this MokioClaw task from the checkpoint: Continue this MokioClaw task from the checkpoint: demo"
-    ) == "demo"
+    assert (
+        normalize_resume_task(
+            "Continue this MokioClaw task from the checkpoint: Continue this MokioClaw task from the checkpoint: demo"
+        )
+        == "demo"
+    )
 
 
 def test_strict_resume_falls_back_to_light_when_state_missing(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path, checkpoint_mode="strict")
     (tmp_path / "TODO.md").write_text("resume todo", encoding="utf-8")
-    CheckpointManager(RuntimeState(workspace=tmp_path, checkpoint_mode="light"), task="original").save(
+    CheckpointManager(
+        RuntimeState(workspace=tmp_path, checkpoint_mode="light"), task="original"
+    ).save(
         sample_state(runtime),
         status="interrupted",
         latest_node="planner",

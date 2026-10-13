@@ -17,10 +17,20 @@ def _normalize_items(items: Any) -> list[str]:
         try:
             decoded = json.loads(stripped)
         except json.JSONDecodeError:
-            return [line.strip("- ").strip() for line in stripped.splitlines() if line.strip()]
+            return [
+                line.strip("- ").strip()
+                for line in stripped.splitlines()
+                if line.strip()
+            ]
         return _normalize_items(decoded)
     if isinstance(items, dict):
-        value = items.get("content") or items.get("description") or items.get("title") or items.get("text") or items.get("command")
+        value = (
+            items.get("content")
+            or items.get("description")
+            or items.get("title")
+            or items.get("text")
+            or items.get("command")
+        )
         if value:
             return [str(value).strip()]
         normalized: list[str] = []
@@ -78,7 +88,13 @@ def update_todo(
 
     if not found:
         return {"ok": False, "error": f"unknown todo_id: {todo_id}", "todos": todos}
-    return {"ok": True, "todo_id": todo_id, "status": status, "note": note, "todos": updated}
+    return {
+        "ok": True,
+        "todo_id": todo_id,
+        "status": status,
+        "note": note,
+        "todos": updated,
+    }
 
 
 def persist_todos(
@@ -89,11 +105,18 @@ def persist_todos(
     plan_summary: str = "",
 ) -> dict[str, Any]:
     path = state.assert_workspace_path(state.workspace / TODO_FILE)
-    content = render_todo_markdown(todos, acceptance_criteria or [], verification_commands or [], plan_summary)
+    content = render_todo_markdown(
+        todos, acceptance_criteria or [], verification_commands or [], plan_summary
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     state.record_read(path, complete=True)
-    return {"ok": True, "path": TODO_FILE, "lines": len(content.splitlines()), "todos": todos}
+    return {
+        "ok": True,
+        "path": TODO_FILE,
+        "lines": len(content.splitlines()),
+        "todos": todos,
+    }
 
 
 def render_todo_markdown(
@@ -109,10 +132,17 @@ def render_todo_markdown(
     if todos:
         for todo in todos:
             status = str(todo.get("status", "pending"))
-            box = {"pending": " ", "in_progress": "-", "completed": "x", "blocked": "!"}.get(status, " ")
+            box = {
+                "pending": " ",
+                "in_progress": "-",
+                "completed": "x",
+                "blocked": "!",
+            }.get(status, " ")
             note = str(todo.get("note", ""))
             note_text = f" — {note}" if note else ""
-            lines.append(f"- [{box}] **{todo.get('id', '')}** `{status}` {todo.get('content', '')}{note_text}")
+            lines.append(
+                f"- [{box}] **{todo.get('id', '')}** `{status}` {todo.get('content', '')}{note_text}"
+            )
     else:
         lines.append("- [ ] No todos yet.")
     if acceptance_criteria:

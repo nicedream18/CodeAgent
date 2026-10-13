@@ -9,7 +9,7 @@ from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import SEARCH_AGENT_PROMPT
 from mokioclaw.providers.openai_provider import create_model
 from mokioclaw.providers.openai_provider import invoke_streaming
-from mokioclaw.tools.execution import execute_tool
+from mokioclaw.tools.execution import execute_tool, tool_failure_result
 from mokioclaw.tools.registry import build_tool
 
 
@@ -45,7 +45,9 @@ def run_search_agent(
     tool_events: list[dict[str, Any]] = []
 
     for _ in range(max_loops):
-        response = invoke_streaming(search_agent, messages, writer=writer, node="searchAgent")
+        response = invoke_streaming(
+            search_agent, messages, writer=writer, node="searchAgent"
+        )
         produced_messages.append(response)
         messages.append(response)
         tool_calls = getattr(response, "tool_calls", None) or []
@@ -56,7 +58,14 @@ def run_search_agent(
             query = str(args.get("query", ""))
             if query:
                 queries.append(query)
-            writer({"type": "tool_call", "node": "searchAgent", "name": call.get("name"), "args": args})
+            writer(
+                {
+                    "type": "tool_call",
+                    "node": "searchAgent",
+                    "name": call.get("name"),
+                    "args": args,
+                }
+            )
             tool_result = _execute_search_tool(call, state=state, on_retry=writer)
             event = _tool_result_event(tool_result)
             tool_events.append(event)
@@ -99,18 +108,27 @@ def run_search_agent(
     return result
 
 
-def _execute_search_tool(call: dict[str, Any], *, state: MokioGraphState | None = None, on_retry=None) -> ToolMessage:
+def _execute_search_tool(
+    call: dict[str, Any], *, state: MokioGraphState | None = None, on_retry=None
+) -> ToolMessage:
     name = call.get("name", "")
     args = call.get("args") or {}
     runtime = state.get("runtime") if state else None
     tool = build_tool(runtime, name) if runtime is not None else None
     if name != "WebSearchTool" or tool is None:
-        result = {"ok": False, "error": f"unknown tool: {name}"}
+        result = tool_failure_result(f"unknown tool: {name}", tool_name=name)
     else:
         try:
-            result = execute_tool(runtime, tool, args, on_retry=on_retry, on_event=on_retry, tool_call_id=call.get("id"))
+            result = execute_tool(
+                runtime,
+                tool,
+                args,
+                on_retry=on_retry,
+                on_event=on_retry,
+                tool_call_id=call.get("id"),
+            )
         except Exception as exc:
-            result = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+            result = tool_failure_result(exc, tool_name=name)
     return ToolMessage(
         content=json.dumps(result, ensure_ascii=False),
         name=name,
@@ -120,7 +138,13 @@ def _execute_search_tool(call: dict[str, Any], *, state: MokioGraphState | None 
 
 def _tool_result_event(tool_message: ToolMessage) -> dict[str, Any]:
     parsed = _parse_tool_content(tool_message.content)
-    return {"type": "tool_result", "node": "searchAgent", "name": tool_message.name, "tool_call_id": tool_message.tool_call_id, "result": parsed}
+    return {
+        "type": "tool_result",
+        "node": "searchAgent",
+        "name": tool_message.name,
+        "tool_call_id": tool_message.tool_call_id,
+        "result": parsed,
+    }
 
 
 def _parse_tool_content(content: Any) -> Any:

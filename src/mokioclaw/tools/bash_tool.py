@@ -10,13 +10,19 @@ import time
 from pathlib import Path
 from typing import Any
 
-from mokioclaw.core.approval import ApprovalDecision, classify_command_risk, classify_dangerous_command, make_approval_request
+from mokioclaw.core.approval import (
+    ApprovalDecision,
+    classify_command_risk,
+    classify_dangerous_command,
+    make_approval_request,
+)
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.tool_context import current_tool_call_context
 
 DEFAULT_TIMEOUT_SECONDS = 120
 DEFAULT_MAX_TIMEOUT_SECONDS = 600
 DEFAULT_MAX_OUTPUT_CHARS = 6000
+
 
 def bash_tool_description() -> str:
     system = platform.system().lower()
@@ -59,7 +65,9 @@ def _coerce_timeout(timeout_seconds: int | str | float) -> int:
 
 def _normalize_command(command: str) -> str:
     if os.name == "nt":
-        normalized = re.sub(r"^\s*python3(\.exe)?\b", "python", command, count=1, flags=re.IGNORECASE)
+        normalized = re.sub(
+            r"^\s*python3(\.exe)?\b", "python", command, count=1, flags=re.IGNORECASE
+        )
         normalized = re.sub(
             r"^\s*cd\s+(?:/workspace|workspace|\.?/workspace|\.mokioclaw[\\/]+workspace)\s*(?:&&|&)\s*",
             "",
@@ -67,7 +75,9 @@ def _normalize_command(command: str) -> str:
             count=1,
             flags=re.IGNORECASE,
         )
-        normalized = re.sub(r"^\s*pwd\s*$", "cd", normalized, count=1, flags=re.IGNORECASE)
+        normalized = re.sub(
+            r"^\s*pwd\s*$", "cd", normalized, count=1, flags=re.IGNORECASE
+        )
         normalized = re.sub(r"\bls\s+-la\b", "dir", normalized)
         normalized = re.sub(r"\bls\b", "dir", normalized)
         normalized = re.sub(r"\bcat\s+([^\s|&<>]+)", r"type \1", normalized)
@@ -146,12 +156,19 @@ def run_bash(
 ) -> dict[str, Any]:
     if not command.strip():
         return {"ok": False, "error": "command must not be empty"}
-    max_timeout = _state_int(state, "bash_max_timeout_seconds", DEFAULT_MAX_TIMEOUT_SECONDS)
+    max_timeout = _state_int(
+        state, "bash_max_timeout_seconds", DEFAULT_MAX_TIMEOUT_SECONDS
+    )
     timeout = _coerce_timeout(timeout_seconds)
     if timeout_seconds is None:
-        timeout = _state_int(state, "bash_default_timeout_seconds", DEFAULT_TIMEOUT_SECONDS)
+        timeout = _state_int(
+            state, "bash_default_timeout_seconds", DEFAULT_TIMEOUT_SECONDS
+        )
     if timeout <= 0 or timeout > max_timeout:
-        return {"ok": False, "error": f"timeout_seconds must be between 1 and {max_timeout}"}
+        return {
+            "ok": False,
+            "error": f"timeout_seconds must be between 1 and {max_timeout}",
+        }
     normalized_command = _normalize_command(command)
     background = _coerce_bool(run_in_background)
 
@@ -164,12 +181,19 @@ def run_bash(
 
     blocked = _looks_dangerous(normalized_command)
     if blocked:
-        return {"ok": False, "error": f"blocked potentially dangerous command pattern: {blocked}"}
+        return {
+            "ok": False,
+            "error": f"blocked potentially dangerous command pattern: {blocked}",
+        }
 
     context = current_tool_call_context()
     # Calls through execute_tool have already passed the unified policy gate.
     # Direct calls to run_bash retain their standalone approval safeguard.
-    approval = None if context and context.tool_name == "BashTool" and context.permission_checked else _resolve_approval(state, normalized_command)
+    approval = (
+        None
+        if context and context.tool_name == "BashTool" and context.permission_checked
+        else _resolve_approval(state, normalized_command)
+    )
     if approval is not None and not approval.get("approved"):
         return approval
 
@@ -177,7 +201,9 @@ def run_bash(
     env, env_error = _build_env(state)
     if env_error is not None:
         return {"ok": False, "error": env_error}
-    max_output_chars = _state_int(state, "bash_max_output_chars", DEFAULT_MAX_OUTPUT_CHARS)
+    max_output_chars = _state_int(
+        state, "bash_max_output_chars", DEFAULT_MAX_OUTPUT_CHARS
+    )
     if background:
         return _run_background(state, normalized_command, env, approval)
     try:
@@ -194,12 +220,22 @@ def run_bash(
             "ok": False,
             "timed_out": True,
             "exit_code": None,
-            **_format_captured_output(state, _decode_output(exc.stdout), _decode_output(exc.stderr), max_output_chars),
+            **_format_captured_output(
+                state,
+                _decode_output(exc.stdout),
+                _decode_output(exc.stderr),
+                max_output_chars,
+            ),
             "duration_ms": round((time.perf_counter() - started) * 1000),
             **(approval or {}),
         }
 
-    output = _format_captured_output(state, _decode_output(completed.stdout), _decode_output(completed.stderr), max_output_chars)
+    output = _format_captured_output(
+        state,
+        _decode_output(completed.stdout),
+        _decode_output(completed.stderr),
+        max_output_chars,
+    )
     return {
         "ok": completed.returncode == 0,
         "timed_out": False,
@@ -297,11 +333,15 @@ def _prepend_harness_paths(state: RuntimeState, env: dict[str, str]) -> None:
     ]
     existing = [part for part in env.get("PATH", "").split(os.pathsep) if part]
     merged: list[str] = []
-    for path in [str(candidate) for candidate in path_candidates if candidate.exists()] + existing:
+    for path in [
+        str(candidate) for candidate in path_candidates if candidate.exists()
+    ] + existing:
         if path not in merged:
             merged.append(path)
     env["PATH"] = os.pathsep.join(merged)
-    if getattr(sys, "prefix", None) and sys.prefix != getattr(sys, "base_prefix", sys.prefix):
+    if getattr(sys, "prefix", None) and sys.prefix != getattr(
+        sys, "base_prefix", sys.prefix
+    ):
         env.setdefault("VIRTUAL_ENV", sys.prefix)
 
 
@@ -310,13 +350,17 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
     shim_dir.mkdir(parents=True, exist_ok=True)
     python_executable = sys.executable
     if os.name == "nt":
-        _write_shim(shim_dir / "python.cmd", f'@echo off\r\n"{python_executable}" %*\r\n')
-        _write_shim(shim_dir / "python3.cmd", f'@echo off\r\n"{python_executable}" %*\r\n')
+        _write_shim(
+            shim_dir / "python.cmd", f'@echo off\r\n"{python_executable}" %*\r\n'
+        )
+        _write_shim(
+            shim_dir / "python3.cmd", f'@echo off\r\n"{python_executable}" %*\r\n'
+        )
         pip_cmd = (
             "@echo off\r\n"
             f'"{python_executable}" -c "import pathlib,sys; import pip; '
-            'p=pathlib.Path(pip.__file__).resolve(); '
-            'prefix=pathlib.Path(sys.prefix).resolve(); '
+            "p=pathlib.Path(pip.__file__).resolve(); "
+            "prefix=pathlib.Path(sys.prefix).resolve(); "
             'raise SystemExit(0 if p == prefix or prefix in p.parents else 1)" >nul 2>nul\r\n'
             f'if errorlevel 1 "{python_executable}" -m ensurepip --upgrade >nul 2>nul\r\n'
             f'"{python_executable}" -m pip %*\r\n'
@@ -324,8 +368,12 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
         _write_shim(shim_dir / "pip.cmd", pip_cmd)
         _write_shim(shim_dir / "pip3.cmd", pip_cmd)
         return shim_dir
-    _write_shim(shim_dir / "python", f"#!/bin/sh\nexec {shlex.quote(python_executable)} \"$@\"\n")
-    _write_shim(shim_dir / "python3", f"#!/bin/sh\nexec {shlex.quote(python_executable)} \"$@\"\n")
+    _write_shim(
+        shim_dir / "python", f'#!/bin/sh\nexec {shlex.quote(python_executable)} "$@"\n'
+    )
+    _write_shim(
+        shim_dir / "python3", f'#!/bin/sh\nexec {shlex.quote(python_executable)} "$@"\n'
+    )
     quoted_python = shlex.quote(python_executable)
     pip_shim = (
         "#!/bin/sh\n"
@@ -340,7 +388,7 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
         "if [ $? -ne 0 ]; then\n"
         f"  {quoted_python} -m ensurepip --upgrade >/dev/null 2>&1 || exit $?\n"
         "fi\n"
-        f"exec {quoted_python} -m pip \"$@\"\n"
+        f'exec {quoted_python} -m pip "$@"\n'
     )
     _write_shim(shim_dir / "pip", pip_shim)
     _write_shim(shim_dir / "pip3", pip_shim)
@@ -348,7 +396,10 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
 
 
 def _write_shim(path: Path, content: str) -> None:
-    if not path.exists() or path.read_text(encoding="utf-8", errors="replace") != content:
+    if (
+        not path.exists()
+        or path.read_text(encoding="utf-8", errors="replace") != content
+    ):
         path.write_text(content, encoding="utf-8")
     if os.name != "nt":
         path.chmod(0o755)
@@ -368,7 +419,9 @@ def _parse_env_file(path, base_env: dict[str, str]) -> dict[str, str]:
         key = key.strip()
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key):
             continue
-        parsed[key] = _expand_env_value(_unquote_env_value(value.strip()), {**base_env, **parsed})
+        parsed[key] = _expand_env_value(
+            _unquote_env_value(value.strip()), {**base_env, **parsed}
+        )
     return parsed
 
 
@@ -383,10 +436,16 @@ def _expand_env_value(value: str, env: dict[str, str]) -> str:
         name = match.group("braced") or match.group("plain") or ""
         return env.get(name, "")
 
-    return re.sub(r"\$\{(?P<braced>[A-Za-z_][A-Za-z0-9_]*)\}|\$(?P<plain>[A-Za-z_][A-Za-z0-9_]*)", replace_var, value)
+    return re.sub(
+        r"\$\{(?P<braced>[A-Za-z_][A-Za-z0-9_]*)\}|\$(?P<plain>[A-Za-z_][A-Za-z0-9_]*)",
+        replace_var,
+        value,
+    )
 
 
-def _format_captured_output(state: RuntimeState, stdout: str, stderr: str, max_output_chars: int) -> dict[str, Any]:
+def _format_captured_output(
+    state: RuntimeState, stdout: str, stderr: str, max_output_chars: int
+) -> dict[str, Any]:
     output: dict[str, Any] = {}
     output_dir = state.workspace / ".mokioclaw" / "bash-outputs"
     output_dir.mkdir(parents=True, exist_ok=True)

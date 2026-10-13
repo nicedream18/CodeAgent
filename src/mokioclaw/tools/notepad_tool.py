@@ -30,4 +30,9 @@ def append_notepad(state: RuntimeState, heading: str, content: str) -> dict[str,
     updated = existing.rstrip() + "\n" + entry
     path.write_text(updated, encoding="utf-8")
     state.record_read(path, complete=True)
-    return {"ok": True, "path": NOTEPAD_FILE, "heading": title, "lines": len(updated.splitlines())}
+    return {
+        "ok": True,
+        "path": NOTEPAD_FILE,
+        "heading": title,
+        "lines": len(updated.splitlines()),
+    }

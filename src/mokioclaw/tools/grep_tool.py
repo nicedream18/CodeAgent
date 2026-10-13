@@ -6,7 +6,11 @@ from pathlib import Path
 from typing import Any
 
 from mokioclaw.core.state import RuntimeState
-from mokioclaw.tools.file_tools import display_path, read_text_lossy, resolve_workspace_path
+from mokioclaw.tools.file_tools import (
+    display_path,
+    read_text_lossy,
+    resolve_workspace_path,
+)
 
 
 SKIP_DIRS = {".git", ".mokioclaw", ".venv", "__pycache__", ".pytest_cache"}
@@ -19,7 +23,11 @@ def _iter_files(root: Path, glob_pattern: str | None) -> list[Path]:
             continue
         if any(part in SKIP_DIRS for part in path.parts):
             continue
-        if glob_pattern and not fnmatch.fnmatch(path.name, glob_pattern) and not fnmatch.fnmatch(str(path), glob_pattern):
+        if (
+            glob_pattern
+            and not fnmatch.fnmatch(path.name, glob_pattern)
+            and not fnmatch.fnmatch(str(path), glob_pattern)
+        ):
             continue
         files.append(path)
     return files
@@ -48,7 +56,10 @@ def grep(
     elif root.is_dir():
         candidates = _iter_files(root, glob)
     else:
-        return {"ok": False, "error": f"path does not exist: {display_path(state, root)}"}
+        return {
+            "ok": False,
+            "error": f"path does not exist: {display_path(state, root)}",
+        }
 
     flags = re.IGNORECASE if ignore_case else 0
     try:
@@ -61,8 +72,15 @@ def grep(
         lines = read_text_lossy(file).splitlines()
         for idx, line in enumerate(lines, start=1):
             if regex.search(line):
-                matches.append({"path": display_path(state, file), "line": idx, "text": line})
+                matches.append(
+                    {"path": display_path(state, file), "line": idx, "text": line}
+                )
                 if len(matches) >= head_limit_value:
-                    return {"ok": True, "pattern": pattern, "matches": matches, "truncated": True}
+                    return {
+                        "ok": True,
+                        "pattern": pattern,
+                        "matches": matches,
+                        "truncated": True,
+                    }
 
     return {"ok": True, "pattern": pattern, "matches": matches, "truncated": False}

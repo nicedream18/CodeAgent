@@ -13,7 +13,9 @@ class ToolCallContext:
     event_writer: Callable[[dict[str, Any]], None] | None = None
 
 
-_CURRENT_TOOL_CALL: ContextVar[ToolCallContext | None] = ContextVar("mokioclaw_tool_call", default=None)
+_CURRENT_TOOL_CALL: ContextVar[ToolCallContext | None] = ContextVar(
+    "mokioclaw_tool_call", default=None
+)
 
 
 def set_tool_call_context(context: ToolCallContext) -> Token:

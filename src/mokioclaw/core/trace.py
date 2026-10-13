@@ -45,6 +45,13 @@ class TraceRecorder:
         self.approval_count = 0
         self.permission_decisions = {"requested": 0, "granted": 0, "denied": 0}
         self.permission_call_ids: set[str] = set()
+        self.tool_retries = 0
+        self.tool_retry_errors: dict[str, int] = {}
+        self.tool_error_types: dict[str, int] = {}
+        self.tool_retry_stops = {
+            "retry_limit_reached": 0,
+            "non_idempotent_side_effect": 0,
+        }
         self.checkpoint_count = 0
         self.handoff_count = 0
         self.final_status = ""
@@ -60,7 +67,13 @@ class TraceRecorder:
     def enabled(self) -> bool:
         return self.mode != "off"
 
-    def start(self, inputs: dict[str, Any], *, resumed: bool = False, resume_event: dict[str, Any] | None = None) -> None:
+    def start(
+        self,
+        inputs: dict[str, Any],
+        *,
+        resumed: bool = False,
+        resume_event: dict[str, Any] | None = None,
+    ) -> None:
         if not self.enabled:
             return
         self.record(
@@ -82,20 +95,38 @@ class TraceRecorder:
         if event_type == "llm_stream_start":
             self.stream_buffers[str(event.get("node", "model"))] = []
         elif event_type == "llm_token":
-            self.stream_buffers.setdefault(str(event.get("node", "model")), []).append(str(event.get("text", "")))
+            self.stream_buffers.setdefault(str(event.get("node", "model")), []).append(
+                str(event.get("text", ""))
+            )
             return
         elif event_type == "llm_stream_end":
             node = str(event.get("node", "model"))
             event = {**event, "text": "".join(self.stream_buffers.pop(node, []))}
-        if event_type == "tool_call":
+        if event_type == "tool_retry":
+            self.tool_retries += 1
+            error_type = str(event.get("error_type", "tool_error"))
+            self.tool_retry_errors[error_type] = (
+                self.tool_retry_errors.get(error_type, 0) + 1
+            )
+        elif event_type == "tool_call":
             self.tool_calls += 1
         elif event_type == "tool_result":
             result = event.get("result")
             if isinstance(result, dict):
                 if result.get("ok") is False:
                     self.failed_tool_calls += 1
+                    error_type = str(result.get("error_type", "tool_error"))
+                    self.tool_error_types[error_type] = (
+                        self.tool_error_types.get(error_type, 0) + 1
+                    )
+                stop_reason = str(result.get("retry_stop_reason", ""))
+                if stop_reason in self.tool_retry_stops:
+                    self.tool_retry_stops[stop_reason] += 1
                 call_id = str(event.get("tool_call_id", ""))
-                if result.get("requires_approval") and call_id not in self.permission_call_ids:
+                if (
+                    result.get("requires_approval")
+                    and call_id not in self.permission_call_ids
+                ):
                     self.approval_count += 1
         elif event_type == "permission_requested":
             self.permission_decisions["requested"] += 1
@@ -112,7 +143,9 @@ class TraceRecorder:
         elif event_type == "checkpoint_saved":
             self.checkpoint_count += 1
         elif event_type == "checkpoint_resumed":
-            self._timeline(f"resume {event.get('mode', '')} fallback={event.get('fallback', False)}")
+            self._timeline(
+                f"resume {event.get('mode', '')} fallback={event.get('fallback', False)}"
+            )
 
         self.record(
             f"custom:{event_type}",
@@ -133,7 +166,11 @@ class TraceRecorder:
             if node == "final":
                 update = event.get(node)
                 if isinstance(update, dict):
-                    self.final_status = "passed" if "PASSED" in str(update.get("final_answer", "")) else "failed"
+                    self.final_status = (
+                        "passed"
+                        if "PASSED" in str(update.get("final_answer", ""))
+                        else "failed"
+                    )
         self.record(
             "graph_update",
             {
@@ -142,7 +179,13 @@ class TraceRecorder:
             },
         )
 
-    def end(self, *, status: str, latest_node: str = "", final_state: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    def end(
+        self,
+        *,
+        status: str,
+        latest_node: str = "",
+        final_state: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
         if not self.enabled:
             return None
         self.status = status
@@ -180,7 +223,10 @@ class TraceRecorder:
         summary = self.summary_payload()
         try:
             write_json(self.root / SUMMARY_FILE, summary)
-            (self.root / TIMELINE_FILE).write_text(build_timeline_markdown(summary, self.timeline_items()), encoding="utf-8")
+            (self.root / TIMELINE_FILE).write_text(
+                build_timeline_markdown(summary, self.timeline_items()),
+                encoding="utf-8",
+            )
         except Exception as exc:
             self.errors.append(f"{type(exc).__name__}: {exc}")
             summary = self.summary_payload()
@@ -202,6 +248,10 @@ class TraceRecorder:
             "node_visits": dict(sorted(self.node_visits.items())),
             "tool_calls": self.tool_calls,
             "failed_tool_calls": self.failed_tool_calls,
+            "tool_retries": self.tool_retries,
+            "tool_retry_errors": dict(sorted(self.tool_retry_errors.items())),
+            "tool_error_types": dict(sorted(self.tool_error_types.items())),
+            "tool_retry_stops": dict(self.tool_retry_stops),
             "approval_count": self.approval_count,
             "permission_decisions": dict(self.permission_decisions),
             "checkpoint_count": self.checkpoint_count,
@@ -226,7 +276,11 @@ class TraceRecorder:
     def timeline_items(self) -> list[str]:
         if self.timeline_omitted <= 0:
             return self.timeline_head + self.timeline_tail
-        return self.timeline_head + [f"... omitted {self.timeline_omitted} event(s) ..."] + self.timeline_tail
+        return (
+            self.timeline_head
+            + [f"... omitted {self.timeline_omitted} event(s) ..."]
+            + self.timeline_tail
+        )
 
 
 def trace_summary_event(summary: dict[str, Any]) -> dict[str, Any]:
@@ -307,7 +361,9 @@ def build_timeline_markdown(summary: dict[str, Any], timeline: list[str]) -> str
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    tmp.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
+    )
     tmp.replace(path)
 
 

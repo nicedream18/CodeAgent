@@ -14,7 +14,11 @@ class EventSummary:
 
 
 def shorten(value: Any, limit: int = 260) -> str:
-    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, default=str)
+    text = (
+        value
+        if isinstance(value, str)
+        else json.dumps(value, ensure_ascii=False, default=str)
+    )
     if len(text) <= limit:
         return text
     return text[: limit - 3] + "..."
@@ -23,7 +27,9 @@ def shorten(value: Any, limit: int = 260) -> str:
 def summarize_event(event: dict[str, Any]) -> EventSummary:
     event_type = event.get("type")
     if event_type == "workspace":
-        return EventSummary("Workspace", str(event.get("path", "")), "workspace", "blue")
+        return EventSummary(
+            "Workspace", str(event.get("path", "")), "workspace", "blue"
+        )
     if event_type == "custom_event":
         payload = event.get("event")
         if isinstance(payload, dict):
@@ -89,18 +95,27 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             "green",
         )
     if event_type in {"plan_snapshot", "todo_update"}:
-        return _summarize_plan(event, "Plan Snapshot" if event_type == "plan_snapshot" else "Todo Updated")
+        return _summarize_plan(
+            event, "Plan Snapshot" if event_type == "plan_snapshot" else "Todo Updated"
+        )
     if event_type == "tool_call":
         name = event.get("name", "tool")
         node = event.get("node", "agent")
-        return EventSummary(f"{node} · {name}", shorten(event.get("args", {}), 500), "tool_call", "magenta")
+        return EventSummary(
+            f"{node} · {name}",
+            shorten(event.get("args", {}), 500),
+            "tool_call",
+            "magenta",
+        )
     if event_type == "tool_result":
         name = event.get("name", "tool")
         node = event.get("node", "agent")
         result = event.get("result")
         ok = result.get("ok") if isinstance(result, dict) else None
         style = "green" if ok is not False else "red"
-        return EventSummary(f"{node} · {name} result", _format_tool_result(result), "tool_result", style)
+        return EventSummary(
+            f"{node} · {name} result", _format_tool_result(result), "tool_result", style
+        )
     if event_type == "handoff":
         return EventSummary(
             f"Handoff · {event.get('from', 'agent')} -> {event.get('to', 'agent')}",
@@ -125,7 +140,9 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             "cyan",
         )
     if event_type == "memory_snapshot":
-        return EventSummary("Memory Snapshot", _format_memory_snapshot(event), "memory", "cyan")
+        return EventSummary(
+            "Memory Snapshot", _format_memory_snapshot(event), "memory", "cyan"
+        )
     if event_type == "context_monitor":
         return EventSummary(
             "Context Monitor",
@@ -136,7 +153,9 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
                 f"next: {event.get('context_next_node', event.get('next_node', ''))}"
             ),
             "context",
-            "yellow" if event.get("context_should_compress", event.get("should_compress", False)) else "blue",
+            "yellow"
+            if event.get("context_should_compress", event.get("should_compress", False))
+            else "blue",
         )
     if event_type == "context_compression":
         compression = _latest_compression(event)
@@ -176,8 +195,14 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             "green",
         )
     if event_type == "trace_summary":
-        nodes = event.get("node_visits") if isinstance(event.get("node_visits"), dict) else {}
-        node_text = ", ".join(f"{node}:{count}" for node, count in nodes.items()) or "(none)"
+        nodes = (
+            event.get("node_visits")
+            if isinstance(event.get("node_visits"), dict)
+            else {}
+        )
+        node_text = (
+            ", ".join(f"{node}:{count}" for node, count in nodes.items()) or "(none)"
+        )
         return EventSummary(
             "Trace Summary",
             (
@@ -203,12 +228,23 @@ def summarize_graph_event(payload: dict[str, Any]) -> EventSummary:
     if node == "planner":
         return _summarize_plan(update, "Planner")
     if node in {"actor", "codeAgent"}:
-        summary = update.get("code_agent_summary") or update.get("last_actor_summary") or update
+        summary = (
+            update.get("code_agent_summary")
+            or update.get("last_actor_summary")
+            or update
+        )
         return EventSummary("codeAgent Summary", shorten(summary, 800), "agent", "cyan")
     if node == "verifier":
-        return EventSummary("Verifier", _format_verifier(update), "verifier", "green" if update.get("passed") else "red")
+        return EventSummary(
+            "Verifier",
+            _format_verifier(update),
+            "verifier",
+            "green" if update.get("passed") else "red",
+        )
     if node == "final":
-        return EventSummary("Final", shorten(update.get("final_answer", update), 1200), "final", "green")
+        return EventSummary(
+            "Final", shorten(update.get("final_answer", update), 1200), "final", "green"
+        )
     if node == "context_monitor":
         return summarize_custom_event({"type": "context_monitor", **update})
     if node == "context_compressor":
@@ -227,10 +263,16 @@ def _summarize_plan(update: dict[str, Any], title: str) -> EventSummary:
     if todos:
         lines.append(f"todos: {counts}")
         for todo in todos[:6]:
-            lines.append(f"- {todo.get('status', 'pending')}: {todo.get('content', todo.get('description', ''))}")
+            lines.append(
+                f"- {todo.get('status', 'pending')}: {todo.get('content', todo.get('description', ''))}"
+            )
         if len(todos) > 6:
             lines.append(f"... {len(todos) - 6} more")
-    commands = update.get("verification_commands") if isinstance(update.get("verification_commands"), list) else []
+    commands = (
+        update.get("verification_commands")
+        if isinstance(update.get("verification_commands"), list)
+        else []
+    )
     if commands:
         lines.append("verify: " + "; ".join(str(command) for command in commands[:3]))
     return EventSummary(title, "\n".join(lines), "plan", "cyan")
@@ -283,11 +325,17 @@ def _format_verifier(update: dict[str, Any]) -> str:
     lines = []
     if update.get("verifier_summary"):
         lines.append(shorten(update.get("verifier_summary"), 500))
-    checks = update.get("verification_checks") if isinstance(update.get("verification_checks"), list) else []
+    checks = (
+        update.get("verification_checks")
+        if isinstance(update.get("verification_checks"), list)
+        else []
+    )
     if checks:
         for check in checks[:6]:
             status = "PASS" if check.get("passed") else "FAIL"
-            lines.append(f"{status}: {check.get('name', 'check')} - {shorten(check.get('detail', ''), 160)}")
+            lines.append(
+                f"{status}: {check.get('name', 'check')} - {shorten(check.get('detail', ''), 160)}"
+            )
     lines.append(f"passed={update.get('passed')} | attempts={update.get('attempts')}")
     return "\n".join(lines)
 
@@ -304,4 +352,7 @@ def _todo_counts(todos: list[dict[str, Any]]) -> str:
     for todo in todos:
         status = str(todo.get("status", "pending"))
         counts[status] = counts.get(status, 0) + 1
-    return ", ".join(f"{status}:{count}" for status, count in sorted(counts.items())) or "0"
+    return (
+        ", ".join(f"{status}:{count}" for status, count in sorted(counts.items()))
+        or "0"
+    )

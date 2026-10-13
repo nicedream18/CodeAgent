@@ -24,16 +24,25 @@ class ApprovalDecision:
 
 
 RISK_PATTERNS = [
-    (r"(?:^|&&|\|\||;)\s*(?:python\s+-m\s+)?pip\s+install\b", "Python package installation"),
+    (
+        r"(?:^|&&|\|\||;)\s*(?:python\s+-m\s+)?pip\s+install\b",
+        "Python package installation",
+    ),
     (r"(?:^|&&|\|\||;)\s*uv\s+add\b", "Project dependency change with uv add"),
     (r"(?:^|&&|\|\||;)\s*uv\s+sync\b", "Dependency synchronization with uv sync"),
-    (r"(?:^|&&|\|\||;)\s*uv\s+pip\s+install\b", "Python package installation with uv pip"),
+    (
+        r"(?:^|&&|\|\||;)\s*uv\s+pip\s+install\b",
+        "Python package installation with uv pip",
+    ),
     (r"(?:^|&&|\|\||;)\s*npm\s+install\b", "Node package installation"),
     (r"(?:^|&&|\|\||;)\s*pnpm\s+install\b", "Node package installation"),
     (r"(?:^|&&|\|\||;)\s*yarn\s+(?:install\b|add\b)", "Node package installation"),
     (r"(?:^|&&|\|\||;)\s*(?:curl|wget)\b", "Network download command"),
     (r"(?:^|&&|\|\||;)\s*uvicorn\b", "Long-running development server"),
-    (r"(?:^|&&|\|\||;)\s*python\s+-m\s+http\.server\b", "Long-running development server"),
+    (
+        r"(?:^|&&|\|\||;)\s*python\s+-m\s+http\.server\b",
+        "Long-running development server",
+    ),
 ]
 
 DANGEROUS_PATTERNS = [
@@ -67,4 +76,6 @@ def classify_dangerous_command(command: str) -> str | None:
 
 
 def make_approval_request(command: str, risk_reason: str) -> ApprovalRequest:
-    return ApprovalRequest(id=f"approval-{uuid4().hex[:8]}", command=command, risk_reason=risk_reason)
+    return ApprovalRequest(
+        id=f"approval-{uuid4().hex[:8]}", command=command, risk_reason=risk_reason
+    )
