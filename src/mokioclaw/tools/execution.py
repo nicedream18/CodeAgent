@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from pathlib import Path
 from typing import Any, Callable, Literal
 
 from langchain_core.tools import BaseTool
@@ -185,9 +186,51 @@ def execute_tool(
 ) -> Any:
     call_id = tool_call_id or f"{tool.name}-call"
 
+    def skill_event(result: Any = None, error: Exception | None = None) -> None:
+        if tool.name != "LoadSkillTool" or on_event is None:
+            return
+        if isinstance(result, dict) and result.get("ok") is True:
+            on_event(
+                {
+                    "type": "skill_loaded",
+                    "tool_call_id": call_id,
+                    "skill_name": result.get("name", ""),
+                    "source": result.get("source", ""),
+                    "path": result.get("path", ""),
+                }
+            )
+            return
+        diagnostic = result.get("diagnostic", {}) if isinstance(result, dict) else {}
+        requested_name = str(args.get("name", ""))
+        if error is not None and not diagnostic:
+            diagnostic = {
+                "code": "load_error",
+                "message": f"{type(error).__name__}: {error}",
+                "skill_name": requested_name,
+                "path": "",
+            }
+        path = Path(str(diagnostic.get("path", ""))) if diagnostic.get("path") else None
+        source = (
+            "workspace"
+            if path is not None and path.is_relative_to(runtime.workspace.resolve())
+            else "user"
+            if path is not None
+            else ""
+        )
+        on_event(
+            {
+                "type": "skill_load_failed",
+                "tool_call_id": call_id,
+                "skill_name": diagnostic.get("skill_name", requested_name),
+                "source": source,
+                "diagnostic": diagnostic,
+            }
+        )
+
     # Reject malformed arguments before opening an approval prompt.
     invalid = _validate_tool_args(tool, args)
     if invalid is not None:
+        skill_event(invalid)
         if on_event:
             on_event(
                 {
@@ -227,6 +270,7 @@ def execute_tool(
         for attempt in range(max_retries + 1):
             try:
                 result = tool.invoke(args)
+                skill_event(result)
                 if isinstance(result, dict) and result.get("ok") is False:
                     error_type, classified_retryable = classify_tool_failure(result)
                     tool_retry_hint = bool(
@@ -278,6 +322,7 @@ def execute_tool(
                     )
                 return _truncate_result(result, runtime.context_output_limit_chars)
             except Exception as exc:
+                skill_event(error=exc)
                 error_type, retryable = classify_tool_failure(exc)
                 can_retry = (
                     error_type in _RETRYABLE_ERROR_TYPES

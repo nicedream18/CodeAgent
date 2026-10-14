@@ -8,7 +8,6 @@ from mokioclaw.agents.code_agent import run_code_agent
 from mokioclaw.agents.search_agent import run_search_agent
 from mokioclaw.graph.state import MokioGraphState
 
-
 Runner = Callable[..., dict[str, Any]]
 
 
@@ -156,6 +155,8 @@ def run_subagent(
     previous_agent_tools = runtime.active_agent_tools
     previous_skill_tools = runtime.active_skill_tools
     previous_skill_permissions = runtime.active_skill_permissions
+    previous_skill_name = runtime.active_skill_name
+    previous_skill_source = runtime.active_skill_source
     runtime.active_agent_tools = configured_tools
     try:
         limit = int(config.get("max_tool_calls", definition.max_tool_calls))
@@ -165,6 +166,8 @@ def run_subagent(
         if name == "codeAgent":
             runtime.active_skill_tools = previous_skill_tools
             runtime.active_skill_permissions = previous_skill_permissions
+            runtime.active_skill_name = previous_skill_name
+            runtime.active_skill_source = previous_skill_source
     summary = str(result.get("summary", ""))
     return {
         **result,

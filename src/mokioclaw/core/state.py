@@ -42,6 +42,8 @@ class RuntimeState:
     model_context_reserve_tokens: int = 8192
     active_skill_tools: set[str] | None = None
     active_skill_permissions: set[str] | None = None
+    active_skill_name: str | None = None
+    active_skill_source: str | None = None
     active_agent_tools: set[str] | None = None
     subagent_configs: dict[str, dict[str, Any]] = field(default_factory=dict)
     subagent_registry: Any = None

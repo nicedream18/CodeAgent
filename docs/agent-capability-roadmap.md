@@ -70,6 +70,47 @@ MOKIO_BASH_ALLOW_PATTERNS='["^pytest(?:\\s|$)"]'
 - 参数错误不会触发审批；危险命令不会触发审批；外部路径审批请求与结果携带同一 `tool_call_id`。
 - 批准仅对本次调用有效；CLI/TUI 和 Python 事件流仍保留原有调用方式。
 
+## Skill 格式、权限与运行过程
+
+Skill 文件使用标准 YAML frontmatter 和 Markdown 正文。工作区目录 `.mokioclaw/skills/<目录名>/SKILL.md` 优先于 `~/.mokioclaw/skills/<目录名>/SKILL.md`；同名工作区文件即使格式错误也会遮蔽用户级版本，并在发现列表中显示诊断。
+
+```yaml
+---
+name: html-page
+description: Create an accessible, self-contained HTML page.
+tools:
+  - FileWriteTool
+permissions:
+  - filesystem_write
+---
+
+Write a semantic HTML page, then report its path.
+```
+
+`tools` 和 `permissions` 都必须是字符串列表。省略或写成 `[]` 都表示不额外授予工具或能力。所列工具必须已注册，且它的全部 capability 都必须出现在 `permissions` 中。`LoadSkillTool` 与 `TodoUpdateTool` 是 CodeAgent 必需的框架控制工具，不需要在 Skill 中重复声明；Skill 权限不会给 Subagent 或其他 Agent 使用。
+
+```text
+CodeAgent 展示 Skill 摘要
+  → 模型按需调用 LoadSkillTool
+  → YAML / 工具注册 / capability 校验
+  → 成功后替换当前 Skill scope，并将正文返回给模型
+  → 每次后续工具调用由统一授权入口执行 scope 检查
+  → CodeAgent 调用结束时恢复进入前的 scope
+```
+
+失败加载保留此前权限范围，不会清空或扩大权限。一次 CodeAgent 调用只保留一个活动 Skill；成功加载另一个 Skill 会替换它。Trace 的 `events.jsonl` 中搜索 `custom:skill_loaded` 和 `custom:skill_load_failed`，可以按 `tool_call_id` 查看结果；专属事件只记录名称、来源、路径和诊断，不记录正文。`summary.json` 的 `skill_load_successes`、`skill_load_failures` 和 `skills_used` 是汇总信息。
+
+### CLI 手动演示
+
+```bash
+mkdir -p .mokioclaw/skills
+cp -R examples/skills/html-page .mokioclaw/skills/
+cp -R examples/skills/invalid-skill .mokioclaw/skills/
+uv run mokioclaw "创建一个无障碍 HTML 页面，按 html-page Skill 工作流执行"
+```
+
+完成后从运行事件中的 `trace_summary` 找到 trace 目录，检查 `events.jsonl` 与 `summary.json`。观察有效 Skill 的 `skill_loaded` 事件和格式错误 Skill 的 `skill_load_failed` 诊断。可尝试把 HTML Skill 的 `tools` 改为空列表，再要求它写文件，确认 `FileWriteTool` 在实际执行前被 Skill scope 拒绝。
+
 ### Subagent 预算与工具范围
 
 ```bash

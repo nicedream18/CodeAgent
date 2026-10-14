@@ -10,7 +10,6 @@ from uuid import uuid4
 
 from langchain_core.messages import BaseMessage, message_to_dict
 
-
 VALID_TRACE_MODES = {"on", "off"}
 TRACE_ROOT = Path(".mokioclaw") / "traces"
 EVENTS_FILE = "events.jsonl"
@@ -52,6 +51,9 @@ class TraceRecorder:
             "retry_limit_reached": 0,
             "non_idempotent_side_effect": 0,
         }
+        self.skill_load_successes = 0
+        self.skill_load_failures = 0
+        self.skill_names: set[str] = set()
         self.checkpoint_count = 0
         self.handoff_count = 0
         self.final_status = ""
@@ -92,6 +94,26 @@ class TraceRecorder:
         if not self.enabled:
             return
         event_type = str(event.get("type", "custom_event"))
+        if event_type == "tool_result" and event.get("name") == "LoadSkillTool":
+            result = event.get("result")
+            if isinstance(result, dict):
+                event = {
+                    **event,
+                    "result": {
+                        key: result.get(key)
+                        for key in (
+                            "ok",
+                            "name",
+                            "source",
+                            "path",
+                            "error_type",
+                            "diagnostic",
+                        )
+                        if key in result
+                    },
+                }
+            else:
+                event = {**event, "result": "[Skill load result redacted]"}
         if event_type == "llm_stream_start":
             self.stream_buffers[str(event.get("node", "model"))] = []
         elif event_type == "llm_token":
@@ -140,6 +162,13 @@ class TraceRecorder:
             self.permission_call_ids.add(str(event.get("tool_call_id", "")))
         elif event_type == "handoff":
             self.handoff_count += 1
+        elif event_type == "skill_loaded":
+            self.skill_load_successes += 1
+            name = str(event.get("skill_name", ""))
+            if name:
+                self.skill_names.add(name)
+        elif event_type == "skill_load_failed":
+            self.skill_load_failures += 1
         elif event_type == "checkpoint_saved":
             self.checkpoint_count += 1
         elif event_type == "checkpoint_resumed":
@@ -256,6 +285,9 @@ class TraceRecorder:
             "permission_decisions": dict(self.permission_decisions),
             "checkpoint_count": self.checkpoint_count,
             "handoff_count": self.handoff_count,
+            "skill_load_successes": self.skill_load_successes,
+            "skill_load_failures": self.skill_load_failures,
+            "skills_used": sorted(self.skill_names),
             "final_status": self.final_status,
             "errors": list(self.errors),
             "timeline_omitted": self.timeline_omitted,

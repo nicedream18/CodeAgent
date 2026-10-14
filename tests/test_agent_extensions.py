@@ -4,9 +4,14 @@ import sys
 from pathlib import Path
 
 import pytest
-from langchain_core.messages import AIMessageChunk
+from langchain_core.messages import AIMessage, AIMessageChunk
 from langchain_core.tools import StructuredTool
 
+from mokioclaw.agents.registry import (
+    SubagentDefinition,
+    SubagentRegistry,
+    parse_subagent_configs,
+)
 from mokioclaw.core.approval import ApprovalDecision
 from mokioclaw.core.session import (
     compact_session_history,
@@ -15,15 +20,13 @@ from mokioclaw.core.session import (
 )
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.tool_policy import authorize_tool, parse_tool_policies
-from mokioclaw.agents.registry import parse_subagent_configs
-from mokioclaw.agents.registry import SubagentDefinition, SubagentRegistry
-from mokioclaw.graph.nodes import _call_registered_subagent_tool
-from mokioclaw.providers.openai_provider import invoke_streaming
-from mokioclaw.tools.execution import ToolExecutionError, execute_tool
 from mokioclaw.core.trace import TraceRecorder
+from mokioclaw.graph.nodes import _call_registered_subagent_tool, context_monitor_node
+from mokioclaw.providers.openai_provider import invoke_streaming
+from mokioclaw.tools import build_tools
+from mokioclaw.tools.execution import ToolExecutionError, execute_tool
 from mokioclaw.tools.mcp_tools import build_mcp_tools
 from mokioclaw.tools.skills import discover_skills, load_skill, parse_skill
-from mokioclaw.graph.nodes import context_monitor_node
 
 
 def test_parse_tool_policies_and_single_operation_approval(tmp_path: Path) -> None:
@@ -317,8 +320,269 @@ def test_skill_discovery_loads_declared_scope_and_rejects_invalid(
 def test_skill_parser_requires_required_frontmatter(tmp_path: Path) -> None:
     skill = tmp_path / "SKILL.md"
     skill.write_text("---\nname: demo\n---\nbody", encoding="utf-8")
-    with pytest.raises(ValueError, match="name, description"):
+    with pytest.raises(ValueError, match="description"):
         parse_skill(skill)
+
+
+@pytest.mark.parametrize(
+    ("frontmatter", "code"),
+    [
+        ("", "missing_frontmatter"),
+        ("name: [broken\ndescription: x", "invalid_yaml"),
+        ("name: demo", "missing_field"),
+        ("name: demo\ndescription: x\ntools: FileWriteTool", "invalid_field_type"),
+        ("name: demo\ndescription: x\npermissions: [unknown]", "unknown_permission"),
+        ("name: demo\ndescription: x\ntools: [MissingTool]", "unknown_tool"),
+        (
+            "name: demo\ndescription: x\ntools: [FileWriteTool]",
+            "missing_tool_permission",
+        ),
+    ],
+)
+def test_skill_parser_reports_structured_diagnostics(
+    tmp_path: Path, frontmatter: str, code: str
+) -> None:
+    skill = tmp_path / "demo" / "SKILL.md"
+    skill.parent.mkdir()
+    skill.write_text(f"---\n{frontmatter}\n---\nbody\n", encoding="utf-8")
+    with pytest.raises(ValueError) as exc:
+        parse_skill(skill)
+    assert exc.value.diagnostic["code"] == code
+    assert exc.value.diagnostic["skill_name"]
+    assert exc.value.diagnostic["path"] == str(skill)
+
+
+def test_skill_empty_scope_denies_tools_and_failed_load_does_not_change_scope(
+    tmp_path: Path,
+) -> None:
+    skill_dir = tmp_path / ".mokioclaw" / "skills" / "empty"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: empty\ndescription: No extra capabilities.\ntools: []\npermissions: []\n---\nInstructions.\n",
+        encoding="utf-8",
+    )
+    runtime = RuntimeState(workspace=tmp_path)
+    runtime.active_skill_tools = {"GrepTool"}
+    runtime.active_skill_permissions = {"filesystem_read"}
+    failed = load_skill(runtime, "missing")
+    assert failed["diagnostic"]["code"] == "not_found"
+    assert runtime.active_skill_tools == {"GrepTool"}
+    assert runtime.active_skill_permissions == {"filesystem_read"}
+
+    loaded = load_skill(runtime, "empty")
+    assert loaded["ok"] is True
+    assert runtime.active_skill_tools == set()
+    assert runtime.active_skill_permissions == set()
+    assert (
+        authorize_tool(runtime, "FileReadTool", {"file_path": "x"})["error_type"]
+        == "permission_denied"
+    )
+
+
+def test_invalid_workspace_skill_shadows_user_skill(
+    monkeypatch, tmp_path: Path
+) -> None:
+    workspace = tmp_path / "workspace"
+    user_home = tmp_path / "home"
+    workspace_skill = workspace / ".mokioclaw" / "skills" / "same" / "SKILL.md"
+    user_skill = user_home / ".mokioclaw" / "skills" / "same" / "SKILL.md"
+    workspace_skill.parent.mkdir(parents=True)
+    user_skill.parent.mkdir(parents=True)
+    workspace_skill.write_text("broken", encoding="utf-8")
+    user_skill.write_text(
+        "---\nname: same\ndescription: user fallback\n---\nUser body\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(Path, "home", lambda: user_home)
+    runtime = RuntimeState(workspace=workspace)
+    discovered = discover_skills(runtime)
+    item = next(skill for skill in discovered if skill["name"] == "same")
+    assert item["valid"] is False
+    assert item["source"] == "workspace"
+    assert load_skill(runtime, "same")["diagnostic"] == item["diagnostic"]
+
+
+def test_skill_events_and_trace_summary_never_include_skill_body(
+    tmp_path: Path,
+) -> None:
+    skill_dir = tmp_path / ".mokioclaw" / "skills" / "logged"
+    skill_dir.mkdir(parents=True)
+    body = "PRIVATE SKILL BODY SHOULD NOT ENTER EVENT"
+    (skill_dir / "SKILL.md").write_text(
+        f"---\nname: logged\ndescription: Logging demo.\n---\n{body}\n",
+        encoding="utf-8",
+    )
+    runtime = RuntimeState(workspace=tmp_path)
+    trace = TraceRecorder(runtime, task="skill trace")
+    events = []
+    tool = next(tool for tool in build_tools(runtime) if tool.name == "LoadSkillTool")
+    result = execute_tool(
+        runtime, tool, {"name": "logged"}, on_event=events.append, tool_call_id="load-1"
+    )
+    assert result["ok"] is True
+    loaded_event = next(event for event in events if event["type"] == "skill_loaded")
+    assert loaded_event["tool_call_id"] == "load-1"
+    assert loaded_event["skill_name"] == "logged"
+    trace.record_custom_event(loaded_event)
+    trace.record_custom_event(
+        {
+            "type": "tool_result",
+            "node": "codeAgent",
+            "name": "LoadSkillTool",
+            "tool_call_id": "load-1",
+            "result": result,
+        }
+    )
+    failed = execute_tool(
+        runtime,
+        tool,
+        {"name": "missing"},
+        on_event=events.append,
+        tool_call_id="load-2",
+    )
+    assert failed["ok"] is False
+    failed_event = next(
+        event for event in events if event["type"] == "skill_load_failed"
+    )
+    assert failed_event["diagnostic"]["code"] == "not_found"
+    trace.record_custom_event(failed_event)
+    summary = trace.end(status="finished")
+    assert summary["skill_load_successes"] == 1
+    assert summary["skill_load_failures"] == 1
+    assert summary["skills_used"] == ["logged"]
+    trace_text = (trace.root / "events.jsonl").read_text(encoding="utf-8")
+    assert body not in trace_text
+
+
+def test_codeagent_subagent_restores_complete_skill_scope(tmp_path: Path) -> None:
+    from mokioclaw.agents.registry import run_subagent
+
+    skill_dir = tmp_path / ".mokioclaw" / "skills" / "temporary"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: temporary\ndescription: temporary\ntools: [FileWriteTool]\npermissions: [filesystem_write]\n---\nTemp workflow\n",
+        encoding="utf-8",
+    )
+    runtime = RuntimeState(workspace=tmp_path)
+    runtime.active_skill_tools = {"GrepTool"}
+    runtime.active_skill_permissions = {"filesystem_read"}
+    runtime.active_skill_name = "outer"
+    runtime.active_skill_source = "user"
+
+    def runner(state, instruction, *, writer=None, max_loops=1):
+        load_skill(state["runtime"], "temporary")
+        return {"ok": True, "summary": "done"}
+
+    registry = SubagentRegistry(
+        {
+            "codeAgent": SubagentDefinition(
+                "codeAgent",
+                "test",
+                runner,
+                frozenset({"LoadSkillTool", "FileWriteTool", "TodoUpdateTool"}),
+                1,
+            )
+        }
+    )
+    runtime.subagent_registry = registry
+    run_subagent({"runtime": runtime}, "codeAgent", "task")
+    assert runtime.active_skill_tools == {"GrepTool"}
+    assert runtime.active_skill_permissions == {"filesystem_read"}
+    assert runtime.active_skill_name == "outer"
+    assert runtime.active_skill_source == "user"
+
+
+def test_codeagent_loads_skill_then_executes_declared_tool(
+    monkeypatch, tmp_path: Path
+) -> None:
+    from mokioclaw.agents.code_agent import run_code_agent
+
+    skill_dir = tmp_path / ".mokioclaw" / "skills" / "writer"
+    skill_dir.mkdir(parents=True)
+    body = "Use FileWriteTool to create the requested page."
+    (skill_dir / "SKILL.md").write_text(
+        f"---\nname: writer\ndescription: Write one file.\ntools: [FileWriteTool]\npermissions: [filesystem_write]\n---\n{body}\n",
+        encoding="utf-8",
+    )
+
+    class BoundModel:
+        def __init__(self):
+            self.calls = [
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "LoadSkillTool",
+                            "args": {"name": "writer"},
+                            "id": "load",
+                            "type": "tool_call",
+                        }
+                    ],
+                ),
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "FileWriteTool",
+                            "args": {
+                                "file_path": "page.html",
+                                "content": "<h1>Hi</h1>",
+                            },
+                            "id": "write",
+                            "type": "tool_call",
+                        }
+                    ],
+                ),
+                AIMessage(content="Finished the page."),
+            ]
+
+        def invoke(self, messages):
+            return self.calls.pop(0)
+
+    class FakeModel:
+        def bind_tools(self, tools):
+            return BoundModel()
+
+    monkeypatch.setattr("mokioclaw.agents.code_agent.create_model", lambda: FakeModel())
+    runtime = RuntimeState(workspace=tmp_path)
+    events = []
+    result = run_code_agent(
+        {"runtime": runtime, "task": "write a page"}, "create it", writer=events.append
+    )
+    assert result["summary"] == "Finished the page."
+    assert (tmp_path / "page.html").read_text(encoding="utf-8") == "<h1>Hi</h1>"
+    tool_messages = [
+        message
+        for message in result["messages"]
+        if getattr(message, "name", "") == "LoadSkillTool"
+    ]
+    assert body in str(tool_messages[0].content)
+    loaded = next(event for event in events if event["type"] == "skill_loaded")
+    assert loaded["tool_call_id"] == "load"
+
+
+def test_invalid_skill_scope_does_not_allow_a_write(tmp_path: Path) -> None:
+    skill_dir = tmp_path / ".mokioclaw" / "skills" / "invalid"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: invalid\ndescription: Missing write permission.\ntools: [FileWriteTool]\n---\nBad scope.\n",
+        encoding="utf-8",
+    )
+    runtime = RuntimeState(workspace=tmp_path)
+    runtime.active_skill_tools = {"LoadSkillTool"}
+    runtime.active_skill_permissions = set()
+    result = load_skill(runtime, "invalid")
+    assert result["diagnostic"]["code"] == "missing_tool_permission"
+    assert runtime.active_skill_tools == {"LoadSkillTool"}
+    assert runtime.active_skill_permissions == set()
+    write_tool = next(
+        tool for tool in build_tools(runtime) if tool.name == "FileWriteTool"
+    )
+    denied = execute_tool(
+        runtime, write_tool, {"file_path": "bad.txt", "content": "no"}
+    )
+    assert denied["error_type"] == "permission_denied"
+    assert not (tmp_path / "bad.txt").exists()
 
 
 def test_compact_session_history_keeps_recent_turns(tmp_path: Path) -> None:
