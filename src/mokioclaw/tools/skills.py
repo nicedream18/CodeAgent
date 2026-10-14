@@ -75,7 +75,6 @@ def discover_skills(runtime: RuntimeState) -> list[dict[str, Any]]:
     seen_dirs: set[str] = set()
     result: list[dict[str, Any]] = []
     for path, skill, diagnostic in candidates:
-        assert diagnostic is not None
         identity = (
             skill["name"]
             if skill is not None

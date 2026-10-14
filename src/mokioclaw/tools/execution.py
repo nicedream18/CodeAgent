@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from langchain_core.tools import BaseTool
 from pydantic import ValidationError
@@ -183,8 +184,16 @@ def execute_tool(
     on_retry: Callable[[dict[str, Any]], None] | None = None,
     on_event: Callable[[dict[str, Any]], None] | None = None,
     tool_call_id: str | None = None,
+    budget_reserved: bool = False,
 ) -> Any:
     call_id = tool_call_id or f"{tool.name}-call"
+
+    if not budget_reserved:
+        budget_failure = reserve_subagent_tool_call(
+            runtime, tool.name, call_id, on_event=on_event
+        )
+        if budget_failure is not None:
+            return budget_failure
 
     def skill_event(result: Any = None, error: Exception | None = None) -> None:
         if tool.name != "LoadSkillTool" or on_event is None:
@@ -376,6 +385,49 @@ def execute_tool(
         }
     finally:
         reset_tool_call_context(context_token)
+
+
+def reserve_subagent_tool_call(
+    runtime: RuntimeState,
+    tool_name: str,
+    tool_call_id: str,
+    *,
+    on_event: Callable[[dict[str, Any]], None] | None = None,
+) -> dict[str, Any] | None:
+    """Reserve one model-requested tool call, including invalid or denied calls."""
+    budget = runtime.active_subagent_budget
+    if budget is None:
+        return None
+    if budget.reserve():
+        return None
+
+    if not budget.exhaustion_event_emitted:
+        budget.exhaustion_event_emitted = True
+        writer = on_event or budget.writer
+        if writer is not None:
+            writer(
+                {
+                    "type": "subagent_budget_exhausted",
+                    "handoff_id": budget.handoff_id,
+                    "subagent": budget.subagent_name,
+                    "tool_call_id": tool_call_id,
+                    "tool_name": tool_name,
+                    "limit": budget.limit,
+                    "used": budget.used,
+                }
+            )
+    return {
+        "ok": False,
+        "error": f"Subagent tool-call budget exhausted ({budget.limit})",
+        "error_type": "budget_exhausted",
+        "retryable": False,
+        "retries": 0,
+        "retry_stop_reason": "tool_budget_exhausted",
+        "tool_name": tool_name,
+        "handoff_id": budget.handoff_id,
+        "budget_limit": budget.limit,
+        "budget_used": budget.used,
+    }
 
 
 def _truncate_result(value: Any, limit: int) -> Any:

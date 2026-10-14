@@ -31,10 +31,15 @@ class SourceItem(TypedDict, total=False):
 
 
 class AgentHandoff(TypedDict, total=False):
+    handoff_id: str
     from_agent: str
     to_agent: str
     instruction: str
     result: str
+    ok: bool
+    evidence: list[dict[str, Any]]
+    unresolved: list[str]
+    stop_reason: str | None
 
 
 class VerificationCheck(TypedDict, total=False):

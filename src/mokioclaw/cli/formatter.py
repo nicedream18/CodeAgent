@@ -506,9 +506,9 @@ def _format_tool_result(result: Any) -> str:
         "error",
     ]
     lines = [f"{key}: {result[key]}" for key in keys if key in result]
-    if "stdout" in result and result["stdout"]:
+    if result.get("stdout"):
         lines.append("stdout:\n" + _shorten(result["stdout"], 500))
-    if "stderr" in result and result["stderr"]:
+    if result.get("stderr"):
         lines.append("stderr:\n" + _shorten(result["stderr"], 500))
     for path_key in ("stdout_path", "stderr_path"):
         if result.get(path_key):
@@ -517,13 +517,13 @@ def _format_tool_result(result: Any) -> str:
         lines.append(f"todos: {len(result['todos'])} item(s)")
     if "heading" in result:
         lines.append(f"heading: {result['heading']}")
-    if "content" in result and result["content"]:
+    if result.get("content"):
         lines.append("content:\n" + _shorten(result["content"], 500))
-    if "answer" in result and result["answer"]:
+    if result.get("answer"):
         lines.append("answer:\n" + _shorten(result["answer"], 500))
     if "results" in result:
         lines.append(f"sources: {len(result['results'])} item(s)")
-    if "summary" in result and result["summary"]:
+    if result.get("summary"):
         lines.append("summary:\n" + _shorten(result["summary"], 500))
     if "sources" in result:
         lines.append(f"sources: {len(result['sources'])} item(s)")
@@ -534,9 +534,12 @@ def _format_tool_result(result: Any) -> str:
 
 def render_handoff(event: dict[str, Any]) -> None:
     title = f"Handoff · {event.get('from', 'agent')} -> {event.get('to', 'agent')}"
+    handoff_id = event.get("handoff_id")
+    instruction = _shorten(event.get("instruction", event.get("task", "")), 900)
+    body = f"handoff_id: {handoff_id}\n{instruction}" if handoff_id else instruction
     console.print(
         Panel(
-            _shorten(event.get("instruction", ""), 900),
+            body,
             title=title,
             border_style="blue",
             box=box.ROUNDED,
@@ -546,9 +549,21 @@ def render_handoff(event: dict[str, Any]) -> None:
 
 def render_handoff_result(event: dict[str, Any]) -> None:
     title = f"Return · {event.get('from', 'agent')} -> {event.get('to', 'agent')}"
+    lines = []
+    if event.get("handoff_id"):
+        lines.append(f"handoff_id: {event['handoff_id']}")
+    if event.get("ok") is not None:
+        lines.append(f"ok: {event['ok']}")
+    lines.append(_shorten(event.get("result", event.get("summary", "")), 1200))
+    if event.get("evidence"):
+        lines.append("evidence:\n" + _shorten(event["evidence"], 800))
+    if event.get("unresolved"):
+        lines.append("unresolved:\n" + _shorten(event["unresolved"], 800))
+    if event.get("stop_reason"):
+        lines.append(f"stop_reason: {event['stop_reason']}")
     console.print(
         Panel(
-            _shorten(event.get("result", ""), 1200),
+            "\n\n".join(lines),
             title=title,
             border_style="cyan",
             box=box.ROUNDED,

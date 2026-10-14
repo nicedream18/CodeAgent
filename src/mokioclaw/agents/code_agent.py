@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.tools import StructuredTool
@@ -14,13 +15,15 @@ from mokioclaw.graph.memory import (
 )
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import CODE_AGENT_PROMPT
-from mokioclaw.providers.openai_provider import create_model
-from mokioclaw.providers.openai_provider import invoke_streaming
+from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 from mokioclaw.tools import build_tools
-from mokioclaw.tools.execution import execute_tool, tool_failure_result
+from mokioclaw.tools.execution import (
+    execute_tool,
+    reserve_subagent_tool_call,
+    tool_failure_result,
+)
 from mokioclaw.tools.skills import skill_summaries
 from mokioclaw.tools.todo_tool import persist_todos, update_todo
-
 
 Writer = Callable[[dict[str, Any]], None]
 
@@ -39,6 +42,13 @@ def run_code_agent(
     writer(memory_event(memory, node="codeAgent"))
     model = create_model()
     registered_tools = build_tools(runtime)
+    if runtime.active_agent_tools is not None:
+        registered_tools = [
+            tool
+            for tool in registered_tools
+            if tool.name in runtime.active_agent_tools
+            or (tool.name.startswith("MCP_") and "MCP_*" in runtime.active_agent_tools)
+        ]
     for error in runtime.mcp_discovery_errors:
         writer({"type": "mcp_discovery_error", **error})
     code_agent = model.bind_tools(registered_tools + [_build_todo_update_tool(todos)])
@@ -60,7 +70,9 @@ def run_code_agent(
     produced_messages: list[Any] = []
     tool_events: list[dict[str, Any]] = []
 
-    for _ in range(max_loops):
+    budget_exhausted = False
+    final_response_allowance = 1 if runtime.active_subagent_budget is not None else 0
+    for _ in range(max_loops + final_response_allowance):
         response = invoke_streaming(
             code_agent, messages, writer=writer, node="codeAgent"
         )
@@ -103,20 +115,35 @@ def run_code_agent(
                 )
             produced_messages.append(tool_result)
             messages.append(tool_result)
+            if (
+                runtime.active_subagent_budget is not None
+                and runtime.active_subagent_budget.exhausted
+            ):
+                budget_exhausted = True
+                break
+        if budget_exhausted:
+            break
     else:
-        produced_messages.append(
-            AIMessage(
-                content="codeAgent stopped after the maximum tool loop count; verifier will inspect current files."
-            )
+        message = (
+            "codeAgent stopped after the final response allowance."
+            if final_response_allowance
+            else "codeAgent stopped after the maximum tool loop count; verifier will inspect current files."
         )
+        produced_messages.append(AIMessage(content=message))
 
     summary = _last_ai_content(produced_messages)
     return {
-        "ok": True,
+        "ok": not budget_exhausted,
         "summary": summary,
         "todos": todos or state.get("todos", []),
         "messages": produced_messages,
         "tool_events": tool_events,
+        "stop_reason": "tool_budget_exhausted" if budget_exhausted else None,
+        "unresolved": (
+            ["Subagent tool-call budget exhausted; implementation may be incomplete."]
+            if budget_exhausted
+            else []
+        ),
     }
 
 
@@ -146,7 +173,15 @@ def execute_code_agent_tool(
         tools = {tool.name: tool for tool in build_tools(runtime)}
         tool = tools.get(name)
         if tool is None:
-            result = tool_failure_result(f"unknown tool: {name}", tool_name=name)
+            budget_failure = reserve_subagent_tool_call(
+                runtime,
+                name,
+                str(call.get("id") or f"{name}-call"),
+                on_event=on_event,
+            )
+            result = budget_failure or tool_failure_result(
+                f"unknown tool: {name}", tool_name=name
+            )
         else:
             try:
                 result = execute_tool(

@@ -123,6 +123,54 @@ def test_trace_records_permission_lifecycle_for_one_tool_call(tmp_path: Path) ->
     assert '"call-1"' in log
 
 
+def test_trace_summarizes_correlated_subagent_handoffs_and_budget(
+    tmp_path: Path,
+) -> None:
+    trace = TraceRecorder(
+        RuntimeState(workspace=tmp_path, trace_mode="on"), task="delegate"
+    )
+    trace.record_custom_event(
+        {
+            "type": "handoff",
+            "handoff_id": "handoff-1",
+            "to": "codeAgent",
+            "instruction": "implement",
+        }
+    )
+    trace.record_custom_event(
+        {
+            "type": "subagent_budget_exhausted",
+            "handoff_id": "handoff-1",
+            "subagent": "codeAgent",
+        }
+    )
+    trace.record_custom_event(
+        {
+            "type": "handoff_result",
+            "handoff_id": "handoff-1",
+            "from": "codeAgent",
+            "ok": False,
+            "stop_reason": "tool_budget_exhausted",
+            "result": "partial",
+        }
+    )
+
+    summary = trace.end(status="finished")
+
+    assert summary is not None
+    assert summary["subagent_budget_exhaustions"] == 1
+    assert summary["subagent_result_status"] == {"ok": 0, "failed": 1}
+    assert summary["handoffs"] == [
+        {
+            "handoff_id": "handoff-1",
+            "subagent": "codeAgent",
+            "instruction": "implement",
+            "status": "failed",
+            "stop_reason": "tool_budget_exhausted",
+        }
+    ]
+
+
 def test_trace_recorder_off_mode_does_not_create_files(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path, trace_mode="off")
     trace = TraceRecorder(runtime, task="demo")

@@ -115,9 +115,66 @@ def test_custom_subagent_registers_and_returns_handoff_contract(tmp_path: Path) 
     )
 
     assert result["agent"] == "auditor"
-    assert result["evidence"] == ["report.txt"]
+    assert result["evidence"] == [
+        {
+            "kind": "tool_event",
+            "label": "report.txt",
+            "reference": "report.txt",
+            "details": "",
+        }
+    ]
     assert state["agent_handoffs"][0]["to_agent"] == "auditor"
     assert [event["type"] for event in events] == ["handoff", "handoff_result"]
+    assert events[0]["handoff_id"] == events[1]["handoff_id"]
+
+
+def test_subagent_budget_counts_invalid_calls_and_keeps_partial_updates(
+    tmp_path: Path,
+) -> None:
+    effects = []
+    tool = StructuredTool.from_function(
+        name="TestTool",
+        func=lambda value: effects.append(value) or {"ok": True},
+        description="A test tool with one required argument.",
+    )
+
+    def runner(state, instruction, *, writer=None, max_loops=4):
+        execute_tool(state["runtime"], tool, {}, on_event=writer)
+        execute_tool(state["runtime"], tool, {"value": "must not run"}, on_event=writer)
+        return {
+            "ok": True,
+            "summary": "partial work",
+            "evidence": ["observed invalid request"],
+            "state_updates": {"research_notes": "partial note"},
+        }
+
+    runtime = RuntimeState(workspace=tmp_path)
+    runtime.subagent_registry = SubagentRegistry(
+        {
+            "auditor": SubagentDefinition(
+                name="auditor",
+                description="Budget test",
+                runner=runner,
+                allowed_tools=frozenset({"TestTool"}),
+                max_tool_calls=1,
+                state_update_fields=frozenset({"research_notes"}),
+            )
+        }
+    )
+    runtime.subagent_configs = {"auditor": {"max_tool_calls": 1}}
+    state = {"task": "review", "runtime": runtime}
+    events = []
+
+    result = _call_registered_subagent_tool(state, events.append, "auditor", "inspect")
+
+    assert effects == []
+    assert result["ok"] is False
+    assert result["stop_reason"] == "tool_budget_exhausted"
+    assert result["metadata"]["tool_calls_used"] == 1
+    assert state["research_notes"] == "partial note"
+    budget_event = next(e for e in events if e["type"] == "subagent_budget_exhausted")
+    assert budget_event["handoff_id"] == events[0]["handoff_id"]
+    assert events[-1]["handoff_id"] == events[0]["handoff_id"]
 
 
 def test_idempotent_tool_retries_only_transient_failures(tmp_path: Path) -> None:

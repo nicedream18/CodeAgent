@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import os
 import re
+from dataclasses import replace
 from typing import Any
+from uuid import uuid4
 
 from dotenv import load_dotenv
 from langchain_core.messages import (
@@ -17,8 +19,8 @@ from langchain_core.tools import StructuredTool
 from langgraph.config import get_stream_writer
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 
-from mokioclaw.agents.registry import run_subagent, registered_subagents
 from mokioclaw.agents.code_agent import run_code_agent as _DEFAULT_CODE_AGENT
+from mokioclaw.agents.registry import registered_subagents, run_subagent
 from mokioclaw.agents.search_agent import run_search_agent as _DEFAULT_SEARCH_AGENT
 
 # Kept as patchable compatibility hooks for callers/tests that replace the
@@ -34,12 +36,10 @@ from mokioclaw.graph.memory import (
 from mokioclaw.graph.state import MokioGraphState, TodoItem, VerificationCheck
 from mokioclaw.prompts.stage3 import PLANNER_PROMPT, VERIFIER_PROMPT
 from mokioclaw.prompts.stage4 import CONTEXT_COMPRESSION_PROMPT
-from mokioclaw.providers.openai_provider import create_model
-from mokioclaw.providers.openai_provider import invoke_streaming
+from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 from mokioclaw.tools import build_read_only_tools
 from mokioclaw.tools.execution import execute_tool, tool_failure_result
 from mokioclaw.tools.todo_tool import persist_todos, write_todos
-
 
 DEFAULT_CONTEXT_TOKEN_LIMIT = 400000
 
@@ -579,42 +579,80 @@ def _call_registered_subagent_tool(
     state: MokioGraphState, writer, subagent_name: str, instruction: str
 ) -> dict[str, Any]:
     name = str(subagent_name)
+    handoff_id = str(uuid4())
     writer(
-        {"type": "handoff", "from": "planner", "to": name, "instruction": instruction}
+        {
+            "type": "handoff",
+            "handoff_id": handoff_id,
+            "from": "planner",
+            "to": name,
+            "instruction": instruction,
+        }
     )
-    result = run_subagent(state, name, instruction, writer=writer)
-    summary = str(result.get("summary", ""))
-    if name == "searchAgent":
-        state["research_notes"] = _join_notes(state.get("research_notes", ""), summary)
-        state["sources"] = _dedupe_sources(
-            list(state.get("sources", [])) + list(result.get("sources", []))
+    runtime = state["runtime"]
+    previous_registry = runtime.subagent_registry
+    registry_override = None
+    # Preserve the old monkeypatch hook while keeping the call inside the same
+    # registry, budget, permission, and result-normalization path.
+    compatibility_runner = {
+        "searchAgent": (run_search_agent, _DEFAULT_SEARCH_AGENT),
+        "codeAgent": (run_code_agent, _DEFAULT_CODE_AGENT),
+    }.get(name)
+    if compatibility_runner and compatibility_runner[0] is not compatibility_runner[1]:
+        registry_override = (previous_registry or registered_subagents()).copy()
+        definition = registry_override.get(name)
+        if definition is not None:
+            registry_override.register(
+                replace(definition, runner=compatibility_runner[0], legacy_runner=True),
+                replace=True,
+            )
+            runtime.subagent_registry = registry_override
+    try:
+        result = run_subagent(
+            state, name, instruction, writer=writer, handoff_id=handoff_id
         )
-    elif name == "codeAgent":
-        state["todos"] = result.get("todos", state.get("todos", []))
-        state["code_agent_summary"] = summary
-        state["last_actor_summary"] = summary
+    finally:
+        runtime.subagent_registry = previous_registry
+    summary = str(result.get("summary", ""))
+    state_updates = result.get("state_updates", {})
+    if isinstance(state_updates, dict):
+        state.update(state_updates)
     handoff = {
+        "handoff_id": handoff_id,
         "from_agent": "planner",
         "to_agent": name,
         "instruction": instruction,
         "result": summary,
+        "ok": result.get("ok", False),
+        "evidence": result.get("evidence", []),
+        "unresolved": result.get("unresolved", []),
+        "stop_reason": result.get("stop_reason"),
     }
     state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
     writer(
         {
             "type": "handoff_result",
+            "handoff_id": handoff_id,
             "from": name,
             "to": "planner",
             "result": summary,
             "evidence": result.get("evidence", []),
             "unresolved": result.get("unresolved", []),
+            "ok": result.get("ok", False),
+            "stop_reason": result.get("stop_reason"),
         }
     )
-    return {
+    response = {
         key: value
         for key, value in result.items()
         if key not in {"messages", "tool_events"}
     }
+    if name == "searchAgent":
+        response["sources"] = state.get("sources", [])
+        response["queries"] = result.get("metadata", {}).get("queries", [])
+    elif name == "codeAgent":
+        response["todos"] = state.get("todos", [])
+    return response
 
 
 def _todo_write_tool(
@@ -660,88 +698,13 @@ def _todo_write_tool(
 def _call_search_agent_tool(
     state: MokioGraphState, writer, instruction: str
 ) -> dict[str, Any]:
-    writer(
-        {
-            "type": "handoff",
-            "from": "planner",
-            "to": "searchAgent",
-            "instruction": instruction,
-        }
-    )
-    result = (
-        run_subagent(state, "searchAgent", instruction, writer=writer)
-        if run_search_agent is _DEFAULT_SEARCH_AGENT
-        else run_search_agent(state, instruction, writer=writer)
-    )
-    existing_sources = list(state.get("sources", []))
-    state["research_notes"] = _join_notes(
-        state.get("research_notes", ""), result.get("summary", "")
-    )
-    state["sources"] = _dedupe_sources(
-        existing_sources + list(result.get("sources", []))
-    )
-    handoff = {
-        "from_agent": "planner",
-        "to_agent": "searchAgent",
-        "instruction": instruction,
-        "result": result.get("summary", ""),
-    }
-    state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
-    writer(
-        {
-            "type": "handoff_result",
-            "from": "searchAgent",
-            "to": "planner",
-            "result": result.get("summary", ""),
-        }
-    )
-    return {
-        "ok": True,
-        "summary": result.get("summary", ""),
-        "sources": state.get("sources", []),
-        "queries": result.get("queries", []),
-    }
+    return _call_registered_subagent_tool(state, writer, "searchAgent", instruction)
 
 
 def _call_code_agent_tool(
     state: MokioGraphState, writer, instruction: str
 ) -> dict[str, Any]:
-    writer(
-        {
-            "type": "handoff",
-            "from": "planner",
-            "to": "codeAgent",
-            "instruction": instruction,
-        }
-    )
-    result = (
-        run_subagent(state, "codeAgent", instruction, writer=writer)
-        if run_code_agent is _DEFAULT_CODE_AGENT
-        else run_code_agent(state, instruction, writer=writer)
-    )
-    state["todos"] = result.get("todos", state.get("todos", []))
-    state["code_agent_summary"] = result.get("summary", "")
-    state["last_actor_summary"] = result.get("summary", "")
-    handoff = {
-        "from_agent": "planner",
-        "to_agent": "codeAgent",
-        "instruction": instruction,
-        "result": result.get("summary", ""),
-    }
-    state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
-    writer(
-        {
-            "type": "handoff_result",
-            "from": "codeAgent",
-            "to": "planner",
-            "result": result.get("summary", ""),
-        }
-    )
-    return {
-        "ok": True,
-        "summary": result.get("summary", ""),
-        "todos": state.get("todos", []),
-    }
+    return _call_registered_subagent_tool(state, writer, "codeAgent", instruction)
 
 
 def _execute_planner_tool(
@@ -1126,8 +1089,13 @@ def _trim_handoffs(handoffs: list[dict[str, Any]]) -> list[dict[str, Any]]:
             {
                 "from_agent": handoff.get("from_agent", ""),
                 "to_agent": handoff.get("to_agent", ""),
+                "handoff_id": handoff.get("handoff_id", ""),
                 "instruction": _short_text(str(handoff.get("instruction", "")), 500),
                 "result": _short_text(str(handoff.get("result", "")), 700),
+                "ok": handoff.get("ok"),
+                "evidence": handoff.get("evidence", []),
+                "unresolved": handoff.get("unresolved", []),
+                "stop_reason": handoff.get("stop_reason"),
             }
         )
     return trimmed

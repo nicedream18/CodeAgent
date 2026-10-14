@@ -1,14 +1,77 @@
 from __future__ import annotations
 
+import copy
 import json
-from dataclasses import dataclass
-from typing import Any, Callable
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
+from types import MappingProxyType
+from typing import Any
 
 from mokioclaw.agents.code_agent import run_code_agent
 from mokioclaw.agents.search_agent import run_search_agent
+from mokioclaw.core.state import RuntimeState, SubagentToolBudget
 from mokioclaw.graph.state import MokioGraphState
 
-Runner = Callable[..., dict[str, Any]]
+
+@dataclass(frozen=True)
+class EvidenceItem:
+    kind: str
+    label: str
+    reference: str = ""
+    details: str = ""
+
+    def as_dict(self) -> dict[str, str]:
+        return {
+            "kind": self.kind,
+            "label": self.label,
+            "reference": self.reference,
+            "details": self.details,
+        }
+
+
+@dataclass(frozen=True)
+class SubagentInput:
+    task: str
+    instruction: str
+    runtime: RuntimeState
+    context: Mapping[str, Any]
+
+    def legacy_state(self) -> dict[str, Any]:
+        """Build an isolated state projection for legacy Python runners."""
+        return {
+            "task": self.task,
+            **copy.deepcopy(dict(self.context)),
+            "runtime": self.runtime,
+        }
+
+
+@dataclass
+class SubagentResult:
+    ok: bool
+    summary: str = ""
+    evidence: list[EvidenceItem] = field(default_factory=list)
+    unresolved: list[str] = field(default_factory=list)
+    state_updates: dict[str, Any] = field(default_factory=dict)
+    stop_reason: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def as_dict(self) -> dict[str, Any]:
+        result = {
+            "ok": self.ok,
+            "summary": self.summary,
+            "evidence": [item.as_dict() for item in self.evidence],
+            "unresolved": list(self.unresolved),
+            "state_updates": copy.deepcopy(self.state_updates),
+            "stop_reason": self.stop_reason,
+        }
+        if self.metadata:
+            result["metadata"] = copy.deepcopy(self.metadata)
+        return result
+
+
+LegacyRunner = Callable[..., dict[str, Any]]
+ContractRunner = Callable[..., SubagentResult | dict[str, Any]]
+Runner = LegacyRunner | ContractRunner
 
 
 @dataclass(frozen=True)
@@ -18,6 +81,9 @@ class SubagentDefinition:
     runner: Runner
     allowed_tools: frozenset[str]
     max_tool_calls: int
+    context_fields: tuple[str, ...] = ()
+    state_update_fields: frozenset[str] = frozenset()
+    legacy_runner: bool = True
 
 
 def default_subagents() -> dict[str, SubagentDefinition]:
@@ -28,6 +94,8 @@ def default_subagents() -> dict[str, SubagentDefinition]:
             run_search_agent,
             frozenset({"WebSearchTool"}),
             4,
+            context_fields=("research_notes", "sources"),
+            state_update_fields=frozenset({"research_notes", "sources"}),
         ),
         "codeAgent": SubagentDefinition(
             "codeAgent",
@@ -48,6 +116,18 @@ def default_subagents() -> dict[str, SubagentDefinition]:
                 }
             ),
             10,
+            context_fields=(
+                "research_notes",
+                "sources",
+                "todos",
+                "plan_summary",
+                "acceptance_criteria",
+                "verification_commands",
+                "session_context",
+            ),
+            state_update_fields=frozenset(
+                {"todos", "code_agent_summary", "last_actor_summary"}
+            ),
         ),
     }
 
@@ -79,7 +159,7 @@ class SubagentRegistry:
     def names(self) -> list[str]:
         return sorted(self._definitions)
 
-    def copy(self) -> "SubagentRegistry":
+    def copy(self) -> SubagentRegistry:
         return SubagentRegistry(self._definitions)
 
 
@@ -117,11 +197,181 @@ def parse_subagent_configs(raw: str | None) -> dict[str, dict[str, Any]]:
                 )
             item["max_tool_calls"] = limit
         if "allowed_tools" in config:
-            if not isinstance(config["allowed_tools"], list):
-                raise ValueError(f"Subagent allowed_tools for {name} must be a list")
-            item["allowed_tools"] = [str(tool) for tool in config["allowed_tools"]]
+            if not isinstance(config["allowed_tools"], list) or any(
+                not isinstance(tool, str) or not tool
+                for tool in config["allowed_tools"]
+            ):
+                raise ValueError(
+                    f"Subagent allowed_tools for {name} must be a list of names"
+                )
+            item["allowed_tools"] = list(dict.fromkeys(config["allowed_tools"]))
         parsed[str(name)] = item
     return parsed
+
+
+def _normalise_evidence(values: Any, *, default_kind: str) -> list[EvidenceItem]:
+    if not isinstance(values, list):
+        return []
+    evidence: list[EvidenceItem] = []
+    for value in values:
+        if isinstance(value, EvidenceItem):
+            evidence.append(value)
+        elif isinstance(value, str):
+            evidence.append(EvidenceItem(default_kind, value, value, ""))
+        elif isinstance(value, dict):
+            label = str(
+                value.get("label")
+                or value.get("title")
+                or value.get("name")
+                or "evidence"
+            )
+            nested_result = value.get("result")
+            nested_result = nested_result if isinstance(nested_result, dict) else {}
+            reference = str(
+                value.get("reference")
+                or value.get("url")
+                or value.get("path")
+                or nested_result.get("path")
+                or nested_result.get("stdout_path")
+                or ""
+            )
+            details = str(
+                value.get("details")
+                or value.get("snippet")
+                or value.get("summary")
+                or value.get("content")
+                or nested_result.get("summary")
+                or nested_result.get("error")
+                or nested_result.get("stdout")
+                or ""
+            )
+            kind = str(
+                value.get("kind") or ("source" if value.get("url") else default_kind)
+            )
+            evidence.append(EvidenceItem(kind, label, reference, details))
+    return evidence
+
+
+def _normalise_result(
+    raw: SubagentResult | dict[str, Any],
+    *,
+    definition: SubagentDefinition,
+    input_value: SubagentInput,
+    legacy_state: dict[str, Any] | None = None,
+    legacy_before: dict[str, Any] | None = None,
+) -> SubagentResult:
+    payload = raw.as_dict() if isinstance(raw, SubagentResult) else dict(raw or {})
+    summary = str(payload.get("summary", ""))
+    ok = bool(payload.get("ok", True))
+    raw_unresolved = payload.get("unresolved", [])
+    unresolved = (
+        [str(item) for item in raw_unresolved]
+        if isinstance(raw_unresolved, list)
+        else ([str(raw_unresolved)] if raw_unresolved else [])
+    )
+    updates = payload.get("state_updates", {})
+    if not isinstance(updates, dict):
+        updates = {}
+
+    # Adapt the existing search/code runner return shapes into explicit updates.
+    context = dict(input_value.context)
+    if definition.name == "searchAgent":
+        sources = payload.get("sources", [])
+        if isinstance(sources, list):
+            updates = {
+                **updates,
+                "sources": _merge_sources(context.get("sources", []), sources),
+                "research_notes": _append_note(
+                    str(context.get("research_notes", "")), summary
+                ),
+            }
+    elif definition.name == "codeAgent":
+        if "todos" in payload:
+            updates = {
+                **updates,
+                "todos": payload["todos"],
+                "code_agent_summary": summary,
+                "last_actor_summary": summary,
+            }
+
+    # Legacy runners receive a projected copy. Only declared changed fields can
+    # be returned to the coordinator as state updates.
+    if legacy_state is not None and legacy_before is not None:
+        for key in definition.state_update_fields:
+            if key in legacy_state and legacy_state.get(key) != legacy_before.get(key):
+                updates[key] = legacy_state[key]
+
+    unexpected = set(updates) - definition.state_update_fields
+    validated_updates = {
+        key: copy.deepcopy(value)
+        for key, value in updates.items()
+        if key in definition.state_update_fields
+    }
+    if unexpected:
+        return SubagentResult(
+            ok=False,
+            summary=summary,
+            evidence=_normalise_evidence(
+                payload.get(
+                    "evidence", payload.get("sources", payload.get("tool_events", []))
+                ),
+                default_kind="tool_event",
+            ),
+            unresolved=unresolved
+            + [
+                f"Runner returned undeclared state update(s): {', '.join(sorted(unexpected))}"
+            ],
+            stop_reason="invalid_state_updates",
+            state_updates=validated_updates,
+            metadata=payload.get("metadata", {}),
+        )
+
+    evidence_values = payload.get("evidence")
+    if evidence_values is None:
+        evidence_values = payload.get(
+            "sources" if definition.name == "searchAgent" else "tool_events", []
+        )
+    metadata = payload.get("metadata", {})
+    if not isinstance(metadata, dict):
+        metadata = {}
+    if definition.name == "searchAgent" and "queries" in payload:
+        metadata = {**metadata, "queries": payload["queries"]}
+    return SubagentResult(
+        ok=ok,
+        summary=summary,
+        evidence=_normalise_evidence(
+            evidence_values,
+            default_kind="source" if definition.name == "searchAgent" else "tool_event",
+        ),
+        unresolved=unresolved,
+        state_updates=validated_updates,
+        stop_reason=payload.get("stop_reason"),
+        metadata=metadata,
+    )
+
+
+def _append_note(previous: str, addition: str) -> str:
+    if not addition.strip():
+        return previous
+    if not previous.strip():
+        return addition.strip()
+    return previous.rstrip() + "\n\n" + addition.strip()
+
+
+def _merge_sources(existing: Any, incoming: list[Any]) -> list[Any]:
+    combined = list(existing) if isinstance(existing, list) else []
+    seen = {
+        str(item.get("url", ""))
+        for item in combined
+        if isinstance(item, dict) and item.get("url")
+    }
+    for item in incoming:
+        key = str(item.get("url", "")) if isinstance(item, dict) else ""
+        if not key or key not in seen:
+            combined.append(item)
+            if key:
+                seen.add(key)
+    return combined
 
 
 def run_subagent(
@@ -130,59 +380,119 @@ def run_subagent(
     instruction: str,
     *,
     writer=None,
+    handoff_id: str = "",
 ) -> dict[str, Any]:
     runtime = state["runtime"]
     registry = runtime.subagent_registry or _GLOBAL_REGISTRY
     definition = registry.get(name)
     if definition is None:
-        return {
-            "ok": False,
-            "error": f"unknown Subagent: {name}",
-            "summary": "",
-            "evidence": [],
-            "unresolved": [],
-        }
+        return SubagentResult(
+            ok=False,
+            unresolved=[f"unknown Subagent: {name}"],
+            stop_reason="unknown_subagent",
+        ).as_dict()
     config = runtime.subagent_configs.get(name, {})
     configured_tools = set(config.get("allowed_tools", definition.allowed_tools))
     if not configured_tools.issubset(definition.allowed_tools):
-        return {
-            "ok": False,
-            "error": f"Subagent {name} requested tools outside its maximum scope",
-            "summary": "",
-            "evidence": [],
-            "unresolved": [],
-        }
+        return SubagentResult(
+            ok=False,
+            unresolved=[f"Subagent {name} requested tools outside its maximum scope"],
+            stop_reason="invalid_tool_scope",
+        ).as_dict()
+
+    try:
+        limit = int(config.get("max_tool_calls", definition.max_tool_calls))
+    except (TypeError, ValueError):
+        return SubagentResult(
+            ok=False,
+            unresolved=[f"Subagent {name} has an invalid max_tool_calls setting"],
+            stop_reason="invalid_budget",
+        ).as_dict()
+    if limit < 1 or limit > 50:
+        return SubagentResult(
+            ok=False,
+            unresolved=[f"Subagent {name} max_tool_calls must be between 1 and 50"],
+            stop_reason="invalid_budget",
+        ).as_dict()
+    context = {
+        key: copy.deepcopy(state[key])
+        for key in definition.context_fields
+        if key in state
+    }
+    input_value = SubagentInput(
+        task=str(state.get("task", "")),
+        instruction=instruction,
+        runtime=runtime,
+        context=MappingProxyType(context),
+    )
     previous_agent_tools = runtime.active_agent_tools
     previous_skill_tools = runtime.active_skill_tools
     previous_skill_permissions = runtime.active_skill_permissions
     previous_skill_name = runtime.active_skill_name
     previous_skill_source = runtime.active_skill_source
+    previous_budget = runtime.active_subagent_budget
+
+    def event_writer(event: dict[str, Any]) -> None:
+        if writer is not None:
+            writer(
+                {
+                    **event,
+                    "handoff_id": event.get("handoff_id") or handoff_id,
+                    "subagent": event.get("subagent") or name,
+                }
+            )
+
+    budget = SubagentToolBudget(name, handoff_id, limit, event_writer)
     runtime.active_agent_tools = configured_tools
+    runtime.active_subagent_budget = budget
+    legacy_state = None
+    legacy_before = None
     try:
-        limit = int(config.get("max_tool_calls", definition.max_tool_calls))
-        result = definition.runner(state, instruction, writer=writer, max_loops=limit)
+        if definition.legacy_runner:
+            legacy_state = input_value.legacy_state()
+            for key in definition.state_update_fields:
+                legacy_state.setdefault(key, copy.deepcopy(state.get(key)))
+            legacy_before = copy.deepcopy(
+                {key: legacy_state.get(key) for key in definition.state_update_fields}
+            )
+            raw_result = definition.runner(
+                legacy_state, instruction, writer=event_writer, max_loops=limit
+            )
+        else:
+            raw_result = definition.runner(
+                input_value, writer=event_writer, max_tool_calls=limit
+            )
+        result = _normalise_result(
+            raw_result,
+            definition=definition,
+            input_value=input_value,
+            legacy_state=legacy_state,
+            legacy_before=legacy_before,
+        )
+    except Exception as exc:
+        result = SubagentResult(
+            ok=False,
+            unresolved=[f"{type(exc).__name__}: {exc}"],
+            stop_reason="runner_error",
+        )
     finally:
         runtime.active_agent_tools = previous_agent_tools
+        runtime.active_subagent_budget = previous_budget
         if name == "codeAgent":
             runtime.active_skill_tools = previous_skill_tools
             runtime.active_skill_permissions = previous_skill_permissions
             runtime.active_skill_name = previous_skill_name
             runtime.active_skill_source = previous_skill_source
-    summary = str(result.get("summary", ""))
-    return {
-        **result,
-        "agent": name,
-        "summary": summary,
-        "evidence": result.get(
-            "evidence",
-            result.get("sources", [])
-            if name == "searchAgent"
-            else result.get("tool_events", []),
-        ),
-        "unresolved": result.get(
-            "unresolved",
-            []
-            if result.get("ok")
-            else [str(result.get("error", "Subagent did not complete"))],
-        ),
+
+    if budget.exhausted:
+        result.ok = False
+        result.stop_reason = "tool_budget_exhausted"
+        message = f"Tool-call budget exhausted ({budget.used}/{budget.limit}); task may be incomplete."
+        if message not in result.unresolved:
+            result.unresolved.append(message)
+    result.metadata = {
+        **result.metadata,
+        "tool_calls_used": budget.used,
+        "tool_call_limit": budget.limit,
     }
+    return {"agent": name, "handoff_id": handoff_id, **result.as_dict()}

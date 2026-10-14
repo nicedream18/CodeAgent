@@ -14,6 +14,33 @@ from mokioclaw.cli.tui.logo import render_logo
 from mokioclaw.core.approval import ApprovalRequest
 
 
+def test_tui_handoff_summary_reads_new_and_legacy_fields() -> None:
+    current = summarize_event(
+        {
+            "type": "custom_event",
+            "event": {
+                "type": "handoff_result",
+                "handoff_id": "h-1",
+                "result": "partial result",
+                "ok": False,
+                "evidence": [{"label": "file.py"}],
+                "unresolved": ["finish validation"],
+            },
+        }
+    )
+    legacy = summarize_event(
+        {
+            "type": "custom_event",
+            "event": {"type": "handoff_result", "summary": "old result"},
+        }
+    )
+
+    assert "handoff_id: h-1" in current.body
+    assert "partial result" in current.body
+    assert "finish validation" in current.body
+    assert "old result" in legacy.body
+
+
 def test_tui_help_is_available() -> None:
     runner = CliRunner()
 

@@ -176,6 +176,7 @@ def _trim_handoffs(handoffs: list[dict[str, Any]]) -> list[dict[str, Any]]:
             {
                 "from_agent": handoff.get("from_agent", ""),
                 "to_agent": handoff.get("to_agent", ""),
+                "handoff_id": handoff.get("handoff_id", ""),
                 "instruction": _short_text(
                     str(handoff.get("instruction", "")),
                     MAX_TEXT_CHARS["agent_handoff_instruction"],
@@ -184,6 +185,9 @@ def _trim_handoffs(handoffs: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     str(handoff.get("result", "")),
                     MAX_TEXT_CHARS["agent_handoff_result"],
                 ),
+                "ok": handoff.get("ok"),
+                "unresolved": handoff.get("unresolved", []),
+                "stop_reason": handoff.get("stop_reason"),
             }
         )
     return trimmed

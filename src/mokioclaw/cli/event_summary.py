@@ -117,18 +117,39 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             f"{node} · {name} result", _format_tool_result(result), "tool_result", style
         )
     if event_type == "handoff":
+        handoff_id = event.get("handoff_id")
+        instruction = event.get("instruction", event.get("task", ""))
+        body = (
+            f"handoff_id: {handoff_id}\n{shorten(instruction, 500)}"
+            if handoff_id
+            else shorten(instruction, 500)
+        )
         return EventSummary(
             f"Handoff · {event.get('from', 'agent')} -> {event.get('to', 'agent')}",
-            shorten(event.get("task", ""), 500),
+            body,
             "handoff",
             "yellow",
         )
     if event_type == "handoff_result":
+        handoff_id = event.get("handoff_id")
+        result = event.get("result", event.get("summary", ""))
+        details = [f"handoff_id: {handoff_id}"] if handoff_id else []
+        if event.get("ok") is not None:
+            details.append(f"ok: {event.get('ok')}")
+        details.append(f"result: {shorten(result, 600)}")
+        evidence = event.get("evidence")
+        if evidence:
+            details.append(f"evidence: {shorten(evidence, 400)}")
+        unresolved = event.get("unresolved")
+        if unresolved:
+            details.append(f"unresolved: {shorten(unresolved, 400)}")
+        if event.get("stop_reason"):
+            details.append(f"stop_reason: {event['stop_reason']}")
         return EventSummary(
             f"Handoff Result · {event.get('from', 'agent')}",
-            shorten(event.get("summary", ""), 600),
+            "\n".join(details),
             "handoff",
-            "green",
+            "green" if event.get("ok", True) else "red",
         )
     if event_type in {"search_results", "search_summary"}:
         sources = event.get("sources") if isinstance(event.get("sources"), list) else []

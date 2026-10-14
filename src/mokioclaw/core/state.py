@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
+from typing import Any
 
 from mokioclaw.core.approval import (
     ApprovalDecision,
@@ -18,6 +19,24 @@ class FileSnapshot:
     path: Path
     mtime_ns: int
     complete: bool
+
+
+@dataclass
+class SubagentToolBudget:
+    subagent_name: str
+    handoff_id: str
+    limit: int
+    writer: Callable[[dict], None] | None = None
+    used: int = 0
+    exhausted: bool = False
+    exhaustion_event_emitted: bool = False
+
+    def reserve(self) -> bool:
+        if self.used >= self.limit:
+            self.exhausted = True
+            return False
+        self.used += 1
+        return True
 
 
 @dataclass
@@ -45,6 +64,7 @@ class RuntimeState:
     active_skill_name: str | None = None
     active_skill_source: str | None = None
     active_agent_tools: set[str] | None = None
+    active_subagent_budget: SubagentToolBudget | None = None
     subagent_configs: dict[str, dict[str, Any]] = field(default_factory=dict)
     subagent_registry: Any = None
     mcp_servers: list[dict[str, Any]] = field(default_factory=list)

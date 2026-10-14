@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import asdict, is_dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -56,13 +56,16 @@ class TraceRecorder:
         self.skill_names: set[str] = set()
         self.checkpoint_count = 0
         self.handoff_count = 0
+        self.subagent_budget_exhaustions = 0
+        self.subagent_result_status = {"ok": 0, "failed": 0}
+        self.handoffs: dict[str, dict[str, Any]] = {}
         self.final_status = ""
         self.timeline_head: list[str] = []
         self.timeline_tail: list[str] = []
         self.timeline_omitted = 0
         self.stream_buffers: dict[str, list[str]] = {}
         if self.enabled:
-            setattr(runtime, "trace_id", self.trace_id)
+            runtime.trace_id = self.trace_id
             self.root.mkdir(parents=True, exist_ok=True)
 
     @property
@@ -162,6 +165,29 @@ class TraceRecorder:
             self.permission_call_ids.add(str(event.get("tool_call_id", "")))
         elif event_type == "handoff":
             self.handoff_count += 1
+            handoff_id = str(event.get("handoff_id", ""))
+            if handoff_id:
+                self.handoffs[handoff_id] = {
+                    "handoff_id": handoff_id,
+                    "subagent": event.get("to", ""),
+                    "instruction": event.get("instruction", event.get("task", "")),
+                    "status": "running",
+                }
+        elif event_type == "handoff_result":
+            handoff_id = str(event.get("handoff_id", ""))
+            ok = bool(event.get("ok", True))
+            self.subagent_result_status["ok" if ok else "failed"] += 1
+            if handoff_id:
+                self.handoffs.setdefault(handoff_id, {"handoff_id": handoff_id})
+                self.handoffs[handoff_id].update(
+                    {
+                        "subagent": event.get("from", ""),
+                        "status": "ok" if ok else "failed",
+                        "stop_reason": event.get("stop_reason"),
+                    }
+                )
+        elif event_type == "subagent_budget_exhausted":
+            self.subagent_budget_exhaustions += 1
         elif event_type == "skill_loaded":
             self.skill_load_successes += 1
             name = str(event.get("skill_name", ""))
@@ -285,6 +311,9 @@ class TraceRecorder:
             "permission_decisions": dict(self.permission_decisions),
             "checkpoint_count": self.checkpoint_count,
             "handoff_count": self.handoff_count,
+            "subagent_budget_exhaustions": self.subagent_budget_exhaustions,
+            "subagent_result_status": dict(self.subagent_result_status),
+            "handoffs": [self.handoffs[key] for key in sorted(self.handoffs)],
             "skill_load_successes": self.skill_load_successes,
             "skill_load_failures": self.skill_load_failures,
             "skills_used": sorted(self.skill_names),
@@ -404,7 +433,7 @@ def normalize_trace_path(path: Path) -> Path:
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _trim_nested(value: Any, *, limit: int) -> Any:

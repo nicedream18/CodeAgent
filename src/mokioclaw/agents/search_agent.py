@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import SEARCH_AGENT_PROMPT
-from mokioclaw.providers.openai_provider import create_model
-from mokioclaw.providers.openai_provider import invoke_streaming
-from mokioclaw.tools.execution import execute_tool, tool_failure_result
+from mokioclaw.providers.openai_provider import create_model, invoke_streaming
+from mokioclaw.tools.execution import (
+    execute_tool,
+    reserve_subagent_tool_call,
+    tool_failure_result,
+)
 from mokioclaw.tools.registry import build_tool
-
 
 Writer = Callable[[dict[str, Any]], None]
 
@@ -25,7 +28,14 @@ def run_search_agent(
 ) -> dict[str, Any]:
     writer = writer or (lambda _: None)
     model = create_model()
-    search_agent = model.bind_tools([build_web_search_tool()])
+    runtime = state["runtime"]
+    search_tools = (
+        [build_tool(runtime, "WebSearchTool")]
+        if runtime.active_agent_tools is None
+        or "WebSearchTool" in runtime.active_agent_tools
+        else []
+    )
+    search_agent = model.bind_tools(search_tools)
     messages = [
         SystemMessage(content=SEARCH_AGENT_PROMPT),
         HumanMessage(
@@ -33,6 +43,7 @@ def run_search_agent(
                 f"Task: {state['task']}\n\n"
                 f"Planner instruction:\n{instruction}\n\n"
                 f"Existing research notes:\n{state.get('research_notes', '')}\n\n"
+                f"Existing sources:\n{json.dumps(state.get('sources', []), ensure_ascii=False)}\n\n"
                 "Search as needed and finish with a concise research summary plus source URLs."
             )
         ),
@@ -44,7 +55,9 @@ def run_search_agent(
     answers: list[str] = []
     tool_events: list[dict[str, Any]] = []
 
-    for _ in range(max_loops):
+    budget_exhausted = False
+    rounds = max_loops + (1 if state["runtime"].active_subagent_budget else 0)
+    for _ in range(rounds):
         response = invoke_streaming(
             search_agent, messages, writer=writer, node="searchAgent"
         )
@@ -87,15 +100,27 @@ def run_search_agent(
                 )
             produced_messages.append(tool_result)
             messages.append(tool_result)
+            budget = state["runtime"].active_subagent_budget
+            if budget is not None and budget.exhausted:
+                budget_exhausted = True
+                break
+        if budget_exhausted:
+            break
 
     summary = _last_ai_content(produced_messages) or "\n".join(answers)
     result = {
-        "ok": True,
+        "ok": not budget_exhausted,
         "summary": summary,
         "queries": queries,
         "sources": _dedupe_sources(sources),
         "messages": produced_messages,
         "tool_events": tool_events,
+        "stop_reason": "tool_budget_exhausted" if budget_exhausted else None,
+        "unresolved": (
+            ["Subagent tool-call budget exhausted; research may be incomplete."]
+            if budget_exhausted
+            else []
+        ),
     }
     writer(
         {
@@ -116,7 +141,19 @@ def _execute_search_tool(
     runtime = state.get("runtime") if state else None
     tool = build_tool(runtime, name) if runtime is not None else None
     if name != "WebSearchTool" or tool is None:
-        result = tool_failure_result(f"unknown tool: {name}", tool_name=name)
+        budget_failure = (
+            reserve_subagent_tool_call(
+                runtime,
+                name,
+                str(call.get("id") or f"{name}-call"),
+                on_event=on_retry,
+            )
+            if runtime is not None
+            else None
+        )
+        result = budget_failure or tool_failure_result(
+            f"unknown tool: {name}", tool_name=name
+        )
     else:
         try:
             result = execute_tool(

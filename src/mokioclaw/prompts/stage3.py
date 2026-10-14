@@ -18,6 +18,10 @@ Rules:
   least two source links in the HTML.
 - Use paths relative to the workspace. Do not prefix paths with workspace/.
 - If the verifier failed, revise the plan and delegate only the missing fix.
+- Treat each Subagent return as a structured result: inspect its summary,
+  evidence, unresolved items, ok flag, and stop_reason. A failed or
+  tool_budget_exhausted result may still contain valid partial state updates;
+  use the evidence already gathered and delegate only the unresolved work.
 - End with a concise supervisor summary after the needed specialist calls.
 """
 
