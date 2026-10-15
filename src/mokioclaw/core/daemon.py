@@ -13,6 +13,11 @@ from typing import Any
 from uuid import uuid4
 
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
+from mokioclaw.core.subagent_tasks import (
+    SubagentTaskManager,
+    reset_daemon_context,
+    set_daemon_context,
+)
 
 
 class ApprovalWaiter:
@@ -64,6 +69,7 @@ class AgentDaemon:
         self.state_dir = state_dir.expanduser()
         self.runs_dir = self.state_dir / "runs"
         self.runs_dir.mkdir(parents=True, exist_ok=True)
+        self.subagent_manager = SubagentTaskManager(self.runs_dir)
         self.host, self.port = host, port
         self.token_path = self.state_dir / "auth.token"
         if self.token_path.exists():
@@ -83,6 +89,7 @@ class AgentDaemon:
         self.server = None
 
     def run(self) -> None:
+        self.subagent_manager.start()
         daemon = self
 
         class Handler(socketserver.StreamRequestHandler):
@@ -136,6 +143,7 @@ class AgentDaemon:
             try:
                 server.serve_forever(poll_interval=0.25)
             finally:
+                self.subagent_manager.close()
                 self.executor.shutdown(wait=False, cancel_futures=False)
                 for path in (self.state_dir / "pid", self.state_dir / "address.json"):
                     try:
@@ -160,6 +168,36 @@ class AgentDaemon:
             return self.subscribe(request_id, params, output)
         if method == "resolve_approval":
             return _result(request_id, self.resolve_approval(params))
+        if method == "subagent_get":
+            result = self.subagent_manager.get(
+                str(params.get("subagent_run_id", "")),
+                wait_seconds=float(params.get("wait_seconds", 0) or 0),
+            )
+            return _result(request_id, result or {"error_type": "unknown_subagent_run"})
+        if method == "subagent_cancel":
+            return _result(
+                request_id,
+                self.subagent_manager.cancel(str(params.get("subagent_run_id", ""))),
+            )
+        if method == "subagent_events":
+            run_id = str(params.get("subagent_run_id", ""))
+            result = self.subagent_manager.get(run_id)
+            if result is None:
+                return _error(request_id, -32004, f"unknown Subagent run: {run_id}")
+            return _result(
+                request_id,
+                {
+                    "task": result,
+                    "events": self.subagent_manager.events(
+                        run_id, int(params.get("after_seq", 0) or 0)
+                    ),
+                },
+            )
+        if method == "subagent_list":
+            parent_run_id = str(params.get("parent_run_id", ""))
+            return _result(
+                request_id, self.subagent_manager.list_for_parent(parent_run_id)
+            )
         if method == "status":
             return _result(
                 request_id,
@@ -169,6 +207,7 @@ class AgentDaemon:
                 },
             )
         if method == "shutdown":
+            self.subagent_manager.stop_accepting()
             if self.server is not None:
                 threading.Thread(target=self.server.shutdown, daemon=True).start()
             return _result(request_id, {"stopping": True})
@@ -194,6 +233,9 @@ class AgentDaemon:
 
     def _run_task(self, record: RunRecord, mode: str, options: dict[str, Any]) -> None:
         os.environ["MOKIO_DAEMON_WORKER"] = "1"
+        context_token = set_daemon_context(
+            self.subagent_manager, record.run_id, record.append
+        )
 
         def approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             waiter = ApprovalWaiter(request)
@@ -243,6 +285,7 @@ class AgentDaemon:
             )
             record.status = "failed"
         finally:
+            reset_daemon_context(context_token)
             try:
                 metadata_path = record.root / "run.json"
                 payload = json.loads(metadata_path.read_text(encoding="utf-8"))

@@ -58,6 +58,7 @@ class TraceRecorder:
         self.handoff_count = 0
         self.subagent_budget_exhaustions = 0
         self.subagent_result_status = {"ok": 0, "failed": 0}
+        self.background_subagents: dict[str, dict[str, Any]] = {}
         self.handoffs: dict[str, dict[str, Any]] = {}
         self.final_status = ""
         self.timeline_head: list[str] = []
@@ -188,6 +189,16 @@ class TraceRecorder:
                 )
         elif event_type == "subagent_budget_exhausted":
             self.subagent_budget_exhaustions += 1
+        elif event_type in {"subagent_task_queued", "subagent_task_status"}:
+            run_id = str(event.get("subagent_run_id", ""))
+            if run_id:
+                self.background_subagents[run_id] = {
+                    "subagent_run_id": run_id,
+                    "parent_run_id": event.get("parent_run_id", ""),
+                    "handoff_id": event.get("handoff_id", ""),
+                    "agent": event.get("agent", ""),
+                    "status": event.get("status", "queued"),
+                }
         elif event_type == "skill_loaded":
             self.skill_load_successes += 1
             name = str(event.get("skill_name", ""))
@@ -288,6 +299,19 @@ class TraceRecorder:
         return trace_summary_event(summary)
 
     def summary_payload(self) -> dict[str, Any]:
+        manager = getattr(self.runtime, "subagent_task_manager", None)
+        parent_run_id = getattr(self.runtime, "parent_run_id", None)
+        if manager is not None and parent_run_id:
+            for task in manager.list_for_parent(parent_run_id):
+                run_id = str(task.get("subagent_run_id", ""))
+                if run_id:
+                    self.background_subagents[run_id] = {
+                        "subagent_run_id": run_id,
+                        "parent_run_id": task.get("parent_run_id", ""),
+                        "handoff_id": task.get("handoff_id", ""),
+                        "agent": task.get("agent", ""),
+                        "status": task.get("status", "unknown"),
+                    }
         return {
             "trace_id": self.trace_id,
             "status": self.status,
@@ -313,6 +337,12 @@ class TraceRecorder:
             "handoff_count": self.handoff_count,
             "subagent_budget_exhaustions": self.subagent_budget_exhaustions,
             "subagent_result_status": dict(self.subagent_result_status),
+            "background_subagent_total": len(self.background_subagents),
+            "background_subagent_status_counts": self._background_subagent_status_counts(),
+            "background_subagents": [
+                self.background_subagents[key]
+                for key in sorted(self.background_subagents)
+            ],
             "handoffs": [self.handoffs[key] for key in sorted(self.handoffs)],
             "skill_load_successes": self.skill_load_successes,
             "skill_load_failures": self.skill_load_failures,
@@ -321,6 +351,13 @@ class TraceRecorder:
             "errors": list(self.errors),
             "timeline_omitted": self.timeline_omitted,
         }
+
+    def _background_subagent_status_counts(self) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        for task in self.background_subagents.values():
+            status = str(task.get("status", "unknown"))
+            counts[status] = counts.get(status, 0) + 1
+        return dict(sorted(counts.items()))
 
     def elapsed_ms(self) -> int:
         return round((time.perf_counter() - self.started_at) * 1000)

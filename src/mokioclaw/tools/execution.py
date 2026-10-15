@@ -398,6 +398,30 @@ def reserve_subagent_tool_call(
     budget = runtime.active_subagent_budget
     if budget is None:
         return None
+    cancel_event = runtime.subagent_cancel_event
+    if cancel_event is not None and cancel_event.is_set():
+        budget.cancelled = True
+        budget.exhausted = True
+        writer = on_event or budget.writer
+        if writer is not None:
+            writer(
+                {
+                    "type": "subagent_cancel_observed",
+                    "handoff_id": budget.handoff_id,
+                    "subagent": budget.subagent_name,
+                    "tool_call_id": tool_call_id,
+                    "tool_name": tool_name,
+                }
+            )
+        return {
+            "ok": False,
+            "error": "Subagent cancellation requested",
+            "error_type": "cancelled",
+            "retryable": False,
+            "retries": 0,
+            "retry_stop_reason": "cancelled",
+            "tool_name": tool_name,
+        }
     if budget.reserve():
         return None
 

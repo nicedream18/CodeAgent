@@ -84,6 +84,7 @@ class SubagentDefinition:
     context_fields: tuple[str, ...] = ()
     state_update_fields: frozenset[str] = frozenset()
     legacy_runner: bool = True
+    background_safe: bool = False
 
 
 def default_subagents() -> dict[str, SubagentDefinition]:
@@ -96,6 +97,7 @@ def default_subagents() -> dict[str, SubagentDefinition]:
             4,
             context_fields=("research_notes", "sources"),
             state_update_fields=frozenset({"research_notes", "sources"}),
+            background_safe=True,
         ),
         "codeAgent": SubagentDefinition(
             "codeAgent",
@@ -486,8 +488,14 @@ def run_subagent(
 
     if budget.exhausted:
         result.ok = False
-        result.stop_reason = "tool_budget_exhausted"
-        message = f"Tool-call budget exhausted ({budget.used}/{budget.limit}); task may be incomplete."
+        result.stop_reason = (
+            "cancelled" if budget.cancelled else "tool_budget_exhausted"
+        )
+        message = (
+            "Cancellation requested; Subagent stopped before its next tool call."
+            if budget.cancelled
+            else f"Tool-call budget exhausted ({budget.used}/{budget.limit}); task may be incomplete."
+        )
         if message not in result.unresolved:
             result.unresolved.append(message)
     result.metadata = {

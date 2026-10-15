@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import Annotated, Literal
@@ -10,10 +11,16 @@ from rich.panel import Panel
 from typer.core import TyperGroup
 
 from mokioclaw.cli.formatter import print_event, safe_echo, safe_secho
-from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 from mokioclaw.core.agent import stream_agent_events
+from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
+from mokioclaw.core.daemon_client import (
+    daemon_status,
+    iter_subagent_events,
+    stop_daemon,
+    subagent_cancel,
+    subagent_status,
+)
 from mokioclaw.core.session import compact_session_history
-from mokioclaw.core.daemon_client import daemon_status, stop_daemon
 
 
 class MokioClawGroup(TyperGroup):
@@ -55,6 +62,41 @@ app = typer.Typer(
 )
 daemon_app = typer.Typer(help="Manage the local MokioClaw Agent daemon.")
 app.add_typer(daemon_app, name="daemon")
+subagent_app = typer.Typer(help="Inspect and control daemon-managed Subagents.")
+app.add_typer(subagent_app, name="subagent")
+
+
+@subagent_app.command("status")
+def subagent_status_command(run_id: str) -> None:
+    safe_echo(json.dumps(subagent_status(run_id), ensure_ascii=False, indent=2))
+
+
+@subagent_app.command("result")
+def subagent_result_command(
+    run_id: str,
+    wait_seconds: Annotated[float, typer.Option("--wait", min=0, max=30)] = 0,
+) -> None:
+    safe_echo(
+        json.dumps(
+            subagent_status(run_id, wait_seconds=wait_seconds),
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+
+@subagent_app.command("cancel")
+def subagent_cancel_command(run_id: str) -> None:
+    safe_echo(json.dumps(subagent_cancel(run_id), ensure_ascii=False, indent=2))
+
+
+@subagent_app.command("events")
+def subagent_events_command(
+    run_id: str,
+    after_seq: Annotated[int, typer.Option("--after-seq", min=0)] = 0,
+) -> None:
+    for item in iter_subagent_events(run_id, after_seq=after_seq):
+        safe_echo(json.dumps(item, ensure_ascii=False))
 
 
 @daemon_app.command("status")

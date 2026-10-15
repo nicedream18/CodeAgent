@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import os
 import re
@@ -39,6 +40,7 @@ from mokioclaw.prompts.stage4 import CONTEXT_COMPRESSION_PROMPT
 from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 from mokioclaw.tools import build_read_only_tools
 from mokioclaw.tools.execution import execute_tool, tool_failure_result
+from mokioclaw.tools.registry import tool_spec_for
 from mokioclaw.tools.todo_tool import persist_todos, write_todos
 
 DEFAULT_CONTEXT_TOKEN_LIMIT = 400000
@@ -551,35 +553,206 @@ def _build_planner_tools(state: MokioGraphState, writer) -> list[StructuredTool]
         ),
         StructuredTool.from_function(
             name="CallSubagentTool",
-            func=lambda subagent_name, instruction: _call_registered_subagent_tool(
-                state, writer, subagent_name, instruction
+            func=lambda subagent_name, instruction, run_in_background=False: (
+                _call_registered_subagent_tool(
+                    state,
+                    writer,
+                    subagent_name,
+                    instruction,
+                    run_in_background=run_in_background,
+                )
             ),
             description=(
                 "Delegate a bounded task to a registered serial Subagent. Registered Subagents: "
                 + ", ".join(registry.names())
-                + ". Args: subagent_name, instruction."
+                + ". Args: subagent_name, instruction, optional run_in_background."
             ),
         ),
         StructuredTool.from_function(
             name="CallSearchAgentTool",
-            func=lambda instruction: _call_search_agent_tool(
-                state, writer, instruction
+            func=lambda instruction, run_in_background=False: _call_search_agent_tool(
+                state, writer, instruction, run_in_background=run_in_background
             ),
-            description="Delegate research work to searchAgent. Args: instruction.",
+            description="Delegate research work to searchAgent. Args: instruction, optional run_in_background.",
         ),
         StructuredTool.from_function(
             name="CallCodeAgentTool",
-            func=lambda instruction: _call_code_agent_tool(state, writer, instruction),
-            description="Delegate implementation work to codeAgent. Args: instruction.",
+            func=lambda instruction, run_in_background=False: _call_code_agent_tool(
+                state, writer, instruction, run_in_background=run_in_background
+            ),
+            description="Delegate implementation work to codeAgent. Args: instruction, optional run_in_background.",
+        ),
+        StructuredTool.from_function(
+            name="AgentResultTool",
+            func=lambda run_id, wait_seconds=0: _agent_result_tool(
+                state, writer, run_id, wait_seconds
+            ),
+            description="Inspect a background Subagent run and optionally wait up to 30 seconds. Args: run_id, optional wait_seconds.",
+        ),
+        StructuredTool.from_function(
+            name="AgentCancelTool",
+            func=lambda run_id: _agent_cancel_tool(state, run_id),
+            description="Request cancellation of a background Subagent run. Args: run_id.",
         ),
     ]
 
 
 def _call_registered_subagent_tool(
-    state: MokioGraphState, writer, subagent_name: str, instruction: str
+    state: MokioGraphState,
+    writer,
+    subagent_name: str,
+    instruction: str,
+    *,
+    run_in_background: bool = False,
 ) -> dict[str, Any]:
     name = str(subagent_name)
     handoff_id = str(uuid4())
+    runtime = state["runtime"]
+    if run_in_background:
+        manager = runtime.subagent_task_manager
+        if manager is None or not runtime.parent_run_id:
+            return {
+                "ok": False,
+                "error_type": "daemon_required",
+                "message": "run_in_background requires a daemon-managed Agent run",
+            }
+        source_registry = runtime.subagent_registry or registered_subagents()
+        definition = source_registry.get(name)
+        if definition is None:
+            return {
+                "ok": False,
+                "error_type": "unknown_subagent",
+                "message": f"unknown Subagent: {name}",
+            }
+        if not definition.background_safe:
+            return {
+                "ok": False,
+                "error_type": "background_not_allowed",
+                "message": f"Subagent {name} is not declared safe for background execution",
+            }
+        unsafe_tools = [
+            tool_name
+            for tool_name in definition.allowed_tools
+            if (spec := tool_spec_for(tool_name)) is None or not spec.read_only
+        ]
+        if unsafe_tools:
+            return {
+                "ok": False,
+                "error_type": "background_requires_read_only_tools",
+                "message": (
+                    f"Subagent {name} declares tools that are not registered as read-only: "
+                    + ", ".join(sorted(unsafe_tools))
+                ),
+            }
+        compatibility_runner = {
+            "searchAgent": (run_search_agent, _DEFAULT_SEARCH_AGENT),
+            "codeAgent": (run_code_agent, _DEFAULT_CODE_AGENT),
+        }.get(name)
+        if (
+            compatibility_runner
+            and compatibility_runner[0] is not compatibility_runner[1]
+        ):
+            source_registry = source_registry.copy()
+            definition = replace(
+                definition, runner=compatibility_runner[0], legacy_runner=True
+            )
+            source_registry.register(definition, replace=True)
+        # Freeze only the fields this Subagent is permitted to read, then give it
+        # a private RuntimeState with its own mutable caches and scope.
+        context = {
+            key: copy.deepcopy(state[key])
+            for key in definition.context_fields
+            if key in state
+        }
+        child_state = {"task": str(state.get("task", "")), **context}
+        child_runtime = copy.copy(runtime)
+        for attr in (
+            "read_files",
+            "tool_policies",
+            "bash_deny_patterns",
+            "bash_allow_patterns",
+            "subagent_configs",
+            "tool_cache",
+            "mcp_servers",
+            "mcp_discovery_errors",
+        ):
+            value = getattr(runtime, attr)
+            setattr(
+                child_runtime,
+                attr,
+                {} if attr in {"read_files", "tool_cache"} else copy.deepcopy(value),
+            )
+        child_runtime.active_agent_tools = None
+        child_runtime.active_skill_tools = None
+        child_runtime.active_skill_permissions = None
+        child_runtime.active_skill_name = None
+        child_runtime.active_skill_source = None
+        child_runtime.active_subagent_budget = None
+        child_runtime.subagent_applied_results = set()
+        child_runtime.subagent_registry = source_registry.copy()
+        child_state["runtime"] = child_runtime
+
+        def runner(child_writer, cancel_event):
+            child_runtime.subagent_cancel_event = cancel_event
+            return run_subagent(
+                child_state,
+                name,
+                instruction,
+                writer=child_writer,
+                handoff_id=handoff_id,
+            )
+
+        writer(
+            {
+                "type": "handoff",
+                "handoff_id": handoff_id,
+                "from": "planner",
+                "to": name,
+                "instruction": instruction,
+                "run_in_background": True,
+            }
+        )
+        accepted = manager.submit(
+            parent_run_id=runtime.parent_run_id,
+            handoff_id=handoff_id,
+            agent=name,
+            instruction=instruction,
+            runner=runner,
+            parent_writer=runtime.subagent_parent_writer,
+        )
+        if not accepted.get("ok"):
+            writer(
+                {
+                    "type": "handoff_result",
+                    "handoff_id": handoff_id,
+                    "from": name,
+                    "to": "planner",
+                    "result": accepted.get("message", "Background task was rejected"),
+                    "ok": False,
+                    "stop_reason": accepted.get("error_type", "submission_rejected"),
+                }
+            )
+            return accepted
+        writer(
+            {
+                "type": "subagent_task_queued",
+                **{
+                    key: accepted[key]
+                    for key in ("subagent_run_id", "parent_run_id", "handoff_id")
+                },
+                "agent": name,
+            }
+        )
+        handoff = {
+            "handoff_id": handoff_id,
+            "to_agent": name,
+            "instruction": instruction,
+            "subagent_run_id": accepted["subagent_run_id"],
+            "status": "queued",
+            "run_in_background": True,
+        }
+        state["agent_handoffs"] = list(state.get("agent_handoffs", [])) + [handoff]
+        return accepted
     writer(
         {
             "type": "handoff",
@@ -587,9 +760,9 @@ def _call_registered_subagent_tool(
             "from": "planner",
             "to": name,
             "instruction": instruction,
+            "run_in_background": False,
         }
     )
-    runtime = state["runtime"]
     previous_registry = runtime.subagent_registry
     registry_override = None
     # Preserve the old monkeypatch hook while keeping the call inside the same
@@ -696,15 +869,97 @@ def _todo_write_tool(
 
 
 def _call_search_agent_tool(
-    state: MokioGraphState, writer, instruction: str
+    state: MokioGraphState, writer, instruction: str, *, run_in_background: bool = False
 ) -> dict[str, Any]:
-    return _call_registered_subagent_tool(state, writer, "searchAgent", instruction)
+    return _call_registered_subagent_tool(
+        state, writer, "searchAgent", instruction, run_in_background=run_in_background
+    )
 
 
 def _call_code_agent_tool(
-    state: MokioGraphState, writer, instruction: str
+    state: MokioGraphState, writer, instruction: str, *, run_in_background: bool = False
 ) -> dict[str, Any]:
-    return _call_registered_subagent_tool(state, writer, "codeAgent", instruction)
+    return _call_registered_subagent_tool(
+        state, writer, "codeAgent", instruction, run_in_background=run_in_background
+    )
+
+
+def _agent_result_tool(
+    state: MokioGraphState, writer, run_id: str, wait_seconds: float = 0
+) -> dict[str, Any]:
+    manager = state["runtime"].subagent_task_manager
+    if manager is None:
+        return {
+            "ok": False,
+            "error_type": "daemon_required",
+            "message": "AgentResultTool requires a daemon-managed Agent run",
+        }
+    try:
+        wait_seconds = min(30.0, max(0.0, float(wait_seconds)))
+    except (TypeError, ValueError):
+        wait_seconds = 0.0
+    task = manager.get(str(run_id), wait_seconds=wait_seconds)
+    if task is None:
+        return {
+            "ok": False,
+            "error_type": "unknown_subagent_run",
+            "run_id": str(run_id),
+        }
+    result = task.get("result")
+    if task.get("status") in {
+        "completed",
+        "failed",
+        "cancelled",
+        "interrupted",
+    } and isinstance(result, dict):
+        applied = state["runtime"].subagent_applied_results
+        if run_id not in applied:
+            definition = (
+                state["runtime"].subagent_registry or registered_subagents()
+            ).get(str(task.get("agent", "")))
+            updates = result.get("state_updates", {})
+            if definition and isinstance(updates, dict):
+                for key, value in updates.items():
+                    if key in definition.state_update_fields:
+                        state[key] = copy.deepcopy(value)
+            applied.add(str(run_id))
+            writer(
+                {
+                    "type": "handoff_result",
+                    "handoff_id": task.get("handoff_id"),
+                    "subagent_run_id": run_id,
+                    "from": task.get("agent"),
+                    "to": "planner",
+                    "result": result.get("summary", ""),
+                    "evidence": result.get("evidence", []),
+                    "unresolved": result.get("unresolved", []),
+                    "ok": bool(result.get("ok")),
+                    "stop_reason": result.get("stop_reason"),
+                    "state_updates_applied": True,
+                }
+            )
+    writer(
+        {
+            "type": "subagent_task_status",
+            "subagent_run_id": run_id,
+            "parent_run_id": task.get("parent_run_id"),
+            "handoff_id": task.get("handoff_id"),
+            "agent": task.get("agent"),
+            "status": task.get("status"),
+        }
+    )
+    return {"ok": task.get("status") == "completed", **task}
+
+
+def _agent_cancel_tool(state: MokioGraphState, run_id: str) -> dict[str, Any]:
+    manager = state["runtime"].subagent_task_manager
+    if manager is None:
+        return {
+            "ok": False,
+            "error_type": "daemon_required",
+            "message": "AgentCancelTool requires a daemon-managed Agent run",
+        }
+    return manager.cancel(str(run_id))
 
 
 def _execute_planner_tool(

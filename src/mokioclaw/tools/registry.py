@@ -185,6 +185,8 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
     ToolSpec(
         "CallCodeAgentTool", None, frozenset(), "Delegate implementation to codeAgent"
     ),
+    ToolSpec("AgentResultTool", None, frozenset(), "Read a background Subagent result"),
+    ToolSpec("AgentCancelTool", None, frozenset(), "Cancel a background Subagent"),
 )
 
 

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Iterable, Literal
+from typing import Any, Literal
 
 from rich.pretty import Pretty
 from rich.table import Table
@@ -16,11 +17,11 @@ from textual.widgets import Collapsible, Footer, Header, Input, Static
 from mokioclaw.cli.event_summary import EventSummary, shorten, summarize_event
 from mokioclaw.cli.tui.approval import ApprovalGate, ApprovalModal
 from mokioclaw.cli.tui.logo import render_logo
-from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 from mokioclaw.core.agent import stream_session_events
+from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
+from mokioclaw.core.daemon_client import subagent_status
 from mokioclaw.core.paths import default_workspace
 from mokioclaw.core.session import compact_session_history
-
 
 StreamFactory = Callable[..., Iterable[dict[str, Any]]]
 
@@ -233,6 +234,7 @@ class MokioClawTuiApp(App[None]):
         self.todos: list[dict[str, Any]] = []
         self._state_lock = Lock()
         self._llm_streams: dict[str, list[str]] = {}
+        self._known_subagents: dict[str, dict[str, Any]] = {}
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -255,7 +257,7 @@ class MokioClawTuiApp(App[None]):
                     id="task-input",
                 )
                 yield Static(
-                    "Enter send · /new session · /compact memory · Ctrl+L clear",
+                    "Enter send · /new · /compact · /subagents · /subagent <id>",
                     id="hint",
                 )
         yield Footer()
@@ -283,6 +285,36 @@ class MokioClawTuiApp(App[None]):
                 f"Compacted {result['compacted']} turn(s); kept {result['kept']}."
             )
             self._refresh_sidebar()
+            return
+        if task == "/subagents":
+            if not self._known_subagents:
+                self.notify("No background Subagents observed in this TUI session.")
+            for run_id in list(self._known_subagents):
+                try:
+                    snapshot = subagent_status(run_id)
+                    self._known_subagents[run_id] = snapshot
+                    self._mount_event_card(
+                        f"Subagent · {run_id}",
+                        json.dumps(snapshot, ensure_ascii=False, indent=2),
+                        category="info",
+                        collapsed=False,
+                    )
+                except Exception as exc:
+                    self.notify(f"Could not query {run_id}: {exc}")
+            return
+        if task.startswith("/subagent "):
+            run_id = task.split(maxsplit=1)[1].strip()
+            try:
+                snapshot = subagent_status(run_id)
+                self._known_subagents[run_id] = snapshot
+                self._mount_event_card(
+                    f"Subagent · {run_id}",
+                    json.dumps(snapshot, ensure_ascii=False, indent=2),
+                    category="info",
+                    collapsed=False,
+                )
+            except Exception as exc:
+                self.notify(f"Could not query {run_id}: {exc}")
             return
         self.start_task(task, None)
 
@@ -431,6 +463,8 @@ class MokioClawTuiApp(App[None]):
                         self._update_from_payload(update)
             elif event.get("type") == "custom_event" and isinstance(payload, dict):
                 self._update_from_payload(payload)
+            elif isinstance(event.get("subagent_run_id"), str):
+                self._update_from_payload(event)
 
     def _update_from_payload(self, payload: dict[str, Any]) -> None:
         if isinstance(payload.get("todos"), list):
@@ -461,6 +495,12 @@ class MokioClawTuiApp(App[None]):
                 payload.get("turn", self.session_turn) or self.session_turn
             )
             self.last_route = str(payload.get("route", self.last_route))
+        if payload.get("subagent_run_id"):
+            run_id = str(payload["subagent_run_id"])
+            self._known_subagents[run_id] = {
+                **self._known_subagents.get(run_id, {}),
+                **payload,
+            }
 
     def _write_welcome(self) -> None:
         self._mount_event_card(

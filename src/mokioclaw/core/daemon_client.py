@@ -6,8 +6,9 @@ import socket
 import subprocess
 import sys
 import time
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 from uuid import uuid4
 
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
@@ -98,6 +99,50 @@ def stop_daemon() -> bool:
         return False
     _request(address, "shutdown", {})
     return True
+
+
+def subagent_status(run_id: str, *, wait_seconds: float = 0) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(
+        address,
+        "subagent_get",
+        {"subagent_run_id": run_id, "wait_seconds": min(30.0, max(0.0, wait_seconds))},
+    )
+
+
+def subagent_cancel(run_id: str) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(address, "subagent_cancel", {"subagent_run_id": run_id})
+
+
+def subagent_events(run_id: str, *, after_seq: int = 0) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(
+        address,
+        "subagent_events",
+        {"subagent_run_id": run_id, "after_seq": max(0, after_seq)},
+    )
+
+
+def iter_subagent_events(
+    run_id: str, *, after_seq: int = 0
+) -> Iterator[dict[str, Any]]:
+    cursor = max(0, after_seq)
+    while True:
+        snapshot = subagent_events(run_id, after_seq=cursor)
+        for item in snapshot.get("events", []):
+            cursor = max(cursor, int(item.get("seq", 0)))
+            yield item
+        task = snapshot.get("task", {})
+        if task.get("status") in {"completed", "failed", "cancelled", "interrupted"}:
+            return
+        time.sleep(0.5)
 
 
 def run_via_daemon(

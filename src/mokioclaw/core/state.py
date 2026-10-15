@@ -30,6 +30,7 @@ class SubagentToolBudget:
     used: int = 0
     exhausted: bool = False
     exhaustion_event_emitted: bool = False
+    cancelled: bool = False
 
     def reserve(self) -> bool:
         if self.used >= self.limit:
@@ -71,6 +72,11 @@ class RuntimeState:
     mcp_timeout_seconds: float = 30.0
     tool_cache: dict[str, list[Any]] = field(default_factory=dict)
     mcp_discovery_errors: list[dict[str, str]] = field(default_factory=list)
+    subagent_task_manager: Any = None
+    parent_run_id: str | None = None
+    subagent_parent_writer: Any = None
+    subagent_cancel_event: Any = None
+    subagent_applied_results: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
         self.approval_mode = normalize_approval_mode(self.approval_mode)

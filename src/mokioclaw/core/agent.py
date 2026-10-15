@@ -43,7 +43,7 @@ def create_runtime(
     load_dotenv()
     selected = workspace or resume_from or default_workspace()
     selected.mkdir(parents=True, exist_ok=True)
-    return RuntimeState(
+    runtime = RuntimeState(
         workspace=selected,
         approval_mode=approval_mode,
         approval_handler=approval_handler,
@@ -77,6 +77,16 @@ def create_runtime(
         mcp_servers=parse_mcp_servers(os.getenv("MOKIO_MCP_SERVERS")),
         mcp_timeout_seconds=_env_int("MOKIO_MCP_TIMEOUT_SECONDS", 30),
     )
+    from mokioclaw.core.subagent_tasks import current_daemon_context
+
+    daemon_context = current_daemon_context()
+    if daemon_context is not None:
+        (
+            runtime.subagent_task_manager,
+            runtime.parent_run_id,
+            runtime.subagent_parent_writer,
+        ) = daemon_context
+    return runtime
 
 
 def stream_agent_events(
