@@ -1,0 +1,829 @@
+{
+  "schema_version": 1,
+  "models": {
+    "EvalTask": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "default": "internship-v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "base_commit": {
+          "title": "Base Commit",
+          "type": "string"
+        },
+        "source_sha256": {
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "dependency_sha256": {
+          "title": "Dependency Sha256",
+          "type": "string"
+        },
+        "image_digest": {
+          "title": "Image Digest",
+          "type": "string"
+        },
+        "requirement": {
+          "title": "Requirement",
+          "type": "string"
+        },
+        "allowed_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Paths",
+          "type": "array"
+        },
+        "target_tests": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Target Tests",
+          "type": "array"
+        },
+        "regression_tests": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Regression Tests",
+          "type": "array"
+        },
+        "reference_patch_sha256": {
+          "title": "Reference Patch Sha256",
+          "type": "string"
+        },
+        "trusted_tests_sha256": {
+          "default": "",
+          "title": "Trusted Tests Sha256",
+          "type": "string"
+        },
+        "test_patch_sha256": {
+          "title": "Test Patch Sha256",
+          "type": "string"
+        },
+        "dataset_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset Revision"
+        },
+        "upstream_license": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Upstream License"
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "base_commit",
+        "source_sha256",
+        "dependency_sha256",
+        "image_digest",
+        "requirement",
+        "allowed_paths",
+        "target_tests",
+        "regression_tests",
+        "reference_patch_sha256",
+        "test_patch_sha256"
+      ],
+      "title": "EvalTask",
+      "type": "object"
+    },
+    "EvalTrialConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "architecture": {
+          "enum": [
+            "baseline",
+            "full",
+            "light",
+            "auto"
+          ],
+          "title": "Architecture",
+          "type": "string"
+        },
+        "repeat": {
+          "maximum": 3,
+          "minimum": 1,
+          "title": "Repeat",
+          "type": "integer"
+        },
+        "seed": {
+          "default": 20261016,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "context_tokens": {
+          "default": 32768,
+          "title": "Context Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 4096,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "token_limit": {
+          "default": 200000,
+          "title": "Token Limit",
+          "type": "integer"
+        },
+        "request_limit": {
+          "default": 40,
+          "title": "Request Limit",
+          "type": "integer"
+        },
+        "tool_limit": {
+          "default": 80,
+          "title": "Tool Limit",
+          "type": "integer"
+        },
+        "generation_seconds": {
+          "default": 900,
+          "title": "Generation Seconds",
+          "type": "integer"
+        },
+        "bash_seconds": {
+          "default": 60,
+          "title": "Bash Seconds",
+          "type": "integer"
+        },
+        "grading_seconds": {
+          "default": 120,
+          "title": "Grading Seconds",
+          "type": "integer"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "model_config_sha256": {
+          "title": "Model Config Sha256",
+          "type": "string"
+        },
+        "harness_revision": {
+          "title": "Harness Revision",
+          "type": "string"
+        },
+        "prompt_sha256": {
+          "title": "Prompt Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "architecture",
+        "repeat",
+        "model",
+        "model_config_sha256",
+        "harness_revision",
+        "prompt_sha256"
+      ],
+      "title": "EvalTrialConfig",
+      "type": "object"
+    },
+    "EvalTrialResult": {
+      "$defs": {
+        "EvalTrialConfig": {
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "task_id": {
+              "title": "Task Id",
+              "type": "string"
+            },
+            "architecture": {
+              "enum": [
+                "baseline",
+                "full",
+                "light",
+                "auto"
+              ],
+              "title": "Architecture",
+              "type": "string"
+            },
+            "repeat": {
+              "maximum": 3,
+              "minimum": 1,
+              "title": "Repeat",
+              "type": "integer"
+            },
+            "seed": {
+              "default": 20261016,
+              "title": "Seed",
+              "type": "integer"
+            },
+            "temperature": {
+              "default": 0,
+              "title": "Temperature",
+              "type": "number"
+            },
+            "context_tokens": {
+              "default": 32768,
+              "title": "Context Tokens",
+              "type": "integer"
+            },
+            "output_tokens": {
+              "default": 4096,
+              "title": "Output Tokens",
+              "type": "integer"
+            },
+            "token_limit": {
+              "default": 200000,
+              "title": "Token Limit",
+              "type": "integer"
+            },
+            "request_limit": {
+              "default": 40,
+              "title": "Request Limit",
+              "type": "integer"
+            },
+            "tool_limit": {
+              "default": 80,
+              "title": "Tool Limit",
+              "type": "integer"
+            },
+            "generation_seconds": {
+              "default": 900,
+              "title": "Generation Seconds",
+              "type": "integer"
+            },
+            "bash_seconds": {
+              "default": 60,
+              "title": "Bash Seconds",
+              "type": "integer"
+            },
+            "grading_seconds": {
+              "default": 120,
+              "title": "Grading Seconds",
+              "type": "integer"
+            },
+            "model": {
+              "title": "Model",
+              "type": "string"
+            },
+            "model_config_sha256": {
+              "title": "Model Config Sha256",
+              "type": "string"
+            },
+            "harness_revision": {
+              "title": "Harness Revision",
+              "type": "string"
+            },
+            "prompt_sha256": {
+              "title": "Prompt Sha256",
+              "type": "string"
+            }
+          },
+          "required": [
+            "task_id",
+            "architecture",
+            "repeat",
+            "model",
+            "model_config_sha256",
+            "harness_revision",
+            "prompt_sha256"
+          ],
+          "title": "EvalTrialConfig",
+          "type": "object"
+        },
+        "Grade": {
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "valid": {
+              "default": false,
+              "title": "Valid",
+              "type": "boolean"
+            },
+            "solved": {
+              "default": false,
+              "title": "Solved",
+              "type": "boolean"
+            },
+            "target_passed": {
+              "default": 0,
+              "title": "Target Passed",
+              "type": "integer"
+            },
+            "target_failed": {
+              "default": 0,
+              "title": "Target Failed",
+              "type": "integer"
+            },
+            "regression_failed": {
+              "default": 0,
+              "title": "Regression Failed",
+              "type": "integer"
+            },
+            "tests_run": {
+              "default": 0,
+              "title": "Tests Run",
+              "type": "integer"
+            },
+            "out_of_scope": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Out Of Scope",
+              "type": "array"
+            },
+            "tampered_tests": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Tampered Tests",
+              "type": "array"
+            },
+            "infrastructure_error": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Infrastructure Error"
+            },
+            "seconds": {
+              "default": 0,
+              "title": "Seconds",
+              "type": "number"
+            },
+            "report": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Report"
+            }
+          },
+          "title": "Grade",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "experiment_id": {
+          "title": "Experiment Id",
+          "type": "string"
+        },
+        "trial_id": {
+          "title": "Trial Id",
+          "type": "string"
+        },
+        "attempt": {
+          "default": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "config": {
+          "$ref": "#/$defs/EvalTrialConfig"
+        },
+        "task_sha256": {
+          "title": "Task Sha256",
+          "type": "string"
+        },
+        "real_model": {
+          "default": false,
+          "title": "Real Model",
+          "type": "boolean"
+        },
+        "task_solved": {
+          "default": false,
+          "title": "Task Solved",
+          "type": "boolean"
+        },
+        "execution_status": {
+          "default": "not_started",
+          "enum": [
+            "not_started",
+            "running",
+            "finished",
+            "failed",
+            "interrupted",
+            "infrastructure_failed"
+          ],
+          "title": "Execution Status",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "grade": {
+          "$ref": "#/$defs/Grade"
+        },
+        "safety_assertions": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Safety Assertions",
+          "type": "object"
+        },
+        "model_claim": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Claim"
+        },
+        "model_metrics": {
+          "additionalProperties": true,
+          "title": "Model Metrics",
+          "type": "object"
+        },
+        "tool_count": {
+          "default": 0,
+          "title": "Tool Count",
+          "type": "integer"
+        },
+        "generation_seconds": {
+          "default": 0,
+          "title": "Generation Seconds",
+          "type": "number"
+        },
+        "actual_path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Actual Path",
+          "type": "array"
+        },
+        "run_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Run Id"
+        },
+        "stream_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Stream Ids",
+          "type": "array"
+        },
+        "tool_call_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tool Call Ids",
+          "type": "array"
+        },
+        "artifacts": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Artifacts",
+          "type": "object"
+        },
+        "infrastructure_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Infrastructure Error"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Started At"
+        },
+        "ended_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ended At"
+        }
+      },
+      "required": [
+        "experiment_id",
+        "trial_id",
+        "config",
+        "task_sha256"
+      ],
+      "title": "EvalTrialResult",
+      "type": "object"
+    },
+    "Grade": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "valid": {
+          "default": false,
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "solved": {
+          "default": false,
+          "title": "Solved",
+          "type": "boolean"
+        },
+        "target_passed": {
+          "default": 0,
+          "title": "Target Passed",
+          "type": "integer"
+        },
+        "target_failed": {
+          "default": 0,
+          "title": "Target Failed",
+          "type": "integer"
+        },
+        "regression_failed": {
+          "default": 0,
+          "title": "Regression Failed",
+          "type": "integer"
+        },
+        "tests_run": {
+          "default": 0,
+          "title": "Tests Run",
+          "type": "integer"
+        },
+        "out_of_scope": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Out Of Scope",
+          "type": "array"
+        },
+        "tampered_tests": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tampered Tests",
+          "type": "array"
+        },
+        "infrastructure_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Infrastructure Error"
+        },
+        "seconds": {
+          "default": 0,
+          "title": "Seconds",
+          "type": "number"
+        },
+        "report": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Report"
+        }
+      },
+      "title": "Grade",
+      "type": "object"
+    }
+  },
+  "suite": {
+    "name": "internship-v1",
+    "core": [
+      "M02",
+      "M03",
+      "M07",
+      "E02"
+    ],
+    "core_trials": 48,
+    "coverage_trials": 8,
+    "tasks": {
+      "M01": {
+        "requirement": "修复 daemon 结束状态与订阅推送之间的竞争：订阅者看到终态时必须已经收到唯一的 daemon_run_finished 事件。保持正常完成、失败、中断及断线重连语义。",
+        "tests": [
+          "tests/test_eval_terminal.py"
+        ],
+        "regression": [
+          "tests/test_daemon.py",
+          "tests/test_run_cancellation.py::test_cancel_rpc_is_idempotent_wakes_approval_and_preserves_terminal_state"
+        ]
+      },
+      "M02": {
+        "requirement": "模型返回 length/max_tokens 时，该响应的所有工具调用（包括看似完整的调用）都必须作废并补齐未执行结果；只允许重新决策一次，再次截断安全停止。原始半截 JSON 不得用 SDK 补全值执行。保留取消、纠正和预算检查。",
+        "tests": [
+          "tests/test_generation_reliability.py::test_truncated_batch_is_closed_and_replanned_once",
+          "tests/test_generation_reliability.py::test_second_truncation_stops_without_third_request"
+        ],
+        "regression": [
+          "tests/test_generation_reliability.py::test_partial_json_never_uses_sdk_tolerant_parse",
+          "tests/test_generation_reliability.py::test_abnormal_finish_does_not_retry"
+        ]
+      },
+      "M03": {
+        "requirement": "首次接触子目录 AGENTS.md 或规则变化时，刷新上下文并使尚未执行的旧修改决策失效。直接 FileWrite/FileEdit 和一批工具中的后续修改均不得沿用旧决策。新模型请求读取规则后允许继续；读操作不应被永久阻止。",
+        "tests": [
+          "tests/test_project_optimization.py::test_rules_refresh_before_write_and_stop_remaining_batch"
+        ],
+        "regression": [
+          "tests/test_project_optimization.py::test_rules_persist_through_compaction_and_cannot_be_silently_dropped",
+          "tests/test_optimization_integration.py::test_checkpoint_restores_nested_rules_and_requires_reverification_after_rewind"
+        ]
+      },
+      "M04": {
+        "requirement": "审批响应必须保持单次生效：重复响应不能反转已完成决定；收到补充指令后旧审批失效，迟到批准不得启动旧调用。保持运行/调用 ID、参数及上下文版本校验。",
+        "tests": [
+          "tests/test_approval_memory.py::test_late_second_approval_cannot_reverse_first_decision"
+        ],
+        "regression": [
+          "tests/test_optimization_integration.py::test_actual_daemon_approval_correction_replans_and_rejects_late_approval",
+          "tests/test_daemon.py::test_daemon_rejects_approval_response_for_different_tool_call"
+        ]
+      },
+      "M05": {
+        "requirement": "修复后台 Subagent 与前台取消信号耦合的问题。显式后台任务必须有独立 RunControl，父运行 Ctrl+C 不取消后台任务；同步 Subagent 仍遵循前台控制。私有资源必须正确关闭。",
+        "tests": [
+          "tests/test_run_cancellation.py::test_background_child_control_is_independent_and_loop_is_closed"
+        ],
+        "regression": [
+          "tests/test_subagent_tasks.py::test_subagent_manager_persists_events_and_result",
+          "tests/test_subagent_tasks.py::test_unfinished_persisted_task_is_marked_interrupted",
+          "tests/test_subagent_tasks.py::test_subagent_queue_limit_and_queued_cancel",
+          "tests/test_run_cancellation.py::test_live_daemon_cancel_foreground_preserves_background_work"
+        ]
+      },
+      "M06": {
+        "requirement": "文件回退不得覆盖用户在 Agent 修改之后的编辑。恢复前必须比较当前文件与记录的 after_hash，冲突保持文件原样；同文件连续修改逆序恢复，新建文件只在内容匹配时删除。保持备份完整性、锁及逐项结果。",
+        "tests": [
+          "tests/test_project_optimization.py::test_rewind_conflict_new_file_quota_and_lock"
+        ],
+        "regression": [
+          "tests/test_project_optimization.py::test_rewind_restores_bytes_modes_and_consecutive_edits",
+          "tests/test_project_optimization.py::test_backup_gc_only_removes_closed_runs"
+        ]
+      },
+      "M07": {
+        "requirement": "为 grep(state, pattern, path='.', glob=None, head_limit=50, ignore_case=False, fixed_strings=False) 增加可选字面量搜索，GrepTool 暴露 fixed_strings: bool=False。开启时点、括号、方括号等按字面量匹配，兼容 ignore_case、中文路径、忽略规则、结果上限。rg 与 Python 后端的 matches 内容和顺序保持一致，旧正则默认行为不变。",
+        "tests": [
+          "tests/test_eval_literal.py"
+        ],
+        "regression": [
+          "tests/test_project_optimization.py::test_search_backends_share_ignore_scope_unicode_and_symlink_boundary",
+          "tests/test_project_optimization.py::test_search_python_regex_fallback_and_limit"
+        ]
+      },
+      "M08": {
+        "requirement": "为 mokioclaw trace 增加 --since ISO8601 时间过滤，要求带 Z 或 UTC 偏移、包含边界时刻并按 UTC 比较。不合法或没有时区的参数返回 CLI 用法错误，不能启动任何运行。旧记录无时间戳或时间戳无效时，在有 --since 条件下跳过；无该参数时仍保持原输出。--follow 与其他筛选可组合。",
+        "tests": [
+          "tests/test_eval_since.py"
+        ],
+        "regression": [
+          "tests/test_reliability_extensions.py::test_transport_trace_incremental_read_old_records_and_cli",
+          "tests/test_cli_smoke.py"
+        ]
+      },
+      "E01": {
+        "instance": "pallets__flask-4045",
+        "regression": [
+          "tests/test_blueprints.py"
+        ]
+      },
+      "E02": {
+        "instance": "pallets__flask-4992",
+        "regression": [
+          "tests/test_config.py"
+        ]
+      },
+      "E03": {
+        "instance": "pallets__flask-5063",
+        "regression": [
+          "tests/test_cli.py::TestRoutes"
+        ]
+      },
+      "E04": {
+        "instance": "psf__requests-3362",
+        "regression": [
+          "tests/test_requests.py::TestCaseInsensitiveDict",
+          "tests/test_requests.py::TestMorselToCookieExpires",
+          "tests/test_requests.py::TestMorselToCookieMaxAge"
+        ]
+      }
+    }
+  }
+}

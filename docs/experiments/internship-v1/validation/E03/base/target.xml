@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.049" timestamp="2026-10-16T13:18:02.211447" hostname="26e70a5f286e"><testcase classname="tests.test_cli.TestRoutes" name="test_subdomain" time="0.002"><failure message="AssertionError: assert 'Subdomain' in 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n'&#10; +  where 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n' = &lt;Result okay&gt;.output">self = &lt;test_cli.TestRoutes object at 0xffff9c578250&gt;
+runner = &lt;click.testing.CliRunner object at 0xffff9c57ba50&gt;
+
+    def test_subdomain(self, runner):
+        app = Flask(__name__, static_folder=None)
+        app.add_url_rule("/a", subdomain="a", endpoint="a")
+        app.add_url_rule("/b", subdomain="b", endpoint="b")
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+        assert result.exit_code == 0
+&gt;       assert "Subdomain" in result.output
+E       AssertionError: assert 'Subdomain' in 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n'
+E        +  where 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n' = &lt;Result okay&gt;.output
+
+tests/test_cli.py:495: AssertionError</failure></testcase><testcase classname="tests.test_cli.TestRoutes" name="test_host" time="0.001"><failure message="AssertionError: assert 'Host' in 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n'&#10; +  where 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n' = &lt;Result okay&gt;.output">self = &lt;test_cli.TestRoutes object at 0xffff9c579b10&gt;
+runner = &lt;click.testing.CliRunner object at 0xffff9c5bf550&gt;
+
+    def test_host(self, runner):
+        app = Flask(__name__, static_folder=None, host_matching=True)
+        app.add_url_rule("/a", host="a", endpoint="a")
+        app.add_url_rule("/b", host="b", endpoint="b")
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+        assert result.exit_code == 0
+&gt;       assert "Host" in result.output
+E       AssertionError: assert 'Host' in 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n'
+E        +  where 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n' = &lt;Result okay&gt;.output
+
+tests/test_cli.py:504: AssertionError</failure></testcase></testsuite></testsuites>

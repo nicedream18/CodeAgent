@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "M04",
+  "version": "internship-v1",
+  "source": "MokioAgent seeded defect",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "9ce6ecd0c361254f9c6b26c7c80c1c9d1d340053c7717cac55c3d6ece3395204",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "审批响应必须保持单次生效：重复响应不能反转已完成决定；收到补充指令后旧审批失效，迟到批准不得启动旧调用。保持运行/调用 ID、参数及上下文版本校验。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_approval_memory.py::test_late_second_approval_cannot_reverse_first_decision"
+  ],
+  "regression_tests": [
+    "tests/test_optimization_integration.py::test_actual_daemon_approval_correction_replans_and_rejects_late_approval",
+    "tests/test_daemon.py::test_daemon_rejects_approval_response_for_different_tool_call"
+  ],
+  "reference_patch_sha256": "3c25fe96dc3e410a7cd93f4e8a170152048c73da86a13034dab8586d9286b6eb",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

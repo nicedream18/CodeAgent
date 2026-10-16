@@ -25,6 +25,7 @@ class EvalTask(Versioned):
     target_tests: list[str]
     regression_tests: list[str]
     reference_patch_sha256: str
+    trusted_tests_sha256: str = ""
     test_patch_sha256: str
     dataset_revision: str | None = None
     upstream_license: str | None = None
@@ -70,9 +71,14 @@ class Grade(Versioned):
     @model_validator(mode="after")
     def credible_success(self) -> Grade:
         if self.solved and (
-            not self.valid or self.tests_run == 0 or self.target_passed == 0
-            or self.target_failed or self.regression_failed or self.out_of_scope
-            or self.tampered_tests or self.infrastructure_error
+            not self.valid
+            or self.tests_run == 0
+            or self.target_passed == 0
+            or self.target_failed
+            or self.regression_failed
+            or self.out_of_scope
+            or self.tampered_tests
+            or self.infrastructure_error
         ):
             raise ValueError("Solved requires a valid, nonempty independent passing grade")
         return self
@@ -85,7 +91,10 @@ class EvalTrialResult(Versioned):
     config: EvalTrialConfig
     task_sha256: str
     real_model: bool = False
-    execution_status: Literal["not_started", "running", "finished", "failed", "interrupted", "infrastructure_failed"] = "not_started"
+    task_solved: bool = False
+    execution_status: Literal[
+        "not_started", "running", "finished", "failed", "interrupted", "infrastructure_failed"
+    ] = "not_started"
     stop_reason: str | None = None
     grade: Grade = Field(default_factory=Grade)
     safety_assertions: dict[str, bool | None] = Field(default_factory=dict)
@@ -101,6 +110,14 @@ class EvalTrialResult(Versioned):
     infrastructure_error: str | None = None
     started_at: str | None = None
     ended_at: str | None = None
+
+    @model_validator(mode="after")
+    def successful_completion(self) -> EvalTrialResult:
+        if self.task_solved and (self.execution_status != "finished" or not self.grade.solved):
+            raise ValueError(
+                "Task success requires completed generation and an independent passing grade"
+            )
+        return self
 
 
 def legacy_result(raw: dict[str, Any]) -> dict[str, Any]:

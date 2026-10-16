@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "M08",
+  "version": "internship-v1",
+  "source": "MokioAgent incremental requirement",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "4e5fbb7937223d2d46f968cd3074be29d03b8361b56254800b07183a801dd832",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "为 mokioclaw trace 增加 --since ISO8601 时间过滤，要求带 Z 或 UTC 偏移、包含边界时刻并按 UTC 比较。不合法或没有时区的参数返回 CLI 用法错误，不能启动任何运行。旧记录无时间戳或时间戳无效时，在有 --since 条件下跳过；无该参数时仍保持原输出。--follow 与其他筛选可组合。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_eval_since.py"
+  ],
+  "regression_tests": [
+    "tests/test_reliability_extensions.py::test_transport_trace_incremental_read_old_records_and_cli",
+    "tests/test_cli_smoke.py"
+  ],
+  "reference_patch_sha256": "0e16f7f6b8c136cb6a17a2d548dc959c4003c676b7e6d2069b6b29490afd9d05",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

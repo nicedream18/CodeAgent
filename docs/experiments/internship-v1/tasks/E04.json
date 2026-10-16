@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "E04",
+  "version": "internship-v1",
+  "source": "psf__requests-3362",
+  "base_commit": "36453b95b13079296776d11b09cab2567ea3e703",
+  "source_sha256": "15611596c73128c68f24cebae504711cf1af0b0cd6639318da8e42b2bff169e0",
+  "dependency_sha256": "5d22de61b95e1e5216911e0642415fb7e192af33e3d444b97e8a299dfb80b771",
+  "image_digest": "sha256:f40819643c9a0efed27d125697db03008e7732fcd9df36bc14d8f28d82a2ec20",
+  "requirement": "Uncertain about content/text vs iter_content(decode_unicode=True/False)\nWhen requesting an application/json document, I'm seeing `next(r.iter_content(16*1024, decode_unicode=True))` returning bytes, whereas `r.text` returns unicode. My understanding was that both should return a unicode object. In essence, I thought \"iter_content\" was equivalent to \"iter_text\" when decode_unicode was True. Have I misunderstood something? I can provide an example if needed.\n\nFor reference, I'm using python 3.5.1 and requests 2.10.0.\n\nThanks!\n\n",
+  "allowed_paths": [
+    "requests/**"
+  ],
+  "target_tests": [
+    "tests/test_requests.py::TestRequests::test_response_decode_unicode"
+  ],
+  "regression_tests": [
+    "tests/test_requests.py::TestCaseInsensitiveDict",
+    "tests/test_requests.py::TestMorselToCookieExpires",
+    "tests/test_requests.py::TestMorselToCookieMaxAge"
+  ],
+  "reference_patch_sha256": "23e64f2da841d5d49874221e915a084e9bb1def2fcd6d6a24fd8e7dce71fba8d",
+  "test_patch_sha256": "cbb63761e0d50033c347fb0847126632ba4c8848db8bd7f598e21d3998d5c260",
+  "dataset_revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+  "upstream_license": "LICENSE"
+}

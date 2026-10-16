@@ -1,0 +1,28 @@
+from mokioclaw.core.state import RuntimeState
+from mokioclaw.tools.grep_tool import grep
+from mokioclaw.tools.registry import build_tools
+
+
+def test_literal_search_backends_and_schema(tmp_path):
+    (tmp_path / "中文.txt").write_text("Foo.bar[0]\nfooXbar0\nfoo.bar[0]\n")
+    runtime = RuntimeState(workspace=tmp_path)
+    results = []
+    for backend in ("python", "rg"):
+        runtime.settings = {"search": {"backend": backend}}
+        output = grep(runtime, "foo.bar[0]", ignore_case=True, fixed_strings=True)
+        assert output["ok"]
+        assert output["backend"] == backend
+        results.append(output["matches"])
+    assert results[0] == results[1]
+    assert [r["line"] for r in results[0]] == [1, 3]
+    assert len(grep(runtime, "foo.bar[0]", ignore_case=True, fixed_strings=True, head_limit=1)["matches"]) == 1
+    assert grep(runtime, "[", fixed_strings=True)["ok"]
+    tool = next(t for t in build_tools(runtime) if t.name == "GrepTool")
+    assert "fixed_strings" in tool.args
+    assert tool.invoke({"pattern": "foo.bar[0]", "fixed_strings": True})["matches"][0]["line"] == 3
+
+
+def test_default_regex_is_preserved(tmp_path):
+    (tmp_path / "a.txt").write_text("foo.bar\nfooXbar\n")
+    runtime = RuntimeState(workspace=tmp_path)
+    assert len(grep(runtime, "foo.bar")["matches"]) == 2

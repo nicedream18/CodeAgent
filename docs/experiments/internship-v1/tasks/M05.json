@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "M05",
+  "version": "internship-v1",
+  "source": "MokioAgent seeded defect",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "3fb900d2d66787d28e241e1846ef3e9d215c769116a968e131b43c05e413213b",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "修复后台 Subagent 与前台取消信号耦合的问题。显式后台任务必须有独立 RunControl，父运行 Ctrl+C 不取消后台任务；同步 Subagent 仍遵循前台控制。私有资源必须正确关闭。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_run_cancellation.py::test_background_child_control_is_independent_and_loop_is_closed"
+  ],
+  "regression_tests": [
+    "tests/test_subagent_tasks.py::test_subagent_manager_persists_events_and_result",
+    "tests/test_subagent_tasks.py::test_unfinished_persisted_task_is_marked_interrupted",
+    "tests/test_subagent_tasks.py::test_subagent_queue_limit_and_queued_cancel",
+    "tests/test_run_cancellation.py::test_live_daemon_cancel_foreground_preserves_background_work"
+  ],
+  "reference_patch_sha256": "8a0a76345b785cd7582b1b2d924cbef1ec07dfce3cf4592c9c2b4dc1f36ccc1a",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

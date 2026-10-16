@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.425" timestamp="2026-10-16T13:17:46.649918+00:00" hostname="3c65dc7f3389"><testcase classname="tests.test_project_optimization" name="test_rewind_conflict_new_file_quota_and_lock" time="0.002" /></testsuite></testsuites>

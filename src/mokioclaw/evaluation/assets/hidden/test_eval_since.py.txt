@@ -1,0 +1,25 @@
+import json
+
+import pytest
+from typer.testing import CliRunner
+
+from mokioclaw.cli.app import app
+
+
+def test_since_filters_utc_boundary_and_invalid_records(tmp_path, monkeypatch):
+    monkeypatch.setenv("MOKIO_DAEMON_DIR", str(tmp_path / "daemon"))
+    root = tmp_path / ".mokioclaw/traces/test"
+    root.mkdir(parents=True)
+    times = ["2025-01-01T00:00:00Z", "2025-01-02T08:00:00+08:00", "2025-01-03T00:00:00Z", None, "broken"]
+    (root / "events.jsonl").write_text("".join(json.dumps({"timestamp": t, "type": "test", "run_id": f"id-{i}"}) + "\n" for i,t in enumerate(times)))
+    output = CliRunner().invoke(app, ["trace", "--workspace", str(tmp_path), "--since", "2025-01-02T00:00:00Z", "--raw"])
+    assert output.exit_code == 0, output.output
+    assert [r["run_id"] for r in map(json.loads, output.stdout.splitlines())] == ["id-1", "id-2"]
+    output = CliRunner().invoke(app, ["trace", "--workspace", str(tmp_path), "--raw"])
+    assert output.exit_code == 0 and len(output.stdout.splitlines()) == 5
+
+
+@pytest.mark.parametrize("value", ["invalid", "2025-01-01", "2025-01-01T00:00:00"])
+def test_since_rejects_invalid_or_naive(value):
+    output = CliRunner().invoke(app, ["trace", "--since", value])
+    assert output.exit_code == 2

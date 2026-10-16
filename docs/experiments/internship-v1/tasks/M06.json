@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "M06",
+  "version": "internship-v1",
+  "source": "MokioAgent seeded defect",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "2a8d609a47972a1f7c69cf78b6006caccf94ffba38a6829f383ecefff28b4ec1",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "文件回退不得覆盖用户在 Agent 修改之后的编辑。恢复前必须比较当前文件与记录的 after_hash，冲突保持文件原样；同文件连续修改逆序恢复，新建文件只在内容匹配时删除。保持备份完整性、锁及逐项结果。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_project_optimization.py::test_rewind_conflict_new_file_quota_and_lock"
+  ],
+  "regression_tests": [
+    "tests/test_project_optimization.py::test_rewind_restores_bytes_modes_and_consecutive_edits",
+    "tests/test_project_optimization.py::test_backup_gc_only_removes_closed_runs"
+  ],
+  "reference_patch_sha256": "c0334ef4f287c0b3a2ea969837e724614804496364cbf6888ac49b37268383f4",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

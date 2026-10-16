@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "FF                                                                       [100%]\n=================================== FAILURES ===================================\n_________________________ test_dotted_name_not_allowed _________________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_dotted_name_not_allowed(app, client):\n>       with pytest.raises(ValueError):\nE       Failed: DID NOT RAISE <class 'ValueError'>\n\ntests/test_blueprints.py:255: Failed\n________________ test_route_decorator_custom_endpoint_with_dots ________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_route_decorator_custom_endpoint_with_dots(app, client):\n        bp = flask.Blueprint(\"bp\", __name__)\n    \n        with pytest.raises(ValueError):\n>           bp.route(\"/\", endpoint=\"a.b\")(lambda: \"\")\n\ntests/test_blueprints.py:326: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/flask/scaffold.py:433: in decorator\n    self.add_url_rule(rule, endpoint, f, **options)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Blueprint 'bp'>, rule = '/', endpoint = 'a.b'\nview_func = <function test_route_decorator_custom_endpoint_with_dots.<locals>.<lambda> at 0xffffb05916c0>\noptions = {}\n\n    def add_url_rule(\n        self,\n        rule: str,\n        endpoint: t.Optional[str] = None,\n        view_func: t.Optional[t.Callable] = None,\n        **options: t.Any,\n    ) -> None:\n        \"\"\"Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for\n        the :func:`url_for` function is prefixed with the name of the blueprint.\n        \"\"\"\n        if endpoint:\n>           assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"\nE           AssertionError: Blueprint endpoints should not contain dots\n\nsrc/flask/blueprints.py:364: AssertionError\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/validation/E01/base/mokio-grade-3h1fxt36/workspace/.target.xml -\n=========================== short test summary info ============================\nFAILED tests/test_blueprints.py::test_dotted_name_not_allowed - Failed: DID N...\nFAILED tests/test_blueprints.py::test_route_decorator_custom_endpoint_with_dots\n2 failed in 0.05s\n...............................................                          [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/validation/E01/base/mokio-grade-3h1fxt36/workspace/.regression.xml -\n47 passed, 2 deselected in 0.10s\n",
+  "stderr": "",
+  "duration_ms": 701,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-e6e13315300c4a1896cc7cd66b2cab43.log",
+    "stdout_output_bytes": 2569,
+    "stdout_retained_bytes": 2569,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-5fa03e31287b4068a6984e22d72f1d59.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+    "container_id": "618f02d6b1f9a9b15692017afdd7a92f12b98625b8f37492e5df30ef927331ac",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-e6e13315300c4a1896cc7cd66b2cab43.log",
+  "stdout_output_bytes": 2569,
+  "stdout_retained_bytes": 2569,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-5fa03e31287b4068a6984e22d72f1d59.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+  "container_id": "618f02d6b1f9a9b15692017afdd7a92f12b98625b8f37492e5df30ef927331ac",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

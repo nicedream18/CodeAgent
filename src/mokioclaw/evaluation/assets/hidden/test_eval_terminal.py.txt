@@ -1,0 +1,32 @@
+import json
+
+from mokioclaw.core.daemon import AgentDaemon, RunRecord
+
+
+def test_terminal_publication_is_atomic_for_subscribers(tmp_path, monkeypatch):
+    from mokioclaw.core import agent
+
+    daemon = AgentDaemon(tmp_path / "daemon")
+    record = RunRecord("terminal-test", tmp_path / "run")
+    (record.root / "run.json").write_text(json.dumps({"status": "running"}))
+    daemon.runs[record.run_id] = record
+    original = record.append
+    seen = []
+
+    def append(event):
+        if event.get("type") == "daemon_run_finished":
+            # An observer acquiring this same condition must never see a
+            # terminal status before its terminal event is in the queue.
+            assert record.condition._is_owned()
+            seen.append(event)
+        return original(event)
+
+    monkeypatch.setattr(record, "append", append)
+    monkeypatch.setattr(agent, "stream_agent_events", lambda *a, **kw: iter([]))
+    try:
+        daemon._run_task(record, "run", {"task": "test", "workspace": str(tmp_path)})
+        assert record.status == "finished"
+        assert len(seen) == 1
+        assert record.events[-1]["event"]["type"] == "daemon_run_finished"
+    finally:
+        daemon.executor.shutdown(wait=True)

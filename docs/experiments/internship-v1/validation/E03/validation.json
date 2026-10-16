@@ -1,0 +1,31 @@
+{
+  "valid": true,
+  "base": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": false,
+    "target_passed": 0,
+    "target_failed": 2,
+    "regression_failed": 0,
+    "tests_run": 6,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 0.702,
+    "report": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/validation/E03/base"
+  },
+  "reference": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": true,
+    "target_passed": 2,
+    "target_failed": 0,
+    "regression_failed": 0,
+    "tests_run": 6,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 0.785,
+    "report": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/validation/E03/reference"
+  }
+}

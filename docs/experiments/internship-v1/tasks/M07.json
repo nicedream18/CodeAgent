@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "M07",
+  "version": "internship-v1",
+  "source": "MokioAgent incremental requirement",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "57bb5cdcc37065aa60c538b1b26decc4cb0a87608ecd3080b4fb0702f733148c",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "为 grep(state, pattern, path='.', glob=None, head_limit=50, ignore_case=False, fixed_strings=False) 增加可选字面量搜索，GrepTool 暴露 fixed_strings: bool=False。开启时点、括号、方括号等按字面量匹配，兼容 ignore_case、中文路径、忽略规则、结果上限。rg 与 Python 后端的 matches 内容和顺序保持一致，旧正则默认行为不变。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_eval_literal.py"
+  ],
+  "regression_tests": [
+    "tests/test_project_optimization.py::test_search_backends_share_ignore_scope_unicode_and_symlink_boundary",
+    "tests/test_project_optimization.py::test_search_python_regex_fallback_and_limit"
+  ],
+  "reference_patch_sha256": "5a12bfe6c3658cd41227387cc6dc5f94bc09079da4692414eefc425724936f98",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

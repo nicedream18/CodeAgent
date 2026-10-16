@@ -1,0 +1,17 @@
+{
+  "flask20": {
+    "base": "python@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce",
+    "image": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+    "dockerfile": "FROM python@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce\nCOPY requirements.txt /opt/requirements.txt\nRUN pip install --no-cache-dir --no-deps -r /opt/requirements.txt\nENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1\n"
+  },
+  "flask23": {
+    "base": "python@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce",
+    "image": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+    "dockerfile": "FROM python@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce\nCOPY requirements.txt /opt/requirements.txt\nRUN pip install --no-cache-dir --no-deps -r /opt/requirements.txt\nENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1\n"
+  },
+  "requests210": {
+    "base": "python@sha256:2d97f6910b16bd338d3060f261f53f144965f755599aab1acda1e13cf1731b1b",
+    "image": "sha256:f40819643c9a0efed27d125697db03008e7732fcd9df36bc14d8f28d82a2ec20",
+    "dockerfile": "FROM python@sha256:2d97f6910b16bd338d3060f261f53f144965f755599aab1acda1e13cf1731b1b\nCOPY requirements.txt /opt/requirements.txt\nRUN pip install --no-cache-dir --no-deps -r /opt/requirements.txt\nENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1\n"
+  }
+}

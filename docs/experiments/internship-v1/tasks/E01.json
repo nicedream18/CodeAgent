@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "E01",
+  "version": "internship-v1",
+  "source": "pallets__flask-4045",
+  "base_commit": "d8c37f43724cd9fb0870f77877b7c4c7e38a19e0",
+  "source_sha256": "96e90e80593b58d7f7629bdbc3486b93235cd1c00cc4891a1941345570277227",
+  "dependency_sha256": "0388ca6af11cad18e75d3138b12715c99a54a219bd2193915e859d3f766c08aa",
+  "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+  "requirement": "Raise error when blueprint name contains a dot\nThis is required since every dot is now significant since blueprints can be nested. An error was already added for endpoint names in 1.0, but should have been added for this as well.\n",
+  "allowed_paths": [
+    "src/flask/**"
+  ],
+  "target_tests": [
+    "tests/test_blueprints.py::test_dotted_name_not_allowed",
+    "tests/test_blueprints.py::test_route_decorator_custom_endpoint_with_dots"
+  ],
+  "regression_tests": [
+    "tests/test_blueprints.py"
+  ],
+  "reference_patch_sha256": "6c4055e1cb35cf9c5d50bbba639af1787d6f5d5146f9539cedc364a43d01c687",
+  "test_patch_sha256": "def1da53a3857f67b571f108abde6fcdac61da5c7820c0749fa7c487fe87a62a",
+  "dataset_revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+  "upstream_license": "LICENSE.rst"
+}

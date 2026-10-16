@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_____________ test_terminal_publication_is_atomic_for_subscribers ______________\n\ntmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_terminal_publication_is_a0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff90eb8b00>\n\n    def test_terminal_publication_is_atomic_for_subscribers(tmp_path, monkeypatch):\n        from mokioclaw.core import agent\n    \n        daemon = AgentDaemon(tmp_path / \"daemon\")\n        record = RunRecord(\"terminal-test\", tmp_path / \"run\")\n        (record.root / \"run.json\").write_text(json.dumps({\"status\": \"running\"}))\n        daemon.runs[record.run_id] = record\n        original = record.append\n        seen = []\n    \n        def append(event):\n            if event.get(\"type\") == \"daemon_run_finished\":\n                # An observer acquiring this same condition must never see a\n                # terminal status before its terminal event is in the queue.\n                assert record.condition._is_owned()\n                seen.append(event)\n            return original(event)\n    \n        monkeypatch.setattr(record, \"append\", append)\n        monkeypatch.setattr(agent, \"stream_agent_events\", lambda *a, **kw: iter([]))\n        try:\n>           daemon._run_task(record, \"run\", {\"task\": \"test\", \"workspace\": str(tmp_path)})\n\ntests/test_eval_terminal.py:27: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/mokioclaw/core/daemon.py:479: in _run_task\n    record.append({\"type\": \"daemon_run_finished\", \"status\": terminal_status})\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nevent = {'status': 'finished', 'type': 'daemon_run_finished'}\n\n    def append(event):\n        if event.get(\"type\") == \"daemon_run_finished\":\n            # An observer acquiring this same condition must never see a\n            # terminal status before its terminal event is in the queue.\n>           assert record.condition._is_owned()\nE           assert False\nE            +  where False = <built-in method _is_owned of _thread.RLock object at 0xffff8ddea400>()\nE            +    where <built-in method _is_owned of _thread.RLock object at 0xffff8ddea400> = <Condition(<unlocked _thread.RLock object owner=0 count=0 at 0xffff8ddea400>, 0)>._is_owned\nE            +      where <Condition(<unlocked _thread.RLock object owner=0 count=0 at 0xffff8ddea400>, 0)> = <mokioclaw.core.daemon.RunRecord object at 0xffff8df99fd0>.condition\n\ntests/test_eval_terminal.py:20: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_eval_terminal.py::test_terminal_publication_is_atomic_for_subscribers\n1 failed in 0.58s\n........                                                                 [100%]\n8 passed in 0.83s\n",
+  "stderr": "",
+  "duration_ms": 2978,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-6e2f496a00a14fadb87366a242334700.log",
+    "stdout_output_bytes": 2921,
+    "stdout_retained_bytes": 2921,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-ceb74d3afe5d4b3193f1f90b8cb74130.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "13a2dbbdca10d47f3bec56d64444d3808e60c67711dc0ef9ca2cfc3045e674aa",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-6e2f496a00a14fadb87366a242334700.log",
+  "stdout_output_bytes": 2921,
+  "stdout_retained_bytes": 2921,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-ceb74d3afe5d4b3193f1f90b8cb74130.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "13a2dbbdca10d47f3bec56d64444d3808e60c67711dc0ef9ca2cfc3045e674aa",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

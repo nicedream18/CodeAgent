@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.576" timestamp="2026-10-16T13:17:17.825884+00:00" hostname="13a2dbbdca10"><testcase classname="tests.test_eval_terminal" name="test_terminal_publication_is_atomic_for_subscribers" time="0.533"><failure message="assert False&#10; +  where False = &lt;built-in method _is_owned of _thread.RLock object at 0xffff8ddea400&gt;()&#10; +    where &lt;built-in method _is_owned of _thread.RLock object at 0xffff8ddea400&gt; = &lt;Condition(&lt;unlocked _thread.RLock object owner=0 count=0 at 0xffff8ddea400&gt;, 0)&gt;._is_owned&#10; +      where &lt;Condition(&lt;unlocked _thread.RLock object owner=0 count=0 at 0xffff8ddea400&gt;, 0)&gt; = &lt;mokioclaw.core.daemon.RunRecord object at 0xffff8df99fd0&gt;.condition">tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_terminal_publication_is_a0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0xffff90eb8b00&gt;
+
+    def test_terminal_publication_is_atomic_for_subscribers(tmp_path, monkeypatch):
+        from mokioclaw.core import agent
+    
+        daemon = AgentDaemon(tmp_path / "daemon")
+        record = RunRecord("terminal-test", tmp_path / "run")
+        (record.root / "run.json").write_text(json.dumps({"status": "running"}))
+        daemon.runs[record.run_id] = record
+        original = record.append
+        seen = []
+    
+        def append(event):
+            if event.get("type") == "daemon_run_finished":
+                # An observer acquiring this same condition must never see a
+                # terminal status before its terminal event is in the queue.
+                assert record.condition._is_owned()
+                seen.append(event)
+            return original(event)
+    
+        monkeypatch.setattr(record, "append", append)
+        monkeypatch.setattr(agent, "stream_agent_events", lambda *a, **kw: iter([]))
+        try:
+&gt;           daemon._run_task(record, "run", {"task": "test", "workspace": str(tmp_path)})
+
+tests/test_eval_terminal.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/core/daemon.py:479: in _run_task
+    record.append({"type": "daemon_run_finished", "status": terminal_status})
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+event = {'status': 'finished', 'type': 'daemon_run_finished'}
+
+    def append(event):
+        if event.get("type") == "daemon_run_finished":
+            # An observer acquiring this same condition must never see a
+            # terminal status before its terminal event is in the queue.
+&gt;           assert record.condition._is_owned()
+E           assert False
+E            +  where False = &lt;built-in method _is_owned of _thread.RLock object at 0xffff8ddea400&gt;()
+E            +    where &lt;built-in method _is_owned of _thread.RLock object at 0xffff8ddea400&gt; = &lt;Condition(&lt;unlocked _thread.RLock object owner=0 count=0 at 0xffff8ddea400&gt;, 0)&gt;._is_owned
+E            +      where &lt;Condition(&lt;unlocked _thread.RLock object owner=0 count=0 at 0xffff8ddea400&gt;, 0)&gt; = &lt;mokioclaw.core.daemon.RunRecord object at 0xffff8df99fd0&gt;.condition
+
+tests/test_eval_terminal.py:20: AssertionError</failure></testcase></testsuite></testsuites>

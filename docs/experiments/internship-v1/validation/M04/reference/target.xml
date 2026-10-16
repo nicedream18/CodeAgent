@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.292" timestamp="2026-10-16T13:17:35.174357+00:00" hostname="14e836ab7de5"><testcase classname="tests.test_approval_memory" name="test_late_second_approval_cannot_reverse_first_decision" time="0.008" /></testsuite></testsuites>

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "E03",
+  "version": "internship-v1",
+  "source": "pallets__flask-5063",
+  "base_commit": "182ce3dd15dfa3537391c3efaf9c3ff407d134d4",
+  "source_sha256": "0ea26eb961b18f85fb179a3fbde3a657d33d8f1a790794f91502d299ca662046",
+  "dependency_sha256": "6d163d09e7e8504f33e531f2b2d8ceb0e33eb2621cd7d3ae2107ac236de0d0eb",
+  "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+  "requirement": "Flask routes to return domain/sub-domains information\nCurrently when checking **flask routes** it provides all routes but **it is no way to see which routes are assigned to which subdomain**.\r\n\r\n**Default server name:**\r\nSERVER_NAME: 'test.local'\r\n\r\n**Domains (sub-domains):**\r\ntest.test.local\r\nadmin.test.local\r\ntest.local\r\n\r\n**Adding blueprints:**\r\napp.register_blueprint(admin_blueprint,url_prefix='',subdomain='admin')\r\napp.register_blueprint(test_subdomain_blueprint,url_prefix='',subdomain='test')\r\n\r\n\r\n```\r\n$ flask routes\r\n * Tip: There are .env or .flaskenv files present. Do \"pip install python-dotenv\" to use them.\r\nEndpoint                                                 Methods    Rule\r\n-------------------------------------------------------  ---------  ------------------------------------------------\r\nadmin_blueprint.home                                      GET        /home\r\ntest_subdomain_blueprint.home                             GET        /home\r\nstatic                                                    GET        /static/<path:filename>\r\n...\r\n```\r\n\r\n\r\n**Feature request**\r\nIt will be good to see something like below (that will make more clear which route for which subdomain, because now need to go and check configuration).\r\n**If it is not possible to fix routes**, can you add or tell which method(s) should be used to get below information from flask? \r\n\r\n```\r\n$ flask routes\r\n * Tip: There are .env or .flaskenv files present. Do \"pip install python-dotenv\" to use them.\r\nDomain                Endpoint                                             Methods    Rule\r\n-----------------   ----------------------------------------------------  ----------  ------------------------------------------------\r\nadmin.test.local     admin_blueprint.home                                  GET        /home\r\ntest.test.local      test_subdomain_blueprint.home                         GET        /home\r\ntest.local           static                                                GET        /static/<path:filename>\r\n...\r\n```\r\n\n",
+  "allowed_paths": [
+    "src/flask/**"
+  ],
+  "target_tests": [
+    "tests/test_cli.py::TestRoutes::test_subdomain",
+    "tests/test_cli.py::TestRoutes::test_host"
+  ],
+  "regression_tests": [
+    "tests/test_cli.py::TestRoutes"
+  ],
+  "reference_patch_sha256": "f9c1ef426acac91e34d551f80f34dfe27fc124ac316af71d70eec1764b4a6497",
+  "test_patch_sha256": "e5b1124e11d391cc01f7d9d03ada6ccd629a817a3334d5980884ed276237bf96",
+  "dataset_revision": "6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2",
+  "upstream_license": "LICENSE.rst"
+}

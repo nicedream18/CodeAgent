@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "FF                                                                       [100%]\n=================================== FAILURES ===================================\n__________________________ TestRoutes.test_subdomain ___________________________\n\nself = <test_cli.TestRoutes object at 0xffff9c578250>\nrunner = <click.testing.CliRunner object at 0xffff9c57ba50>\n\n    def test_subdomain(self, runner):\n        app = Flask(__name__, static_folder=None)\n        app.add_url_rule(\"/a\", subdomain=\"a\", endpoint=\"a\")\n        app.add_url_rule(\"/b\", subdomain=\"b\", endpoint=\"b\")\n        cli = FlaskGroup(create_app=lambda: app)\n        result = runner.invoke(cli, [\"routes\"])\n        assert result.exit_code == 0\n>       assert \"Subdomain\" in result.output\nE       AssertionError: assert 'Subdomain' in 'Endpoint  Methods  Rule\\n--------  -------  ----\\na         GET      /a\\nb         GET      /b\\n'\nE        +  where 'Endpoint  Methods  Rule\\n--------  -------  ----\\na         GET      /a\\nb         GET      /b\\n' = <Result okay>.output\n\ntests/test_cli.py:495: AssertionError\n_____________________________ TestRoutes.test_host _____________________________\n\nself = <test_cli.TestRoutes object at 0xffff9c579b10>\nrunner = <click.testing.CliRunner object at 0xffff9c5bf550>\n\n    def test_host(self, runner):\n        app = Flask(__name__, static_folder=None, host_matching=True)\n        app.add_url_rule(\"/a\", host=\"a\", endpoint=\"a\")\n        app.add_url_rule(\"/b\", host=\"b\", endpoint=\"b\")\n        cli = FlaskGroup(create_app=lambda: app)\n        result = runner.invoke(cli, [\"routes\"])\n        assert result.exit_code == 0\n>       assert \"Host\" in result.output\nE       AssertionError: assert 'Host' in 'Endpoint  Methods  Rule\\n--------  -------  ----\\na         GET      /a\\nb         GET      /b\\n'\nE        +  where 'Endpoint  Methods  Rule\\n--------  -------  ----\\na         GET      /a\\nb         GET      /b\\n' = <Result okay>.output\n\ntests/test_cli.py:504: AssertionError\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/validation/E03/base/mokio-grade-_e1u32o9/workspace/.target.xml -\n=========================== short test summary info ============================\nFAILED tests/test_cli.py::TestRoutes::test_subdomain - AssertionError: assert...\nFAILED tests/test_cli.py::TestRoutes::test_host - AssertionError: assert 'Hos...\n2 failed in 0.05s\n....                                                                     [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/validation/E03/base/mokio-grade-_e1u32o9/workspace/.regression.xml -\n4 passed, 2 deselected in 0.03s\n",
+  "stderr": "",
+  "duration_ms": 540,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-7ab0b6fb0184458598f10168e2a3d775.log",
+    "stdout_output_bytes": 2627,
+    "stdout_retained_bytes": 2627,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-8cafd821f27d431cbce8c4ab7d869173.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+    "container_id": "26e70a5f286e721660663f7a98d8a65e1ddd8d20d0aaf3f60e0e4d501baf9653",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-7ab0b6fb0184458598f10168e2a3d775.log",
+  "stdout_output_bytes": 2627,
+  "stdout_retained_bytes": 2627,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-8cafd821f27d431cbce8c4ab7d869173.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+  "container_id": "26e70a5f286e721660663f7a98d8a65e1ddd8d20d0aaf3f60e0e4d501baf9653",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

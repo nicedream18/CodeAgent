@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "M01",
+  "version": "internship-v1",
+  "source": "MokioAgent seeded defect",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "dce330d8bf2e38c4fdb241629be9791b4af38cd315bc62d1eaf19b65ca2c1d5f",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "修复 daemon 结束状态与订阅推送之间的竞争：订阅者看到终态时必须已经收到唯一的 daemon_run_finished 事件。保持正常完成、失败、中断及断线重连语义。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_eval_terminal.py"
+  ],
+  "regression_tests": [
+    "tests/test_daemon.py",
+    "tests/test_run_cancellation.py::test_cancel_rpc_is_idempotent_wakes_approval_and_preserves_terminal_state"
+  ],
+  "reference_patch_sha256": "7a69fbfb76e335d32b610f0d87fa0379884aed1884405f3ac60c31c30baff495",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.444" timestamp="2026-10-16T13:17:44.140723+00:00" hostname="97dbf383bc5a"><testcase classname="tests.test_project_optimization" name="test_rewind_conflict_new_file_quota_and_lock" time="0.002"><failure message="assert not True">tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_rewind_conflict_new_file_0')
+
+    def test_rewind_conflict_new_file_quota_and_lock(tmp_path):
+        from mokioclaw.core.session_lock import session_writer
+    
+        runtime = RuntimeState(workspace=tmp_path)
+        assert write_file(runtime, "new.txt", "agent")["ok"]
+        (tmp_path / "new.txt").write_text("user")
+&gt;       assert not rewind(tmp_path, runtime.run_id, apply=True)["ok"]
+E       assert not True
+
+tests/test_project_optimization.py:269: AssertionError</failure></testcase></testsuite></testsuites>
