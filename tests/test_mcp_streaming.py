@@ -75,7 +75,7 @@ def test_cancel_async_model_before_first_token_or_between_chunks(tmp_path, after
             invoke_streaming(
                 model, [], state={"runtime": runtime}, writer=events.append, node="demo"
             )
-        except BaseException as exc:
+        except BaseException as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
             errors.append(exc)
 
     worker = threading.Thread(target=consume)
@@ -90,12 +90,8 @@ def test_cancel_async_model_before_first_token_or_between_chunks(tmp_path, after
         assert isinstance(errors[0], RunInterrupted)
         assert model.closed.is_set()
         assert events[-1]["status"] == "interrupted"
-        assert (
-            len([event for event in events if event["type"] == "llm_stream_end"]) == 1
-        )
-        assert (
-            len({event["stream_id"] for event in events if "stream_id" in event}) == 1
-        )
+        assert len([event for event in events if event["type"] == "llm_stream_end"]) == 1
+        assert len({event["stream_id"] for event in events if "stream_id" in event}) == 1
     finally:
         control.cancel()
         worker.join(3)
@@ -110,15 +106,11 @@ def test_async_stream_aggregates_content_tools_and_usage(tmp_path):
         chunks=[
             AIMessageChunk(
                 content=[{"type": "text", "text": "你好"}],
-                tool_call_chunks=[
-                    {"name": "echo", "args": '{"text":', "id": "t1", "index": 0}
-                ],
+                tool_call_chunks=[{"name": "echo", "args": '{"text":', "id": "t1", "index": 0}],
             ),
             AIMessageChunk(
                 content=[{"type": "text", "text": "世界"}],
-                tool_call_chunks=[
-                    {"name": None, "args": '"hello"}', "id": None, "index": 0}
-                ],
+                tool_call_chunks=[{"name": None, "args": '"hello"}', "id": None, "index": 0}],
                 usage_metadata={
                     "input_tokens": 3,
                     "output_tokens": 4,
@@ -129,17 +121,13 @@ def test_async_stream_aggregates_content_tools_and_usage(tmp_path):
     )
     events = []
     try:
-        message = invoke_streaming(
-            model, [], state={"runtime": runtime}, writer=events.append
-        )
+        message = invoke_streaming(model, [], state={"runtime": runtime}, writer=events.append)
         text = "".join(item["text"] for item in events if item["type"] == "llm_token")
         assert text == "你好世界"
         assert message.tool_calls[0]["args"] == {"text": "hello"}
         assert message.usage_metadata["total_tokens"] == 7
         assert (
-            next(event for event in events if event["type"] == "llm_stream_end")[
-                "status"
-            ]
+            next(event for event in events if event["type"] == "llm_stream_end")["status"]
             == "finished"
         )
         # Reuse the same event loop for a second invocation.
@@ -163,9 +151,7 @@ def test_async_stream_aggregates_content_tools_and_usage(tmp_path):
 def test_invalid_or_failed_stream_has_one_failed_end(chunks, failure):
     events = []
     with pytest.raises((RuntimeError, ValueError)):
-        invoke_streaming(
-            AsyncModel(chunks=chunks, fail=failure), [], writer=events.append
-        )
+        invoke_streaming(AsyncModel(chunks=chunks, fail=failure), [], writer=events.append)
     assert events[-1]["status"] == "failed"
     assert sum(item["type"] == "llm_stream_end" for item in events) == 1
 
@@ -204,15 +190,8 @@ def test_trace_separates_simultaneous_streams_and_flushes_interruption(tmp_path)
         )
     trace.end(status="interrupted")
     trace.end(status="interrupted")
-    rows = [
-        json.loads(line)
-        for line in (trace.root / "events.jsonl").read_text().splitlines()
-    ]
-    ends = [
-        row["payload"]["payload"]
-        for row in rows
-        if row["type"] == "custom:llm_stream_end"
-    ]
+    rows = [json.loads(line) for line in (trace.root / "events.jsonl").read_text().splitlines()]
+    ends = [row["payload"]["payload"] for row in rows if row["type"] == "custom:llm_stream_end"]
     assert len(ends) == 2
     assert [event["status"] for event in ends] == ["interrupted", "interrupted"]
     assert [(tmp_path / event["full_output_path"]).read_text() for event in ends] == [
@@ -227,12 +206,8 @@ def test_rich_stream_prints_model_markup_as_literal_text(monkeypatch):
     from mokioclaw.cli import formatter
 
     output = StringIO()
-    monkeypatch.setattr(
-        formatter, "console", Console(file=output, color_system=None, width=200)
-    )
-    formatter.print_custom_event(
-        {"type": "llm_stream_start", "node": "demo", "stream_id": "s"}
-    )
+    monkeypatch.setattr(formatter, "console", Console(file=output, color_system=None, width=200))
+    formatter.print_custom_event({"type": "llm_stream_start", "node": "demo", "stream_id": "s"})
     formatter.print_custom_event({"type": "llm_token", "text": "[bold]中文[/bold]"})
     formatter.print_custom_event(
         {
@@ -326,9 +301,7 @@ def test_mcp_faults_are_bounded_and_next_call_succeeds(mcp_runtime, mode, expect
     )
     assert result["ok"] is expected
     event = next(
-        item
-        for item in events
-        if item["type"] == "mcp_diagnostic" and item["phase"] == "call"
+        item for item in events if item["type"] == "mcp_diagnostic" and item["phase"] == "call"
     )
     assert event["tool_call_id"] == "call-test"
     assert event["status"] == ("finished" if expected else "failed")
@@ -339,9 +312,7 @@ def test_mcp_faults_are_bounded_and_next_call_succeeds(mcp_runtime, mode, expect
         assert event["output_truncated"]
         assert len(event["stderr"].encode()) <= 4096
         assert event["stderr"].endswith("TAIL_MARK")
-        assert (
-            runtime.workspace / event["full_output_path"]
-        ).stat().st_size == 1024 * 1024
+        assert (runtime.workspace / event["full_output_path"]).stat().st_size == 1024 * 1024
     assert execute_tool(runtime, tool, {"text": "after"})["ok"] is True
 
 
@@ -451,15 +422,13 @@ def test_sync_subagent_propagates_cancellation_and_restores_scope(tmp_path):
     worker.join(2)
     try:
         assert not worker.is_alive() and failures
-        assert (
-            runtime.active_subagent_budget is None
-            and runtime.active_agent_tools is None
-        )
+        assert runtime.active_subagent_budget is None and runtime.active_agent_tools is None
     finally:
         control.close()
 
 
 def test_mcp_crash_result_does_not_abort_code_agent(mcp_runtime, monkeypatch):
+    mcp_runtime.mcp_loading = "eager"
     from mokioclaw.agents import code_agent
 
     class ScriptedModel:
@@ -495,12 +464,9 @@ def test_mcp_crash_result_does_not_abort_code_agent(mcp_runtime, monkeypatch):
         {"runtime": mcp_runtime, "task": "test"}, "test", writer=events.append
     )
     assert "服务故障已处理" in result["summary"]
+    assert any(event["type"] == "tool_result" and not event["result"]["ok"] for event in events)
     assert any(
-        event["type"] == "tool_result" and not event["result"]["ok"] for event in events
-    )
-    assert any(
-        event["type"] == "mcp_diagnostic" and event["status"] == "failed"
-        for event in events
+        event["type"] == "mcp_diagnostic" and event["status"] == "failed" for event in events
     )
 
 
@@ -509,12 +475,8 @@ def test_bad_or_duplicate_mcp_schema_does_not_abort_registration(tmp_path, monke
 
     from mokioclaw.tools import mcp_tools
 
-    good = SimpleNamespace(
-        name="echo", description="test", input_schema={"type": "object"}
-    )
-    bad = SimpleNamespace(
-        name="bad", description="test", input_schema={"properties": []}
-    )
+    good = SimpleNamespace(name="echo", description="test", input_schema={"type": "object"})
+    bad = SimpleNamespace(name="bad", description="test", input_schema={"properties": []})
     monkeypatch.setattr(
         mcp_tools, "_operation", lambda *_args: SimpleNamespace(tools=[good, bad, good])
     )

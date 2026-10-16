@@ -29,7 +29,7 @@ def session_writer(workspace: Path):
                 pass
             raise RuntimeError(
                 "session_busy: workspace has an active session writer; use compact --run-id for a running task"
-            )
+            ) from None
     else:
         raise RuntimeError("session_busy: could not acquire workspace session lease")
     with os.fdopen(fd, "w", encoding="utf-8") as handle:

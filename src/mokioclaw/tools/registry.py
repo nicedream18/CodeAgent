@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from langchain_core.tools import BaseTool, StructuredTool
 
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.tools.bash_tool import bash_tool_description, run_bash
 from mokioclaw.tools.file_tools import edit_file, read_file, write_file
-from mokioclaw.tools.grep_tool import grep
-from mokioclaw.tools.mcp_tools import build_mcp_tools
+from mokioclaw.tools.grep_tool import file_glob, grep
+from mokioclaw.tools.mcp_tools import build_mcp_tools, build_tool_search
 from mokioclaw.tools.notepad_tool import append_notepad, read_notepad
 from mokioclaw.tools.skills import build_load_skill_tool
 from mokioclaw.tools.web_search_tool import build_web_search_tool
@@ -36,8 +37,8 @@ class ToolSpec:
 def _file_read(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="FileReadTool",
-        func=lambda file_path, offset=0, limit=2000, char_offset=None, char_limit=8000: (
-            read_file(state, file_path, offset, limit, char_offset, char_limit)
+        func=lambda file_path, offset=0, limit=2000, char_offset=None, char_limit=8000: read_file(
+            state, file_path, offset, limit, char_offset, char_limit
         ),
         description="Read a UTF-8 text file inside the workspace. Use offset/limit for lines, or char_offset/char_limit for a long single line or a saved tool result. Returned next_char_offset supports further reading.",
     )
@@ -54,9 +55,7 @@ def _file_write(state: RuntimeState) -> StructuredTool:
 def _file_edit(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="FileEditTool",
-        func=lambda file_path, old_text, new_text: edit_file(
-            state, file_path, old_text, new_text
-        ),
+        func=lambda file_path, old_text, new_text: edit_file(state, file_path, old_text, new_text),
         description="Edit an existing workspace file by replacing one unique old_text snippet.",
     )
 
@@ -64,8 +63,8 @@ def _file_edit(state: RuntimeState) -> StructuredTool:
 def _grep(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="GrepTool",
-        func=lambda pattern, path=".", glob=None, head_limit=50, ignore_case=False: (
-            grep(state, pattern, path, glob, head_limit, ignore_case)
+        func=lambda pattern, path=".", glob=None, head_limit=50, ignore_case=False: grep(
+            state, pattern, path, glob, head_limit, ignore_case
         ),
         description="Search workspace text files by regex pattern and return matching lines.",
     )
@@ -98,6 +97,28 @@ def _notepad_append(state: RuntimeState) -> StructuredTool:
 
 
 TOOL_SPECS: tuple[ToolSpec, ...] = (
+    ToolSpec(
+        "ToolSearchTool",
+        build_tool_search,
+        frozenset({"execution"}),
+        "Find MCP tools on demand",
+        frozenset({"mcp"}),
+        idempotent=True,
+        read_only=True,
+    ),
+    ToolSpec(
+        "FileGlobTool",
+        lambda state: StructuredTool.from_function(
+            name="FileGlobTool",
+            func=lambda pattern="**/*", path=".", limit=100: file_glob(state, pattern, path, limit),
+            description="List matching workspace files, respecting ignore rules.",
+        ),
+        frozenset({"execution", "read_only"}),
+        "List workspace files",
+        frozenset({"filesystem_read"}),
+        idempotent=True,
+        read_only=True,
+    ),
     ToolSpec(
         "FileReadTool",
         _file_read,
@@ -174,15 +195,10 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
     # Planner orchestration tools are constructed from graph state, but their
     # authorization metadata still lives in this registry.
     ToolSpec("TodoWriteTool", None, frozenset(), "Publish planner TODOs"),
-    ToolSpec(
-        "CallSubagentTool", None, frozenset(), "Delegate to a registered Subagent"
-    ),
-    ToolSpec(
-        "CallSearchAgentTool", None, frozenset(), "Delegate research to searchAgent"
-    ),
-    ToolSpec(
-        "CallCodeAgentTool", None, frozenset(), "Delegate implementation to codeAgent"
-    ),
+    ToolSpec("CallRepoAgentTool", None, frozenset(), "Explore the repository read-only"),
+    ToolSpec("CallSubagentTool", None, frozenset(), "Delegate to a registered Subagent"),
+    ToolSpec("CallSearchAgentTool", None, frozenset(), "Delegate research to searchAgent"),
+    ToolSpec("CallCodeAgentTool", None, frozenset(), "Delegate implementation to codeAgent"),
     ToolSpec("AgentResultTool", None, frozenset(), "Read a background Subagent result"),
     ToolSpec("AgentCancelTool", None, frozenset(), "Cancel a background Subagent"),
 )
@@ -197,9 +213,7 @@ class ToolRegistry:
 
     def register(self, tool: BaseTool, spec: ToolSpec) -> None:
         if tool.name != spec.name:
-            raise ValueError(
-                f"tool name {tool.name!r} does not match spec {spec.name!r}"
-            )
+            raise ValueError(f"tool name {tool.name!r} does not match spec {spec.name!r}")
         if tool.name in self._tools:
             raise ValueError(f"duplicate tool registration: {tool.name}")
         schema = getattr(tool, "args_schema", None)
@@ -222,11 +236,7 @@ class ToolRegistry:
         return self._specs.get(name)
 
     def tools(self, profile: ToolProfile) -> list[BaseTool]:
-        return [
-            tool
-            for name, tool in self._tools.items()
-            if profile in self._specs[name].profiles
-        ]
+        return [tool for name, tool in self._tools.items() if profile in self._specs[name].profiles]
 
     def tool_schemas(self, profile: ToolProfile) -> list[dict[str, Any]]:
         return [
@@ -260,8 +270,10 @@ def _build_registry(state: RuntimeState) -> ToolRegistry:
     registry = ToolRegistry()
     for spec in TOOL_SPECS:
         if spec.factory is not None:
+            if spec.name == "ToolSearchTool" and not state.mcp_servers:
+                continue
             registry.register(spec.factory(state), spec)
-    for tool in build_mcp_tools(state):
+    for tool in build_mcp_tools(state) if state.mcp_loading == "eager" else []:
         spec = tool_spec_for(tool.name)
         assert spec is not None
         registry.register(tool, spec)
@@ -270,9 +282,14 @@ def _build_registry(state: RuntimeState) -> ToolRegistry:
 
 def build_tools(state: RuntimeState) -> list[BaseTool]:
     """Compatibility builder for execution agents."""
+    from mokioclaw.tools.mcp_tools import refresh_catalog_config
+
+    refresh_catalog_config(state)
     if "write" not in state.tool_cache:
         state.tool_cache["write"] = _build_registry(state).tools("execution")
-    return state.tool_cache["write"]
+    native = state.tool_cache["write"]
+    names = {t.name for t in native}
+    return native + [t for name, t in state.mcp_loaded_tools.items() if name not in names]
 
 
 def build_read_only_tools(state: RuntimeState) -> list[BaseTool]:

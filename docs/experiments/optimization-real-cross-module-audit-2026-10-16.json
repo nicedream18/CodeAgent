@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-10-16T10:05:13.020684+00:00",
+  "source_report": "optimization-real-cross-module-2026-10-16.json",
+  "reason": "Original task specified replacing before with after, not byte-exact preservation of a missing terminal newline. Preserve the original failed validator report and independently audit the actual files.",
+  "runs": [
+    {
+      "mode": "full",
+      "actual_contents": {
+        "config.txt": "after",
+        "app.txt": "after"
+      },
+      "passed": true,
+      "trace_status": "finished",
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ]
+    },
+    {
+      "mode": "light",
+      "actual_contents": {
+        "config.txt": "after",
+        "app.txt": "after"
+      },
+      "passed": true,
+      "trace_status": "finished",
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ]
+    },
+    {
+      "mode": "auto",
+      "actual_contents": {
+        "config.txt": "after\n",
+        "app.txt": "after\n"
+      },
+      "passed": true,
+      "trace_status": "finished",
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ]
+    }
+  ],
+  "passed": true
+}

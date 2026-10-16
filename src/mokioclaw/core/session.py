@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -48,9 +48,7 @@ def append_user_turn(session: dict[str, Any], content: str) -> int:
     turn = int(session.get("turn_index", 0)) + 1
     session["turn_index"] = turn
     session["last_task"] = content
-    session.setdefault("user_requirements", []).append(
-        {"turn": turn, "content": content}
-    )
+    session.setdefault("user_requirements", []).append({"turn": turn, "content": content})
     _append_turn(
         session,
         {
@@ -129,13 +127,9 @@ def _compact_saved_session(workspace: Path, *, keep_recent: int = 4) -> dict[str
     fact_state = {**checkpoint.get("summary", {}), "task": session.get("last_task", "")}
     try:
         catalogue = json.loads(
-            (workspace / ".mokioclaw/checkpoints/context-facts.json").read_text(
-                encoding="utf-8"
-            )
+            (workspace / ".mokioclaw/checkpoints/context-facts.json").read_text(encoding="utf-8")
         )
-        fact_state.update(
-            {key: value for key, value in catalogue.items() if key != "task"}
-        )
+        fact_state.update({key: value for key, value in catalogue.items() if key != "task"})
     except (OSError, ValueError):
         catalogue = {}
     facts = critical_facts(fact_state)
@@ -148,9 +142,7 @@ def _compact_saved_session(workspace: Path, *, keep_recent: int = 4) -> dict[str
     session["context_version"] = int(session.get("context_version", 0)) + 1
     facts_file = session_dir(workspace) / f"facts-{session['context_version']}.json"
     _atomic_json(facts_file, facts)
-    session["compaction_facts"]["full_facts_path"] = facts_file.relative_to(
-        workspace
-    ).as_posix()
+    session["compaction_facts"]["full_facts_path"] = facts_file.relative_to(workspace).as_posix()
     if len(turns) <= keep_recent:
         return {
             "ok": True,
@@ -170,13 +162,9 @@ def _compact_saved_session(workspace: Path, *, keep_recent: int = 4) -> dict[str
         role = turn.get("role", "")
         route = f"/{turn.get('route')}" if turn.get("route") else ""
         summary = turn.get("summary") or turn.get("content", "")
-        additions.append(
-            f"turn {turn.get('turn')}: {role}{route}: {_head_tail(str(summary), 520)}"
-        )
+        additions.append(f"turn {turn.get('turn')}: {role}{route}: {_head_tail(str(summary), 520)}")
     session["summary"] = trim_text(
-        "\n".join(
-            part for part in [str(session.get("summary", "")), *additions] if part
-        ),
+        "\n".join(part for part in [str(session.get("summary", "")), *additions] if part),
         1800,
     )
     session["recent_turns"] = kept
@@ -200,12 +188,8 @@ def _compact_saved_session(workspace: Path, *, keep_recent: int = 4) -> dict[str
     }
 
 
-def build_session_context(
-    workspace: Path, session: dict[str, Any] | None = None
-) -> str:
-    session = _normalize_session(
-        session or load_or_create_session(workspace), workspace
-    )
+def build_session_context(workspace: Path, session: dict[str, Any] | None = None) -> str:
+    session = _normalize_session(session or load_or_create_session(workspace), workspace)
     manifest = workspace_manifest(workspace, limit=40)
     files = [
         item.get("path", "")
@@ -250,20 +234,12 @@ def build_session_context(
     # Required user corrections are never cut through a serialized JSON string.
     # The request guard will report if those requirements cannot fit the window.
     context_limit = (
-        MAX_SESSION_CONTEXT // 2
-        if session.get("context_version")
-        else MAX_SESSION_CONTEXT
+        MAX_SESSION_CONTEXT // 2 if session.get("context_version") else MAX_SESSION_CONTEXT
     )
-    while (
-        len(json.dumps(payload, ensure_ascii=False)) > context_limit
-        and payload["recent_turns"]
-    ):
+    while len(json.dumps(payload, ensure_ascii=False)) > context_limit and payload["recent_turns"]:
         payload["recent_turns"].pop(0)
     if session.get("context_version"):
-        while (
-            len(json.dumps(payload, ensure_ascii=False)) > context_limit
-            and payload["summary"]
-        ):
+        while len(json.dumps(payload, ensure_ascii=False)) > context_limit and payload["summary"]:
             payload["summary"] = payload["summary"][: len(payload["summary"]) // 2]
         if len(json.dumps(payload, ensure_ascii=False)) > context_limit:
             payload["last_final_answer"] = ""
@@ -350,7 +326,7 @@ def trim_text(text: str, limit: int) -> str:
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _normalize_session(raw: dict[str, Any], workspace: Path) -> dict[str, Any]:
@@ -393,9 +369,7 @@ def _compact_session(session: dict[str, Any]) -> None:
         role = turn.get("role", "")
         route = f"/{turn.get('route')}" if turn.get("route") else ""
         summary = turn.get("summary") or turn.get("content", "")
-        additions.append(
-            f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}"
-        )
+        additions.append(f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}")
     existing = str(session.get("summary", ""))
     session["summary"] = trim_text(
         "\n".join(part for part in [existing, *additions] if part), MAX_SESSION_SUMMARY

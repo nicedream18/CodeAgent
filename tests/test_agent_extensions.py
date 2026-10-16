@@ -31,13 +31,9 @@ from mokioclaw.tools.skills import discover_skills, load_skill, parse_skill
 
 def test_parse_tool_policies_and_single_operation_approval(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path, approval_mode="inline")
-    runtime.tool_policies = parse_tool_policies(
-        '{"FileWriteTool":"ask","BashTool":"deny"}'
-    )
+    runtime.tool_policies = parse_tool_policies('{"FileWriteTool":"ask","BashTool":"deny"}')
     requests = []
-    runtime.approval_handler = lambda request: (
-        requests.append(request) or ApprovalDecision(True)
-    )
+    runtime.approval_handler = lambda request: requests.append(request) or ApprovalDecision(True)
 
     assert authorize_tool(runtime, "FileWriteTool", {"file_path": "index.html"}) is None
     assert requests[0].tool_name == "FileWriteTool"
@@ -52,18 +48,14 @@ def test_mcp_tools_require_an_explicit_single_operation_approval(
 ) -> None:
     requests = []
     runtime = RuntimeState(workspace=tmp_path, approval_mode="inline")
-    runtime.approval_handler = lambda request: (
-        requests.append(request) or ApprovalDecision(True)
-    )
+    runtime.approval_handler = lambda request: requests.append(request) or ApprovalDecision(True)
     assert authorize_tool(runtime, "MCP_docs_lookup", {"query": "x"}) is None
     assert requests[0].tool_name == "MCP_docs_lookup"
 
 
 def test_context_monitor_reserves_model_budget(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setenv("MOKIO_CONTEXT_TOKEN_LIMIT", "1000")
-    monkeypatch.setattr(
-        "mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 850
-    )
+    monkeypatch.setattr("mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 850)
     result = context_monitor_node(
         {
             "runtime": RuntimeState(
@@ -117,9 +109,7 @@ def test_custom_subagent_registers_and_returns_handoff_contract(tmp_path: Path) 
     )
     state = {"runtime": runtime, "task": "review", "messages": []}
     events = []
-    result = _call_registered_subagent_tool(
-        state, events.append, "auditor", "report.txt"
-    )
+    result = _call_registered_subagent_tool(state, events.append, "auditor", "report.txt")
 
     assert result["agent"] == "auditor"
     assert result["evidence"] == [
@@ -218,9 +208,7 @@ def test_non_idempotent_tool_does_not_retry(tmp_path: Path) -> None:
     tool = StructuredTool.from_function(
         name="FileWriteTool", func=write_file, description="Test write tool"
     )
-    result = execute_tool(
-        RuntimeState(workspace=tmp_path), tool, {"file_path": "a.txt"}
-    )
+    result = execute_tool(RuntimeState(workspace=tmp_path), tool, {"file_path": "a.txt"})
 
     assert result["error_type"] == "transient"
     assert result["retryable"] is False
@@ -288,9 +276,7 @@ def test_non_retryable_failures_and_unknown_categories_do_not_retry(
 
     def fail_with_unknown_outcome(query: str):
         calls["count"] += 1
-        raise ToolExecutionError(
-            "outcome_unknown", "request may have completed", retryable=True
-        )
+        raise ToolExecutionError("outcome_unknown", "request may have completed", retryable=True)
 
     tool = StructuredTool.from_function(
         name="WebSearchTool",
@@ -346,9 +332,7 @@ def test_tool_output_is_bounded(tmp_path: Path) -> None:
         func=lambda: {"ok": True, "content": "x" * 500},
         description="Test read tool",
     )
-    result = execute_tool(
-        RuntimeState(workspace=tmp_path, context_output_limit_chars=40), tool, {}
-    )
+    result = execute_tool(RuntimeState(workspace=tmp_path, context_output_limit_chars=40), tool, {})
     assert result["output_truncated"] is True
     assert result["omitted_characters"] == 460
     assert len(result["content"]) < 100
@@ -443,9 +427,7 @@ def test_skill_empty_scope_denies_tools_and_failed_load_does_not_change_scope(
     )
 
 
-def test_invalid_workspace_skill_shadows_user_skill(
-    monkeypatch, tmp_path: Path
-) -> None:
+def test_invalid_workspace_skill_shadows_user_skill(monkeypatch, tmp_path: Path) -> None:
     workspace = tmp_path / "workspace"
     user_home = tmp_path / "home"
     workspace_skill = workspace / ".mokioclaw" / "skills" / "same" / "SKILL.md"
@@ -497,6 +479,10 @@ def test_skill_events_and_trace_summary_never_include_skill_body(
             "result": result,
         }
     )
+    # Consume the new Skill instructions at a model boundary before another call.
+    from mokioclaw.core.instructions import inject_instructions
+
+    inject_instructions(runtime, [])
     failed = execute_tool(
         runtime,
         tool,
@@ -505,9 +491,7 @@ def test_skill_events_and_trace_summary_never_include_skill_body(
         tool_call_id="load-2",
     )
     assert failed["ok"] is False
-    failed_event = next(
-        event for event in events if event["type"] == "skill_load_failed"
-    )
+    failed_event = next(event for event in events if event["type"] == "skill_load_failed")
     assert failed_event["diagnostic"]["code"] == "not_found"
     trace.record_custom_event(failed_event)
     summary = trace.end(status="finished")
@@ -556,9 +540,7 @@ def test_codeagent_subagent_restores_complete_skill_scope(tmp_path: Path) -> Non
     assert runtime.active_skill_source == "user"
 
 
-def test_codeagent_loads_skill_then_executes_declared_tool(
-    monkeypatch, tmp_path: Path
-) -> None:
+def test_codeagent_loads_skill_then_executes_declared_tool(monkeypatch, tmp_path: Path) -> None:
     from mokioclaw.agents.code_agent import run_code_agent
 
     skill_dir = tmp_path / ".mokioclaw" / "skills" / "writer"
@@ -616,9 +598,7 @@ def test_codeagent_loads_skill_then_executes_declared_tool(
     assert result["summary"] == "Finished the page."
     assert (tmp_path / "page.html").read_text(encoding="utf-8") == "<h1>Hi</h1>"
     tool_messages = [
-        message
-        for message in result["messages"]
-        if getattr(message, "name", "") == "LoadSkillTool"
+        message for message in result["messages"] if getattr(message, "name", "") == "LoadSkillTool"
     ]
     assert body in str(tool_messages[0].content)
     loaded = next(event for event in events if event["type"] == "skill_loaded")
@@ -639,12 +619,8 @@ def test_invalid_skill_scope_does_not_allow_a_write(tmp_path: Path) -> None:
     assert result["diagnostic"]["code"] == "missing_tool_permission"
     assert runtime.active_skill_tools == {"LoadSkillTool"}
     assert runtime.active_skill_permissions == set()
-    write_tool = next(
-        tool for tool in build_tools(runtime) if tool.name == "FileWriteTool"
-    )
-    denied = execute_tool(
-        runtime, write_tool, {"file_path": "bad.txt", "content": "no"}
-    )
+    write_tool = next(tool for tool in build_tools(runtime) if tool.name == "FileWriteTool")
+    denied = execute_tool(runtime, write_tool, {"file_path": "bad.txt", "content": "no"})
     assert denied["error_type"] == "permission_denied"
     assert not (tmp_path / "bad.txt").exists()
 
@@ -684,9 +660,11 @@ def test_streaming_model_emits_tokens_and_returns_assembled_message() -> None:
     assert [event["type"] for event in events] == [
         "context_budget",
         "llm_stream_start",
+        "llm_request",
         "llm_token",
         "llm_token",
         "llm_stream_end",
+        "llm_response",
     ]
 
 

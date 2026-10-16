@@ -36,9 +36,7 @@ MAX_TEXT_CHARS = {
 }
 
 
-def build_layered_memory(
-    state: dict[str, Any], *, node: str = "graph"
-) -> dict[str, Any]:
+def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[str, Any]:
     runtime = state["runtime"]
     notepad = read_notepad(runtime)
     history = read_history_summary(runtime)
@@ -56,9 +54,9 @@ def build_layered_memory(
 
         from mokioclaw.core.context_compaction import _atomic_json
 
-        digest = hashlib.sha256(
-            json.dumps(all_sources, ensure_ascii=False).encode()
-        ).hexdigest()[:24]
+        digest = hashlib.sha256(json.dumps(all_sources, ensure_ascii=False).encode()).hexdigest()[
+            :24
+        ]
         source_catalogue = f".mokioclaw/memory/sources-{digest}.json"
         _atomic_json(runtime.workspace / source_catalogue, all_sources)
         while len(json.dumps(sources, ensure_ascii=False)) > 4000 and sources:
@@ -76,6 +74,7 @@ def build_layered_memory(
         "acceptance_criteria": state.get("acceptance_criteria", []),
         "verification_commands": state.get("verification_commands", []),
         "latest_user_corrections": state.get("latest_user_corrections", []),
+        "repo_context": state.get("repo_context", ""),
         "research_notes": _short_text(
             state.get("research_notes", ""), MAX_TEXT_CHARS["research_notes"]
         ),
@@ -89,9 +88,7 @@ def build_layered_memory(
         ),
         "verification_checks": state.get("verification_checks", [])[-20:],
         "source_catalogue": source_catalogue,
-        "last_error": _short_text(
-            state.get("last_error", ""), MAX_TEXT_CHARS["last_error"]
-        ),
+        "last_error": _short_text(state.get("last_error", ""), MAX_TEXT_CHARS["last_error"]),
         "attempts": state.get("attempts", 0),
         "max_attempts": state.get("max_attempts", 3),
         "context_next_node": state.get("context_next_node", ""),
@@ -100,9 +97,7 @@ def build_layered_memory(
     history_summary_store = {
         "history_path": HISTORY_SUMMARY_FILE,
         "history_exists": history.get("exists", False),
-        "history_summary": _short_text(
-            history_summary, MAX_TEXT_CHARS["history_summary"]
-        ),
+        "history_summary": _short_text(history_summary, MAX_TEXT_CHARS["history_summary"]),
         "notepad_path": NOTEPAD_FILE,
         "notepad_exists": notepad.get("exists", False),
         "notepad": _short_text(notepad.get("content", ""), MAX_TEXT_CHARS["notepad"]),
@@ -166,9 +161,7 @@ def persist_history_summary(state: RuntimeState, summary: str) -> dict[str, Any]
     path = state.assert_workspace_path(state.workspace / HISTORY_SUMMARY_FILE)
     path.parent.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    content = (
-        f"# MokioClaw History Summary\n\n_Updated: {timestamp}_\n\n{summary.strip()}\n"
-    )
+    content = f"# MokioClaw History Summary\n\n_Updated: {timestamp}_\n\n{summary.strip()}\n"
     path.write_text(content, encoding="utf-8")
     state.record_read(path, complete=True)
     return {

@@ -40,6 +40,9 @@ class RunRecord:
         self.subscribers = 0
         self.context_control = ContextControl()
         self.run_control = RunControl()
+        from mokioclaw.core.run_inbox import RunInbox
+
+        self.run_control.inbox = RunInbox(self.root / "messages.json", self.condition)
         self._load_events()
 
     def _load_events(self) -> None:
@@ -54,6 +57,23 @@ class RunRecord:
 
     def append(self, event: dict[str, Any]) -> int:
         with self.condition:
+            if event.get("type") == "custom_event" and isinstance(event.get("event"), dict):
+                from mokioclaw.core.protocol import validate_event
+
+                event = {**event, "event": validate_event(event["event"])}
+                event = {
+                    **event,
+                    "event": {
+                        "event_id": uuid4().hex,
+                        "run_id": self.run_id,
+                        "context_version": getattr(
+                            getattr(self.run_control, "runtime", None),
+                            "context_version",
+                            0,
+                        ),
+                        **event["event"],
+                    },
+                }
             seq = len(self.events) + 1
             item = {"run_id": self.run_id, "seq": seq, "event": event}
             self.events.append(item)
@@ -64,9 +84,7 @@ class RunRecord:
 
 
 class AgentDaemon:
-    def __init__(
-        self, state_dir: Path, host: str = "127.0.0.1", port: int = 8765
-    ) -> None:
+    def __init__(self, state_dir: Path, host: str = "127.0.0.1", port: int = 8765) -> None:
         if host not in {"127.0.0.1", "localhost", "::1"}:
             raise ValueError("MokioClaw daemon only binds to loopback interfaces")
         self.state_dir = state_dir.expanduser()
@@ -84,11 +102,10 @@ class AgentDaemon:
                 self.token_path.chmod(0o600)
             except OSError:
                 pass
+        self.approval_sessions = {}
         self.runs: dict[str, RunRecord] = {}
         self.lock = threading.Lock()
-        self.executor = ThreadPoolExecutor(
-            max_workers=4, thread_name_prefix="mokioclaw-run"
-        )
+        self.executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="mokioclaw-run")
         self.server = None
 
     def run(self) -> None:
@@ -105,13 +122,15 @@ class AgentDaemon:
                     response = daemon.dispatch(request, self.wfile)
                     if response is not None:
                         self.wfile.write(
-                            json.dumps(
-                                response, ensure_ascii=False, default=str
-                            ).encode()
-                            + b"\n"
+                            json.dumps(response, ensure_ascii=False, default=str).encode() + b"\n"
                         )
                         self.wfile.flush()
-                except Exception as exc:
+                except json.JSONDecodeError:
+                    self.wfile.write(
+                        json.dumps(_error(None, -32700, "invalid JSON")).encode() + b"\n"
+                    )
+                    self.wfile.flush()
+                except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
                     self.wfile.write(
                         json.dumps(
                             {
@@ -155,15 +174,115 @@ class AgentDaemon:
                         pass
 
     def dispatch(self, request: dict[str, Any], output) -> dict[str, Any] | None:
+        from mokioclaw.core.transport_trace import transport_record
+
+        transport_record(self.state_dir, "CLIENT→CORE", "rpc_received", request=request)
+        result = self._dispatch_contract(request, output)
+        transport_record(
+            self.state_dir, "CORE→CLIENT", "rpc_response", request=request, response=result
+        )
+        return result
+
+    def _dispatch_contract(self, request: dict[str, Any], output) -> dict[str, Any] | None:
+        from pydantic import ValidationError
+
+        from mokioclaw.core.protocol import PARAMS, RpcRequest
+
+        try:
+            parsed = RpcRequest.model_validate(request)
+        except ValidationError:
+            return _error(
+                request.get("id") if isinstance(request, dict) else None,
+                -32600,
+                "invalid JSON-RPC request",
+            )
+        if not secrets.compare_digest(str(parsed.params.get("token", "")), self.token):
+            return _error(parsed.id, -32001, "unauthorized local client")
+        if parsed.method not in PARAMS:
+            return _error(parsed.id, -32601, f"method not found: {parsed.method}")
+        try:
+            params = PARAMS[parsed.method].model_validate(parsed.params)
+        except ValidationError as exc:
+            return _error(parsed.id, -32602, str(exc.errors(include_input=False)))
+        from mokioclaw.core.transport_trace import transport_record
+
+        transport_record(self.state_dir, "CLIENT→CORE", "rpc_validated", request=request)
+        return self._dispatch_validated(
+            {**request, "params": params.model_dump(exclude_unset=True)}, output
+        )
+
+    def _dispatch_validated(self, request: dict[str, Any], output) -> dict[str, Any] | None:
         request_id = request.get("id")
         if request.get("jsonrpc") != "2.0" or not isinstance(request_id, (int, str)):
             return _error(request_id, -32600, "invalid JSON-RPC request")
-        params = (
-            request.get("params") if isinstance(request.get("params"), dict) else {}
-        )
+        params = request.get("params") if isinstance(request.get("params"), dict) else {}
         if not secrets.compare_digest(str(params.get("token", "")), self.token):
             return _error(request_id, -32001, "unauthorized local client")
         method = request.get("method")
+        if method == "submit_run_message":
+            with self.lock:
+                record = self.runs.get(str(params.get("run_id", "")))
+            if record is None:
+                return _result(request_id, {"ok": False, "error_type": "unknown_run"})
+            with record.condition:
+                if any(
+                    m["message_id"] == params.get("message_id")
+                    for m in record.run_control.inbox.items
+                ):
+                    return _result(
+                        request_id,
+                        {
+                            "run_id": record.run_id,
+                            **record.run_control.inbox.submit(
+                                params.get("message_id"), params.get("text")
+                            ),
+                        },
+                    )
+                if record.status != "running" or record.run_control.cancel_event.is_set():
+                    return _result(request_id, {"ok": False, "error_type": "run_finished"})
+                before = len(record.run_control.inbox.items)
+                result = record.run_control.inbox.submit(
+                    params.get("message_id"), params.get("text")
+                )
+                if result.get("ok") and len(record.run_control.inbox.items) > before:
+                    record.append(
+                        {
+                            "type": "custom_event",
+                            "event": {"type": "user_message_received", **result},
+                        }
+                    )
+                    for waiter in record.waiters.values():
+                        waiter.decision = ApprovalDecision(False, "Superseded by a user correction")
+                        waiter.event.set()
+                    record.waiters.clear()
+                    record.append(
+                        {
+                            "type": "custom_event",
+                            "event": {"type": "approvals_superseded"},
+                        }
+                    )
+                return _result(request_id, {"run_id": record.run_id, **result})
+        if method == "permissions":
+            from mokioclaw.core.approval_rules import ApprovalRules
+
+            workspace = Path(params["workspace"]).resolve()
+            rules = ApprovalRules(workspace, params.get("session_id", ""), self.approval_sessions)
+            if params.get("action", "list") != "list":
+                rules.revoke(params.get("rule_id"), clear=params.get("action") == "clear")
+                with self.lock:
+                    active_runs = list(self.runs.values())
+                for active in active_runs:
+                    runtime = getattr(active.run_control, "runtime", None)
+                    if runtime is not None and runtime.workspace.resolve() == workspace:
+                        with active.condition:
+                            for waiter in active.waiters.values():
+                                waiter.decision = ApprovalDecision(False, "Approval policy changed")
+                                waiter.event.set()
+                            active.waiters.clear()
+                        active.append(
+                            {"type": "custom_event", "event": {"type": "approvals_superseded"}}
+                        )
+            return _result(request_id, {"ok": True, **rules.list_rules()})
         if method == "cancel_run":
             with self.lock:
                 record = self.runs.get(str(params.get("run_id", "")))
@@ -172,17 +291,13 @@ class AgentDaemon:
             with record.condition:
                 if record.status == "running" and record.run_control.cancel():
                     for waiter in record.waiters.values():
-                        waiter.decision = ApprovalDecision(
-                            False, "Run cancelled by user."
-                        )
+                        waiter.decision = ApprovalDecision(False, "Run cancelled by user.")
                         waiter.event.set()
                     if not any(
                         item["event"].get("type") == "run_cancel_requested"
                         for item in record.events
                     ):
-                        record.append(
-                            {"type": "run_cancel_requested", "run_id": record.run_id}
-                        )
+                        record.append({"type": "run_cancel_requested", "run_id": record.run_id})
                 return _result(
                     request_id,
                     {
@@ -206,9 +321,7 @@ class AgentDaemon:
                     record.context_control.get(str(params.get("request_id", ""))),
                 )
             if method == "compact_cancel":
-                result = record.context_control.cancel(
-                    str(params.get("request_id", ""))
-                )
+                result = record.context_control.cancel(str(params.get("request_id", "")))
                 record.append({"type": "context_compact_request", **result})
                 return _result(request_id, result)
             if record.status != "running":
@@ -253,13 +366,18 @@ class AgentDaemon:
             )
         if method == "subagent_list":
             parent_run_id = str(params.get("parent_run_id", ""))
-            return _result(
-                request_id, self.subagent_manager.list_for_parent(parent_run_id)
-            )
+            return _result(request_id, self.subagent_manager.list_for_parent(parent_run_id))
         if method == "status":
             return _result(
                 request_id,
                 {
+                    "protocol_version": 1,
+                    "capabilities": [
+                        "typed_protocol",
+                        "explicit_skill",
+                        "approval_memory",
+                        "layered_trace",
+                    ],
                     "pid": os.getpid(),
                     "runs": {key: run.status for key, run in self.runs.items()},
                 },
@@ -273,20 +391,15 @@ class AgentDaemon:
 
     def start_run(self, params: dict[str, Any]) -> str:
         mode = str(params.get("mode", "run"))
-        options = (
-            params.get("options") if isinstance(params.get("options"), dict) else {}
-        )
+        options = params.get("options") if isinstance(params.get("options"), dict) else {}
         run_id = f"run-{uuid4().hex[:12]}"
         record = RunRecord(run_id, self.runs_dir / run_id)
-        record.append(
-            {"type": "custom_event", "event": {"type": "run_started", "run_id": run_id}}
-        )
+        record.run_control.approval_sessions = self.approval_sessions
+        record.append({"type": "custom_event", "event": {"type": "run_started", "run_id": run_id}})
         with self.lock:
             self.runs[run_id] = record
         (record.root / "run.json").write_text(
-            json.dumps(
-                {"mode": mode, "options": options, "status": "running"}, indent=2
-            ),
+            json.dumps({"mode": mode, "options": options, "status": "running"}, indent=2),
             encoding="utf-8",
         )
         self.executor.submit(self._run_task, record, mode, options)
@@ -296,18 +409,14 @@ class AgentDaemon:
         control_token = CURRENT_CONTROL.set(record.context_control)
         run_token = CURRENT_RUN.set(record.run_control)
         os.environ["MOKIO_DAEMON_WORKER"] = "1"
-        context_token = set_daemon_context(
-            self.subagent_manager, record.run_id, record.append
-        )
+        context_token = set_daemon_context(self.subagent_manager, record.run_id, record.append)
 
         def approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             waiter = ApprovalWaiter(request)
             with record.condition:
                 record.run_control.check()
                 record.waiters[request.id] = waiter
-            record.append(
-                {"type": "daemon_approval_request", "request": asdict(request)}
-            )
+            record.append({"type": "daemon_approval_request", "request": asdict(request)})
             try:
                 approval_timeout_seconds = max(
                     1.0, float(os.getenv("MOKIO_APPROVAL_TIMEOUT_SECONDS", "300"))
@@ -320,10 +429,12 @@ class AgentDaemon:
             with record.condition:
                 record.waiters.pop(request.id, None)
             record.run_control.check()
-            return waiter.decision or ApprovalDecision(
-                False, "Approval was not resolved."
-            )
+            from mokioclaw.core.run_inbox import check_redirect
 
+            check_redirect(getattr(record.run_control, "runtime", None))
+            return waiter.decision or ApprovalDecision(False, "Approval was not resolved.")
+
+        terminal_status = "failed"
         try:
             from mokioclaw.core.agent import stream_agent_events, stream_session_events
 
@@ -338,22 +449,18 @@ class AgentDaemon:
                 if key not in path_options and key != "task"
             }
             common["approval_handler"] = (
-                approval_handler
-                if common.get("approval_mode", "inline") == "inline"
-                else None
+                approval_handler if common.get("approval_mode") in {None, "inline"} else None
             )
             stream = stream_session_events if mode == "session" else stream_agent_events
             for event in stream(options.get("task"), **common, **path_options):
                 record.append(event)
-            record.status = record.run_control.finish("finished")
+            terminal_status = record.run_control.finish("finished")
         except (RunInterrupted, KeyboardInterrupt):
             record.run_control.cancel()
-            record.status = record.run_control.finish("interrupted")
-        except BaseException as exc:
-            record.append(
-                {"type": "daemon_run_error", "error": f"{type(exc).__name__}: {exc}"}
-            )
-            record.status = record.run_control.finish("failed")
+            terminal_status = record.run_control.finish("interrupted")
+        except BaseException as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
+            record.append({"type": "daemon_run_error", "error": f"{type(exc).__name__}: {exc}"})
+            terminal_status = record.run_control.finish("failed")
         finally:
             record.run_control.close()
             for failed in record.context_control.close():
@@ -364,19 +471,16 @@ class AgentDaemon:
             try:
                 metadata_path = record.root / "run.json"
                 payload = json.loads(metadata_path.read_text(encoding="utf-8"))
-                payload["status"] = record.status
-                metadata_path.write_text(
-                    json.dumps(payload, indent=2), encoding="utf-8"
-                )
+                payload["status"] = terminal_status
+                metadata_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
             except (OSError, json.JSONDecodeError):
                 pass
-            record.append({"type": "daemon_run_finished", "status": record.status})
             with record.condition:
+                record.status = terminal_status
+                record.append({"type": "daemon_run_finished", "status": terminal_status})
                 record.condition.notify_all()
 
-    def subscribe(
-        self, request_id: Any, params: dict[str, Any], output
-    ) -> dict[str, Any] | None:
+    def subscribe(self, request_id: Any, params: dict[str, Any], output) -> dict[str, Any] | None:
         run_id = str(params.get("run_id", ""))
         with self.lock:
             record = self.runs.get(run_id)
@@ -408,6 +512,23 @@ class AgentDaemon:
                     pending = record.events[cursor:]
                     status = record.status
                 for item in pending:
+                    if (
+                        "approval_memory" not in params.get("client_capabilities", [])
+                        and item.get("event", {}).get("type") == "daemon_approval_request"
+                    ):
+                        original = item["event"]["request"]
+                        item = {
+                            **item,
+                            "event": {
+                                **item["event"],
+                                "request": {
+                                    k: v
+                                    for k, v in original.items()
+                                    if k
+                                    in {"id", "command", "risk_reason", "tool_name", "tool_call_id"}
+                                },
+                            },
+                        }
                     output.write(
                         json.dumps(
                             {"jsonrpc": "2.0", "method": "event", "params": item},
@@ -417,6 +538,16 @@ class AgentDaemon:
                         + b"\n"
                     )
                     output.flush()
+                    from mokioclaw.core.transport_trace import transport_record
+
+                    transport_record(
+                        self.state_dir,
+                        "CORE→CLIENT",
+                        "event_push",
+                        request={"id": request_id, "method": "subscribe"},
+                        run_id=run_id,
+                        event=item,
+                    )
                     cursor = int(item["seq"])
                 if status != "running" and cursor >= len(record.events):
                     output.write(
@@ -440,32 +571,55 @@ class AgentDaemon:
                 record.subscribers = max(0, record.subscribers - 1)
                 if disconnected and record.subscribers == 0:
                     for waiter in record.waiters.values():
-                        waiter.decision = ApprovalDecision(
-                            False, "Approval client disconnected."
-                        )
+                        waiter.decision = ApprovalDecision(False, "Approval client disconnected.")
                         waiter.event.set()
 
     def resolve_approval(self, params: dict[str, Any]) -> dict[str, Any]:
         run = self.runs.get(str(params.get("run_id", "")))
-        request_id = str(params.get("approval_id", ""))
-        waiter = run.waiters.get(request_id) if run else None
-        if waiter is None:
-            return {"ok": False, "error": "approval request is no longer pending"}
-        tool_call_id = str(params.get("tool_call_id", ""))
-        if (
-            tool_call_id
-            and waiter.request.tool_call_id
-            and tool_call_id != waiter.request.tool_call_id
-        ):
-            return {
-                "ok": False,
-                "error": "approval response does not match the pending tool call",
-            }
-        waiter.decision = ApprovalDecision(
-            bool(params.get("approved")), str(params.get("reason", ""))
-        )
-        waiter.event.set()
-        return {"ok": True}
+        if run is None:
+            return {"ok": False, "error": "unknown run"}
+        with run.condition:
+            request_id = str(params.get("approval_id", ""))
+            waiter = run.waiters.get(request_id) if run else None
+            if waiter is None or waiter.event.is_set():
+                return {"ok": False, "error": "approval request is no longer pending"}
+            tool_call_id = str(params.get("tool_call_id", ""))
+            if (
+                tool_call_id
+                and waiter.request.tool_call_id
+                and tool_call_id != waiter.request.tool_call_id
+            ):
+                return {
+                    "ok": False,
+                    "error": "approval response does not match the pending tool call",
+                }
+            runtime = getattr(run.run_control, "runtime", None)
+            from mokioclaw.core.approval_rules import runtime_rules
+
+            if runtime is not None and (
+                waiter.request.context_version != runtime.context_version
+                or waiter.request.policy_version != runtime_rules(runtime).version()
+            ):
+                waiter.decision = ApprovalDecision(False, "Approval request is stale.")
+                waiter.event.set()
+                run.append(
+                    {
+                        "type": "custom_event",
+                        "event": {"type": "approvals_superseded", "approval_ids": [request_id]},
+                    }
+                )
+                return {"ok": False, "error": "approval request is stale"}
+            for key in ("context_version", "policy_version"):
+                if params.get(key) is not None and params[key] != getattr(waiter.request, key):
+                    return {"ok": False, "error": "approval version mismatch"}
+            waiter.decision = ApprovalDecision(
+                bool(params.get("approved")),
+                str(params.get("reason", "")),
+                params.get("scope", "once"),
+                params.get("match_scope", "exact"),
+            )
+            waiter.event.set()
+            return {"ok": True}
 
 
 def _result(request_id: Any, result: Any) -> dict[str, Any]:
@@ -473,6 +627,8 @@ def _result(request_id: Any, result: Any) -> dict[str, Any]:
 
 
 def _error(request_id: Any, code: int, message: str) -> dict[str, Any]:
+    if not isinstance(request_id, (str, int)) or isinstance(request_id, bool):
+        request_id = None
     return {
         "jsonrpc": "2.0",
         "id": request_id,

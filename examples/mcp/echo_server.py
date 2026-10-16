@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import anyio
-
 from mcp import types
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -16,9 +15,7 @@ async def list_tools(context, params) -> types.ListToolsResult:
                 description="Return the supplied text with a short prefix.",
                 inputSchema={
                     "type": "object",
-                    "properties": {
-                        "text": {"type": "string", "description": "Text to echo"}
-                    },
+                    "properties": {"text": {"type": "string", "description": "Text to echo"}},
                     "required": ["text"],
                 },
             )
@@ -43,9 +40,7 @@ server = Server("mokioclaw-example", on_list_tools=list_tools, on_call_tool=call
 
 async def main() -> None:
     async with stdio_server() as (read_stream, write_stream):
-        await server.run(
-            read_stream, write_stream, server.create_initialization_options()
-        )
+        await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
 if __name__ == "__main__":

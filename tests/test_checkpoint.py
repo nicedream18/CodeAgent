@@ -10,10 +10,10 @@ from mokioclaw.core.checkpoint import (
     CHECKPOINT_ROOT,
     CheckpointManager,
     build_light_resume_inputs,
+    deserialize_state,
     load_resume_inputs,
     normalize_resume_task,
     serialize_state,
-    deserialize_state,
     workspace_manifest,
 )
 from mokioclaw.core.state import RuntimeState
@@ -157,10 +157,7 @@ def test_light_resume_normalizes_repeated_resume_prefix(tmp_path: Path) -> None:
 
     inputs = build_light_resume_inputs(runtime)
 
-    assert (
-        inputs["task"]
-        == "Continue this MokioClaw task from the checkpoint: original task"
-    )
+    assert inputs["task"] == "Continue this MokioClaw task from the checkpoint: original task"
 
 
 def test_normalize_resume_task_strips_nested_prefixes() -> None:

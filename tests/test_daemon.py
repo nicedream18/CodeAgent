@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
-from io import BytesIO
 import threading
 import time
+from io import BytesIO
 from pathlib import Path
 
 import pytest
@@ -41,9 +41,7 @@ def test_daemon_runs_task_streams_events_and_roundtrips_approval(
 
     def fake_stream(task, *, approval_handler=None, **kwargs):
         assert task == "create a page"
-        decision = approval_handler(
-            ApprovalRequest("approval-demo", "write page", "file write")
-        )
+        decision = approval_handler(ApprovalRequest("approval-demo", "write page", "file write"))
         yield {"type": "workspace", "path": "/tmp/workspace"}
         yield {
             "type": "custom_event",
@@ -63,22 +61,23 @@ def test_daemon_runs_task_streams_events_and_roundtrips_approval(
                 ),
             )
         )
-        assert [event.get("type") for event in events] == ["custom_event", "workspace", "custom_event"]
+        assert [event.get("type") for event in events] == [
+            "custom_event",
+            "workspace",
+            "custom_event",
+            "daemon_run_finished",
+        ]
         assert events[0]["event"]["type"] == "run_started"
-        assert events[-1]["event"]["approved"] is True
+        assert events[-2]["event"]["approved"] is True
         assert approvals and approvals[0].id == "approval-demo"
         status = daemon_status(start=False)
         assert status and len(status["runs"]) == 1
         run_dir = next((state_dir / "runs").iterdir())
         persisted = [
             json.loads(line)
-            for line in (run_dir / "events.jsonl")
-            .read_text(encoding="utf-8")
-            .splitlines()
+            for line in (run_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()
         ]
-        assert any(
-            item["event"].get("type") == "daemon_approval_request" for item in persisted
-        )
+        assert any(item["event"].get("type") == "daemon_approval_request" for item in persisted)
         assert [item["seq"] for item in persisted] == list(range(1, len(persisted) + 1))
     finally:
         stop_daemon()
@@ -187,9 +186,7 @@ def test_daemon_disconnect_denies_pending_approval(tmp_path: Path, monkeypatch) 
     assert waiter.decision == ApprovalDecision(False, "Approval client disconnected.")
 
 
-def test_daemon_approval_timeout_denies_pending_call(
-    monkeypatch, tmp_path: Path
-) -> None:
+def test_daemon_approval_timeout_denies_pending_call(monkeypatch, tmp_path: Path) -> None:
     import mokioclaw.core.agent as agent
     from mokioclaw.core.daemon import RunRecord
 
@@ -219,9 +216,7 @@ def test_daemon_approval_timeout_denies_pending_call(
     daemon._run_task(record, "run", {"approval_mode": "inline", "task": "write a page"})
 
     approval_result = next(
-        item["event"]
-        for item in record.events
-        if item["event"].get("type") == "approval_result"
+        item["event"] for item in record.events if item["event"].get("type") == "approval_result"
     )
     assert approval_result["approved"] is False
     assert approval_result["reason"] == "Approval request timed out."

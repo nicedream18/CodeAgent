@@ -5,11 +5,13 @@ import shlex
 import shutil
 import subprocess
 from dataclasses import asdict, is_dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from langchain_core.messages import BaseMessage, message_to_dict, messages_from_dict
+
+from mokioclaw.core.instructions import instructions
 
 VALID_CHECKPOINT_MODES = {"light", "strict", "off"}
 CHECKPOINT_ROOT = Path(".mokioclaw") / "checkpoints"
@@ -35,9 +37,7 @@ class CheckpointManager:
     def __init__(self, runtime: Any, task: str = "") -> None:
         self.runtime = runtime
         self.workspace = runtime.workspace
-        self.mode = normalize_checkpoint_mode(
-            getattr(runtime, "checkpoint_mode", "light")
-        )
+        self.mode = normalize_checkpoint_mode(getattr(runtime, "checkpoint_mode", "light"))
         self.task = task
         self.root = checkpoint_dir(self.workspace)
 
@@ -57,9 +57,7 @@ class CheckpointManager:
             return None
 
         context_checkpoint = getattr(self.runtime, "context_checkpoint", {})
-        if context_checkpoint.get("context_version", 0) > state.get(
-            "context_version", 0
-        ):
+        if context_checkpoint.get("context_version", 0) > state.get("context_version", 0):
             state = {**state, **context_checkpoint}
 
         self.root.mkdir(parents=True, exist_ok=True)
@@ -83,9 +81,7 @@ class CheckpointManager:
             git_error=git_error,
         )
         _write_json(self.root / CHECKPOINT_FILE, payload)
-        (self.root / RECOVERY_FILE).write_text(
-            build_recovery_markdown(payload), encoding="utf-8"
-        )
+        (self.root / RECOVERY_FILE).write_text(build_recovery_markdown(payload), encoding="utf-8")
 
         return checkpoint_saved_event(payload)
 
@@ -119,9 +115,7 @@ class CheckpointManager:
             "checkpoint_file": str(self.root / CHECKPOINT_FILE),
             "recovery_file": str(self.root / RECOVERY_FILE),
             "state_file": str(self.root / STATE_FILE) if self.mode == "strict" else "",
-            "events_file": str(self.root / EVENTS_FILE)
-            if self.mode == "strict"
-            else "",
+            "events_file": str(self.root / EVENTS_FILE) if self.mode == "strict" else "",
             "task": task,
             "latest_node": latest_node or "",
             "next_node": state.get("context_next_node", ""),
@@ -180,16 +174,12 @@ def load_resume_inputs(
     task: str | None = None,
     max_attempts: int = 3,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    requested_mode = normalize_checkpoint_mode(
-        getattr(runtime, "checkpoint_mode", "light")
-    )
+    requested_mode = normalize_checkpoint_mode(getattr(runtime, "checkpoint_mode", "light"))
     if requested_mode == "strict":
         try:
             state = load_strict_state(runtime, max_attempts=max_attempts)
-        except Exception as exc:
-            inputs = build_light_resume_inputs(
-                runtime, task=task, max_attempts=max_attempts
-            )
+        except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
+            inputs = build_light_resume_inputs(runtime, task=task, max_attempts=max_attempts)
             event = checkpoint_resumed_event(
                 workspace=runtime.workspace,
                 mode="light",
@@ -218,7 +208,7 @@ def load_strict_state(runtime: Any, *, max_attempts: int = 3) -> dict[str, Any]:
     state_path = checkpoint_dir(runtime.workspace) / STATE_FILE
     raw = json.loads(state_path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
-        raise ValueError("state.json is not an object")
+        raise ValueError("state.json is not an object")  # noqa: TRY004 — preserve the public ValueError validation contract
     state = deserialize_state(raw, runtime)
     state["max_attempts"] = max_attempts
     metadata = dict(state.get("metadata", {}))
@@ -264,9 +254,7 @@ def build_light_resume_inputs(
     context_summary = trim_text(
         "\n\n".join(part for part in context_parts if part), MAX_RECOVERY_TEXT
     )
-    summary = (
-        checkpoint.get("summary") if isinstance(checkpoint.get("summary"), dict) else {}
-    )
+    summary = checkpoint.get("summary") if isinstance(checkpoint.get("summary"), dict) else {}
 
     inputs: dict[str, Any] = {
         "task": resume_task,
@@ -319,9 +307,7 @@ def read_checkpoint_text(workspace: Path, name: str) -> str:
     if not path.exists():
         return ""
     try:
-        return trim_text(
-            path.read_text(encoding="utf-8", errors="replace"), MAX_RECOVERY_TEXT
-        )
+        return trim_text(path.read_text(encoding="utf-8", errors="replace"), MAX_RECOVERY_TEXT)
     except OSError:
         return ""
 
@@ -347,9 +333,11 @@ def serialize_state(state: dict[str, Any]) -> dict[str, Any]:
         serialized[key] = json_safe(value)
     runtime = state.get("runtime")
     if runtime is not None:
-        serialized["applied_subagent_results"] = sorted(
-            runtime.subagent_applied_results
-        )
+        serialized["applied_subagent_results"] = sorted(runtime.subagent_applied_results)
+        from mokioclaw.core.context_compaction import critical_facts
+
+        for key in ("project_instructions", "inbox_reference"):
+            serialized[key] = critical_facts(state).get(key)
     return serialized
 
 
@@ -365,6 +353,11 @@ def deserialize_state(data: dict[str, Any], runtime: Any) -> dict[str, Any]:
     else:
         state["messages"] = []
     state["runtime"] = runtime
+    if (runtime.workspace / ".mokioclaw/changes/reverify.json").exists():
+        state.update(passed=False, verification_results=[], context_next_node="verifier")
+    from mokioclaw.core.instructions import restore_instructions
+
+    restore_instructions(runtime, state.get("project_instructions"))
     return state
 
 
@@ -390,6 +383,21 @@ def state_summary(state: dict[str, Any]) -> dict[str, Any]:
     sources = state.get("sources", [])
     return {
         "plan_summary": trim_text(state.get("plan_summary", ""), 1200),
+        "explicit_skill": getattr(state.get("runtime"), "explicit_skill", None),
+        "inbox_reference": str(
+            state["runtime"].run_control.inbox.path.relative_to(state["runtime"].workspace)
+        )
+        if state.get("runtime")
+        and state["runtime"].run_control
+        and state["runtime"].run_control.inbox.path
+        else "",
+        "repo_context": state.get("repo_context", ""),
+        "repo_explored": state.get("repo_explored", False),
+        "stop_reason": state.get("stop_reason", ""),
+        "model_metrics": getattr(state.get("runtime"), "model_metrics", {}),
+        "project_instructions": instructions(state["runtime"]).manifest()
+        if state.get("runtime")
+        else [],
         "context_version": state.get("context_version", 0),
         "latest_user_corrections": json_safe(state.get("latest_user_corrections", [])),
         "agent_handoffs": json_safe(state.get("agent_handoffs", [])),
@@ -458,9 +466,7 @@ def build_recovery_markdown(payload: dict[str, Any]) -> str:
         "## Todos",
     ]
     lines.extend(
-        _markdown_items(
-            [f"[{todo.get('status', '')}] {todo.get('content', '')}" for todo in todos]
-        )
+        _markdown_items([f"[{todo.get('status', '')}] {todo.get('content', '')}" for todo in todos])
     )
     lines.extend(["", "## Acceptance Criteria"])
     lines.extend(_markdown_items(criteria))
@@ -469,10 +475,7 @@ def build_recovery_markdown(payload: dict[str, Any]) -> str:
     lines.extend(["", "## Sources"])
     lines.extend(
         _markdown_items(
-            [
-                f"{source.get('title', '')}: {source.get('url', '')}"
-                for source in sources
-            ]
+            [f"{source.get('title', '')}: {source.get('url', '')}" for source in sources]
         )
     )
     lines.extend(
@@ -489,18 +492,13 @@ def build_recovery_markdown(payload: dict[str, Any]) -> str:
     )
     lines.extend(
         _markdown_items(
-            [
-                f"{item.get('path', '')} ({item.get('size', 0)} bytes)"
-                for item in manifest[:40]
-            ]
+            [f"{item.get('path', '')} ({item.get('size', 0)} bytes)" for item in manifest[:40]]
         )
     )
     return "\n".join(lines).rstrip() + "\n"
 
 
-def workspace_manifest(
-    workspace: Path, *, limit: int = MAX_MANIFEST_ITEMS
-) -> list[dict[str, Any]]:
+def workspace_manifest(workspace: Path, *, limit: int = MAX_MANIFEST_ITEMS) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     if not workspace.exists():
         return items
@@ -520,17 +518,13 @@ def workspace_manifest(
             {
                 "path": rel.as_posix(),
                 "size": stat.st_size,
-                "mtime": datetime.fromtimestamp(
-                    stat.st_mtime, tz=timezone.utc
-                ).isoformat(),
+                "mtime": datetime.fromtimestamp(stat.st_mtime, tz=UTC).isoformat(),
             }
         )
     return items
 
 
-def snapshot_workspace_git(
-    workspace: Path, root: Path
-) -> tuple[str | None, str | None]:
+def snapshot_workspace_git(workspace: Path, root: Path) -> tuple[str | None, str | None]:
     if shutil.which("git") is None:
         return None, "git executable not found"
 
@@ -557,14 +551,14 @@ def snapshot_workspace_git(
             args.append("--allow-empty")
         _git(workspace, git_dir, args)
         return git_head(workspace, git_dir), None
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
         return git_head(workspace, git_dir), f"{type(exc).__name__}: {exc}"
 
 
 def git_head(workspace: Path, git_dir: Path) -> str | None:
     try:
         result = _git(workspace, git_dir, ["rev-parse", "--short", "HEAD"])
-    except Exception:
+    except Exception:  # noqa: BLE001 — fault boundary; control signals are handled separately
         return None
     value = result.stdout.strip()
     return value or None
@@ -606,7 +600,7 @@ def trim_text(value: Any, limit: int) -> str:
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def should_skip_workspace_path(rel: Path) -> bool:
@@ -626,7 +620,12 @@ def should_skip_workspace_path(rel: Path) -> bool:
 
 def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> None:
     for key in (
+        "inbox_reference",
+        "repo_context",
+        "repo_explored",
+        "project_instructions",
         "context_version",
+        "explicit_skill",
         "latest_user_corrections",
         "agent_handoffs",
         "applied_subagent_results",
@@ -640,10 +639,17 @@ def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> Non
         "verifier_summary",
         "last_error",
     ):
-        if key in summary and summary[key]:
+        if summary.get(key):
             inputs[key] = summary[key]
     runtime = inputs.get("runtime")
     if runtime is not None:
+        from mokioclaw.core.instructions import restore_instructions
+
+        restore_instructions(runtime, inputs.get("project_instructions"))
+        if (runtime.workspace / ".mokioclaw/changes/reverify.json").exists():
+            inputs["passed"] = False
+            inputs["verification_results"] = []
+            inputs["context_next_node"] = "verifier"
         runtime.context_version = int(inputs.get("context_version", 0))
         if runtime.context_control is not None:
             runtime.context_control.version = runtime.context_version
@@ -652,6 +658,7 @@ def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> Non
             facts = json.loads(facts_file.read_text(encoding="utf-8"))
             for key in (
                 "sources",
+                "explicit_skill",
                 "latest_user_corrections",
                 "todos",
                 "acceptance_criteria",
@@ -659,9 +666,7 @@ def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> Non
             ):
                 if key in facts:
                     inputs[key] = facts[key]
-            runtime.subagent_applied_results.update(
-                facts.get("applied_subagent_results", [])
-            )
+            runtime.subagent_applied_results.update(facts.get("applied_subagent_results", []))
         except (OSError, ValueError):
             # Older checkpoints have no separate complete fact catalogue.
             inputs["metadata"] = {
@@ -677,15 +682,11 @@ def _markdown_items(items: list[Any]) -> list[str]:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
-    )
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     tmp.replace(path)
 
 
-def _git(
-    workspace: Path, git_dir: Path, args: list[str]
-) -> subprocess.CompletedProcess[str]:
+def _git(workspace: Path, git_dir: Path, args: list[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", f"--git-dir={git_dir}", f"--work-tree={workspace}", *args],
         cwd=workspace,

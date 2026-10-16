@@ -28,9 +28,7 @@ def test_registry_profiles_share_metadata_and_keep_agent_tool_sets(
     assert "WebSearchTool" not in execution_names
     assert {"FileReadTool", "GrepTool", "WebSearchTool"}.issubset(read_only_names)
     assert "FileWriteTool" not in read_only_names
-    assert tool_spec_for("FileWriteTool").capabilities == frozenset(
-        {"filesystem_write"}
-    )
+    assert tool_spec_for("FileWriteTool").capabilities == frozenset({"filesystem_write"})
     assert tool_spec_for("WebSearchTool").idempotent is True
 
 
@@ -57,18 +55,14 @@ def test_invalid_args_are_rejected_before_permission_prompt(tmp_path: Path) -> N
     runtime = RuntimeState(workspace=tmp_path)
     runtime.tool_policies["FileWriteTool"] = "ask"
     requests = []
-    runtime.approval_handler = lambda request: (
-        requests.append(request) or ApprovalDecision(True)
-    )
+    runtime.approval_handler = lambda request: requests.append(request) or ApprovalDecision(True)
     tool = StructuredTool.from_function(
         name="FileWriteTool",
         func=lambda file_path, content: {"ok": True},
         description="write",
     )
 
-    result = execute_tool(
-        runtime, tool, {"file_path": "page.html"}, tool_call_id="call-invalid"
-    )
+    result = execute_tool(runtime, tool, {"file_path": "page.html"}, tool_call_id="call-invalid")
 
     assert result["ok"] is False
     assert result["error_type"] == "invalid_input"
@@ -109,9 +103,7 @@ def test_approval_events_are_correlated_to_single_tool_call(tmp_path: Path) -> N
     runtime = RuntimeState(workspace=tmp_path, approval_mode="inline")
     runtime.tool_policies["FileWriteTool"] = "ask"
     requests = []
-    runtime.approval_handler = lambda request: (
-        requests.append(request) or ApprovalDecision(True)
-    )
+    runtime.approval_handler = lambda request: requests.append(request) or ApprovalDecision(True)
     events = []
     tool = StructuredTool.from_function(
         name="FileWriteTool",
@@ -171,13 +163,9 @@ def test_bash_policy_precedence_deny_then_outside_ask_then_allow(
     runtime.bash_deny_patterns = [r"\bdeploy\b"]
     runtime.bash_allow_patterns = [r"pip install"]
     approvals = []
-    runtime.approval_handler = lambda request: (
-        approvals.append(request) or ApprovalDecision(True)
-    )
+    runtime.approval_handler = lambda request: approvals.append(request) or ApprovalDecision(True)
 
-    denied = authorize_tool(
-        runtime, "BashTool", {"command": "deploy now"}, tool_call_id="deny-1"
-    )
+    denied = authorize_tool(runtime, "BashTool", {"command": "deploy now"}, tool_call_id="deny-1")
     assert denied["error_type"] == "permission_denied"
     assert approvals == []
 
@@ -196,9 +184,9 @@ def test_bash_policy_precedence_deny_then_outside_ask_then_allow(
 
 
 def test_bash_policy_patterns_are_validated() -> None:
-    assert parse_bash_patterns(
-        '["rm\\\\s+-rf"]', variable="MOKIO_BASH_DENY_PATTERNS"
-    ) == [r"rm\s+-rf"]
+    assert parse_bash_patterns('["rm\\\\s+-rf"]', variable="MOKIO_BASH_DENY_PATTERNS") == [
+        r"rm\s+-rf"
+    ]
     try:
         parse_bash_patterns('["["]', variable="MOKIO_BASH_DENY_PATTERNS")
     except ValueError as exc:
@@ -211,13 +199,9 @@ def test_approval_preview_redacts_secrets(tmp_path: Path) -> None:
     runtime = RuntimeState(workspace=tmp_path, approval_mode="inline")
     runtime.tool_policies["WebSearchTool"] = "ask"
     requests = []
-    runtime.approval_handler = lambda request: (
-        requests.append(request) or ApprovalDecision(False)
-    )
+    runtime.approval_handler = lambda request: requests.append(request) or ApprovalDecision(False)
 
-    authorize_tool(
-        runtime, "WebSearchTool", {"query": "search", "api_key": "secret-value"}
-    )
+    authorize_tool(runtime, "WebSearchTool", {"query": "search", "api_key": "secret-value"})
 
     assert "secret-value" not in requests[0].command
     assert "[redacted]" in requests[0].command

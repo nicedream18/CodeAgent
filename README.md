@@ -16,7 +16,7 @@ MokioClaw 是一个教学优先的 Mini CodeAgent 项目。它按 Agent 系统�
 
 ## 当前阶段
 
-当前处于第 6 阶段的第一步：在 MultiAgent、Context Engineering、Harness Engineering 基础上，新增 Textual TUI 本地交互层。飞书 API 交互仍属于下一步。
+当前已具备 Textual TUI、本机 daemon、可取消的模型流和 MCP stdio；本轮进一步加入项目规则、只读仓库探索、运行中补充指令、MCP 按需发现、hooks、文件回退及可选轻量流程。飞书 API 交互仍属于后续工作。
 
 第 3 阶段的图不再是固定的 `planner -> searchAgent -> codeAgent -> verifier` 顺序链路。现在外层 LangGraph 只有 supervisor 与验收循环：
 
@@ -56,6 +56,27 @@ uv run mokioclaw "帮我查阅明日方舟阿米娅，并编写一个 HTML 介�
 ```
 
 这个任务适合展示 MultiAgent，因为它需要先查资料，再把资料转成可交付的 HTML 页面，最后由模型版 verifier 读取文件、执行检查、判断是否完成。第 4 阶段会在 planner/verifier 之间自动监控上下文 token，达到阈值后插入压缩节点，并把规则、工作记忆、历史摘要拆成独立层次展示。
+
+## 七阶段优化的使用入口
+
+默认仍走完整多 Agent 流程。工作区的 `AGENTS.md` 会自动生效，子目录规则在访问对应文件时加载。planner 修改已有代码前先调用只读 `repoAgent`，使用文件、行号证据辅助规划。通用提示词不再内置 Amiya 演示要求；相关示例见 `examples/skills/amiya-profile/SKILL.md`。
+
+```bash
+# 简单任务可显式选轻量流程，auto 则保守复用路由判断
+uv run mokioclaw --workspace ./workspace --workflow-mode light "将 app.txt 的 before 改为 after，并读取验证"
+uv run mokioclaw tui --workspace ./workspace --workflow-mode auto
+# 另一终端向正在执行的任务补充要求；TUI 可直接输入
+uv run mokioclaw send run-xxxxxxxxxxxx "不要修改数据库" --message-id correction-001
+# 默认只预览文件工具变更，加 --apply 才回退
+uv run mokioclaw rewind --workspace ./workspace
+uv run mokioclaw rewind --workspace ./workspace --apply
+# 九个离线场景，无网络、无真实模型费用
+uv run python examples/optimization_demo.py --output /tmp/mokio-optimization.json
+```
+
+可选 TOML 配置放在 `~/.mokioclaw/config.toml` 或工作区 `.mokioclaw/config.toml`，优先级为显式参数 → 环境变量 → 项目 → 用户 → 默认值。配置示例包含 hooks、角色模型、MCP 服务用途和运行预算，见 [optimization-config.toml](examples/optimization-config.toml)。MCP 默认按需发现；文件回退仅覆盖 FileWrite/FileEdit，Bash/MCP 修改不在覆盖范围内。TUI 空闲时用 `/changes`、`/rewind` 查看并确认回退。
+
+各阶段数据流、故障处理和学习要点见 [设计与学习指南](docs/optimization-design.md)，自动化与真实模型数据见 [验收记录](docs/optimization-acceptance.md)。
 
 ## Context Engineering
 
@@ -112,7 +133,8 @@ uv run mokioclaw compact --run-id run-xxxxxxxxxxxx --request-id compact-xxxxxxxx
 
 | 节点 / Agent | 使用工具 | 职责 |
 | --- | --- | --- |
-| `planner` | `TodoWriteTool` / `CallSearchAgentTool` / `CallCodeAgentTool` | 制定计划，并通过 toolcall 分派专家 Agent |
+| `planner` | `TodoWriteTool` / `CallRepoAgentTool` / `CallSearchAgentTool` / `CallCodeAgentTool` | 探索已有仓库、制定计划，并通过 toolcall 分派专家 Agent |
+| `repoAgent` | `FileReadTool` / `GrepTool` / `FileGlobTool` | 只读探索入口、调用链、约定和测试，返回文件行号证据 |
 | `searchAgent` | `WebSearchTool` | 调用 Tavily 搜索资料，返回研究摘要和 sources |
 | `codeAgent` | `FileReadTool` / `FileWriteTool` / `FileEditTool` / `GrepTool` / `BashTool` / `TodoUpdateTool` | 写文件、运行检查、更新 todo 进度 |
 | `context_monitor` | 无 | 估算当前上下文 token，决定是否触发压缩 |
@@ -134,7 +156,9 @@ uv run mokioclaw compact --run-id run-xxxxxxxxxxxx --request-id compact-xxxxxxxx
 | `FileReadTool` | 读取 workspace 内文本文件 | 支持 `offset` / `limit`，记录“已读状态” |
 | `FileWriteTool` | 创建文件或整文件写入 | 覆盖已有文件前要求先读 |
 | `FileEditTool` | 对已有文件做局部替换 | 基于 `old_text` / `new_text`，要求唯一匹配 |
-| `GrepTool` | 搜索 workspace 内文本内容 | 用结构化方式定位内容 |
+| `GrepTool` | 搜索 workspace 内文本内容 | 优先 rg、Python 降级，共享忽略范围和有界结果 |
+| `FileGlobTool` | 按文件名匹配 workspace 文件 | 遵循忽略规则和工作区边界 |
+| `ToolSearchTool` | 按服务用途按需加载 MCP 工具 | 下一请求重新绑定 schema，沿用权限与审批 |
 | `BashTool` | 执行开发命令 | 固定 workspace、fresh shell、可配置超时、长输出落盘、后台任务、env file 注入、基础安全拦截；高风险命令需要人类审批 |
 
 ## Harness Engineering
@@ -415,3 +439,22 @@ uv run mokioclaw "帮我查阅明日方舟阿米娅，并编写一个 HTML 介�
 ```
 
 MCP 故障诊断、模型流式输出、取消链路和可复现实验见 [MCP 与流式输出验收](docs/mcp-streaming-acceptance.md)。
+
+### 可靠生成、协议与交互治理
+
+模型输出被截断时整批工具调用作废，最多重新决策一次；再次截断会保存进展并以明确原因停止。新增共享协议模型、分层 trace、多行输入、显式 Skill、TOML Agent 角色和会话/项目审批记忆。默认完整流程与单次审批保持不变。
+
+```sh
+make check
+uv run mokioclaw --skill review "检查 app.py"
+uv run mokioclaw trace --workspace ./workspace --layer llm --raw
+uv run mokioclaw permissions list --workspace ./workspace
+uv run python examples/reliability_demo.py --output /tmp/reliability.json
+```
+
+TUI 中 Enter 提交，Shift/Alt+Enter 换行；输入 `/` 查看命令，使用 `/skill`、`/agents` 和 `/permissions`。角色配置范例见 `examples/agents/`。
+
+- [设计与模块边界](docs/reliability-design.md)
+- [验收、真实模型观察与基准](docs/reliability-acceptance.md)
+- [接口文档](docs/WIRE_PROTOCOL.md)
+- [故障排查](docs/reliability-troubleshooting.md)

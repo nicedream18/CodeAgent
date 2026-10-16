@@ -1,0 +1,94 @@
+{
+  "created_at": "2026-10-16T09:46:55.622394+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": true,
+  "model": "deepseek-chat",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-k6_ztate",
+  "results": {
+    "workflows": {
+      "passed": true,
+      "runs": [
+        {
+          "mode": "light",
+          "passed": true,
+          "selected": [
+            "light"
+          ],
+          "duration_ms": 10752.599,
+          "metrics": {
+            "requests": 9,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 251,
+                "output_tokens": 46,
+                "total_tokens": 297,
+                "duration_ms": 1207.019,
+                "requests": 1
+              },
+              "codeAgent": {
+                "input_tokens": 10773,
+                "output_tokens": 411,
+                "total_tokens": 11184,
+                "duration_ms": 5239.486000000001,
+                "requests": 5
+              },
+              "verifier": {
+                "input_tokens": 5457,
+                "output_tokens": 292,
+                "total_tokens": 5749,
+                "duration_ms": 3616.958,
+                "requests": 3
+              }
+            },
+            "input_tokens": 16481,
+            "output_tokens": 749,
+            "total_tokens": 17230,
+            "duration_ms": 10063.463,
+            "estimated": false
+          }
+        },
+        {
+          "mode": "auto",
+          "passed": true,
+          "selected": [
+            "light"
+          ],
+          "duration_ms": 11556.899,
+          "metrics": {
+            "requests": 10,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 251,
+                "output_tokens": 46,
+                "total_tokens": 297,
+                "duration_ms": 1114.028,
+                "requests": 1
+              },
+              "codeAgent": {
+                "input_tokens": 10767,
+                "output_tokens": 408,
+                "total_tokens": 11175,
+                "duration_ms": 4746.436000000001,
+                "requests": 5
+              },
+              "verifier": {
+                "input_tokens": 12219,
+                "output_tokens": 499,
+                "total_tokens": 12718,
+                "duration_ms": 4651.119000000001,
+                "requests": 4
+              }
+            },
+            "input_tokens": 23237,
+            "output_tokens": 953,
+            "total_tokens": 24190,
+            "duration_ms": 10511.583,
+            "estimated": false
+          }
+        }
+      ],
+      "duration_ms": 22309.884
+    }
+  },
+  "passed": true
+}

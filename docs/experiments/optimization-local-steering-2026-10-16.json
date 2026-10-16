@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-10-16T09:42:04.679529+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": false,
+  "model": "local deterministic fixture",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-gfh3i8oz",
+  "results": {
+    "steering": {
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 0.974,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 0.974,
+        "estimated": true
+      },
+      "duration_ms": 15.05
+    }
+  },
+  "passed": true
+}

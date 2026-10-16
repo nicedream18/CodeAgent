@@ -137,9 +137,7 @@ def test_long_exception_is_bounded_and_reported(tmp_path):
 
 
 def test_long_single_line_can_be_read_at_tail_and_visibility_is_honest(tmp_path):
-    (tmp_path / "long.txt").write_text(
-        "x" * 200000 + "TAIL_REQUIREMENT", encoding="utf-8"
-    )
+    (tmp_path / "long.txt").write_text("x" * 200000 + "TAIL_REQUIREMENT", encoding="utf-8")
     runtime = runtime_at(tmp_path)
     tool = build_tool(runtime, "FileReadTool")
     first = execute_tool(runtime, tool, {"file_path": "long.txt"})
@@ -195,9 +193,7 @@ def test_compaction_preserves_facts_and_uses_new_messages_without_replaying_tool
     }
     messages = history()
     model, events = SpyModel(), []
-    response = invoke_streaming(
-        model, messages, state=state, writer=events.append, node="planner"
-    )
+    response = invoke_streaming(model, messages, state=state, writer=events.append, node="planner")
     assert response.content == "done" and len(model.requests) == 1
     message_groups(model.requests[0])
     assert len(messages) < 10
@@ -226,10 +222,7 @@ def test_invalid_summary_uses_deterministic_memory(tmp_path, bad):
         reason="manual",
         summarizer=lambda *_: bad,
     )
-    assert (
-        event["degraded"]
-        and json.loads(replacement[2].content)["facts"]["task"] == "verify"
-    )
+    assert event["degraded"] and json.loads(replacement[2].content)["facts"]["task"] == "verify"
 
 
 def test_summary_transport_failure_is_bounded_and_required_overflow_is_rejected(
@@ -262,19 +255,13 @@ def test_summary_transport_failure_is_bounded_and_required_overflow_is_rejected(
 def test_protocol_group_must_be_complete():
     with pytest.raises(ContextBudgetError, match="incomplete|all tool"):
         message_groups(
-            [
-                AIMessage(
-                    content="", tool_calls=[{"id": "x", "name": "tool", "args": {}}]
-                )
-            ]
+            [AIMessage(content="", tool_calls=[{"id": "x", "name": "tool", "args": {}}])]
         )
     with pytest.raises(ContextBudgetError, match="orphan"):
         message_groups([ToolMessage(content="done", tool_call_id="missing")])
 
 
-def test_manual_request_applies_at_next_call_and_duplicate_requests_coalesce(
-    monkeypatch, tmp_path
-):
+def test_manual_request_applies_at_next_call_and_duplicate_requests_coalesce(monkeypatch, tmp_path):
     from mokioclaw.core import context_compaction
 
     monkeypatch.setattr(
@@ -316,9 +303,7 @@ def test_offline_compact_preserves_late_user_correction_and_checks_writer_lease(
     task = "intro " * 600 + "LATEST_REQUIREMENT_KEEP_SOURCE"
     turn = append_user_turn(session, task)
     for _ in range(8):
-        append_assistant_turn(
-            session, turn=turn, route="workflow", content="observation " * 100
-        )
+        append_assistant_turn(session, turn=turn, route="workflow", content="observation " * 100)
     save_session(tmp_path, session)
     with session_writer(tmp_path), pytest.raises(RuntimeError, match="session_busy"):
         compact_session_history(tmp_path)
@@ -378,9 +363,7 @@ def test_daemon_compact_rpc_uses_run_specific_control(tmp_path):
     result = dispatch("compact_run", run_id="r1")
     assert result["status"] == "pending"
     assert (
-        dispatch("compact_status", run_id="r1", request_id=result["request_id"])[
-            "status"
-        ]
+        dispatch("compact_status", run_id="r1", request_id=result["request_id"])["status"]
         == "pending"
     )
     assert dispatch("compact_run", run_id="missing")["error_type"] == "unknown_run"
@@ -495,8 +478,7 @@ def test_memory_source_catalogue_is_bounded_without_losing_full_sources(tmp_path
     from mokioclaw.graph.memory import build_layered_memory
 
     sources = [
-        {"url": "https://example.test/" + str(i), "title": "title" * 50}
-        for i in range(1000)
+        {"url": "https://example.test/" + str(i), "title": "title" * 50} for i in range(1000)
     ]
     memory = build_layered_memory(
         {"runtime": runtime_at(tmp_path), "task": "research", "sources": sources}
@@ -530,9 +512,7 @@ def test_summary_itself_uses_guarded_bounded_input(monkeypatch, tmp_path):
     assert count <= ContextBudget.from_runtime(state["runtime"]).target
 
 
-def test_code_agent_completes_artifact_after_multiple_local_compactions(
-    monkeypatch, tmp_path
-):
+def test_code_agent_completes_artifact_after_multiple_local_compactions(monkeypatch, tmp_path):
     from mokioclaw.agents import code_agent
     from mokioclaw.core import context_compaction
 
@@ -562,9 +542,7 @@ def test_code_agent_completes_artifact_after_multiple_local_compactions(
                 }
                 name = "FileReadTool"
             elif self.calls == 7:
-                tail = json.loads(messages[-1].content)["content"].split(
-                    "TAIL_CRITERION: "
-                )[-1]
+                tail = json.loads(messages[-1].content)["content"].split("TAIL_CRITERION: ")[-1]
                 args = {
                     "file_path": "report.json",
                     "content": json.dumps(
@@ -596,9 +574,7 @@ def test_code_agent_completes_artifact_after_multiple_local_compactions(
         "acceptance_criteria": ["report criterion equals spec tail"],
     }
     events = []
-    result = code_agent.run_code_agent(
-        state, "Finish report.json", writer=events.append
-    )
+    result = code_agent.run_code_agent(state, "Finish report.json", writer=events.append)
     report = json.loads((tmp_path / "report.json").read_text())
     assert report == {
         "criterion": "PASS_WITH_SOURCE",
@@ -606,14 +582,9 @@ def test_code_agent_completes_artifact_after_multiple_local_compactions(
     }
     assert result["ok"]
     assert sum(e["type"] == "context_compression" for e in events) >= 2
-    assert (
-        sum(e["type"] == "tool_call" and e["name"] == "FileWriteTool" for e in events)
-        == 1
-    )
+    assert sum(e["type"] == "tool_call" and e["name"] == "FileWriteTool" for e in events) == 1
     assert all(
-        e["input_tokens"] <= e["token_limit"]
-        for e in events
-        if e["type"] == "context_budget"
+        e["input_tokens"] <= e["token_limit"] for e in events if e["type"] == "context_budget"
     )
     for request in model.requests:
         message_groups(request)
@@ -633,9 +604,7 @@ def test_transport_honors_the_selected_output_parameter(monkeypatch, parameter):
     assert ("max_tokens" in payload) != ("max_completion_tokens" in payload)
 
 
-def test_background_results_keep_independent_budgets_and_merge_sources_once(
-    monkeypatch, tmp_path
-):
+def test_background_results_keep_independent_budgets_and_merge_sources_once(monkeypatch, tmp_path):
     import copy
     import threading
     import time
@@ -714,9 +683,7 @@ def test_background_results_keep_independent_budgets_and_merge_sources_once(
     "count,attempted,blocked",
     [(594, False, False), (595, True, False), (700, True, False), (701, True, True)],
 )
-def test_request_high_and_hard_boundaries(
-    monkeypatch, tmp_path, count, attempted, blocked
-):
+def test_request_high_and_hard_boundaries(monkeypatch, tmp_path, count, attempted, blocked):
     from mokioclaw.core import context_compaction
 
     class FixedCounter(SpyModel):
@@ -739,14 +706,10 @@ def test_request_high_and_hard_boundaries(
     model = FixedCounter()
     if blocked:
         with pytest.raises(ContextBudgetError):
-            invoke_streaming(
-                model, [HumanMessage(content="task")], state={"runtime": runtime}
-            )
+            invoke_streaming(model, [HumanMessage(content="task")], state={"runtime": runtime})
         assert not model.requests
     else:
-        invoke_streaming(
-            model, [HumanMessage(content="task")], state={"runtime": runtime}
-        )
+        invoke_streaming(model, [HumanMessage(content="task")], state={"runtime": runtime})
         assert model.requests
     assert bool(calls) == attempted
 
@@ -762,25 +725,19 @@ def test_real_stdio_mcp_large_result_is_bounded(tmp_path):
         {
             "name": "large",
             "command": sys.executable,
-            "args": [
-                str(Path(__file__).resolve().parents[1] / "examples/mcp/echo_server.py")
-            ],
+            "args": [str(Path(__file__).resolve().parents[1] / "examples/mcp/echo_server.py")],
         }
     ]
     tools = build_mcp_tools(runtime)
     tool = next(tool for tool in tools if tool.name == "MCP_large_echo")
     events = []
-    result = execute_tool(
-        runtime, tool, {"text": "中文" * 100000}, on_event=events.append
-    )
+    result = execute_tool(runtime, tool, {"text": "中文" * 100000}, on_event=events.append)
     assert result["output_truncated"] and len(encoded(result)) <= 24000
     assert (tmp_path / result["full_output_path"]).is_file()
     assert any(event["type"] == "tool_output_truncated" for event in events)
 
 
-def test_first_registered_code_agent_handles_unset_summary_fields(
-    monkeypatch, tmp_path
-):
+def test_first_registered_code_agent_handles_unset_summary_fields(monkeypatch, tmp_path):
     from mokioclaw.agents import code_agent
     from mokioclaw.agents.registry import run_subagent
 
@@ -835,10 +792,7 @@ def test_compaction_does_not_retime_old_tool_group_after_latest_correction(tmp_p
         reason="manual",
         summarizer=lambda *_: {"summary": "historical reads"},
     )
-    assert any(
-        isinstance(item, HumanMessage) and "LATEST" in item.content
-        for item in replacement
-    )
+    assert any(isinstance(item, HumanMessage) and "LATEST" in item.content for item in replacement)
     assert not any(isinstance(item, ToolMessage) for item in replacement)
     assert event["removed_messages"] == 8
 
@@ -908,9 +862,7 @@ def test_pending_compact_can_be_cancelled_but_in_progress_is_not_interrupted():
     assert control.take() is None
     second = control.request()
     assert control.take()["request_id"] == second["request_id"]
-    assert (
-        control.cancel(second["request_id"])["error_type"] == "compaction_in_progress"
-    )
+    assert control.cancel(second["request_id"])["error_type"] == "compaction_in_progress"
     assert control.get(second["request_id"])["status"] == "applying"
     assert control.close()[0]["status"] == "failed"
     assert control.cancel("missing")["error_type"] == "unknown_compact_request"
@@ -924,16 +876,12 @@ def test_cli_cancels_request_and_rejects_incomplete_cancel(monkeypatch):
         daemon_client, "compact_cancel", lambda *_: {"ok": True, "status": "cancelled"}
     )
     runner = CliRunner()
-    result = runner.invoke(
-        app, ["compact", "--run-id", "r1", "--request-id", "c1", "--cancel"]
-    )
+    result = runner.invoke(app, ["compact", "--run-id", "r1", "--request-id", "c1", "--cancel"])
     assert result.exit_code == 0 and "cancelled" in result.output
     assert runner.invoke(app, ["compact", "--run-id", "r1", "--cancel"]).exit_code != 0
 
 
-def test_live_daemon_rpc_applies_manual_compact_and_persists_completion(
-    monkeypatch, tmp_path
-):
+def test_live_daemon_rpc_applies_manual_compact_and_persists_completion(monkeypatch, tmp_path):
     import threading
 
     from mokioclaw.core import agent, context_compaction, daemon_client
@@ -987,9 +935,7 @@ def test_live_daemon_rpc_applies_manual_compact_and_persists_completion(
         import time
 
         deadline = time.monotonic() + 3
-        while (
-            not (daemon_dir / "address.json").exists() and time.monotonic() < deadline
-        ):
+        while not (daemon_dir / "address.json").exists() and time.monotonic() < deadline:
             time.sleep(0.01)
         assert (daemon_dir / "address.json").exists()
         consumer.start()
@@ -1004,8 +950,7 @@ def test_live_daemon_rpc_applies_manual_compact_and_persists_completion(
         assert completed["status"] == "applied"
         assert received[0]["run_id"] == run_id
         assert any(
-            event.get("event", {}).get("type") == "context_compression"
-            for event in received
+            event.get("event", {}).get("type") == "context_compression" for event in received
         )
         persisted = (daemon_dir / "runs" / run_id / "events.jsonl").read_text()
         assert request["request_id"] in persisted and '"status": "applied"' in persisted

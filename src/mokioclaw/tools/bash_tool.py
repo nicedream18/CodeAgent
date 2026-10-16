@@ -43,13 +43,11 @@ def bash_tool_description() -> str:
         )
     if system == "darwin":
         return (
-            common
-            + " Current platform: macOS. Commands are executed by a POSIX shell. "
+            common + " Current platform: macOS. Commands are executed by a POSIX shell. "
             "Use portable sh/bash-style commands such as ls, cat, grep, tail, export, and python/python3 as available."
         )
     return (
-        common
-        + " Current platform: Linux/Unix. Commands are executed by a POSIX shell. "
+        common + " Current platform: Linux/Unix. Commands are executed by a POSIX shell. "
         "Use portable sh/bash-style commands such as ls, cat, grep, tail, export, and python/python3 as available."
     )
 
@@ -75,9 +73,7 @@ def _normalize_command(command: str) -> str:
             count=1,
             flags=re.IGNORECASE,
         )
-        normalized = re.sub(
-            r"^\s*pwd\s*$", "cd", normalized, count=1, flags=re.IGNORECASE
-        )
+        normalized = re.sub(r"^\s*pwd\s*$", "cd", normalized, count=1, flags=re.IGNORECASE)
         normalized = re.sub(r"\bls\s+-la\b", "dir", normalized)
         normalized = re.sub(r"\bls\b", "dir", normalized)
         normalized = re.sub(r"\bcat\s+([^\s|&<>]+)", r"type \1", normalized)
@@ -156,14 +152,10 @@ def run_bash(
 ) -> dict[str, Any]:
     if not command.strip():
         return {"ok": False, "error": "command must not be empty"}
-    max_timeout = _state_int(
-        state, "bash_max_timeout_seconds", DEFAULT_MAX_TIMEOUT_SECONDS
-    )
+    max_timeout = _state_int(state, "bash_max_timeout_seconds", DEFAULT_MAX_TIMEOUT_SECONDS)
     timeout = _coerce_timeout(timeout_seconds)
     if timeout_seconds is None:
-        timeout = _state_int(
-            state, "bash_default_timeout_seconds", DEFAULT_TIMEOUT_SECONDS
-        )
+        timeout = _state_int(state, "bash_default_timeout_seconds", DEFAULT_TIMEOUT_SECONDS)
     if timeout <= 0 or timeout > max_timeout:
         return {
             "ok": False,
@@ -201,9 +193,7 @@ def run_bash(
     env, env_error = _build_env(state)
     if env_error is not None:
         return {"ok": False, "error": env_error}
-    max_output_chars = _state_int(
-        state, "bash_max_output_chars", DEFAULT_MAX_OUTPUT_CHARS
-    )
+    max_output_chars = _state_int(state, "bash_max_output_chars", DEFAULT_MAX_OUTPUT_CHARS)
     if background:
         return _run_background(state, normalized_command, env, approval)
     try:
@@ -333,15 +323,11 @@ def _prepend_harness_paths(state: RuntimeState, env: dict[str, str]) -> None:
     ]
     existing = [part for part in env.get("PATH", "").split(os.pathsep) if part]
     merged: list[str] = []
-    for path in [
-        str(candidate) for candidate in path_candidates if candidate.exists()
-    ] + existing:
+    for path in [str(candidate) for candidate in path_candidates if candidate.exists()] + existing:
         if path not in merged:
             merged.append(path)
     env["PATH"] = os.pathsep.join(merged)
-    if getattr(sys, "prefix", None) and sys.prefix != getattr(
-        sys, "base_prefix", sys.prefix
-    ):
+    if getattr(sys, "prefix", None) and sys.prefix != getattr(sys, "base_prefix", sys.prefix):
         env.setdefault("VIRTUAL_ENV", sys.prefix)
 
 
@@ -350,12 +336,8 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
     shim_dir.mkdir(parents=True, exist_ok=True)
     python_executable = sys.executable
     if os.name == "nt":
-        _write_shim(
-            shim_dir / "python.cmd", f'@echo off\r\n"{python_executable}" %*\r\n'
-        )
-        _write_shim(
-            shim_dir / "python3.cmd", f'@echo off\r\n"{python_executable}" %*\r\n'
-        )
+        _write_shim(shim_dir / "python.cmd", f'@echo off\r\n"{python_executable}" %*\r\n')
+        _write_shim(shim_dir / "python3.cmd", f'@echo off\r\n"{python_executable}" %*\r\n')
         pip_cmd = (
             "@echo off\r\n"
             f'"{python_executable}" -c "import pathlib,sys; import pip; '
@@ -368,12 +350,8 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
         _write_shim(shim_dir / "pip.cmd", pip_cmd)
         _write_shim(shim_dir / "pip3.cmd", pip_cmd)
         return shim_dir
-    _write_shim(
-        shim_dir / "python", f'#!/bin/sh\nexec {shlex.quote(python_executable)} "$@"\n'
-    )
-    _write_shim(
-        shim_dir / "python3", f'#!/bin/sh\nexec {shlex.quote(python_executable)} "$@"\n'
-    )
+    _write_shim(shim_dir / "python", f'#!/bin/sh\nexec {shlex.quote(python_executable)} "$@"\n')
+    _write_shim(shim_dir / "python3", f'#!/bin/sh\nexec {shlex.quote(python_executable)} "$@"\n')
     quoted_python = shlex.quote(python_executable)
     pip_shim = (
         "#!/bin/sh\n"
@@ -396,10 +374,7 @@ def _ensure_toolchain_shims(state: RuntimeState) -> Path:
 
 
 def _write_shim(path: Path, content: str) -> None:
-    if (
-        not path.exists()
-        or path.read_text(encoding="utf-8", errors="replace") != content
-    ):
+    if not path.exists() or path.read_text(encoding="utf-8", errors="replace") != content:
         path.write_text(content, encoding="utf-8")
     if os.name != "nt":
         path.chmod(0o755)
@@ -419,9 +394,7 @@ def _parse_env_file(path, base_env: dict[str, str]) -> dict[str, str]:
         key = key.strip()
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key):
             continue
-        parsed[key] = _expand_env_value(
-            _unquote_env_value(value.strip()), {**base_env, **parsed}
-        )
+        parsed[key] = _expand_env_value(_unquote_env_value(value.strip()), {**base_env, **parsed})
     return parsed
 
 

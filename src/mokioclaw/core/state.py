@@ -40,10 +40,15 @@ class SubagentToolBudget:
         return True
 
 
-@dataclass
-class RuntimeState:
-    workspace: Path
-    read_files: dict[Path, FileSnapshot] = field(default_factory=dict)
+@dataclass(kw_only=True)
+class RuntimeConfig:
+    """Configuration defaults; mutable execution fields live in RuntimeState."""
+
+    settings: dict[str, Any] = field(default_factory=dict)
+    workflow_mode: str = "full"
+    mcp_loading: str = "deferred"
+    run_token_limit: int = 0
+    rewind_quota_bytes: int = 64 * 1024 * 1024
     approval_mode: str = "inline"
     approval_handler: Callable[[ApprovalRequest], ApprovalDecision | bool] | None = None
     bash_default_timeout_seconds: int = 120
@@ -51,9 +56,7 @@ class RuntimeState:
     bash_max_output_chars: int = 6000
     bash_env_file: Path | None = None
     checkpoint_mode: str = "light"
-    resume_from: Path | None = None
     trace_mode: str = "on"
-    trace_id: str | None = None
     tool_policies: dict[str, str] = field(default_factory=dict)
     bash_deny_patterns: list[str] = field(default_factory=list)
     bash_allow_patterns: list[str] = field(default_factory=list)
@@ -68,6 +71,38 @@ class RuntimeState:
     context_safety_tokens: int = 1024
     context_high_ratio: float = 0.85
     context_target_ratio: float = 0.60
+    subagent_configs: dict[str, dict[str, Any]] = field(default_factory=dict)
+    mcp_servers: list[dict[str, Any]] = field(default_factory=list)
+    mcp_timeout_seconds: float = 30.0
+
+
+@dataclass
+class RuntimeState(RuntimeConfig):
+    workspace: Path
+    light_active: bool = False
+    light_target: str | None = None
+    light_escalation: bool = False
+    mcp_loaded_tools: dict[str, Any] = field(default_factory=dict)
+    mcp_catalog_version: int = 0
+    mcp_config_digest: str = ""
+    instructions: Any = None
+    instructions_reported: int = -1
+    context_dirty: bool = False
+    run_id: str = ""
+    session_id: str = ""
+    model_metrics: dict[str, Any] = field(default_factory=dict)
+    model_profile: str | None = None
+    agent_profiles: dict[str, Any] = field(default_factory=dict)
+    agent_profile_diagnostics: list[dict[str, str]] = field(default_factory=list)
+    active_agent_prompt: str = ""
+    active_agent_name: str | None = None
+    explicit_skill: str | None = None
+    foreground_state: dict[str, Any] | None = None
+    hook_context: list[str] = field(default_factory=list)
+    tool_execution_count: int = 0
+    read_files: dict[Path, FileSnapshot] = field(default_factory=dict)
+    resume_from: Path | None = None
+    trace_id: str | None = None
     context_control: Any = None
     context_version: int = 0
     context_request_sequence: int = 0
@@ -79,10 +114,7 @@ class RuntimeState:
     active_skill_source: str | None = None
     active_agent_tools: set[str] | None = None
     active_subagent_budget: SubagentToolBudget | None = None
-    subagent_configs: dict[str, dict[str, Any]] = field(default_factory=dict)
     subagent_registry: Any = None
-    mcp_servers: list[dict[str, Any]] = field(default_factory=list)
-    mcp_timeout_seconds: float = 30.0
     tool_cache: dict[str, list[Any]] = field(default_factory=dict)
     mcp_discovery_errors: list[dict[str, str]] = field(default_factory=list)
     subagent_task_manager: Any = None

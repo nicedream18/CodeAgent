@@ -8,10 +8,15 @@ from types import MappingProxyType
 from typing import Any
 
 from mokioclaw.agents.code_agent import run_code_agent
+from mokioclaw.agents.repo_agent import run_repo_agent
 from mokioclaw.agents.search_agent import run_search_agent
+from mokioclaw.core.context_budget import ContextBudgetError
 from mokioclaw.core.run_control import RunInterrupted, check_run
+from mokioclaw.core.run_inbox import RunRedirected
 from mokioclaw.core.state import RuntimeState, SubagentToolBudget
 from mokioclaw.graph.state import MokioGraphState
+from mokioclaw.providers.generation import ModelGenerationStopped
+from mokioclaw.providers.model_policy import RunBudgetExceeded
 
 
 @dataclass(frozen=True)
@@ -90,6 +95,15 @@ class SubagentDefinition:
 
 def default_subagents() -> dict[str, SubagentDefinition]:
     return {
+        "repoAgent": SubagentDefinition(
+            "repoAgent",
+            "Explore local code and tests read-only",
+            run_repo_agent,
+            frozenset({"FileReadTool", "GrepTool", "FileGlobTool"}),
+            8,
+            context_fields=("latest_user_corrections",),
+            state_update_fields=frozenset({"repo_context", "repo_explored"}),
+        ),
         "searchAgent": SubagentDefinition(
             "searchAgent",
             "Research using web search",
@@ -110,12 +124,14 @@ def default_subagents() -> dict[str, SubagentDefinition]:
                     "FileWriteTool",
                     "FileEditTool",
                     "GrepTool",
+                    "FileGlobTool",
                     "BashTool",
                     "NotepadReadTool",
                     "NotepadAppendTool",
                     "LoadSkillTool",
                     "TodoUpdateTool",
                     "MCP_*",
+                    "ToolSearchTool",
                 }
             ),
             10,
@@ -129,33 +145,26 @@ def default_subagents() -> dict[str, SubagentDefinition]:
                 "session_context",
                 "latest_user_corrections",
             ),
-            state_update_fields=frozenset(
-                {"todos", "code_agent_summary", "last_actor_summary"}
-            ),
+            state_update_fields=frozenset({"todos", "code_agent_summary", "last_actor_summary"}),
         ),
     }
 
 
 class SubagentRegistry:
-    def __init__(
-        self, definitions: dict[str, SubagentDefinition] | None = None
-    ) -> None:
+    def __init__(self, definitions: dict[str, SubagentDefinition] | None = None) -> None:
         self._definitions = dict(definitions or {})
 
-    def register(
-        self, definition: SubagentDefinition, *, replace: bool = False
-    ) -> None:
-        if (
-            not definition.name
-            or not definition.allowed_tools
-            or definition.max_tool_calls < 1
-        ):
+    def register(self, definition: SubagentDefinition, *, replace: bool = False) -> None:
+        if not definition.name or not definition.allowed_tools or definition.max_tool_calls < 1:
             raise ValueError(
                 "Subagent name, allowed_tools, and positive max_tool_calls are required"
             )
         if definition.name in self._definitions and not replace:
             raise ValueError(f"Subagent is already registered: {definition.name}")
         self._definitions[definition.name] = definition
+
+    def unregister(self, name: str) -> None:
+        self._definitions.pop(name, None)
 
     def get(self, name: str) -> SubagentDefinition | None:
         return self._definitions.get(name)
@@ -187,28 +196,25 @@ def parse_subagent_configs(raw: str | None) -> dict[str, dict[str, Any]]:
     except json.JSONDecodeError as exc:
         raise ValueError("MOKIO_SUBAGENTS must be a JSON object") from exc
     if not isinstance(value, dict):
-        raise ValueError("MOKIO_SUBAGENTS must be a JSON object")
+        raise ValueError("MOKIO_SUBAGENTS must be a JSON object")  # noqa: TRY004 — preserve the public ValueError validation contract
     parsed: dict[str, dict[str, Any]] = {}
     for name, config in value.items():
         if not isinstance(config, dict):
-            raise ValueError(f"Subagent config for {name} must be an object")
+            raise ValueError(f"Subagent config for {name} must be an object")  # noqa: TRY004 — preserve the public ValueError validation contract
         item: dict[str, Any] = {}
         if "max_tool_calls" in config:
             limit = int(config["max_tool_calls"])
             if not 1 <= limit <= 50:
-                raise ValueError(
-                    f"Subagent max_tool_calls for {name} must be between 1 and 50"
-                )
+                raise ValueError(f"Subagent max_tool_calls for {name} must be between 1 and 50")
             item["max_tool_calls"] = limit
         if "allowed_tools" in config:
             if not isinstance(config["allowed_tools"], list) or any(
-                not isinstance(tool, str) or not tool
-                for tool in config["allowed_tools"]
+                not isinstance(tool, str) or not tool for tool in config["allowed_tools"]
             ):
-                raise ValueError(
-                    f"Subagent allowed_tools for {name} must be a list of names"
-                )
+                raise ValueError(f"Subagent allowed_tools for {name} must be a list of names")
             item["allowed_tools"] = list(dict.fromkeys(config["allowed_tools"]))
+        if "model_profile" in config:
+            item["model_profile"] = str(config["model_profile"])
         parsed[str(name)] = item
     return parsed
 
@@ -223,12 +229,7 @@ def _normalise_evidence(values: Any, *, default_kind: str) -> list[EvidenceItem]
         elif isinstance(value, str):
             evidence.append(EvidenceItem(default_kind, value, value, ""))
         elif isinstance(value, dict):
-            label = str(
-                value.get("label")
-                or value.get("title")
-                or value.get("name")
-                or "evidence"
-            )
+            label = str(value.get("label") or value.get("title") or value.get("name") or "evidence")
             nested_result = value.get("result")
             nested_result = nested_result if isinstance(nested_result, dict) else {}
             reference = str(
@@ -249,9 +250,7 @@ def _normalise_evidence(values: Any, *, default_kind: str) -> list[EvidenceItem]
                 or nested_result.get("stdout")
                 or ""
             )
-            kind = str(
-                value.get("kind") or ("source" if value.get("url") else default_kind)
-            )
+            kind = str(value.get("kind") or ("source" if value.get("url") else default_kind))
             evidence.append(EvidenceItem(kind, label, reference, details))
     return evidence
 
@@ -279,17 +278,18 @@ def _normalise_result(
 
     # Adapt the existing search/code runner return shapes into explicit updates.
     context = dict(input_value.context)
-    if definition.name == "searchAgent":
+    base_name = input_value.runtime.agent_profiles.get(definition.name, {}).get(
+        "base", definition.name
+    )
+    if base_name == "searchAgent":
         sources = payload.get("sources", [])
         if isinstance(sources, list):
             updates = {
                 **updates,
                 "sources": _merge_sources(context.get("sources", []), sources),
-                "research_notes": _append_note(
-                    str(context.get("research_notes", "")), summary
-                ),
+                "research_notes": _append_note(str(context.get("research_notes", "")), summary),
             }
-    elif definition.name == "codeAgent":
+    elif base_name == "codeAgent":
         if "todos" in payload:
             updates = {
                 **updates,
@@ -316,15 +316,11 @@ def _normalise_result(
             ok=False,
             summary=summary,
             evidence=_normalise_evidence(
-                payload.get(
-                    "evidence", payload.get("sources", payload.get("tool_events", []))
-                ),
+                payload.get("evidence", payload.get("sources", payload.get("tool_events", []))),
                 default_kind="tool_event",
             ),
             unresolved=unresolved
-            + [
-                f"Runner returned undeclared state update(s): {', '.join(sorted(unexpected))}"
-            ],
+            + [f"Runner returned undeclared state update(s): {', '.join(sorted(unexpected))}"],
             stop_reason="invalid_state_updates",
             state_updates=validated_updates,
             metadata=payload.get("metadata", {}),
@@ -365,9 +361,7 @@ def _append_note(previous: str, addition: str) -> str:
 def _merge_sources(existing: Any, incoming: list[Any]) -> list[Any]:
     combined = list(existing) if isinstance(existing, list) else []
     seen = {
-        str(item.get("url", ""))
-        for item in combined
-        if isinstance(item, dict) and item.get("url")
+        str(item.get("url", "")) for item in combined if isinstance(item, dict) and item.get("url")
     }
     for item in incoming:
         key = str(item.get("url", "")) if isinstance(item, dict) else ""
@@ -419,11 +413,7 @@ def run_subagent(
             unresolved=[f"Subagent {name} max_tool_calls must be between 1 and 50"],
             stop_reason="invalid_budget",
         ).as_dict()
-    context = {
-        key: copy.deepcopy(state[key])
-        for key in definition.context_fields
-        if key in state
-    }
+    context = {key: copy.deepcopy(state[key]) for key in definition.context_fields if key in state}
     input_value = SubagentInput(
         task=str(state.get("task", "")),
         instruction=instruction,
@@ -436,6 +426,9 @@ def run_subagent(
     previous_skill_name = runtime.active_skill_name
     previous_skill_source = runtime.active_skill_source
     previous_budget = runtime.active_subagent_budget
+    previous_model_profile = runtime.model_profile
+    previous_prompt = runtime.active_agent_prompt
+    previous_agent_name = runtime.active_agent_name
 
     def event_writer(event: dict[str, Any]) -> None:
         if writer is not None:
@@ -450,13 +443,17 @@ def run_subagent(
     budget = SubagentToolBudget(name, handoff_id, limit, event_writer)
     runtime.active_agent_tools = configured_tools
     runtime.active_subagent_budget = budget
+    runtime.model_profile = config.get("model_profile")
+    runtime.active_agent_prompt = runtime.agent_profiles.get(name, {}).get("system_prompt", "")
+    runtime.active_agent_name = name
     legacy_state = None
     legacy_before = None
     try:
         if definition.legacy_runner:
             legacy_state = input_value.legacy_state()
             for key in definition.state_update_fields:
-                legacy_state.setdefault(key, copy.deepcopy(state.get(key)))
+                if key in state:
+                    legacy_state.setdefault(key, copy.deepcopy(state[key]))
             legacy_before = copy.deepcopy(
                 {key: legacy_state.get(key) for key in definition.state_update_fields}
             )
@@ -464,9 +461,7 @@ def run_subagent(
                 legacy_state, instruction, writer=event_writer, max_loops=limit
             )
         else:
-            raw_result = definition.runner(
-                input_value, writer=event_writer, max_tool_calls=limit
-            )
+            raw_result = definition.runner(input_value, writer=event_writer, max_tool_calls=limit)
         result = _normalise_result(
             raw_result,
             definition=definition,
@@ -474,9 +469,15 @@ def run_subagent(
             legacy_state=legacy_state,
             legacy_before=legacy_before,
         )
-    except RunInterrupted:
+    except (RunRedirected, RunBudgetExceeded, ModelGenerationStopped) as redirect:
+        if legacy_state is not None:
+            for key in definition.state_update_fields:
+                if legacy_state.get(key) is not None:
+                    redirect.state[key] = copy.deepcopy(legacy_state[key])
         raise
-    except Exception as exc:
+    except (RunInterrupted, ContextBudgetError):
+        raise
+    except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
         result = SubagentResult(
             ok=False,
             unresolved=[f"{type(exc).__name__}: {exc}"],
@@ -485,17 +486,17 @@ def run_subagent(
     finally:
         runtime.active_agent_tools = previous_agent_tools
         runtime.active_subagent_budget = previous_budget
-        if name == "codeAgent":
-            runtime.active_skill_tools = previous_skill_tools
-            runtime.active_skill_permissions = previous_skill_permissions
-            runtime.active_skill_name = previous_skill_name
-            runtime.active_skill_source = previous_skill_source
+        runtime.model_profile = previous_model_profile
+        runtime.active_agent_prompt = previous_prompt
+        runtime.active_agent_name = previous_agent_name
+        runtime.active_skill_tools = previous_skill_tools
+        runtime.active_skill_permissions = previous_skill_permissions
+        runtime.active_skill_name = previous_skill_name
+        runtime.active_skill_source = previous_skill_source
 
     if budget.exhausted:
         result.ok = False
-        result.stop_reason = (
-            "cancelled" if budget.cancelled else "tool_budget_exhausted"
-        )
+        result.stop_reason = "cancelled" if budget.cancelled else "tool_budget_exhausted"
         message = (
             "Cancellation requested; Subagent stopped before its next tool call."
             if budget.cancelled

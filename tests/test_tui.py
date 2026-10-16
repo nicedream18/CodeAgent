@@ -131,9 +131,7 @@ def test_tui_renders_fake_stream_events(tmp_path) -> None:
             "event": {
                 "type": "todo_update",
                 "plan_summary": "demo plan",
-                "todos": [
-                    {"id": "todo-1", "content": "write file", "status": "in_progress"}
-                ],
+                "todos": [{"id": "todo-1", "content": "write file", "status": "in_progress"}],
             },
         }
         yield {
@@ -301,9 +299,7 @@ def test_tui_runs_multiple_tasks_in_same_session_workspace(tmp_path) -> None:
         yield {"type": "workspace", "path": str(kwargs["session_workspace"])}
 
     async def run() -> None:
-        app = MokioClawTuiApp(
-            workspace=tmp_path / "session-workspace", stream_factory=fake_stream
-        )
+        app = MokioClawTuiApp(workspace=tmp_path / "session-workspace", stream_factory=fake_stream)
         async with app.run_test(size=(100, 30)) as pilot:
             app.start_task("first")
             await pilot.pause(0.2)

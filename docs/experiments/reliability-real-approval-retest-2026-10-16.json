@@ -1,0 +1,438 @@
+{
+  "created_at": "2026-10-16T11:29:01.860410+00:00",
+  "head": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": true,
+  "model": "deepseek-chat",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-reliability-0sxrhb42",
+  "runs": [
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 904.85,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "09defc80b098451995bdebdcab607417",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150142.7709599
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 579.602,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 579.602,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 915.375,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "96a6af1a0132446e8c3549e662c4b8d9",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150142.7827232
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 590.808,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 590.808,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 1061.696,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "03d5755c4c4542b79873382387ec1673",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150142.928253
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 737.266,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 737.266,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 861.375,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "f5916c61d5cb41c0b568fdd994e7eb06",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150143.643119
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 851.851,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 851.851,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 970.206,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "ce843febfc524d9ebae397e60d734f75",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150143.74206
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 957.913,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 957.913,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 1013.238,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "2ea67a4e67ad4a76a59914b8180c8e55",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150143.941974
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 1000.539,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 1000.539,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 520.217,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "236e7d5df4004b8d8bff8208b75a21b4",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150144.261684
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 507.987,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 507.987,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 743.516,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "226a1deff62b4c1795cc84d5a8b54579",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150144.386977
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 731.721,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 731.721,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 944.27,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "e469b30293604bb0903a739ab494d6b1",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150144.885522
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 932.428,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 932.428,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "estimated": false
+      }
+    }
+  ],
+  "passed": true,
+  "summary": [
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 904.85,
+        "median": 915.375,
+        "max": 1061.696
+      },
+      "requests": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 861.375,
+        "median": 970.206,
+        "max": 1013.238
+      },
+      "requests": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 520.217,
+        "median": 743.516,
+        "max": 944.27
+      },
+      "requests": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    }
+  ]
+}

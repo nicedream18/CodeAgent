@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 from rich.text import Text
 
 from mokioclaw.core.paths import find_project_root
-
 
 FALLBACK_LOGO = [
     "  <      >  ",
@@ -22,9 +25,7 @@ def default_logo_path() -> Path:
     return find_project_root() / "assets" / "logo-no-words.png"
 
 
-def render_logo(
-    path: Path | None = None, *, max_width: int = 36, max_rows: int = 12
-) -> Text:
+def render_logo(path: Path | None = None, *, max_width: int = 36, max_rows: int = 12) -> Text:
     logo_path = path or default_logo_path()
     try:
         return _render_png_logo(str(logo_path), max_width=max_width, max_rows=max_rows)
@@ -56,7 +57,7 @@ def _render_png_logo(path: str, *, max_width: int, max_rows: int) -> Text:
     return text
 
 
-def _crop_visible(image: "Image.Image") -> "Image.Image":
+def _crop_visible(image: Image.Image) -> Image.Image:
     rgba = image.convert("RGBA")
     pixels = rgba.load()
     width, height = rgba.size
@@ -78,7 +79,7 @@ def _crop_visible(image: "Image.Image") -> "Image.Image":
     return rgba.crop((left, top, right, bottom))
 
 
-def _pad_bottom(image: "Image.Image") -> "Image.Image":
+def _pad_bottom(image: Image.Image) -> Image.Image:
     from PIL import Image
 
     width, height = image.size
@@ -87,9 +88,7 @@ def _pad_bottom(image: "Image.Image") -> "Image.Image":
     return padded
 
 
-def _pixel_char(
-    upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]
-) -> str:
+def _pixel_char(upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]) -> str:
     upper_visible = _visible(upper)
     lower_visible = _visible(lower)
     if upper_visible and lower_visible:
@@ -101,9 +100,7 @@ def _pixel_char(
     return " "
 
 
-def _pixel_style(
-    upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]
-) -> str:
+def _pixel_style(upper: tuple[int, int, int, int], lower: tuple[int, int, int, int]) -> str:
     upper_visible = _visible(upper)
     lower_visible = _visible(lower)
     if upper_visible and lower_visible:

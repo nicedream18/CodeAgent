@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from rich import box
@@ -11,6 +12,8 @@ from rich.text import Text
 
 console = Console()
 _active_llm_streams: set[str] = set()
+_stream_lengths: dict[str, int] = {}
+_stream_workspace: Path | None = None
 
 STATUS_SYMBOLS = {
     "pending": "[ ]",
@@ -37,22 +40,20 @@ def safe_secho(message: Any = "", **kwargs: Any) -> None:
 
 
 def _shorten(value: Any, limit: int = 260) -> str:
-    text = (
-        value
-        if isinstance(value, str)
-        else json.dumps(value, ensure_ascii=False, default=str)
-    )
+    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, default=str)
     if len(text) <= limit:
         return text
     return text[: limit - 3] + "..."
 
 
 def print_event(event: dict[str, Any]) -> None:
+    global _stream_workspace
     event_type = event.get("type")
     if event_type == "run_cancel_requested":
         console.print("\ncancelling")
         return
     if event_type == "workspace":
+        _stream_workspace = Path(event["path"])
         console.print(
             Panel(
                 str(event["path"]),
@@ -73,23 +74,59 @@ def print_event(event: dict[str, Any]) -> None:
 
 def print_custom_event(event: dict[str, Any]) -> None:
     event_type = event.get("type")
+    if event_type in {"model_usage", "run_finished"}:
+        from mokioclaw.cli.event_summary import summarize_event
+
+        summary = summarize_event({"type": "custom_event", "event": event})
+        if summary:
+            console.print(Panel(Text(summary.body), title=summary.title))
+        return
+    if event_type in {"llm_request", "llm_response"}:
+        return
     if event_type == "llm_stream_start":
         node = str(event.get("node", "model"))
-        _active_llm_streams.add(str(event.get("stream_id") or node))
+        stream_id = str(event.get("stream_id") or node)
+        _active_llm_streams.add(stream_id)
+        _stream_lengths[stream_id] = 0
         console.print(Text(f"[{node}] "), end="")
         return
     if event_type == "llm_token":
+        stream_id = str(
+            event.get("stream_id")
+            or event.get("node")
+            or (next(iter(_active_llm_streams)) if len(_active_llm_streams) == 1 else "model")
+        )
+        _stream_lengths[stream_id] = _stream_lengths.get(stream_id, 0) + len(
+            str(event.get("text", ""))
+        )
         console.print(Text(str(event.get("text", ""))), end="")
         return
     if event_type == "llm_stream_end":
         node = str(event.get("stream_id") or event.get("node", "model"))
+        if _stream_workspace and event.get("full_output_path"):
+            from mokioclaw.core.artifacts import read_diagnostic_text
+
+            full = read_diagnostic_text(_stream_workspace, event["full_output_path"])
+            if full is not None:
+                console.print(Text(full[_stream_lengths.get(node, 0) :]), end="")
+        _stream_lengths.pop(node, None)
         if node in _active_llm_streams:
             console.print()
             _active_llm_streams.discard(node)
         if event.get("status") in {"failed", "interrupted"}:
             console.print(Text(f"Model stream {event['status']}"), style="yellow")
         return
-    if event_type in {"mcp_diagnostic", "run_started", "run_finished"}:
+    if event_type in {
+        "mcp_diagnostic",
+        "run_started",
+        "run_finished",
+        "user_message_received",
+        "user_message_applied",
+        "instructions_loaded",
+        "workflow_selected",
+        "hook_result",
+        "run_budget_exhausted",
+    }:
         from mokioclaw.cli.event_summary import summarize_custom_event
 
         summary = summarize_custom_event(event)
@@ -194,9 +231,7 @@ def render_intent_decision(event: dict[str, Any]) -> None:
     ]
     style = "cyan" if event.get("route") == "chat" else "magenta"
     console.print(
-        Panel(
-            "\n".join(lines), title="Intent Router", border_style=style, box=box.ROUNDED
-        )
+        Panel("\n".join(lines), title="Intent Router", border_style=style, box=box.ROUNDED)
     )
 
 
@@ -205,9 +240,7 @@ def render_chat_response(event: dict[str, Any]) -> None:
     reason = event.get("reason")
     if reason:
         lines.append(f"\nmode: {event.get('mode', 'lightweight')} | reason: {reason}")
-    console.print(
-        Panel("\n".join(lines), title="MokioClaw", border_style="cyan", box=box.ROUNDED)
-    )
+    console.print(Panel("\n".join(lines), title="MokioClaw", border_style="cyan", box=box.ROUNDED))
 
 
 def render_session_event(event: dict[str, Any]) -> None:
@@ -233,9 +266,7 @@ def render_session_event(event: dict[str, Any]) -> None:
             f"route: {event.get('route', '')}",
             f"summary: {event.get('summary_file', '')}",
         ]
-    console.print(
-        Panel("\n".join(lines), title=title, border_style="cyan", box=box.ROUNDED)
-    )
+    console.print(Panel("\n".join(lines), title=title, border_style="cyan", box=box.ROUNDED))
 
 
 def print_graph_event(payload: dict[str, Any]) -> None:
@@ -250,9 +281,7 @@ def print_graph_event(payload: dict[str, Any]) -> None:
         if node == "planner":
             render_plan(update, title="Planner", border_style="cyan")
         elif node in {"actor", "codeAgent"}:
-            summary = update.get("code_agent_summary") or update.get(
-                "last_actor_summary"
-            )
+            summary = update.get("code_agent_summary") or update.get("last_actor_summary")
             if summary:
                 console.print(
                     Panel(
@@ -272,14 +301,10 @@ def print_graph_event(payload: dict[str, Any]) -> None:
         elif node == "final":
             render_final(update)
         else:
-            console.print(
-                Panel(_shorten(update, 1200), title=str(node), box=box.ROUNDED)
-            )
+            console.print(Panel(_shorten(update, 1200), title=str(node), box=box.ROUNDED))
 
 
-def render_plan(
-    update: dict[str, Any], *, title: str, border_style: str = "cyan"
-) -> None:
+def render_plan(update: dict[str, Any], *, title: str, border_style: str = "cyan") -> None:
     plan = update.get("plan_summary", "")
     todos = update.get("todos", [])
     commands = update.get("verification_commands", [])
@@ -293,9 +318,7 @@ def render_plan(
         status = todo.get("status", "pending")
         table.add_row(
             todo.get("id", ""),
-            Text(
-                STATUS_SYMBOLS.get(status, "[?]"), style=STATUS_STYLES.get(status, "")
-            ),
+            Text(STATUS_SYMBOLS.get(status, "[?]"), style=STATUS_STYLES.get(status, "")),
             todo.get("content", ""),
             todo.get("note", ""),
         )
@@ -320,9 +343,7 @@ def render_verifier(update: dict[str, Any]) -> None:
     if checks:
         for check in checks:
             ok = bool(check.get("passed"))
-            status = Text(
-                "PASS" if ok else "FAIL", style="bold green" if ok else "bold red"
-            )
+            status = Text("PASS" if ok else "FAIL", style="bold green" if ok else "bold red")
             table.add_row(
                 check.get("name", "check"),
                 status,
@@ -331,9 +352,7 @@ def render_verifier(update: dict[str, Any]) -> None:
     else:
         for result in update.get("verification_results", []):
             ok = bool(result.get("ok"))
-            status = Text(
-                "PASS" if ok else "FAIL", style="bold green" if ok else "bold red"
-            )
+            status = Text("PASS" if ok else "FAIL", style="bold green" if ok else "bold red")
             output = result.get("stdout") or result.get("stderr") or ""
             table.add_row(result.get("command", ""), status, _shorten(output, 260))
     footer = f"passed={update.get('passed')} | attempts={update.get('attempts')}"
@@ -355,11 +374,7 @@ def render_verifier(update: dict[str, Any]) -> None:
 def render_final(update: dict[str, Any]) -> None:
     answer = update.get("final_answer", "")
     style = "green" if "PASSED" in answer else "red"
-    console.print(
-        Panel(
-            _shorten(answer, 2000), title="Final", border_style=style, box=box.ROUNDED
-        )
-    )
+    console.print(Panel(_shorten(answer, 2000), title="Final", border_style=style, box=box.ROUNDED))
 
 
 def render_context_monitor(update: dict[str, Any]) -> None:
@@ -431,9 +446,7 @@ def render_memory_snapshot(update: dict[str, Any]) -> None:
     body = Table.grid(expand=True)
     body.add_row(table)
     body.add_row(Text(footer, style="yellow"))
-    console.print(
-        Panel(body, title="Memory Snapshot", border_style="cyan", box=box.ROUNDED)
-    )
+    console.print(Panel(body, title="Memory Snapshot", border_style="cyan", box=box.ROUNDED))
 
 
 def render_checkpoint_saved(event: dict[str, Any]) -> None:
@@ -479,12 +492,8 @@ def render_checkpoint_resumed(event: dict[str, Any]) -> None:
 
 
 def render_trace_summary(event: dict[str, Any]) -> None:
-    node_visits = (
-        event.get("node_visits") if isinstance(event.get("node_visits"), dict) else {}
-    )
-    node_text = (
-        ", ".join(f"{node}:{count}" for node, count in node_visits.items()) or "(none)"
-    )
+    node_visits = event.get("node_visits") if isinstance(event.get("node_visits"), dict) else {}
+    node_text = ", ".join(f"{node}:{count}" for node, count in node_visits.items()) or "(none)"
     lines = [
         f"trace: {event.get('trace_id', '')}",
         f"status: {event.get('status', '')}",
@@ -501,9 +510,7 @@ def render_trace_summary(event: dict[str, Any]) -> None:
         lines.append("errors: " + _shorten(errors, 260))
     style = "green" if event.get("status") == "finished" else "yellow"
     console.print(
-        Panel(
-            "\n".join(lines), title="Trace Summary", border_style=style, box=box.ROUNDED
-        )
+        Panel("\n".join(lines), title="Trace Summary", border_style=style, box=box.ROUNDED)
     )
 
 
@@ -595,9 +602,7 @@ def render_handoff_result(event: dict[str, Any]) -> None:
     )
 
 
-def render_sources(
-    sources: list[dict[str, Any]], *, title: str, answer: str = ""
-) -> None:
+def render_sources(sources: list[dict[str, Any]], *, title: str, answer: str = "") -> None:
     table = Table(box=box.SIMPLE_HEAVY, header_style="bold")
     table.add_column("Title")
     table.add_column("URL")

@@ -1,0 +1,24 @@
+{
+  "created_at": "2026-10-16T10:07:38.981366+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": false,
+  "model": "local deterministic fixture",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-xj1tfrnb",
+  "results": {
+    "search": {
+      "passed": true,
+      "backend": "rg",
+      "rg_ms": 22.996,
+      "python_ms": 15.77,
+      "matches": [
+        {
+          "path": "中文.py",
+          "line": 1,
+          "text": "def needle():"
+        }
+      ],
+      "duration_ms": 74.354
+    }
+  },
+  "passed": true
+}

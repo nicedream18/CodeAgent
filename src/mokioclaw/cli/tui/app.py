@@ -4,7 +4,7 @@ import json
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from threading import Lock
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 from rich.pretty import Pretty
 from rich.table import Table
@@ -17,10 +17,11 @@ from textual.widgets import Collapsible, Footer, Header, Input, Static
 
 from mokioclaw.cli.event_summary import EventSummary, shorten, summarize_event
 from mokioclaw.cli.tui.approval import ApprovalGate, ApprovalModal
+from mokioclaw.cli.tui.input import TaskInput
 from mokioclaw.cli.tui.logo import render_logo
 from mokioclaw.core.agent import stream_session_events
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
-from mokioclaw.core.daemon_client import cancel_run, subagent_status
+from mokioclaw.core.daemon_client import cancel_run, subagent_status, submit_run_message
 from mokioclaw.core.paths import default_workspace
 from mokioclaw.core.session import compact_session_history
 
@@ -120,7 +121,9 @@ class MokioClawTuiApp(App[None]):
     }
 
     #input-row {
-        height: 3;
+        height: auto;
+        min-height: 3;
+        max-height: 12;
         border: round #4a8f86;
         padding: 0 1;
         background: #151719;
@@ -192,7 +195,7 @@ class MokioClawTuiApp(App[None]):
     }
     """
 
-    BINDINGS = [
+    BINDINGS: ClassVar[list[Binding]] = [
         Binding("ctrl+k", "compact_context", "Compact", priority=True),
         Binding("ctrl+c", "cancel_or_quit", "Cancel/Quit", priority=True),
         ("ctrl+l", "clear_events", "Clear"),
@@ -205,11 +208,13 @@ class MokioClawTuiApp(App[None]):
         initial_task: str | None = None,
         workspace: Path | None = None,
         max_attempts: int = 3,
-        approval_mode: Literal["inline", "auto", "deny"] = "inline",
-        checkpoint_mode: Literal["light", "strict", "off"] = "light",
-        trace_mode: Literal["on", "off"] = "on",
+        approval_mode: Literal["inline", "auto", "deny"] | None = None,
+        checkpoint_mode: Literal["light", "strict", "off"] | None = None,
+        trace_mode: Literal["on", "off"] | None = None,
         resume: Path | None = None,
         stream_factory: StreamFactory = stream_session_events,
+        workflow_mode: str | None = None,
+        skill: str | None = None,
     ) -> None:
         super().__init__()
         self.initial_task = initial_task
@@ -221,6 +226,8 @@ class MokioClawTuiApp(App[None]):
         self.trace_mode = trace_mode
         self.resume = resume
         self.stream_factory = stream_factory
+        self.workflow_mode = workflow_mode
+        self._initial_skill = skill
         self.running = False
         self.run_count = 0
         self.approval_count = 0
@@ -262,7 +269,7 @@ class MokioClawTuiApp(App[None]):
                     yield Static("", id="side-state")
             with Horizontal(id="input-row"):
                 yield Static("❯", id="prompt")
-                yield Input(
+                yield TaskInput(
                     placeholder="Chat or ask for coding work, then press Enter",
                     id="task-input",
                 )
@@ -270,13 +277,57 @@ class MokioClawTuiApp(App[None]):
                     "Enter send · /new · /compact · Ctrl+K compact run · /subagents",
                     id="hint",
                 )
+            yield Static("", id="command-completion")
         yield Footer()
 
+    def command_candidates(self):
+        return getattr(self, "_command_items", [])
+
     def on_mount(self) -> None:
+        self._command_items = [
+            ("help", "命令说明"),
+            ("new", "新建会话"),
+            ("compact", "压缩上下文"),
+            ("skills", "可用 Skill"),
+            ("skill", "显式选择 Skill"),
+            ("agents", "角色目录"),
+            ("permissions", "审批规则"),
+            ("changes", "文件变更"),
+            ("rewind", "回退预览"),
+            ("subagents", "后台任务"),
+        ]
+        self._skill_names = set()
+        self._skill_diagnostics = []
+        self._selected_skill = self._initial_skill
+        try:
+            from mokioclaw.core.agent import create_runtime
+            from mokioclaw.tools.skills import discover_skills
+
+            self._catalog_runtime = create_runtime(self.session_workspace)
+            reserved = {name for name, _ in self._command_items}
+            self._skill_diagnostics = []
+            for skill in discover_skills(self._catalog_runtime):
+                if skill.get("valid"):
+                    self._skill_names.add(skill["name"])
+                    import re
+
+                    if skill["name"] in reserved:
+                        self._skill_diagnostics.append(
+                            {
+                                "name": skill["name"],
+                                "reason": "alias_conflicts_with_builtin; use /skill",
+                                "source": skill.get("path"),
+                            }
+                        )
+                    elif re.fullmatch(r"[\w-]+", skill["name"]):
+                        self._command_items.append((skill["name"], skill["description"]))
+        except (ValueError, OSError) as exc:
+            self.notify(str(exc), severity="error")
+        self.query_one("#command-completion", Static).display = False
         self.set_interval(0.05, self._flush_model_streams)
         self._write_welcome()
         self._refresh_sidebar()
-        self.query_one("#task-input", Input).focus()
+        self.query_one("#task-input", TaskInput).focus()
         if self.initial_task:
             self.call_after_refresh(self.start_task, self.initial_task, self.resume)
 
@@ -288,7 +339,164 @@ class MokioClawTuiApp(App[None]):
             event.input.value = ""
             self.action_compact_context()
             return
-        if not task or self.running:
+        if not task:
+            return
+        if task == "/changes" or task.startswith("/rewind"):
+            if self.running:
+                self.notify("请先等待当前任务结束或取消，再回退文件。")
+                return
+            from mokioclaw.core.approval import make_approval_request
+            from mokioclaw.core.changes import rewind
+
+            workspace = Path(self.latest_workspace or self.workspace or self.session_workspace)
+            run_id = task.split(maxsplit=1)[1] if " " in task else None
+            try:
+                result = rewind(workspace, run_id)
+            except (OSError, ValueError, RuntimeError) as exc:
+                self.notify(str(exc), severity="error")
+                return
+            event.input.value = ""
+            self._mount_event_card(
+                "文件变更 · FileWrite/FileEdit",
+                json.dumps(result, ensure_ascii=False, indent=2),
+                category="info",
+                collapsed=False,
+            )
+            if task.startswith("/rewind") and result.get("changes"):
+
+                def restore(approved):
+                    if approved:
+                        try:
+                            restored = rewind(workspace, result["run_id"], apply=True)
+                            self._mount_event_card(
+                                "文件回退",
+                                json.dumps(restored, ensure_ascii=False, indent=2),
+                                category="info",
+                                collapsed=False,
+                            )
+                        except (OSError, ValueError, RuntimeError) as exc:
+                            self.notify(str(exc), severity="error")
+
+                self.push_screen(
+                    ApprovalModal(
+                        make_approval_request(
+                            "Restore file-tool edits",
+                            "已展示差异；冲突文件不会被覆盖。",
+                        ),
+                        str(workspace),
+                    ),
+                    restore,
+                )
+            return
+        if task in {"/help", "/skills", "/agents", "/permissions"} or task.startswith(
+            "/permissions "
+        ):
+            if task == "/help":
+                content = self.command_candidates()
+            elif task == "/skills":
+                from mokioclaw.tools.skills import discover_skills
+
+                content = {
+                    "skills": discover_skills(self._catalog_runtime),
+                    "diagnostics": self._skill_diagnostics,
+                }
+            elif task == "/agents":
+                content = {
+                    "roles": [
+                        {
+                            "name": name,
+                            "description": self._catalog_runtime.subagent_registry.get(
+                                name
+                            ).description,
+                            "tools": sorted(
+                                self._catalog_runtime.subagent_registry.get(name).allowed_tools
+                            ),
+                            "source": self._catalog_runtime.agent_profiles.get(name, {}).get(
+                                "source", "Python registration"
+                            ),
+                        }
+                        for name in self._catalog_runtime.subagent_registry.names()
+                    ],
+                    "profiles": self._catalog_runtime.agent_profiles,
+                    "diagnostics": self._catalog_runtime.agent_profile_diagnostics,
+                }
+            else:
+                from mokioclaw.core.daemon_client import permissions
+
+                parts = task.split()
+                action = parts[1] if len(parts) > 1 else "list"
+                if action not in {"list", "revoke", "clear"} or (
+                    action == "revoke" and len(parts) != 3
+                ):
+                    self.notify("用法：/permissions [list|revoke ID|clear]", severity="error")
+                    return
+                content = permissions(
+                    self.session_workspace,
+                    action=action,
+                    rule_id=parts[2] if action == "revoke" else None,
+                    session_id=self.session_id,
+                )
+            self._mount_event_card(
+                task,
+                json.dumps(content, ensure_ascii=False, indent=2),
+                category="info",
+                collapsed=False,
+            )
+            event.input.value = ""
+            return
+        if task == "/new" and self.running:
+            self.notify("当前运行结束后才能新建会话。")
+            return
+        if task == "/skill":
+            self.notify("用法：/skill 名称 任务参数")
+            return
+        selected_skill = None
+        if task.startswith("/skill "):
+            parts = task.split(maxsplit=2)
+            selected_skill = parts[1]
+            task = parts[2] if len(parts) > 2 else f"使用 {selected_skill} Skill 完成任务"
+        elif task.startswith("/") and task[1:].split(maxsplit=1)[0] in self._skill_names:
+            parts = task[1:].split(maxsplit=1)
+            selected_skill = parts[0]
+            task = parts[1] if len(parts) > 1 else f"使用 {selected_skill} Skill 完成任务"
+        if selected_skill:
+            if self.running:
+                self.notify("当前运行结束后才能选择新的 Skill。", severity="warning")
+                return
+            if selected_skill not in self._skill_names:
+                self.notify("Skill 不存在或配置无效。", severity="error")
+                return
+            self._selected_skill = selected_skill
+        else:
+            self._selected_skill = None
+        if self.running:
+            if not self.active_run_id:
+                self.notify("等待运行建立后即可发送补充要求。")
+                return
+            from uuid import uuid4
+
+            run_id, message_id = self.active_run_id, uuid4().hex
+            event.input.value = ""
+
+            def send():
+                try:
+                    result = submit_run_message(run_id, message_id, task)
+                except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
+                    result = {"ok": False, "error": str(exc)}
+                self._post_from_worker(
+                    AgentEventMessage(
+                        {
+                            "type": "custom_event",
+                            "event": {
+                                "type": "user_message_response",
+                                "run_id": run_id,
+                                **result,
+                            },
+                        }
+                    )
+                )
+
+            self.run_worker(send, thread=True, group="run-input")
             return
         event.input.value = ""
         if task == "/new":
@@ -307,7 +515,7 @@ class MokioClawTuiApp(App[None]):
                         category="info",
                         collapsed=False,
                     )
-                except Exception as exc:
+                except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
                     self.notify(f"Could not query {run_id}: {exc}")
             return
         if task.startswith("/subagent "):
@@ -321,7 +529,7 @@ class MokioClawTuiApp(App[None]):
                     category="info",
                     collapsed=False,
                 )
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
                 self.notify(f"Could not query {run_id}: {exc}")
             return
         self.start_task(task, None)
@@ -358,13 +566,17 @@ class MokioClawTuiApp(App[None]):
                 self.query_one("#status", Static).update("cancelling")
             else:
                 self._cancel_requested = False
-                self.notify(
-                    str(envelope.get("error", "Cancel failed")), severity="error"
-                )
+                self.notify(str(envelope.get("error", "Cancel failed")), severity="error")
             return
-        payload = (
-            envelope.get("event") if envelope.get("type") == "custom_event" else None
-        )
+        payload = envelope.get("event") if envelope.get("type") == "custom_event" else None
+        if isinstance(payload, dict) and payload.get("type") in {
+            "approvals_superseded",
+            "user_message_response",
+        }:
+            if payload.get("run_id") and payload["run_id"] != self.active_run_id:
+                return
+            if payload.get("ok", True):
+                self._release_approval_gates()
         if isinstance(payload, dict) and payload.get("type") == "run_started":
             self.active_run_id = payload.get("run_id")
             if self._cancel_requested:
@@ -380,9 +592,7 @@ class MokioClawTuiApp(App[None]):
                 preview = Static(Text("Waiting for text…"), classes="model-preview")
                 full = Static(Text(""), classes="model-full")
                 self._stream_widgets[stream_id] = (preview, full)
-                card = Collapsible(
-                    full, title=f"Model · {node} · running", collapsed=True
-                )
+                card = Collapsible(full, title=f"Model · {node} · running", collapsed=True)
                 container = Vertical(preview, card, classes="event-card event-info")
                 container.styles.height = "auto"
                 self._stream_cards[stream_id] = card
@@ -392,6 +602,14 @@ class MokioClawTuiApp(App[None]):
                 self._llm_streams[stream_id].append(str(payload.get("text", "")))
                 self._dirty_streams.add(stream_id)
             elif payload["type"] == "llm_stream_end":
+                if payload.get("full_output_path"):
+                    from mokioclaw.core.artifacts import read_diagnostic_text
+
+                    text = read_diagnostic_text(
+                        Path(self.latest_workspace), payload["full_output_path"]
+                    )
+                    if text is not None:
+                        self._llm_streams[stream_id] = [text]
                 self._dirty_streams.add(stream_id)
                 self._flush_model_streams()
                 card = self._stream_cards.pop(stream_id)
@@ -417,11 +635,9 @@ class MokioClawTuiApp(App[None]):
         self._stream_widgets.clear()
         self._llm_streams.clear()
         self.resume = None
-        self.query_one("#task-input", Input).disabled = False
-        self.query_one("#task-input", Input).focus()
-        self.query_one("#status", Static).update(
-            f"{message.status}; ready for next task"
-        )
+        self.query_one("#task-input", TaskInput).disabled = False
+        self.query_one("#task-input", TaskInput).focus()
+        self.query_one("#status", Static).update(f"{message.status}; ready for next task")
         self._refresh_sidebar()
 
     def on_approval_requested_message(self, message: ApprovalRequestedMessage) -> None:
@@ -433,7 +649,7 @@ class MokioClawTuiApp(App[None]):
                 self._approval_gates.append(message.gate)
         workspace = self.latest_workspace or str(self.workspace or "")
         self.push_screen(
-            ApprovalModal(message.gate.request, workspace),
+            ApprovalModal(message.gate.request, workspace, remember=True),
             self._resolve_approval(message.gate),
         )
 
@@ -454,12 +670,10 @@ class MokioClawTuiApp(App[None]):
         def cancel():
             try:
                 result = cancel_run(run_id)
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
                 result = {"ok": False, "error": str(exc)}
             self._post_from_worker(
-                AgentEventMessage(
-                    {**result, "run_id": run_id, "type": "ui_cancel_result"}
-                ),
+                AgentEventMessage({**result, "run_id": run_id, "type": "ui_cancel_result"}),
             )
 
         self.run_worker(cancel, thread=True, group="cancel-run")
@@ -470,9 +684,7 @@ class MokioClawTuiApp(App[None]):
 
     def action_compact_context(self) -> None:
         if self.running and not self.active_run_id:
-            self.notify(
-                "Run is starting; request compact again once its ID is available."
-            )
+            self.notify("Run is starting; request compact again once its ID is available.")
             return
         run_id = self.active_run_id if self.running else None
         workspace = self.session_workspace
@@ -517,7 +729,7 @@ class MokioClawTuiApp(App[None]):
         self.todos = []
         self.failed_tool_count = 0
         self.tool_count = 0
-        self.query_one("#task-input", Input).disabled = True
+        self.query_one("#task-input", TaskInput).disabled = False
         self.query_one("#status", Static).update("running")
         self._refresh_sidebar()
         self._write_run_start(task, resume)
@@ -543,31 +755,31 @@ class MokioClawTuiApp(App[None]):
         status = "finished"
         try:
             approval_handler = (
-                self._approval_handler if self.approval_mode == "inline" else None
+                self._approval_handler if self.approval_mode in {None, "inline"} else None
             )
             for event in self.stream_factory(
                 task,
                 session_workspace=self.session_workspace,
+                **({"skill": self._selected_skill} if self._selected_skill else {}),
                 max_attempts=self.max_attempts,
                 approval_mode=self.approval_mode,
                 approval_handler=approval_handler,
                 checkpoint_mode=self.checkpoint_mode,
                 resume_workspace=resume,
                 trace_mode=self.trace_mode,
+                **({"workflow_mode": self.workflow_mode} if self.workflow_mode is not None else {}),
                 use_daemon=True,
             ):
                 payload = event.get("event", {})
                 if event.get("type") == "daemon_run_finished":
                     status = event.get("status", status)
-                elif (
-                    isinstance(payload, dict) and payload.get("type") == "run_finished"
-                ):
+                elif isinstance(payload, dict) and payload.get("type") == "run_finished":
                     status = payload.get("status", status)
                 if not self._post_from_worker(AgentEventMessage(event)):
                     return
         except KeyboardInterrupt:
             status = "interrupted"
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
             status = "failed"
             error_event = {
                 "type": "custom_event",
@@ -628,9 +840,7 @@ class MokioClawTuiApp(App[None]):
         if payload.get("type") == "context_compression":
             self.latest_context_compression = f"{payload.get('before_tokens')} → {payload.get('after_tokens')} est. · {payload.get('scope', 'run')}"
         if payload.get("type") == "context_compression_failed":
-            self.latest_context_compression = (
-                "failed: " + str(payload.get("error", ""))[:80]
-            )
+            self.latest_context_compression = "failed: " + str(payload.get("error", ""))[:80]
         if isinstance(payload.get("todos"), list):
             self.todos = payload["todos"]
         if payload.get("type") == "tool_call":
@@ -651,13 +861,9 @@ class MokioClawTuiApp(App[None]):
             self.session_turn = int(payload.get("turn_index", 0) or 0)
             self.latest_workspace = str(payload.get("workspace", self.latest_workspace))
         if payload.get("type") == "session_turn_started":
-            self.session_turn = int(
-                payload.get("turn", self.session_turn) or self.session_turn
-            )
+            self.session_turn = int(payload.get("turn", self.session_turn) or self.session_turn)
         if payload.get("type") == "session_turn_saved":
-            self.session_turn = int(
-                payload.get("turn", self.session_turn) or self.session_turn
-            )
+            self.session_turn = int(payload.get("turn", self.session_turn) or self.session_turn)
             self.last_route = str(payload.get("route", self.last_route))
         if payload.get("subagent_run_id"):
             run_id = str(payload["subagent_run_id"])
@@ -676,11 +882,7 @@ class MokioClawTuiApp(App[None]):
         )
 
     def _write_run_start(self, task: str, resume: Path | None) -> None:
-        mode = (
-            f"resume: {resume}"
-            if resume is not None
-            else f"workspace: {self.session_workspace}"
-        )
+        mode = f"resume: {resume}" if resume is not None else f"workspace: {self.session_workspace}"
         self._mount_event_card(
             f"You · turn {self.run_count}",
             shorten(task, 500),
@@ -752,12 +954,8 @@ class MokioClawTuiApp(App[None]):
         for todo in self.todos:
             status = str(todo.get("status", "pending"))
             counts[status] = counts.get(status, 0) + 1
-        current = next(
-            (todo for todo in self.todos if todo.get("status") == "in_progress"), None
-        )
-        count_text = ", ".join(
-            f"{key}:{value}" for key, value in sorted(counts.items())
-        )
+        current = next((todo for todo in self.todos if todo.get("status") == "in_progress"), None)
+        count_text = ", ".join(f"{key}:{value}" for key, value in sorted(counts.items()))
         if current:
             return f"{count_text}\n{shorten(current.get('content', current.get('description', '')), 120)}"
         return count_text
@@ -788,9 +986,7 @@ class MokioClawTuiApp(App[None]):
             )
         else:
             card = Vertical(
-                Static(
-                    Text(title_text, style=f"bold {self._category_style(category)}")
-                ),
+                Static(Text(title_text, style=f"bold {self._category_style(category)}")),
                 summary,
                 classes=f"event-card {self._category_class(category)}",
             )
@@ -808,9 +1004,7 @@ class MokioClawTuiApp(App[None]):
         if summary.category == "intent":
             route = self._line_value(body, "route")
             reason = self._line_value(body, "reason")
-            return f"route {route or 'workflow'}" + (
-                f" · {shorten(reason, 90)}" if reason else ""
-            )
+            return f"route {route or 'workflow'}" + (f" · {shorten(reason, 90)}" if reason else "")
         if summary.category == "chat":
             return shorten(body.split("\nmode:")[0], 2400)
         if summary.category == "plan":
@@ -821,9 +1015,7 @@ class MokioClawTuiApp(App[None]):
             return shorten(body, 160)
         if summary.category == "tool_result":
             ok = self._line_value(body, "ok")
-            path = self._line_value(body, "path") or self._line_value(
-                body, "stdout_path"
-            )
+            path = self._line_value(body, "path") or self._line_value(body, "stdout_path")
             pieces = [f"ok={ok}" if ok else "tool result"]
             if path:
                 pieces.append(path)
@@ -835,9 +1027,9 @@ class MokioClawTuiApp(App[None]):
         if summary.category == "context":
             primary = self._first_matching_line(body, ("tokens:", "compress:", "next:"))
             scope = self._first_matching_line(body, ("scope:", "status:"))
-            return shorten(
-                " · ".join(part for part in (primary, scope) if part), 200
-            ) or shorten(body, 160)
+            return shorten(" · ".join(part for part in (primary, scope) if part), 200) or shorten(
+                body, 160
+            )
         if summary.category == "checkpoint":
             status = self._line_value(body, "status") or self._line_value(body, "mode")
             return f"checkpoint {status}" if status else "checkpoint updated"

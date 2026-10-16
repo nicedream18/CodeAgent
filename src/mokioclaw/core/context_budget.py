@@ -26,13 +26,9 @@ class ContextBudget:
                 "context window/output must be positive; safety must be nonnegative"
             )
         if self.input_limit <= 0:
-            raise ContextBudgetError(
-                "context window must exceed output reserve plus safety margin"
-            )
+            raise ContextBudgetError("context window must exceed output reserve plus safety margin")
         if not 0 < self.target_ratio < self.high_ratio <= 1:
-            raise ContextBudgetError(
-                "require 0 < context target ratio < high ratio <= 1"
-            )
+            raise ContextBudgetError("require 0 < context target ratio < high ratio <= 1")
 
     @property
     def input_limit(self) -> int:
@@ -48,6 +44,12 @@ class ContextBudget:
 
     @classmethod
     def from_runtime(cls, runtime: Any = None) -> ContextBudget:
+        from mokioclaw.providers.model_policy import REQUEST_BUDGET
+
+        selected = REQUEST_BUDGET.get()
+        if selected is not None:
+            return selected
+
         def setting(attr: str, env: str, default: Any, cast=int):
             value = getattr(runtime, attr, None)
             return cast(value if value is not None else os.getenv(env, default))
@@ -59,15 +61,9 @@ class ContextBudget:
                 "MOKIO_MODEL_CONTEXT_RESERVE_TOKENS",
                 8192,
             ),
-            safety=setting(
-                "context_safety_tokens", "MOKIO_CONTEXT_SAFETY_TOKENS", 1024
-            ),
-            high_ratio=setting(
-                "context_high_ratio", "MOKIO_CONTEXT_HIGH_RATIO", 0.85, float
-            ),
-            target_ratio=setting(
-                "context_target_ratio", "MOKIO_CONTEXT_TARGET_RATIO", 0.60, float
-            ),
+            safety=setting("context_safety_tokens", "MOKIO_CONTEXT_SAFETY_TOKENS", 1024),
+            high_ratio=setting("context_high_ratio", "MOKIO_CONTEXT_HIGH_RATIO", 0.85, float),
+            target_ratio=setting("context_target_ratio", "MOKIO_CONTEXT_TARGET_RATIO", 0.60, float),
         )
 
 
@@ -95,16 +91,12 @@ def estimate_messages(
     Counting is always labelled an estimate: providers add transport-specific
     wrappers. The byte fallback deliberately overestimates non-ASCII text.
     """
-    schemas = (
-        tools if tools is not None else getattr(model, "kwargs", {}).get("tools", [])
-    )
+    schemas = tools if tools is not None else getattr(model, "kwargs", {}).get("tools", [])
     schema_text = json.dumps(schemas, ensure_ascii=False, default=str)
     schema_count = len(schema_text.encode("utf-8")) if schemas else 0
     counter = getattr(model, "get_num_tokens_from_messages", None)
     if not callable(counter):
-        counter = getattr(
-            getattr(model, "bound", None), "get_num_tokens_from_messages", None
-        )
+        counter = getattr(getattr(model, "bound", None), "get_num_tokens_from_messages", None)
     if callable(counter):
         try:
             # Do not pass tools to counters which silently ignore their schema.
@@ -114,20 +106,14 @@ def estimate_messages(
         except Exception:  # noqa: BLE001 - arbitrary provider counters may fail
             counter = None  # The labelled conservative fallback below is intentional.
     payload = [
-        message.model_dump(exclude_none=True)
-        if hasattr(message, "model_dump")
-        else str(message)
+        message.model_dump(exclude_none=True) if hasattr(message, "model_dump") else str(message)
         for message in messages
     ]
     text = json.dumps(payload, ensure_ascii=False, default=str)
-    return max(
-        1, len(text.encode("utf-8")) + schema_count + 16 * len(messages)
-    ), "utf8_bytes"
+    return max(1, len(text.encode("utf-8")) + schema_count + 16 * len(messages)), "utf8_bytes"
 
 
-def snapshot(
-    model: Any, messages: list[Any], budget: ContextBudget, tools=None
-) -> BudgetSnapshot:
+def snapshot(model: Any, messages: list[Any], budget: ContextBudget, tools=None) -> BudgetSnapshot:
     count, method = estimate_messages(model, messages, tools)
     return BudgetSnapshot(
         count,

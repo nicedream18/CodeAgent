@@ -1,0 +1,240 @@
+{
+  "created_at": "2026-10-16T11:28:13.742150+00:00",
+  "head": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": false,
+  "model": "fixed offline fixture",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-reliability-iho3wmx6",
+  "runs": [
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 4.142,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "95831e91cec6448abef3a80f7b19cdb0",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.752029
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 2.177,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "0c58cbf1b11649429811759a7750af33",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.754335
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 3.749,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "d541190f6eeb4869be6deec315111a89",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.758146
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 1.903,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "ca7dfd3d412a4ec69b0604bf15b887dc",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.760119
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 1.821,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "d6a9ba7fd6534cfcaa148f17dbbe3f75",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.762004
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 4.372,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "2d05903aaa184968a39f69ae8a81d29b",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.766104
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 5.411,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "389128d9d4514ef6bd338931f41e70e4",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.7717319
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 4.895,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "16e6d8c2bcfc4b2eaa2a466744843ed9",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.776914
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 2.574,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "9af309eabb124efd9916c033912b1086",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792150093.779424
+        }
+      ],
+      "metrics": {}
+    }
+  ],
+  "passed": true,
+  "summary": [
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 2.177,
+        "median": 3.749,
+        "max": 4.142
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1.821,
+        "median": 1.903,
+        "max": 4.372
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 2.574,
+        "median": 4.895,
+        "max": 5.411
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    }
+  ]
+}

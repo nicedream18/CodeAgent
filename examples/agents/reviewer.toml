@@ -1,0 +1,7 @@
+name = "reviewer"
+description = "只读审查代码并提供文件和行号证据"
+base = "repoAgent"
+system_prompt = "检查现有实现和相关测试，优先报告可复现的问题。只读文件，结论附路径和行号。"
+allowed_tools = ["FileReadTool", "GrepTool", "FileGlobTool"]
+max_tool_calls = 8
+# model_profile = "review"  # 在 config.toml 的 model_profiles 中定义后启用

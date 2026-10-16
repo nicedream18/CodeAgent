@@ -8,6 +8,7 @@ from typing import Any, Literal
 from langchain_core.tools import BaseTool
 from pydantic import ValidationError
 
+from mokioclaw.core.context_budget import ContextBudgetError
 from mokioclaw.core.run_control import RunInterrupted, check_run
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.tool_context import (
@@ -16,6 +17,7 @@ from mokioclaw.core.tool_context import (
     set_tool_call_context,
 )
 from mokioclaw.core.tool_policy import authorize_tool
+from mokioclaw.providers.generation import ModelGenerationStopped
 from mokioclaw.tools.registry import tool_spec_for
 
 ToolErrorType = Literal[
@@ -42,9 +44,7 @@ class ToolExecutionError(Exception):
         self, error_type: ToolErrorType | str, message: str, *, retryable: bool = False
     ) -> None:
         super().__init__(message)
-        self.error_type = (
-            error_type if error_type in _TOOL_ERROR_TYPES else "tool_error"
-        )
+        self.error_type = error_type if error_type in _TOOL_ERROR_TYPES else "tool_error"
         self.retryable = bool(retryable and self.error_type in _RETRYABLE_ERROR_TYPES)
 
 
@@ -88,8 +88,7 @@ def classify_tool_failure(error: Any) -> tuple[str, bool]:
     if any(marker in text for marker in ("permission", "denied", "approval")):
         return "permission_denied", False
     if any(
-        marker in text
-        for marker in ("validation", "invalid", "missing required", "unknown tool")
+        marker in text for marker in ("validation", "invalid", "missing required", "unknown tool")
     ):
         return "invalid_input", False
     return "tool_error", False
@@ -180,6 +179,7 @@ def _validate_tool_args(tool: BaseTool, args: dict[str, Any]) -> dict[str, Any] 
 def execute_tool(runtime, tool, args, **kwargs) -> Any:
     from mokioclaw.core.tool_output import bound_tool_result
 
+    before = runtime.tool_execution_count
     result = _execute_tool(runtime, tool, args, **kwargs)
     bounded = bound_tool_result(
         result,
@@ -189,14 +189,25 @@ def execute_tool(runtime, tool, args, **kwargs) -> Any:
         writer=kwargs.get("on_event") or kwargs.get("on_retry"),
     )
     writer = kwargs.get("on_event") or kwargs.get("on_retry")
+    if runtime.tool_execution_count > before:
+        from mokioclaw.core.hooks import HookContext, run_hooks
+
+        run_hooks(
+            runtime,
+            HookContext(
+                "PostToolUse",
+                tool.name,
+                kwargs.get("tool_call_id") or "",
+                args,
+                bounded,
+            ),
+            writer,
+        )
     if (
         writer
         and isinstance(bounded, dict)
         and not bounded.get("output_truncated")
-        and any(
-            bounded.get(key)
-            for key in ("stdout_truncated", "stderr_truncated", "truncated")
-        )
+        and any(bounded.get(key) for key in ("stdout_truncated", "stderr_truncated", "truncated"))
     ):
         from uuid import uuid4
 
@@ -210,8 +221,7 @@ def execute_tool(runtime, tool, args, **kwargs) -> Any:
                 "tool_call_id": kwargs.get("tool_call_id") or f"{tool.name}-call",
                 "retained_characters": len(encoded(bounded)),
                 "reasons": ["native_output_limit"],
-                "full_output_path": bounded.get("stdout_path")
-                or bounded.get("stderr_path"),
+                "full_output_path": bounded.get("stdout_path") or bounded.get("stderr_path"),
             }
         )
     return bounded
@@ -228,12 +238,13 @@ def _execute_tool(
     budget_reserved: bool = False,
 ) -> Any:
     check_run(runtime)
+    from mokioclaw.core.run_inbox import check_redirect
+
+    check_redirect(runtime)
     call_id = tool_call_id or f"{tool.name}-call"
 
     if not budget_reserved:
-        budget_failure = reserve_subagent_tool_call(
-            runtime, tool.name, call_id, on_event=on_event
-        )
+        budget_failure = reserve_subagent_tool_call(runtime, tool.name, call_id, on_event=on_event)
         if budget_failure is not None:
             return budget_failure
 
@@ -293,43 +304,101 @@ def _execute_tool(
             )
         return {**invalid, "tool_name": tool.name}
 
-    denied = authorize_tool(
-        runtime, tool.name, args, tool_call_id=call_id, event_writer=on_event
+    if runtime.context_dirty:
+        return {
+            "ok": False,
+            "error_type": "context_changed",
+            "error": "Context changed; reconsider pending tools in the next model request.",
+            "retryable": False,
+        }
+    if runtime.light_active:
+        if tool.name in {"FileWriteTool", "FileEditTool"}:
+            target = str(runtime.assert_workspace_path(runtime.workspace / args["file_path"]))
+            if runtime.light_target is not None and target != runtime.light_target:
+                runtime.light_escalation = True
+            runtime.light_target = runtime.light_target or target
+        if tool.name in {"BashTool", "NotepadAppendTool"} or tool.name.startswith("MCP_"):
+            runtime.light_escalation = True
+        if runtime.light_escalation:
+            return {
+                "ok": False,
+                "error_type": "workflow_escalation_required",
+                "error": "Broader work requires the full workflow; this tool was not started.",
+                "retryable": False,
+            }
+
+    static_denial = authorize_tool(
+        runtime,
+        tool.name,
+        args,
+        tool_call_id=call_id,
+        event_writer=on_event,
+        static_only=True,
     )
+    if static_denial is not None:
+        return {
+            **static_denial,
+            "retries": 0,
+            "retry_stop_reason": "permission_denied",
+            "tool_name": tool.name,
+        }
+    from mokioclaw.core.hooks import HookContext, run_hooks
+
+    hook_denial = run_hooks(runtime, HookContext("PreToolUse", tool.name, call_id, args), on_event)
+    if hook_denial is not None:
+        return hook_denial
+
+    denied = authorize_tool(runtime, tool.name, args, tool_call_id=call_id, event_writer=on_event)
     check_run(runtime)
+    check_redirect(runtime)
     if denied is not None:
         return {
             **denied,
-            "error_type": _explicit_error_type(denied.get("error_type"))
-            or "permission_denied",
+            "error_type": _explicit_error_type(denied.get("error_type")) or "permission_denied",
             "retryable": False,
             "retries": 0,
             "retry_stop_reason": "permission_denied",
             "tool_name": tool.name,
         }
 
+    from mokioclaw.core.approval_rules import args_digest, runtime_rules
+
+    permissions = runtime_rules(runtime)
+    authorized_version = permissions.version()
+    authorized_context = runtime.context_version
+    authorized_args = args_digest(args)
     spec = tool_spec_for(tool.name)
     is_idempotent = bool(spec and spec.idempotent)
-    max_retries = (
-        max(0, int(getattr(runtime, "tool_retry_limit", 2))) if is_idempotent else 0
-    )
+    max_retries = max(0, int(getattr(runtime, "tool_retry_limit", 2))) if is_idempotent else 0
     context_token = set_tool_call_context(
-        ToolCallContext(
-            call_id, tool.name, permission_checked=True, event_writer=on_event
-        )
+        ToolCallContext(call_id, tool.name, permission_checked=True, event_writer=on_event)
     )
     try:
         for attempt in range(max_retries + 1):
             try:
                 check_run(runtime)
+                check_redirect(runtime)
+                from mokioclaw.core.run_inbox import mark_tool_started
+
+                if (
+                    permissions.version() != authorized_version
+                    or runtime.context_version != authorized_context
+                    or args_digest(args) != authorized_args
+                ):
+                    return {
+                        "ok": False,
+                        "error_type": "approval_stale",
+                        "error": "Authorization changed before execution; reconsider this call.",
+                        "retryable": False,
+                    }
+                mark_tool_started()
+                runtime.tool_execution_count += 1
                 result = tool.invoke(args)
                 check_run(runtime)
                 skill_event(result)
                 if isinstance(result, dict) and result.get("ok") is False:
                     error_type, classified_retryable = classify_tool_failure(result)
-                    tool_retry_hint = bool(
-                        result.get("retryable", classified_retryable)
-                    )
+                    tool_retry_hint = bool(result.get("retryable", classified_retryable))
                     can_retry = (
                         error_type in _RETRYABLE_ERROR_TYPES
                         and tool_retry_hint
@@ -358,9 +427,7 @@ def _execute_tool(
                         time.sleep(delay)
                         continue
                     error_message = result.get("error") or (
-                        "tool execution timed out"
-                        if result.get("timed_out")
-                        else error_type
+                        "tool execution timed out" if result.get("timed_out") else error_type
                     )
                     failure = _failure_result(
                         error=error_message,
@@ -373,9 +440,9 @@ def _execute_tool(
                     )
                     return {**result, **failure}
                 return result
-            except RunInterrupted:
+            except (RunInterrupted, ContextBudgetError, ModelGenerationStopped):
                 raise
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
                 skill_event(error=exc)
                 error_type, retryable = classify_tool_failure(exc)
                 can_retry = (

@@ -1,0 +1,77 @@
+{
+  "created_at": "2026-10-16T10:05:13.967446+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": true,
+  "model": "deepseek-chat",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-pdvl8pry",
+  "results": {
+    "cross_module": {
+      "passed": true,
+      "runs": [
+        {
+          "mode": "auto",
+          "passed": true,
+          "selected": [
+            "full"
+          ],
+          "duration_ms": 39678.623,
+          "metrics": {
+            "requests": 26,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 263,
+                "output_tokens": 54,
+                "total_tokens": 317,
+                "duration_ms": 801.195,
+                "requests": 1
+              },
+              "repoAgent": {
+                "input_tokens": 8455,
+                "output_tokens": 2598,
+                "total_tokens": 11053,
+                "duration_ms": 14618.625,
+                "requests": 8
+              },
+              "planner": {
+                "input_tokens": 30916,
+                "output_tokens": 1718,
+                "total_tokens": 32634,
+                "duration_ms": 11293.792999999998,
+                "requests": 6
+              },
+              "codeAgent": {
+                "input_tokens": 21460,
+                "output_tokens": 683,
+                "total_tokens": 22143,
+                "duration_ms": 6602.596,
+                "requests": 7
+              },
+              "verifier": {
+                "input_tokens": 16018,
+                "output_tokens": 786,
+                "total_tokens": 16804,
+                "duration_ms": 5328.696,
+                "requests": 4
+              }
+            },
+            "input_tokens": 77112,
+            "output_tokens": 5839,
+            "total_tokens": 82951,
+            "duration_ms": 38644.905000000006,
+            "estimated": false
+          },
+          "file_change_records": [
+            "app.txt",
+            "config.txt"
+          ],
+          "actual_contents": {
+            "app.txt": "after",
+            "config.txt": "after"
+          }
+        }
+      ],
+      "duration_ms": 39679.305
+    }
+  },
+  "passed": true
+}

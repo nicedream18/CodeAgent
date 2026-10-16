@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import threading
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 _LOCK = threading.RLock()
@@ -13,6 +14,19 @@ MAX_FILES = 32
 MAX_TOTAL_BYTES = 16 * 1024 * 1024
 
 
+def read_diagnostic_text(workspace: Path, reference: str) -> str | None:
+    path = (workspace / reference).resolve()
+    if not path.is_relative_to(workspace.resolve()) or not path.is_relative_to(
+        (workspace / ".mokioclaw/diagnostics").resolve()
+    ):
+        return None
+    try:
+        with path.open("rb") as handle:
+            return handle.read(MAX_FILE_BYTES).decode("utf-8", errors="replace")
+    except OSError:
+        return None
+
+
 class DiagnosticArtifact:
     def __init__(self, workspace: Path, kind: str):
         self.workspace = workspace
@@ -20,6 +34,7 @@ class DiagnosticArtifact:
         self.root.mkdir(parents=True, exist_ok=True)
         self.path = self.root / f"{kind}-{uuid4().hex}.log"
         self._handle = self.path.open("xb")
+        self.path.chmod(0o600)
         with _LOCK:
             _ACTIVE.add(self.path)
         self.total = 0
@@ -37,7 +52,7 @@ class DiagnosticArtifact:
                 retained = retained.decode("utf-8", errors="ignore").encode("utf-8")
             self.retained += self._handle.write(retained)
 
-    def finish(self):
+    def finish(self) -> dict[str, Any]:
         if not self.closed:
             self._handle.close()
             self.closed = True
@@ -53,9 +68,7 @@ class DiagnosticArtifact:
                 total = 0
                 for index, (_, path, size) in enumerate(sorted(files, reverse=True)):
                     total += size
-                    if (
-                        index >= MAX_FILES or total > MAX_TOTAL_BYTES
-                    ) and path not in _ACTIVE:
+                    if (index >= MAX_FILES or total > MAX_TOTAL_BYTES) and path not in _ACTIVE:
                         path.unlink(missing_ok=True)
         return {
             "full_output_path": self.path.relative_to(self.workspace).as_posix(),

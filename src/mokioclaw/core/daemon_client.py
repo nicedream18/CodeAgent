@@ -47,7 +47,7 @@ def ensure_daemon(*, start: bool = True) -> dict[str, Any] | None:
             time.sleep(0.1)
         raise RuntimeError(
             f"Timed out waiting for MokioClaw daemon startup lock: {lock_path}"
-        )
+        ) from None
     os.close(lock_fd)
     host = "127.0.0.1"
     port = int(os.getenv("MOKIO_DAEMON_PORT", "8765"))
@@ -108,6 +108,17 @@ def cancel_run(run_id: str) -> dict[str, Any]:
     return _request(address, "cancel_run", {"run_id": run_id})
 
 
+def submit_run_message(run_id: str, message_id: str, text: str) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(
+        address,
+        "submit_run_message",
+        {"run_id": run_id, "message_id": message_id, "text": text},
+    )
+
+
 def compact_run(run_id: str) -> dict[str, Any]:
     address = ensure_daemon(start=False)
     if not address:
@@ -119,18 +130,14 @@ def compact_status(run_id: str, request_id: str) -> dict[str, Any]:
     address = ensure_daemon(start=False)
     if not address:
         raise RuntimeError("MokioClaw daemon is stopped")
-    return _request(
-        address, "compact_status", {"run_id": run_id, "request_id": request_id}
-    )
+    return _request(address, "compact_status", {"run_id": run_id, "request_id": request_id})
 
 
 def compact_cancel(run_id: str, request_id: str) -> dict[str, Any]:
     address = ensure_daemon(start=False)
     if not address:
         raise RuntimeError("MokioClaw daemon is stopped")
-    return _request(
-        address, "compact_cancel", {"run_id": run_id, "request_id": request_id}
-    )
+    return _request(address, "compact_cancel", {"run_id": run_id, "request_id": request_id})
 
 
 def subagent_status(run_id: str, *, wait_seconds: float = 0) -> dict[str, Any]:
@@ -162,9 +169,7 @@ def subagent_events(run_id: str, *, after_seq: int = 0) -> dict[str, Any]:
     )
 
 
-def iter_subagent_events(
-    run_id: str, *, after_seq: int = 0
-) -> Iterator[dict[str, Any]]:
+def iter_subagent_events(run_id: str, *, after_seq: int = 0) -> Iterator[dict[str, Any]]:
     cursor = max(0, after_seq)
     while True:
         snapshot = subagent_events(run_id, after_seq=cursor)
@@ -186,10 +191,15 @@ def run_via_daemon(
 ) -> Iterator[dict[str, Any]]:
     address = ensure_daemon(start=True)
     serialized = {
-        key: str(value) if isinstance(value, Path) else value
-        for key, value in options.items()
+        key: str(value) if isinstance(value, Path) else value for key, value in options.items()
     }
     serialized["task"] = task
+    if serialized.get("skill"):
+        capabilities = _request(address, "status", {}).get("capabilities", [])
+        if "explicit_skill" not in capabilities:
+            raise RuntimeError(
+                "Daemon does not support explicit_skill; update/restart it after active tasks finish"
+            )
     started = _request(address, "start_run", {"mode": mode, "options": serialized})
     run_id = started["run_id"]
     yield from iter_run_events(run_id, approval_handler=approval_handler)
@@ -223,9 +233,7 @@ def iter_run_events(run_id: str, *, approval_handler=None):
                     message = json.loads(line)
                     if message.get("id") == request_id:
                         if "error" in message:
-                            raise RuntimeError(
-                                message["error"].get("message", "subscribe failed")
-                            )
+                            raise RuntimeError(message["error"].get("message", "subscribe failed"))
                         continue
                     if message.get("method") == "event":
                         item = message.get("params", {})
@@ -259,6 +267,10 @@ def iter_run_events(run_id: str, *, approval_handler=None):
                                     "tool_call_id": request.tool_call_id,
                                     "approved": decision.approved,
                                     "reason": decision.reason,
+                                    "scope": decision.scope,
+                                    "match_scope": decision.match_scope,
+                                    "context_version": request.context_version,
+                                    "policy_version": request.policy_version,
                                 },
                             )
                             continue
@@ -268,48 +280,49 @@ def iter_run_events(run_id: str, *, approval_handler=None):
         except KeyboardInterrupt:
             # SIGINT cancels explicitly; socket disconnects continue to reconnect.
             cancel_run(run_id)
-            approval_handler = lambda _request: ApprovalDecision(
-                False, "Run cancelling."
-            )
+
+            def approval_handler(_request):
+                return ApprovalDecision(False, "Run cancelling.")
         except (OSError, json.JSONDecodeError, ConnectionError):
             time.sleep(0.2)
             refreshed = ensure_daemon(start=False)
             if not refreshed:
                 raise RuntimeError(
                     "MokioClaw daemon disconnected while a task was running"
-                )
+                ) from None
             address = refreshed
 
 
-def _request(
-    address: dict[str, Any], method: str, params: dict[str, Any]
-) -> dict[str, Any]:
+def _request(address: dict[str, Any], method: str, params: dict[str, Any]) -> dict[str, Any]:
     token_path = daemon_state_dir() / "auth.token"
     token = token_path.read_text(encoding="utf-8").strip()
     request_id = uuid4().hex
     params = {**params, "token": token}
-    with socket.create_connection(
-        (address["host"], int(address["port"])), timeout=10
-    ) as sock:
+    with socket.create_connection((address["host"], int(address["port"])), timeout=10) as sock:
         stream = sock.makefile("rwb", buffering=0)
         _write_request(stream, method, params, request_id)
         line = stream.readline(1024 * 1024)
     if not line:
         raise ConnectionError("daemon closed the request without a response")
-    response = json.loads(line)
+    from mokioclaw.core.protocol import RpcResponse
+
+    response = RpcResponse.model_validate(json.loads(line)).model_dump(exclude_unset=True)
     if response.get("error"):
         raise RuntimeError(response["error"].get("message", "daemon request failed"))
     return response.get("result", {})
 
 
-def _write_request(
-    stream, method: str, params: dict[str, Any], request_id: str
-) -> None:
+def _write_request(stream, method: str, params: dict[str, Any], request_id: str) -> None:
     request = {
         "jsonrpc": "2.0",
+        "protocol_version": 1,
         "id": request_id,
         "method": method,
-        "params": {**params, "token": _token()},
+        "params": {
+            **params,
+            "token": _token(),
+            "client_capabilities": ["approval_memory", "typed_protocol"],
+        },
     }
     stream.write(json.dumps(request, ensure_ascii=False).encode() + b"\n")
 
@@ -334,3 +347,27 @@ def _health(address: dict[str, Any], state_dir: Path) -> bool:
         return True
     except (OSError, RuntimeError, json.JSONDecodeError):
         return False
+
+
+def permissions(workspace: Path, *, action="list", rule_id=None, session_id=""):
+    address = ensure_daemon(start=False)
+    if address:
+        capabilities = _request(address, "status", {}).get("capabilities", [])
+        if "approval_memory" not in capabilities:
+            raise RuntimeError("Daemon does not support approval_memory")
+        return _request(
+            address,
+            "permissions",
+            {
+                "workspace": str(workspace.resolve()),
+                "action": action,
+                "rule_id": rule_id,
+                "session_id": session_id,
+            },
+        )
+    from mokioclaw.core.approval_rules import ApprovalRules
+
+    rules = ApprovalRules(workspace, session_id)
+    if action != "list":
+        rules.revoke(rule_id, clear=action == "clear")
+    return {"ok": True, **rules.list_rules()}

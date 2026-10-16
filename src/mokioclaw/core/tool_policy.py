@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 import re
 import shlex
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from mokioclaw.core.approval import (
     ApprovalDecision,
@@ -17,7 +18,6 @@ from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.tool_context import current_tool_call_context
 from mokioclaw.tools.registry import tool_spec_for
 
-
 VALID_POLICIES = {"allow", "ask", "deny"}
 
 
@@ -29,7 +29,7 @@ def parse_tool_policies(raw: str | None) -> dict[str, str]:
     except json.JSONDecodeError as exc:
         raise ValueError("MOKIO_TOOL_POLICIES must be a JSON object") from exc
     if not isinstance(payload, dict):
-        raise ValueError("MOKIO_TOOL_POLICIES must be a JSON object")
+        raise ValueError("MOKIO_TOOL_POLICIES must be a JSON object")  # noqa: TRY004 — preserve the public ValueError validation contract
     policies: dict[str, str] = {}
     for name, policy in payload.items():
         normalized = str(policy).strip().lower()
@@ -46,9 +46,7 @@ def parse_bash_patterns(raw: str | None, *, variable: str) -> list[str]:
     try:
         payload = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise ValueError(
-            f"{variable} must be a JSON list of regular expressions"
-        ) from exc
+        raise ValueError(f"{variable} must be a JSON list of regular expressions") from exc
     if not isinstance(payload, list) or any(
         not isinstance(item, str) or not item for item in payload
     ):
@@ -57,15 +55,11 @@ def parse_bash_patterns(raw: str | None, *, variable: str) -> list[str]:
         try:
             re.compile(pattern, re.IGNORECASE)
         except re.error as exc:
-            raise ValueError(
-                f"invalid regular expression in {variable}: {pattern}"
-            ) from exc
+            raise ValueError(f"invalid regular expression in {variable}: {pattern}") from exc
     return list(payload)
 
 
-def _emit(
-    writer: Callable[[dict[str, Any]], None] | None, event_type: str, **payload: Any
-) -> None:
+def _emit(writer: Callable[[dict[str, Any]], None] | None, event_type: str, **payload: Any) -> None:
     if writer is not None:
         writer({"type": event_type, **payload})
 
@@ -113,9 +107,12 @@ def _outside_workspace_command(command: str, workspace: Path) -> bool:
             # Ignore URL-like strings and harmless shell descriptor syntax.
             if "://" not in token and token not in {"/dev/null"}:
                 candidates.append(token)
-        elif re.match(r"^[A-Za-z]:[\\/]", token):
-            candidates.append(token)
-        elif token.startswith("../") or token == ".." or "/../" in token:
+        elif (
+            re.match(r"^[A-Za-z]:[\\/]", token)
+            or token.startswith("../")
+            or token == ".."
+            or "/../" in token
+        ):
             candidates.append(token)
 
         for candidate in candidates:
@@ -124,10 +121,7 @@ def _outside_workspace_command(command: str, workspace: Path) -> bool:
                 path = workspace_root / path
             try:
                 resolved = path.resolve()
-                if (
-                    resolved != workspace_root
-                    and workspace_root not in resolved.parents
-                ):
+                if resolved != workspace_root and workspace_root not in resolved.parents:
                     return True
             except (OSError, RuntimeError):
                 return True
@@ -180,6 +174,9 @@ def _request_approval(
     tool_call_id: str,
     event_writer: Callable[[dict[str, Any]], None] | None,
 ) -> dict[str, Any] | None:
+    from mokioclaw.core.approval_rules import args_digest, runtime_rules
+
+    rules = runtime_rules(runtime)
     preview = _approval_preview(name, args)
     base_request = make_approval_request(preview, reason)
     request = ApprovalRequest(
@@ -188,6 +185,11 @@ def _request_approval(
         risk_reason=reason,
         tool_name=name,
         tool_call_id=tool_call_id,
+        run_id=runtime.run_id,
+        args_digest=args_digest(args),
+        context_version=runtime.context_version,
+        policy_version=rules.version(),
+        rule_preview=rules.resource(name, args, runtime.mcp_servers),
     )
     if runtime.approval_mode == "auto":
         _emit(
@@ -230,9 +232,28 @@ def _request_approval(
         risk_reason=reason,
     )
     decision = runtime.approval_handler(request)
-    approved = (
-        decision.approved if isinstance(decision, ApprovalDecision) else bool(decision)
-    )
+    from mokioclaw.core.run_control import check_run
+    from mokioclaw.core.run_inbox import check_redirect
+
+    check_run(runtime)
+    check_redirect(runtime)
+    if (
+        request.context_version != runtime.context_version
+        or request.args_digest != args_digest(args)
+        or request.policy_version != rules.version()
+    ):
+        return _deny(
+            name,
+            "Approval context changed; request approval again",
+            tool_call_id=tool_call_id,
+            event_writer=event_writer,
+            reason="approval_stale",
+        )
+    if isinstance(decision, ApprovalDecision) and decision.scope != "once":
+        rules.remember(
+            name, args, decision.approved, decision.scope, decision.match_scope, runtime.mcp_servers
+        )
+    approved = decision.approved if isinstance(decision, ApprovalDecision) else bool(decision)
     if approved:
         _emit(
             event_writer,
@@ -272,6 +293,7 @@ def authorize_tool(
     *,
     tool_call_id: str = "",
     event_writer: Callable[[dict[str, Any]], None] | None = None,
+    static_only: bool = False,
 ) -> dict[str, Any] | None:
     """Enforce nested agent/skill scopes and the configured per-call policy."""
     call_id = tool_call_id or (
@@ -364,6 +386,46 @@ def authorize_tool(
             event_writer=event_writer,
             reason="tool_policy_deny",
         )
+    from mokioclaw.core.approval_rules import runtime_rules
+
+    rules = runtime_rules(runtime)
+    try:
+        remembered = rules.match(name, args, runtime.mcp_servers)
+    except (OSError, ValueError):
+        return _deny(
+            name,
+            "Approval storage is unreadable",
+            tool_call_id=call_id,
+            event_writer=event_writer,
+            reason="approval_storage_invalid",
+        )
+    if remembered is not None and not remembered.allowed:
+        return _deny(
+            name,
+            "Denied by saved approval rule",
+            tool_call_id=call_id,
+            event_writer=event_writer,
+            reason="saved_rule_deny",
+        )
+    if static_only:
+        return None
+    # Saved grants never satisfy forced approval for paths outside the workspace.
+    if (
+        remembered is not None
+        and remembered.allowed
+        and runtime.approval_mode != "deny"
+        and not (command and _outside_workspace_command(command, runtime.workspace))
+    ):
+        _emit(
+            event_writer,
+            "permission_granted",
+            tool_call_id=call_id,
+            tool_name=name,
+            decision="saved_rule_allow",
+            rule_id=remembered.id,
+            scope=remembered.scope,
+        )
+        return None
     if command and _outside_workspace_command(command, runtime.workspace):
         denied = _request_approval(
             runtime,

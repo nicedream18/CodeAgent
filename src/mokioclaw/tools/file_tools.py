@@ -4,6 +4,7 @@ import difflib
 from pathlib import Path
 from typing import Any
 
+from mokioclaw.core.instructions import touch_instructions
 from mokioclaw.core.state import RuntimeState
 
 MAX_READ_LINES = 2000
@@ -62,6 +63,7 @@ def read_file(
         path = resolve_workspace_path(state, file_path)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
+    touch_instructions(state, path)
     if not path.exists():
         return {
             "ok": False,
@@ -114,9 +116,7 @@ def read_file(
     complete = offset_value == 0 and len(selected) == len(lines)
     state.record_read(path, complete=complete)
 
-    numbered = "\n".join(
-        f"{offset_value + idx + 1}: {line}" for idx, line in enumerate(selected)
-    )
+    numbered = "\n".join(f"{offset_value + idx + 1}: {line}" for idx, line in enumerate(selected))
     return {
         "ok": True,
         "path": display_path(state, path),
@@ -134,6 +134,9 @@ def write_file(state: RuntimeState, file_path: str, content: str) -> dict[str, A
         path = resolve_workspace_path(state, file_path)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
+    changed = touch_instructions(state, path, writing=True)
+    if changed:
+        return changed
     existed = path.exists()
 
     if existed:
@@ -161,8 +164,21 @@ def write_file(state: RuntimeState, file_path: str, content: str) -> dict[str, A
     else:
         original = ""
 
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
+    from mokioclaw.core.changes import journal_write
+
+    try:
+        change_id = journal_write(state, path, content)
+    except (OSError, ValueError) as exc:
+        from mokioclaw.core.changes import JournalCommitError
+
+        return {
+            "ok": False,
+            "error": str(exc),
+            "error_type": "outcome_unknown"
+            if isinstance(exc, JournalCommitError)
+            else "tool_error",
+            "retryable": False,
+        }
     state.record_read(path, complete=True)
 
     diff = "\n".join(
@@ -177,19 +193,21 @@ def write_file(state: RuntimeState, file_path: str, content: str) -> dict[str, A
     return {
         "ok": True,
         "type": "update" if existed else "create",
+        "change_id": change_id,
         "path": display_path(state, path),
         "lines": len(content.splitlines()),
         "diff": diff[:4000],
     }
 
 
-def edit_file(
-    state: RuntimeState, file_path: str, old_text: str, new_text: str
-) -> dict[str, Any]:
+def edit_file(state: RuntimeState, file_path: str, old_text: str, new_text: str) -> dict[str, Any]:
     try:
         path = resolve_workspace_path(state, file_path)
     except ValueError as exc:
         return {"ok": False, "error": str(exc)}
+    changed = touch_instructions(state, path, writing=True)
+    if changed:
+        return changed
     if not path.exists():
         return {
             "ok": False,
@@ -221,7 +239,21 @@ def edit_file(
         }
 
     updated = original.replace(old_text, new_text, 1)
-    path.write_text(updated, encoding="utf-8")
+    from mokioclaw.core.changes import journal_write
+
+    try:
+        change_id = journal_write(state, path, updated)
+    except (OSError, ValueError) as exc:
+        from mokioclaw.core.changes import JournalCommitError
+
+        return {
+            "ok": False,
+            "error": str(exc),
+            "error_type": "outcome_unknown"
+            if isinstance(exc, JournalCommitError)
+            else "tool_error",
+            "retryable": False,
+        }
     state.record_read(path, complete=True)
 
     diff = "\n".join(
@@ -237,5 +269,6 @@ def edit_file(
         "ok": True,
         "path": display_path(state, path),
         "replacements": 1,
+        "change_id": change_id,
         "diff": diff[:4000],
     }

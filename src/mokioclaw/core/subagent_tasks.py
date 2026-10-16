@@ -13,14 +13,12 @@ from typing import Any
 from uuid import uuid4
 
 TERMINAL = {"completed", "failed", "cancelled", "interrupted"}
-_DAEMON_CONTEXT: ContextVar[tuple[Any, str, Callable[[dict[str, Any]], Any]] | None] = (
-    ContextVar("mokioclaw_daemon_subagent_context", default=None)
+_DAEMON_CONTEXT: ContextVar[tuple[Any, str, Callable[[dict[str, Any]], Any]] | None] = ContextVar(
+    "mokioclaw_daemon_subagent_context", default=None
 )
 
 
-def set_daemon_context(
-    manager: Any, run_id: str, writer: Callable[[dict[str, Any]], Any]
-) -> Token:
+def set_daemon_context(manager: Any, run_id: str, writer: Callable[[dict[str, Any]], Any]) -> Token:
     return _DAEMON_CONTEXT.set((manager, run_id, writer))
 
 
@@ -107,8 +105,7 @@ class SubagentTaskManager:
             event_path = path.parent / "events.jsonl"
             try:
                 events = [
-                    json.loads(line)
-                    for line in event_path.read_text(encoding="utf-8").splitlines()
+                    json.loads(line) for line in event_path.read_text(encoding="utf-8").splitlines()
                 ]
             except (OSError, json.JSONDecodeError):
                 events = []
@@ -129,9 +126,7 @@ class SubagentTaskManager:
         self._loop.run_forever()
 
     async def _start_workers(self) -> None:
-        self._workers = [
-            asyncio.create_task(self._worker()) for _ in range(self.max_running)
-        ]
+        self._workers = [asyncio.create_task(self._worker()) for _ in range(self.max_running)]
         self._ready.set()
 
     def stop_accepting(self) -> None:
@@ -145,9 +140,7 @@ class SubagentTaskManager:
         handoff_id: str,
         agent: str,
         instruction: str,
-        runner: Callable[
-            [Callable[[dict[str, Any]], None], threading.Event], dict[str, Any]
-        ],
+        runner: Callable[[Callable[[dict[str, Any]], None], threading.Event], dict[str, Any]],
         parent_writer: Callable[[dict[str, Any]], None] | None = None,
     ) -> dict[str, Any]:
         self.start()
@@ -202,9 +195,7 @@ class SubagentTaskManager:
             runner, parent_writer = pair
             if task.cancel_requested:
                 self._set_status(task, "cancelled")
-                self._append(
-                    task, {"type": "subagent_task_cancelled", **self._ids(task)}
-                )
+                self._append(task, {"type": "subagent_task_cancelled", **self._ids(task)})
                 self._queue.task_done()
                 continue
             self._set_status(task, "running")
@@ -228,9 +219,7 @@ class SubagentTaskManager:
                     self._set_status(task, "cancelled")
                     final_type = "subagent_task_cancelled"
                 else:
-                    self._set_status(
-                        task, "completed" if result.get("ok") else "failed"
-                    )
+                    self._set_status(task, "completed" if result.get("ok") else "failed")
                     final_type = (
                         "subagent_task_completed"
                         if task.status == "completed"
@@ -413,11 +402,7 @@ class SubagentTaskManager:
     def list_for_parent(self, parent_run_id: str) -> list[dict[str, Any]]:
         with self._lock:
             tasks = list(self._tasks.values())
-        results = [
-            self._snapshot(task)
-            for task in tasks
-            if task.parent_run_id == parent_run_id
-        ]
+        results = [self._snapshot(task) for task in tasks if task.parent_run_id == parent_run_id]
         known = {item["subagent_run_id"] for item in results}
         for path in self.root.glob("subagent-*/task.json"):
             try:
@@ -440,8 +425,7 @@ class SubagentTaskManager:
                 return [
                     item
                     for item in (
-                        json.loads(line)
-                        for line in path.read_text(encoding="utf-8").splitlines()
+                        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
                     )
                     if int(item.get("seq", 0)) > after_seq
                 ]
@@ -455,9 +439,7 @@ class SubagentTaskManager:
             self._accepting = False
         if not self._started:
             return
-        shutdown_future = asyncio.run_coroutine_threadsafe(
-            self._stop_workers(), self._loop
-        )
+        shutdown_future = asyncio.run_coroutine_threadsafe(self._stop_workers(), self._loop)
         try:
             shutdown_future.result(timeout=self.shutdown_grace_seconds)
         except TimeoutError:
@@ -479,9 +461,9 @@ class SubagentTaskManager:
                         },
                     )
             try:
-                asyncio.run_coroutine_threadsafe(
-                    self._cancel_workers(), self._loop
-                ).result(timeout=1)
+                asyncio.run_coroutine_threadsafe(self._cancel_workers(), self._loop).result(
+                    timeout=1
+                )
             except (TimeoutError, RuntimeError):
                 self._loop.call_soon_threadsafe(self._loop.stop)
         self._executor.shutdown(wait=False, cancel_futures=True)

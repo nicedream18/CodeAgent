@@ -40,11 +40,11 @@ def skill_roots(runtime: RuntimeState) -> list[Path]:
 
 
 def _registered_tool_names(runtime: RuntimeState) -> set[str]:
-    from mokioclaw.tools.registry import TOOL_SPECS, build_tools
+    from mokioclaw.tools.registry import TOOL_SPECS
 
     names = {spec.name for spec in TOOL_SPECS}
     # Tool factories include configured MCP tools, whose names are runtime-specific.
-    names.update(tool.name for tool in build_tools(runtime))
+    names.update(runtime.mcp_loaded_tools)
     return names
 
 
@@ -57,7 +57,15 @@ def discover_skills(runtime: RuntimeState) -> list[dict[str, Any]]:
             continue
         for path in sorted(root.glob("*/SKILL.md")):
             try:
-                skill = parse_skill(path, registered_tools=registered)
+                from mokioclaw.tools.mcp_tools import _safe_name
+
+                skill = parse_skill(
+                    path,
+                    registered_tools=registered,
+                    deferred_mcp_prefixes=tuple(
+                        f"MCP_{_safe_name(s['name'])}_" for s in runtime.mcp_servers
+                    ),
+                )
                 candidates.append((path, skill, None))
             except SkillDiagnostic as exc:
                 candidates.append((path, None, exc.diagnostic))
@@ -76,9 +84,7 @@ def discover_skills(runtime: RuntimeState) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     for path, skill, diagnostic in candidates:
         identity = (
-            skill["name"]
-            if skill is not None
-            else diagnostic.get("skill_name", path.parent.name)
+            skill["name"] if skill is not None else diagnostic.get("skill_name", path.parent.name)
         )
         if identity in seen_dirs:
             continue
@@ -101,7 +107,7 @@ def discover_skills(runtime: RuntimeState) -> list[dict[str, Any]]:
 
 
 def parse_skill(
-    path: Path, *, registered_tools: set[str] | None = None
+    path: Path, *, registered_tools: set[str] | None = None, deferred_mcp_prefixes=()
 ) -> dict[str, Any]:
     from mokioclaw.tools.registry import TOOL_SPECS, tool_spec_for
 
@@ -121,14 +127,10 @@ def parse_skill(
         metadata = yaml.safe_load(metadata_text)
     except yaml.YAMLError as exc:
         mark = getattr(exc, "problem_mark", None)
-        location = (
-            f"line {mark.line + 2}, column {mark.column + 1}" if mark else "frontmatter"
-        )
+        location = f"line {mark.line + 2}, column {mark.column + 1}" if mark else "frontmatter"
         raise SkillDiagnostic("invalid_yaml", f"{location}: {exc}", path) from exc
     if not isinstance(metadata, dict):
-        raise SkillDiagnostic(
-            "invalid_frontmatter", "frontmatter must be a YAML mapping", path
-        )
+        raise SkillDiagnostic("invalid_frontmatter", "frontmatter must be a YAML mapping", path)
 
     name_value = metadata.get("name")
     name = name_value.strip() if isinstance(name_value, str) else path.parent.name
@@ -138,18 +140,14 @@ def parse_skill(
                 "missing_field", f"required field '{required}' is missing", path, name
             )
     if not isinstance(name_value, str) or not name_value.strip():
-        raise SkillDiagnostic(
-            "invalid_field_type", "'name' must be a non-empty string", path, name
-        )
+        raise SkillDiagnostic("invalid_field_type", "'name' must be a non-empty string", path, name)
     description_value = metadata["description"]
     if not isinstance(description_value, str) or not description_value.strip():
         raise SkillDiagnostic(
             "invalid_field_type", "'description' must be a non-empty string", path, name
         )
     if not body.strip():
-        raise SkillDiagnostic(
-            "missing_body", "Skill Markdown body must not be empty", path, name
-        )
+        raise SkillDiagnostic("missing_body", "Skill Markdown body must not be empty", path, name)
 
     tools = _string_list(metadata, "tools", path, name)
     permissions = _string_list(metadata, "permissions", path, name)
@@ -163,13 +161,13 @@ def parse_skill(
         )
 
     known_tools = (
-        registered_tools
-        if registered_tools is not None
-        else {spec.name for spec in TOOL_SPECS}
+        registered_tools if registered_tools is not None else {spec.name for spec in TOOL_SPECS}
     )
     for tool_name in tools:
         # MCP tools are valid only when present in this runtime's discovered set.
-        if tool_name not in known_tools:
+        if tool_name not in known_tools and not any(
+            tool_name.startswith(prefix) for prefix in deferred_mcp_prefixes
+        ):
             raise SkillDiagnostic(
                 "unknown_tool", f"tool is not registered: {tool_name}", path, name
             )
@@ -198,9 +196,7 @@ def parse_skill(
     }
 
 
-def _string_list(
-    metadata: dict[str, Any], key: str, path: Path, name: str
-) -> list[str]:
+def _string_list(metadata: dict[str, Any], key: str, path: Path, name: str) -> list[str]:
     value = metadata.get(key, [])
     if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
         raise SkillDiagnostic(
@@ -219,6 +215,13 @@ def _skill_source(runtime: RuntimeState, path: Path) -> str:
 
 
 def load_skill(runtime: RuntimeState, name: str) -> dict[str, Any]:
+    if runtime.explicit_skill and name != runtime.explicit_skill:
+        return {
+            "ok": False,
+            "error": "Explicit Skill is fixed for this run",
+            "error_type": "skill_scope",
+            "retryable": False,
+        }
     discovered = discover_skills(runtime)
     skill = next((item for item in discovered if item["name"] == name), None)
     if skill is None:
@@ -245,10 +248,29 @@ def load_skill(runtime: RuntimeState, name: str) -> dict[str, Any]:
             "diagnostic": diagnostic,
         }
 
+    from mokioclaw.tools.mcp_tools import _safe_name, build_mcp_tools
+
+    for tool_name in skill["tools"]:
+        if tool_name.startswith("MCP_"):
+            servers = [
+                s
+                for s in runtime.mcp_servers
+                if tool_name.startswith(f"MCP_{_safe_name(s['name'])}_")
+            ]
+            tools = {t.name: t for t in build_mcp_tools(runtime, servers)}
+            if tool_name not in tools:
+                return {
+                    "ok": False,
+                    "error": f"MCP tool could not be validated: {tool_name}",
+                    "error_type": "invalid_input",
+                }
+            runtime.mcp_loaded_tools[tool_name] = tools[tool_name]
+            runtime.mcp_catalog_version += 1
     runtime.active_skill_tools = set(skill["tools"])
     runtime.active_skill_permissions = set(skill["permissions"])
     runtime.active_skill_name = skill["name"]
     runtime.active_skill_source = skill["source"]
+    runtime.context_dirty = True
     # Skill instructions are returned only to the calling model, not emitted to trace.
     return {"ok": True, **skill}
 

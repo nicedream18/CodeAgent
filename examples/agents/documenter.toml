@@ -1,0 +1,7 @@
+name = "documenter"
+description = "通过文件工具维护文档"
+base = "codeAgent"
+system_prompt = "阅读相关实现后更新文档。遵守项目规则，只处理用户指定的文档；需要其他能力时交回 planner。"
+allowed_tools = ["FileReadTool", "FileWriteTool", "FileEditTool", "TodoUpdateTool"]
+max_tool_calls = 6
+# 工具白名单限定能力；若需强制目录限制，配合 PreToolUse hook。

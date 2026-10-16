@@ -14,11 +14,7 @@ class EventSummary:
 
 
 def shorten(value: Any, limit: int = 260) -> str:
-    text = (
-        value
-        if isinstance(value, str)
-        else json.dumps(value, ensure_ascii=False, default=str)
-    )
+    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, default=str)
     if len(text) <= limit:
         return text
     return text[: limit - 3] + "..."
@@ -27,9 +23,7 @@ def shorten(value: Any, limit: int = 260) -> str:
 def summarize_event(event: dict[str, Any]) -> EventSummary:
     event_type = event.get("type")
     if event_type == "workspace":
-        return EventSummary(
-            "Workspace", str(event.get("path", "")), "workspace", "blue"
-        )
+        return EventSummary("Workspace", str(event.get("path", "")), "workspace", "blue")
     if event_type == "custom_event":
         payload = event.get("event")
         if isinstance(payload, dict):
@@ -45,6 +39,39 @@ def summarize_event(event: dict[str, Any]) -> EventSummary:
 
 def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
     event_type = event.get("type", "event")
+    if event_type == "run_budget_exhausted":
+        return EventSummary("运行预算已耗尽", event.get("message", ""), "error")
+    if event_type == "workflow_selected":
+        return EventSummary("执行流程", f"{event.get('mode')} · {event.get('reason', '')}", "info")
+    if event_type == "hook_result":
+        return EventSummary(
+            f"Hook · {event.get('hook')} · {event.get('action')}",
+            event.get("message", ""),
+            "error" if event.get("action") == "block" else "info",
+        )
+    if event_type in {
+        "user_message_received",
+        "user_message_response",
+        "user_message_applied",
+    }:
+        state = (
+            "已应用"
+            if event_type == "user_message_applied"
+            else "已排队"
+            if event.get("ok", True)
+            else "发送失败"
+        )
+        return EventSummary(
+            f"补充指令 · {state}",
+            str(event.get("text", event.get("error", event.get("error_type", "")))),
+            "info",
+        )
+    if event_type == "instructions_loaded":
+        return EventSummary(
+            "项目规则",
+            "\n".join(f"{r['scope']}: {r['path']}" for r in event.get("rules", [])),
+            "info",
+        )
     if event_type == "mcp_diagnostic":
         return EventSummary(
             f"MCP · {event.get('server')} · {event.get('phase')}",
@@ -53,7 +80,7 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             f"log: {event.get('full_output_path', '')} | truncated: {event.get('output_truncated', False)}",
             "error" if event.get("status") == "failed" else "info",
         )
-    if event_type in {"run_started", "run_finished"}:
+    if event_type == "run_started":
         return EventSummary(
             "Run", f"{event.get('run_id', '')} {event.get('status', 'running')}", "info"
         )
@@ -173,8 +200,22 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             "cyan",
         )
     if event_type == "memory_snapshot":
+        return EventSummary("Memory Snapshot", _format_memory_snapshot(event), "memory", "cyan")
+    if event_type in {"model_usage", "run_finished"}:
+        metrics = event.get("model_metrics", event)
+
+        def cache(name):
+            return "unknown" if metrics.get(name) is None else str(metrics[name])
+
+        roles = "\n".join(
+            f"{name}: requests={values.get('requests', 0)}, input={values.get('input_tokens', 0)}, output={values.get('output_tokens', 0)}, cache_read={values.get('cache_read_tokens') if values.get('cache_read_tokens') is not None else 'unknown'}, cache_creation={values.get('cache_creation_tokens') if values.get('cache_creation_tokens') is not None else 'unknown'}, ms={values.get('duration_ms', 0)}"
+            for name, values in metrics.get("roles", {}).items()
+        )
         return EventSummary(
-            "Memory Snapshot", _format_memory_snapshot(event), "memory", "cyan"
+            "Model Usage",
+            f"agent: {event.get('agent', 'run')} · requests: {metrics.get('requests', 1)}\ninput: {metrics.get('input_tokens', 0)} · output: {metrics.get('output_tokens', 0)} · estimated: {metrics.get('estimated', False)}\ncache read: {cache('cache_read_tokens')} · creation: {cache('cache_creation_tokens')} · incomplete: {metrics.get('cache_usage_incomplete', False)}\ntime: {metrics.get('duration_ms', 0)} ms\n{roles}",
+            "info",
+            "cyan",
         )
     if event_type == "context_budget":
         return EventSummary(
@@ -262,14 +303,8 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             "green",
         )
     if event_type == "trace_summary":
-        nodes = (
-            event.get("node_visits")
-            if isinstance(event.get("node_visits"), dict)
-            else {}
-        )
-        node_text = (
-            ", ".join(f"{node}:{count}" for node, count in nodes.items()) or "(none)"
-        )
+        nodes = event.get("node_visits") if isinstance(event.get("node_visits"), dict) else {}
+        node_text = ", ".join(f"{node}:{count}" for node, count in nodes.items()) or "(none)"
         return EventSummary(
             "Trace Summary",
             (
@@ -295,11 +330,7 @@ def summarize_graph_event(payload: dict[str, Any]) -> EventSummary:
     if node == "planner":
         return _summarize_plan(update, "Planner")
     if node in {"actor", "codeAgent"}:
-        summary = (
-            update.get("code_agent_summary")
-            or update.get("last_actor_summary")
-            or update
-        )
+        summary = update.get("code_agent_summary") or update.get("last_actor_summary") or update
         return EventSummary("codeAgent Summary", shorten(summary, 800), "agent", "cyan")
     if node == "verifier":
         return EventSummary(
@@ -419,7 +450,4 @@ def _todo_counts(todos: list[dict[str, Any]]) -> str:
     for todo in todos:
         status = str(todo.get("status", "pending"))
         counts[status] = counts.get(status, 0) + 1
-    return (
-        ", ".join(f"{status}:{count}" for status, count in sorted(counts.items()))
-        or "0"
-    )
+    return ", ".join(f"{status}:{count}" for status, count in sorted(counts.items())) or "0"

@@ -18,9 +18,11 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from mokioclaw.core.context_budget import ContextBudget, ContextBudgetError, snapshot
 from mokioclaw.core.run_control import RunInterrupted
 from mokioclaw.core.tool_output import encoded
+from mokioclaw.providers.generation import ModelGenerationStopped
 
 FACT_FIELDS = (
     "task",
+    "explicit_skill",
     "latest_user_corrections",
     "plan_summary",
     "todos",
@@ -33,11 +35,7 @@ FACT_FIELDS = (
 
 
 def critical_facts(state: dict[str, Any]) -> dict[str, Any]:
-    facts = {
-        key: copy.deepcopy(state[key])
-        for key in FACT_FIELDS
-        if state.get(key) is not None
-    }
+    facts = {key: copy.deepcopy(state[key]) for key in FACT_FIELDS if state.get(key) is not None}
     facts["sources"] = [
         {"title": source.get("title", ""), "url": source.get("url", "")}
         for source in state.get("sources", [])
@@ -54,6 +52,13 @@ def critical_facts(state: dict[str, Any]) -> dict[str, Any]:
     runtime = state.get("runtime")
     if runtime is not None:
         facts["applied_subagent_results"] = sorted(runtime.subagent_applied_results)
+        from mokioclaw.core.instructions import instructions
+
+        facts["project_instructions"] = instructions(runtime).manifest()
+        if runtime.run_control and runtime.run_control.inbox.path:
+            facts["inbox_reference"] = str(
+                runtime.run_control.inbox.path.relative_to(runtime.workspace)
+            )
     return facts
 
 
@@ -72,9 +77,7 @@ def message_groups(messages: list[Any]) -> tuple[list[Any], list[list[Any]]]:
             pending.remove(message.tool_call_id)
         else:
             if pending:
-                raise ContextBudgetError(
-                    "missing tool results before next model message"
-                )
+                raise ContextBudgetError("missing tool results before next model message")
             groups.append([message])
             pending = {str(call["id"]) for call in getattr(message, "tool_calls", [])}
     if pending:
@@ -92,9 +95,7 @@ def _observations(groups: list[list[Any]]) -> dict[str, Any]:
                 {
                     "type": message.type,
                     "name": getattr(message, "name", ""),
-                    "content": text
-                    if len(text) <= 700
-                    else text[:340] + "\n…\n" + text[-340:],
+                    "content": text if len(text) <= 700 else text[:340] + "\n…\n" + text[-340:],
                 }
             )
     return {"findings": findings}
@@ -111,9 +112,7 @@ def validated_observations(candidate: Any, fallback: dict[str, Any]) -> dict[str
     return {"summary": candidate["summary"][:2400], **fallback, "degraded": False}
 
 
-def _model_observations(
-    state, extract, writer, budget, model_factory=None
-) -> dict[str, Any]:
+def _model_observations(state, extract, writer, budget, model_factory=None) -> dict[str, Any]:
     from mokioclaw.prompts.stage4 import CONTEXT_COMPRESSION_PROMPT
     from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 
@@ -121,7 +120,9 @@ def _model_observations(
         SystemMessage(content=CONTEXT_COMPRESSION_PROMPT),
         HumanMessage(content=encoded(extract)),
     ]
-    model = (model_factory or create_model)()
+    from mokioclaw.providers.model_policy import create_role_model
+
+    model = create_role_model(model_factory or create_model, state["runtime"], "context_compressor")
     # Fit a bounded extract before invoking the same guarded transport. No
     # recursive compaction of the compressor is permitted.
     while snapshot(model, messages, budget, []).input_tokens > budget.target:
@@ -182,7 +183,7 @@ def compact_messages(
     try:
         candidate = (summarizer or _model_observations)(state, extract, writer, budget)
         observations = validated_observations(candidate, extract)
-    except RunInterrupted:
+    except (RunInterrupted, ModelGenerationStopped):
         raise
     except Exception as exc:  # noqa: BLE001 - failed summary transports use deterministic memory
         observations = {
@@ -202,9 +203,7 @@ def compact_messages(
         active = runtime.active_subagent_budget
         if active is not None:
             scope += "-" + active.handoff_id[:12]
-        facts_path = (
-            Path(".mokioclaw") / "context" / scope / f"facts-{uuid4().hex}.json"
-        )
+        facts_path = Path(".mokioclaw") / "context" / scope / f"facts-{uuid4().hex}.json"
         _atomic_json(runtime.workspace / facts_path, facts)
     prompt_facts = dict(facts)
     for key in ("sources", "background_tasks", "applied_subagent_results"):
@@ -228,16 +227,10 @@ def compact_messages(
     recent = groups[-1] if any(isinstance(m, ToolMessage) for m in groups[-1]) else []
     if recent:
         last_user = max(
-            (
-                index
-                for index, item in enumerate(messages)
-                if isinstance(item, HumanMessage)
-            ),
+            (index for index, item in enumerate(messages) if isinstance(item, HumanMessage)),
             default=-1,
         )
-        recent_position = next(
-            index for index, item in enumerate(messages) if item is recent[0]
-        )
+        recent_position = next(index for index, item in enumerate(messages) if item is recent[0])
         if recent_position < last_user:
             recent = []
     replacement = protected + [AIMessage(content=encoded(payload))] + recent
@@ -296,9 +289,7 @@ def compact_messages(
         state["context_summary"] = encoded(payload)
         state["history_summary"] = encoded(payload)
         state["context_version"] = version
-        state["compression_events"] = (
-            list(state.get("compression_events", [])) + [event]
-        )[-20:]
+        state["compression_events"] = (list(state.get("compression_events", [])) + [event])[-20:]
         runtime.context_checkpoint = {
             key: copy.deepcopy(state[key])
             for key in (
@@ -335,11 +326,7 @@ def prepare_model_context(
     control = getattr(runtime, "context_control", None)
     request = (
         control.take()
-        if (
-            control
-            and allow_compaction
-            and not getattr(runtime, "active_subagent_budget", None)
-        )
+        if (control and allow_compaction and not getattr(runtime, "active_subagent_budget", None))
         else None
     )
     try:
@@ -359,20 +346,14 @@ def prepare_model_context(
                 completed = control.finish(
                     request["request_id"],
                     result["status"],
-                    **{
-                        k: v
-                        for k, v in result.items()
-                        if k not in {"status", "request_id"}
-                    },
+                    **{k: v for k, v in result.items() if k not in {"status", "request_id"}},
                 )
                 if writer:
                     writer({**completed, "type": "context_compact_request"})
         current = snapshot(model, messages, budget)
         if current.input_tokens > budget.input_limit:
-            raise ContextBudgetError(
-                "request exceeds context budget before model invocation"
-            )
-    except RunInterrupted:
+            raise ContextBudgetError("request exceeds context budget before model invocation")
+    except (RunInterrupted, ModelGenerationStopped):
         raise
     except Exception as exc:
         event = {
@@ -386,9 +367,7 @@ def prepare_model_context(
         }
         if request:
             event.update(
-                control.finish(
-                    request["request_id"], "failed", ok=False, error=event["error"]
-                )
+                control.finish(request["request_id"], "failed", ok=False, error=event["error"])
             )
         if writer:
             writer(event)
@@ -410,9 +389,7 @@ def prepare_model_context(
     return budget, current
 
 
-def graph_context_updates(
-    state: dict[str, Any], messages: list[Any], node: str
-) -> dict[str, Any]:
+def graph_context_updates(state: dict[str, Any], messages: list[Any], node: str) -> dict[str, Any]:
     from langchain_core.messages import RemoveMessage
     from langgraph.graph.message import REMOVE_ALL_MESSAGES
 

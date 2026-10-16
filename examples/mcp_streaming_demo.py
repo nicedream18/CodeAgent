@@ -40,9 +40,7 @@ def _run_once(workspace: Path, real: bool, cancel: bool) -> dict:
     def writer(event):
         nonlocal requested
         trace.record_custom_event(event)
-        events.append(
-            {**event, "elapsed_ms": round((time.monotonic() - started) * 1000)}
-        )
+        events.append({**event, "elapsed_ms": round((time.monotonic() - started) * 1000)})
         print_custom_event(event)
         if event["type"] == "llm_token":
             text_parts.append(event["text"])

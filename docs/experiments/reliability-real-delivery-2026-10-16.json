@@ -1,0 +1,3905 @@
+{
+  "created_at": "2026-10-16T11:43:35.974475+00:00",
+  "head": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "source_fingerprints": {
+    "src/mokioclaw/__init__.py": "614ca7849cf300e5b0d18a0900cd02a94e1a477ea0b8355a71edf45ba854e2c8",
+    "src/mokioclaw/__main__.py": "cd4ad75c462f29d35913b8444c0ea9caa430d626a1856feef08f864085fb77a0",
+    "src/mokioclaw/daemon.py": "5d6b539088d1108cdaa5a9b14741fc0bca90c3e772b0d53f316064dcd2999ec2",
+    "src/mokioclaw/tools/grep_tool.py": "a51ed7ddd24c5c9c99c3a6f058147000d64ff4a8be66b44c64a49ab155cf2af6",
+    "src/mokioclaw/tools/execution.py": "ea06840cf153a02e1aea81fafb8ebe6102053cf7daa2f917065e5a9dd1859d73",
+    "src/mokioclaw/tools/skills.py": "f0f5c2f3ba4fb918df79300461954e0281dffa94ef9d148f5984e9a12a10fe2f",
+    "src/mokioclaw/tools/registry.py": "9086ebe0928bd91cef0376d6f624bafccea0974b9f0d708d4e0d353e5fefa747",
+    "src/mokioclaw/tools/bash_tool.py": "262c5ef9b392f611a3f036c9469f2b011ab4c28ac824fe4f5bcfe21e5bb04ce3",
+    "src/mokioclaw/tools/__init__.py": "6c2448cf47f986770abf0fc3991e12248b2ef04db75d17d5a01ca1bfe507ed51",
+    "src/mokioclaw/tools/file_tools.py": "72a2077254bb5af815f067494329e881fe94246e99bb42ae514f3ffa89bbc129",
+    "src/mokioclaw/tools/notepad_tool.py": "5136bb82076a322f4a22f4d5af717022313940519e2df3ac722675416fcd6d74",
+    "src/mokioclaw/tools/web_search_tool.py": "2e9bea9ee89b1d8335b0814c04653c3114d7d6cccebb0d18bd0aa60b006612b7",
+    "src/mokioclaw/tools/todo_tool.py": "6e7f4c93ab4b880a6d607642b486de58ee7b206511a78d9772d6f3b6048bf5bc",
+    "src/mokioclaw/tools/mcp_tools.py": "6474253af5c788ca4c784fc76ca9622953e06d4198d8860b444e7b3b483e4570",
+    "src/mokioclaw/core/trace.py": "973a056c71665088a08cdcdba71d67bd10fe5230fc91252152086fdc1e8283f2",
+    "src/mokioclaw/core/changes.py": "c7eb3d90aa580af5dc73927a609ab152c74641ef3a430d8bb6721d97f8cf84dd",
+    "src/mokioclaw/core/hooks.py": "4b87aaa6d577cdf0bb93f067a61b86f49bdab01e4d93b531b231f922b27c8905",
+    "src/mokioclaw/core/session_lock.py": "4901558686a597196a1a1c63adcd71d1675db88d880787e2859cf2482f94c43d",
+    "src/mokioclaw/core/checkpoint.py": "a7bfb6f62d15d1f79a65d0ac8b34275e9ba292a3bd5e93bce4dc71f0442a91b1",
+    "src/mokioclaw/core/paths.py": "4ad9f3881c7f5492cd3cd46298c6b1beca145db429a7f2a549a60744dd94158a",
+    "src/mokioclaw/core/tool_output.py": "5f5bfb21fd018a800f026f2380ae6886e3ac21caa5a607ae078b7f1942fa4172",
+    "src/mokioclaw/core/instructions.py": "318f938406bc7414354f32dac006f43204dc13f0a1a68c737b93692758cb87f9",
+    "src/mokioclaw/core/run_control.py": "4f1aab10e381b51030c8d937c705561a488561c564971538541584b6109234cb",
+    "src/mokioclaw/core/run_inbox.py": "0d057816ea7240697c8e4552e81a9440d478ca4d9eaeaf673dc7c9b13e5d7e20",
+    "src/mokioclaw/core/session.py": "b8f11d4029760c246b908d4dbbe35b6aa34feda67230f84a487793a27b361aec",
+    "src/mokioclaw/core/tool_context.py": "f447028cba942ba0f0d5746e82b1e32ed35d190b2fbde86351567df6ca217948",
+    "src/mokioclaw/core/__init__.py": "6c303aa0474b4b26ca95cc417b100dfa7a25d9bef8dcc2ba087873a50fcd4c85",
+    "src/mokioclaw/core/daemon_client.py": "96adf736e990b55bb81ca4597845d35173645a6b2f21741b5666a668af011fb0",
+    "src/mokioclaw/core/context_budget.py": "d01a45495cb34413d6a3af5417c9474d01d9a76e0e09ac600df70ff18647befa",
+    "src/mokioclaw/core/subagent_tasks.py": "51b82452bddeb1496750b374593213c3ff8c4faf3f96174ca613bb29c9a4cf30",
+    "src/mokioclaw/core/approval_rules.py": "2832c49bf77d806a2cce567c391130d1b0ebf28aaf3228cf53178366edbc5983",
+    "src/mokioclaw/core/transport_trace.py": "8c2863e03cf03549f5379fb1836935c57e421f049c5f5513df511304448d12c9",
+    "src/mokioclaw/core/context_control.py": "a9b98422721a9d25cb0b0f44f2dd43d703f647950af5cd8855f776bb300e1747",
+    "src/mokioclaw/core/tool_loop.py": "0d14d1936359394149e700ac37e76fdb0bb899b74aa2552ae1aeb366efce7141",
+    "src/mokioclaw/core/agent.py": "f572f085e96c7aa719f29c29acbf2322ae8aef4699b41e6e06629f4fd2c1f2d9",
+    "src/mokioclaw/core/approval.py": "260f8c98ce41a9632fb1e64e94ff04ef42d541a89d7f2bac6986d1f7e457f607",
+    "src/mokioclaw/core/settings.py": "34d75e1f6dd6753cfa7484312fe5adfbeda659a4a7c9a68739b23a77e2bede81",
+    "src/mokioclaw/core/agent_profiles.py": "70943f232b3d3250ae95933db08e95c016aa2932e9663428be427efd45bc8930",
+    "src/mokioclaw/core/artifacts.py": "ae686819ed5759edcedd43c3cdf097b9ecfcc6c657c233b266c29fa56078adef",
+    "src/mokioclaw/core/tool_policy.py": "95552fdcb4034fbe457153375facba060a97a6c6091dcde6957e86207f243b99",
+    "src/mokioclaw/core/daemon.py": "1ec42ef4d684a16c95a8be5aa53a769db673a6f2026053d6608b36bcebcf47b4",
+    "src/mokioclaw/core/state.py": "5e5ba0d6506d78f0326e312cc2e218e32451901264092384307502f2e31b2c0a",
+    "src/mokioclaw/core/context_compaction.py": "6f527c0ddfe13ddc31fe465ab64f7101a440e90767022662543a9b20f9e73c7f",
+    "src/mokioclaw/providers/generation.py": "a9d3edd24990915c8459b2e56312bc7128c6a0b7ed5d047c6151a3749af0b15d",
+    "src/mokioclaw/providers/__init__.py": "b24b5644b03909bb29488d20b078003b5d17bae5cb9b1803ff0ec14668f1cb49",
+    "src/mokioclaw/providers/model_policy.py": "efe52ac1f9fb3e41025f01ace3ab02e04cfc68f4e10f576241c6c90aff34e1e3",
+    "src/mokioclaw/providers/openai_provider.py": "4db6a9136db7ccbdba962459afc613ff532dcd29a5b8148280da2a7d6eaea97e",
+    "src/mokioclaw/providers/usage.py": "8c055598d17c55cf8f53b9cb1d26a5f09b3cfc07fafdf26b639069102772b1c6",
+    "src/mokioclaw/providers/payload_trace.py": "527adbdb661b96c397f6db472de43e1371997dc41933e3e19771643e082b3ad1",
+    "src/mokioclaw/graph/memory.py": "3af5018ec388e07471b5d5fb7f2acbc47f052f2a4651d9a76cfa44a0fd1ddec9",
+    "src/mokioclaw/graph/light.py": "54762adf600879d49b5c06521f86fb763e33d0fd2e99f1f7eac92538be7df784",
+    "src/mokioclaw/graph/__init__.py": "9f35a6cfdf1e9446d3149e00d8e5c73567ad102d801584b57db91fab3421fa57",
+    "src/mokioclaw/graph/workflow.py": "8bdaa7b87284e5e8758737a2540fd7785607bd426e11a876861ea2544d8312c6",
+    "src/mokioclaw/graph/nodes.py": "260bd14e8ab24544b403ccad1b2304dcb24f73a7a39cf257386ff1baba3291c3",
+    "src/mokioclaw/graph/state.py": "453ce569233255979d906b745d7dabacce48b40f6a611994484df49373b60a3d",
+    "src/mokioclaw/agents/registry.py": "e1e8f891cbd4706e79e02af753778f8fa15ebf657d63643bca78156f07855379",
+    "src/mokioclaw/agents/repo_agent.py": "6db29fe3efe37b571f0926bc4be1892d6693d45305deff5dced4163933618903",
+    "src/mokioclaw/agents/__init__.py": "3158ab6b32e7e24b11bfd4aefc614eb279aba60ae9676ddfb11e1b2ad7389db1",
+    "src/mokioclaw/agents/code_agent.py": "0bab15379f3bd810c955487a2e87d5789de6985c41043fa3fec75e46338a9db0",
+    "src/mokioclaw/agents/search_agent.py": "c7603ce8fd7d1cf72f7d2796c99c994a2ea2ff69d188ca8b7c4ccc0e6c6c651c",
+    "src/mokioclaw/cli/formatter.py": "515332d29f2805f9b14ba598f13b80493c475fe00bd083fd1d27538038df2397",
+    "src/mokioclaw/cli/__init__.py": "0f329cb3fa4c0af3f3c9cd077f3fe14b53ba85dcdfda5ca63761ef94c6a77afe",
+    "src/mokioclaw/cli/event_summary.py": "c2fbc6d9e41c99425839542e773f03160351d5366951c11e2f65116496fb2a40",
+    "src/mokioclaw/cli/app.py": "dc7679de1a03cedb339b1d9f77f8f0b6ea3579d74aaa32d3bc18de9b4b213f0c",
+    "src/mokioclaw/prompts/stage4.py": "072a980d9bd7b92d223faa30621fd45c36541e6da5fdc5c6cc1508833f422ed5",
+    "src/mokioclaw/prompts/__init__.py": "e24c85137b1d3f6ca03b962c7b5c10e62cea656540b14c038703e6f74316e785",
+    "src/mokioclaw/prompts/stage2.py": "a39d2fc47bcde3b5ade4fa501132abf637c223e22abbead5ae6855a9dfb278d6",
+    "src/mokioclaw/prompts/stage3.py": "a2ddab7d8025996c1f93e87779c23a55e0bf3c4e8e7faeb59eb7bc5d022a4aaa",
+    "src/mokioclaw/cli/tui/__init__.py": "b9d18da8e8de5ba6b818cd37fb021d9143c514f9e0354f3b917863c1e6d360e0",
+    "src/mokioclaw/cli/tui/logo.py": "1c7e330fcf0f02c98c1aac4ff7e63bd4f5a0fcf942fcd2961f74726c57c0c550",
+    "src/mokioclaw/cli/tui/input.py": "8e2e40ac181d651ee0a5a2092516fcb4b9603014beeadb4697a5139c9cb5d48e",
+    "src/mokioclaw/cli/tui/approval.py": "5c0329c88144e8cd1e72ade92f6d040bbff618754cbe2934f2e069cf1714a573",
+    "src/mokioclaw/cli/tui/app.py": "c77d40a7c33e0ef92cf3c48ddceec57f1467a8127f4f6c8b4ff86c5d2cb76629",
+    "src/mokioclaw/graph/steps/final.py": "074b39586ea87e16349fbfda821969e818c206fa053f933876bb4a86e6c36bd4",
+    "src/mokioclaw/graph/steps/compression.py": "e214d97cfc8813bf8e53943ec4f5f05540639977ca5b984c63e0f3e0b3c4c27a",
+    "src/mokioclaw/graph/steps/__init__.py": "f3bd5e2270a3023a6ffdf35013a8065511aedc7319d099d9d8c1f974f68ce699",
+    "src/mokioclaw/graph/steps/review.py": "76016a7371220fd88147e9d6643df426a2ac2ab6076d171faeca2205c692fceb",
+    "src/mokioclaw/graph/steps/routing.py": "58551e81283caab716c179eab22b79c1a02e33f4d2b1609d53fd19c74acea6a3",
+    "src/mokioclaw/graph/steps/planning.py": "fb7c9530324be687a9b3352298f80f85941e7fa5ee88e406c713f42da1196d8e",
+    "src/mokioclaw/graph/steps/delegation.py": "e340241fd8640e71271e1c4483c72ebc0501573ab9d078f7214be068e6853dbc",
+    "src/mokioclaw/core/runner/events.py": "9d9df0a2ac84272c246afceef66103f386845d9eb98d9ce4e73b913cf300ebe2",
+    "src/mokioclaw/core/runner/session.py": "3590c4a846cad769be064cbcf9d6ac797f93415d599f5c4ec4316c6b03eb228e",
+    "src/mokioclaw/core/runner/__init__.py": "f3bd5e2270a3023a6ffdf35013a8065511aedc7319d099d9d8c1f974f68ce699",
+    "src/mokioclaw/core/runner/lifecycle.py": "df495ea61da7904f6403b4e83031e0a66f29c9d6327584339dc2cab4981b99cf",
+    "src/mokioclaw/core/protocol/__init__.py": "2349e0b52b0cbc72184c19e109d249e79a9088e886ea81c063398af1e81cd91d",
+    "examples/amiya_plan.py": "6ed189b5f47efaf0d3b2a85e959719cc8d6960e05567059b81b5ef43f6da61d8",
+    "examples/reliability_demo.py": "57f614e001b370bc2135330f28cfd76babcc40e9df445866a682fde34ee0c8f9",
+    "examples/context_governance_demo.py": "e692de0b53743bdb63f053e47b1fe5124371c07f2d476df9a5e9b77629650df3",
+    "examples/mcp_streaming_demo.py": "b427b5097047a7d0a1dd4048b083a0cd002403d4c4ce38f3470a535302905485",
+    "examples/optimization_models.py": "0ccdc0a906f91e57527ed5db6b13e2e528bb0f18568038916d5b3fd30d96bd69",
+    "examples/optimization_demo.py": "1404ad8686db31dd552505b04d1977b12e7d333ed38c8089d97218056f5f52e2",
+    "examples/mcp/echo_server.py": "58757fa872660246fbad6b6cbde52a7d7e526adf987b0b51d18249a2836c2a30"
+  },
+  "lock_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "real_model": true,
+  "model": "deepseek-chat",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-reliability-0uog4ndd",
+  "runs": [
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 44253.964,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 28,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 954.923,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 8655,
+            "output_tokens": 2674,
+            "total_tokens": 11329,
+            "duration_ms": 16523.212,
+            "cache_read_tokens": 6016,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 9
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 30030,
+            "output_tokens": 1898,
+            "total_tokens": 31928,
+            "duration_ms": 11763.047,
+            "cache_read_tokens": 25088,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 7
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 21617,
+            "output_tokens": 755,
+            "total_tokens": 22372,
+            "duration_ms": 6835.459,
+            "cache_read_tokens": 18944,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 7
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 16321,
+            "output_tokens": 732,
+            "total_tokens": 17053,
+            "duration_ms": 6957.977,
+            "cache_read_tokens": 12672,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 76874,
+        "output_tokens": 6105,
+        "total_tokens": 82979,
+        "duration_ms": 43034.61799999999,
+        "cache_read_tokens": 62720,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 47932.767,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 30,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 971.105,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 11666,
+            "output_tokens": 2929,
+            "total_tokens": 14595,
+            "duration_ms": 18587.251,
+            "cache_read_tokens": 8448,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 11
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 31698,
+            "output_tokens": 1744,
+            "total_tokens": 33442,
+            "duration_ms": 11252.4,
+            "cache_read_tokens": 25600,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 23194,
+            "output_tokens": 660,
+            "total_tokens": 23854,
+            "duration_ms": 7477.339000000001,
+            "cache_read_tokens": 20352,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 7
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 19820,
+            "output_tokens": 819,
+            "total_tokens": 20639,
+            "duration_ms": 8335.293,
+            "cache_read_tokens": 16256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 86629,
+        "output_tokens": 6198,
+        "total_tokens": 92827,
+        "duration_ms": 46623.388,
+        "cache_read_tokens": 70656,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 48016.685,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 30,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 868.493,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 9654,
+            "output_tokens": 3641,
+            "total_tokens": 13295,
+            "duration_ms": 20942.668,
+            "cache_read_tokens": 6656,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 10
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 35040,
+            "output_tokens": 1699,
+            "total_tokens": 36739,
+            "duration_ms": 11100.223,
+            "cache_read_tokens": 28928,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 26338,
+            "output_tokens": 772,
+            "total_tokens": 27110,
+            "duration_ms": 6995.171000000001,
+            "cache_read_tokens": 23168,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 8
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 17762,
+            "output_tokens": 810,
+            "total_tokens": 18572,
+            "duration_ms": 6740.475,
+            "cache_read_tokens": 14592,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 89045,
+        "output_tokens": 6968,
+        "total_tokens": 96013,
+        "duration_ms": 46647.02999999999,
+        "cache_read_tokens": 73344,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 12420.229,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 11,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 1009.173,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 10770,
+            "output_tokens": 397,
+            "total_tokens": 11167,
+            "duration_ms": 5358.488,
+            "cache_read_tokens": 9600,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 10312,
+            "output_tokens": 476,
+            "total_tokens": 10788,
+            "duration_ms": 5476.673,
+            "cache_read_tokens": 8960,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 21333,
+        "output_tokens": 919,
+        "total_tokens": 22252,
+        "duration_ms": 11844.334,
+        "cache_read_tokens": 18560,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 10195.044,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 838.374,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 10770,
+            "output_tokens": 417,
+            "total_tokens": 11187,
+            "duration_ms": 4555.268,
+            "cache_read_tokens": 9600,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 8161,
+            "output_tokens": 464,
+            "total_tokens": 8625,
+            "duration_ms": 4228.377,
+            "cache_read_tokens": 7040,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 19182,
+        "output_tokens": 927,
+        "total_tokens": 20109,
+        "duration_ms": 9622.019,
+        "cache_read_tokens": 16640,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 11558.829,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 11,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 1017.353,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 10776,
+            "output_tokens": 415,
+            "total_tokens": 11191,
+            "duration_ms": 4991.353999999999,
+            "cache_read_tokens": 9728,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 10722,
+            "output_tokens": 578,
+            "total_tokens": 11300,
+            "duration_ms": 4968.437,
+            "cache_read_tokens": 9472,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 21749,
+        "output_tokens": 1039,
+        "total_tokens": 22788,
+        "duration_ms": 10977.144000000002,
+        "cache_read_tokens": 19200,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 10988.437,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 11,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 733.071,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 10785,
+            "output_tokens": 410,
+            "total_tokens": 11195,
+            "duration_ms": 4500.387000000001,
+            "cache_read_tokens": 9728,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 10680,
+            "output_tokens": 577,
+            "total_tokens": 11257,
+            "duration_ms": 5159.592000000001,
+            "cache_read_tokens": 9472,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 21716,
+        "output_tokens": 1033,
+        "total_tokens": 22749,
+        "duration_ms": 10393.05,
+        "cache_read_tokens": 19200,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 10485.056,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 1041.516,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 10779,
+            "output_tokens": 410,
+            "total_tokens": 11189,
+            "duration_ms": 5012.256,
+            "cache_read_tokens": 9728,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 8133,
+            "output_tokens": 456,
+            "total_tokens": 8589,
+            "duration_ms": 3799.214,
+            "cache_read_tokens": 7040,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 19163,
+        "output_tokens": 912,
+        "total_tokens": 20075,
+        "duration_ms": 9852.986,
+        "cache_read_tokens": 16768,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 10557.092,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 251,
+            "output_tokens": 46,
+            "total_tokens": 297,
+            "duration_ms": 845.189,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 10782,
+            "output_tokens": 412,
+            "total_tokens": 11194,
+            "duration_ms": 4583.535,
+            "cache_read_tokens": 9728,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 8141,
+            "output_tokens": 460,
+            "total_tokens": 8601,
+            "duration_ms": 4506.504000000001,
+            "cache_read_tokens": 7040,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 19174,
+        "output_tokens": 918,
+        "total_tokens": 20092,
+        "duration_ms": 9935.227999999997,
+        "cache_read_tokens": 16768,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 33505.702,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 22,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 771.811,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 3605,
+            "output_tokens": 1333,
+            "total_tokens": 4938,
+            "duration_ms": 7048.790999999999,
+            "cache_read_tokens": 2688,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 24313,
+            "output_tokens": 1354,
+            "total_tokens": 25667,
+            "duration_ms": 9358.499,
+            "cache_read_tokens": 19072,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 23181,
+            "output_tokens": 1364,
+            "total_tokens": 24545,
+            "duration_ms": 9604.592,
+            "cache_read_tokens": 19072,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 8
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 17203,
+            "output_tokens": 723,
+            "total_tokens": 17926,
+            "duration_ms": 5645.351,
+            "cache_read_tokens": 13440,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 68565,
+        "output_tokens": 4828,
+        "total_tokens": 73393,
+        "duration_ms": 32429.043999999998,
+        "cache_read_tokens": 54400,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 37442.849,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 26,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 48,
+            "total_tokens": 311,
+            "duration_ms": 583.159,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 3605,
+            "output_tokens": 1184,
+            "total_tokens": 4789,
+            "duration_ms": 6933.026,
+            "cache_read_tokens": 2688,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 29806,
+            "output_tokens": 1745,
+            "total_tokens": 31551,
+            "duration_ms": 10836.995,
+            "cache_read_tokens": 24576,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 33041,
+            "output_tokens": 1440,
+            "total_tokens": 34481,
+            "duration_ms": 12441.867000000002,
+            "cache_read_tokens": 28672,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 11
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 16325,
+            "output_tokens": 761,
+            "total_tokens": 17086,
+            "duration_ms": 5583.968000000001,
+            "cache_read_tokens": 12928,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 83040,
+        "output_tokens": 5178,
+        "total_tokens": 88218,
+        "duration_ms": 36379.015,
+        "cache_read_tokens": 68992,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 37974.102,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 25,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 695.632,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 3699,
+            "output_tokens": 1300,
+            "total_tokens": 4999,
+            "duration_ms": 7690.528,
+            "cache_read_tokens": 2944,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 30761,
+            "output_tokens": 1735,
+            "total_tokens": 32496,
+            "duration_ms": 11437.703,
+            "cache_read_tokens": 25344,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 28556,
+            "output_tokens": 1350,
+            "total_tokens": 29906,
+            "duration_ms": 11527.087,
+            "cache_read_tokens": 24320,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 10
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 17510,
+            "output_tokens": 842,
+            "total_tokens": 18352,
+            "duration_ms": 5596.053,
+            "cache_read_tokens": 13696,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          }
+        },
+        "estimated": false,
+        "input_tokens": 80789,
+        "output_tokens": 5281,
+        "total_tokens": 86070,
+        "duration_ms": 36947.003,
+        "cache_read_tokens": 66432,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 39535.337,
+      "passed": true,
+      "selected": [
+        "light",
+        "full"
+      ],
+      "metrics": {
+        "requests": 29,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 1070.79,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 36498,
+            "output_tokens": 1354,
+            "total_tokens": 37852,
+            "duration_ms": 13321.488,
+            "cache_read_tokens": 32640,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 13
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 33270,
+            "output_tokens": 1315,
+            "total_tokens": 34585,
+            "duration_ms": 10205.075,
+            "cache_read_tokens": 27264,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 8
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 4091,
+            "output_tokens": 1757,
+            "total_tokens": 5848,
+            "duration_ms": 9029.141,
+            "cache_read_tokens": 2944,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 15559,
+            "output_tokens": 810,
+            "total_tokens": 16369,
+            "duration_ms": 5086.351000000001,
+            "cache_read_tokens": 10624,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 3
+          }
+        },
+        "estimated": false,
+        "input_tokens": 89681,
+        "output_tokens": 5290,
+        "total_tokens": 94971,
+        "duration_ms": 38712.845,
+        "cache_read_tokens": 73600,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 47323.838,
+      "passed": true,
+      "selected": [
+        "light",
+        "full"
+      ],
+      "metrics": {
+        "requests": 32,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 883.854,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 33630,
+            "output_tokens": 1371,
+            "total_tokens": 35001,
+            "duration_ms": 11978.608999999999,
+            "cache_read_tokens": 29696,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 12
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 27957,
+            "output_tokens": 1211,
+            "total_tokens": 29168,
+            "duration_ms": 9536.103000000001,
+            "cache_read_tokens": 22400,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 8
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 6281,
+            "output_tokens": 2790,
+            "total_tokens": 9071,
+            "duration_ms": 14878.020999999999,
+            "cache_read_tokens": 4224,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 31630,
+            "output_tokens": 1422,
+            "total_tokens": 33052,
+            "duration_ms": 9086.576000000001,
+            "cache_read_tokens": 24320,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 99761,
+        "output_tokens": 6848,
+        "total_tokens": 106609,
+        "duration_ms": 46363.16299999999,
+        "cache_read_tokens": 80768,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 43562.557,
+      "passed": true,
+      "selected": [
+        "light",
+        "full"
+      ],
+      "metrics": {
+        "requests": 34,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 1000.699,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 46212,
+            "output_tokens": 1472,
+            "total_tokens": 47684,
+            "duration_ms": 15993.465,
+            "cache_read_tokens": 41088,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 17
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 31153,
+            "output_tokens": 1101,
+            "total_tokens": 32254,
+            "duration_ms": 9710.878999999999,
+            "cache_read_tokens": 25600,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 8
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 2927,
+            "output_tokens": 1450,
+            "total_tokens": 4377,
+            "duration_ms": 7914.138,
+            "cache_read_tokens": 2048,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 3
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 26654,
+            "output_tokens": 1150,
+            "total_tokens": 27804,
+            "duration_ms": 8143.651,
+            "cache_read_tokens": 21632,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 107209,
+        "output_tokens": 5227,
+        "total_tokens": 112436,
+        "duration_ms": 42762.83199999999,
+        "cache_read_tokens": 90496,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 37427.087,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 25,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 47,
+            "total_tokens": 310,
+            "duration_ms": 772.977,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 6964,
+            "output_tokens": 2308,
+            "total_tokens": 9272,
+            "duration_ms": 12928.161999999998,
+            "cache_read_tokens": 5504,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 7
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 29164,
+            "output_tokens": 1732,
+            "total_tokens": 30896,
+            "duration_ms": 11009.419999999998,
+            "cache_read_tokens": 23808,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 18498,
+            "output_tokens": 689,
+            "total_tokens": 19187,
+            "duration_ms": 5536.067999999999,
+            "cache_read_tokens": 16128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 19285,
+            "output_tokens": 888,
+            "total_tokens": 20173,
+            "duration_ms": 6087.661,
+            "cache_read_tokens": 16128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 74174,
+        "output_tokens": 5664,
+        "total_tokens": 79838,
+        "duration_ms": 36334.288,
+        "cache_read_tokens": 61696,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 34113.045,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 22,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 863.555,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 3829,
+            "output_tokens": 1133,
+            "total_tokens": 4962,
+            "duration_ms": 7268.332,
+            "cache_read_tokens": 3072,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 28820,
+            "output_tokens": 1893,
+            "total_tokens": 30713,
+            "duration_ms": 11859.311,
+            "cache_read_tokens": 24192,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 23446,
+            "output_tokens": 1150,
+            "total_tokens": 24596,
+            "duration_ms": 9521.587,
+            "cache_read_tokens": 19584,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 8
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 11674,
+            "output_tokens": 567,
+            "total_tokens": 12241,
+            "duration_ms": 3640.346,
+            "cache_read_tokens": 8448,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 3
+          }
+        },
+        "estimated": false,
+        "input_tokens": 68032,
+        "output_tokens": 4797,
+        "total_tokens": 72829,
+        "duration_ms": 33153.130999999994,
+        "cache_read_tokens": 55424,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 2164.23,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Loaded the required `review` Skill (`.mokioclaw/skills/review/SKILL.md`) and followed its read-only workflow.\n- Read `app.txt` (1 line): exact content is `before`.\n- No files were written or modified; no todos were required for this read-only review task.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3074,
+            "output_tokens": 174,
+            "total_tokens": 3248,
+            "duration_ms": 2140.355,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3074,
+        "output_tokens": 174,
+        "total_tokens": 3248,
+        "duration_ms": 2140.355,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 2113.005,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Loaded the required `review` Skill (read-only reviewer; tools: FileReadTool; permissions: filesystem_read) from `.mokioclaw/skills/review/SKILL.md`.\n- Followed its workflow: read `app.txt` (1 line) and responded with `SKILL_MARKER` plus its exact content.\n- Files changed: none (Skill forbids writes).\n- Checks run: read of `.mokioclaw/skills/review/SKILL.md` and `app.txt`; no todos were present in the plan state, so no todo transitions were needed.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3074,
+            "output_tokens": 233,
+            "total_tokens": 3307,
+            "duration_ms": 2093.8630000000003,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3074,
+        "output_tokens": 233,
+        "total_tokens": 3307,
+        "duration_ms": 2093.8630000000003,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 1784.154,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Loaded the required `review` Skill (read-only reviewer; tools: FileReadTool; permissions: filesystem_read) from `.mokioclaw/skills/review/SKILL.md`.\n- Followed its workflow: read `app.txt` (1 line) and responded with `SKILL_MARKER` plus its exact content.\n- Files changed: none (Skill forbids writes).\n- Checks run: read-only file reads only; no shell commands needed.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3074,
+            "output_tokens": 205,
+            "total_tokens": 3279,
+            "duration_ms": 1745.5030000000002,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3074,
+        "output_tokens": 205,
+        "total_tokens": 3279,
+        "duration_ms": 1745.5030000000002,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 2056.719,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Loaded the required `review` Skill (`.mokioclaw/skills/review/SKILL.md`) and followed its read-only workflow.\n- Read `app.txt` (1 line) — exact content: `before`.\n- No files were written or modified; no todos were required for this single-step read-only task.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3074,
+            "output_tokens": 176,
+            "total_tokens": 3250,
+            "duration_ms": 2022.3670000000002,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3074,
+        "output_tokens": 176,
+        "total_tokens": 3250,
+        "duration_ms": 2022.3670000000002,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 2595.83,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Skill loaded: `review` (read-only reviewer; tools: FileReadTool; permissions: filesystem_read) from `.mokioclaw/skills/review/SKILL.md`.\n- Files read: `.mokioclaw/skills/review/SKILL.md`, `app.txt` (1 line).\n- Files changed: none (skill is read-only; no writes performed).\n- Checks run: read-only inspection only — no commands executed, no TODO state existed to update.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3073,
+            "output_tokens": 208,
+            "total_tokens": 3281,
+            "duration_ms": 2557.622,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3073,
+        "output_tokens": 208,
+        "total_tokens": 3281,
+        "duration_ms": 2557.622,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 2597.361,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n\n- **Skill used:** `review` (read-only reviewer) — loaded from `.mokioclaw/skills/review/SKILL.md`; its workflow was followed exactly (read `app.txt`, respond with `SKILL_MARKER` and the file's exact content, write no files).\n- **Files changed:** none (Skill is read-only; no writes performed).\n- **Checks run:** read `.mokioclaw/skills/review/SKILL.md` (7 lines) and `app.txt` (1 line, content `before`).\n- **Result:** `app.txt` contains exactly `before`; no TODO items were present in the plan state, so no todo transitions were required.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3074,
+            "output_tokens": 257,
+            "total_tokens": 3331,
+            "duration_ms": 2558.987,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3074,
+        "output_tokens": 257,
+        "total_tokens": 3331,
+        "duration_ms": 2558.987,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 2878.588,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Loaded the required `review` Skill (read-only reviewer) and followed its workflow: read `app.txt`, then responded with `SKILL_MARKER` and its exact content.\n- Files changed: none (Skill is read-only; no writes performed).\n- Checks run: read `.mokioclaw/skills/review/SKILL.md` and `app.txt` (1 line, content: `before`).",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3125,
+            "output_tokens": 247,
+            "total_tokens": 3372,
+            "duration_ms": 2845.576,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3125,
+        "output_tokens": 247,
+        "total_tokens": 3372,
+        "duration_ms": 2845.576,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 41204.342,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 28,
+        "roles": {
+          "intent_router": {
+            "estimated": false,
+            "input_tokens": 263,
+            "output_tokens": 54,
+            "total_tokens": 317,
+            "duration_ms": 1134.477,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          },
+          "repoAgent": {
+            "estimated": false,
+            "input_tokens": 3605,
+            "output_tokens": 1367,
+            "total_tokens": 4972,
+            "duration_ms": 8484.307,
+            "cache_read_tokens": 2688,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 4
+          },
+          "planner": {
+            "estimated": false,
+            "input_tokens": 32298,
+            "output_tokens": 1967,
+            "total_tokens": 34265,
+            "duration_ms": 10965.720000000001,
+            "cache_read_tokens": 26880,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 6
+          },
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 38693,
+            "output_tokens": 1581,
+            "total_tokens": 40274,
+            "duration_ms": 13243.228000000003,
+            "cache_read_tokens": 33920,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 12
+          },
+          "verifier": {
+            "estimated": false,
+            "input_tokens": 23255,
+            "output_tokens": 734,
+            "total_tokens": 23989,
+            "duration_ms": 6279.173000000001,
+            "cache_read_tokens": 19200,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 5
+          }
+        },
+        "estimated": false,
+        "input_tokens": 98114,
+        "output_tokens": 5703,
+        "total_tokens": 103817,
+        "duration_ms": 40106.905,
+        "cache_read_tokens": 82816,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 2228.763,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Skill loaded: `review` (read-only reviewer, tools: FileReadTool, permissions: filesystem_read) from `.mokioclaw/skills/review/SKILL.md`.\n- Files read: `.mokioclaw/skills/review/SKILL.md`, `app.txt` (1 line).\n- Files changed: none (Skill forbids writes).\n- Checks run: read-only inspection only; no shell commands needed.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3073,
+            "output_tokens": 198,
+            "total_tokens": 3271,
+            "duration_ms": 2208.865,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3073,
+        "output_tokens": 198,
+        "total_tokens": 3271,
+        "duration_ms": 2208.865,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 1838.554,
+      "passed": true,
+      "answer": "SKILL_MARKER: before\n\n**Summary**\n- Loaded the required `review` Skill (`.mokioclaw/skills/review/SKILL.md`) and followed its read-only workflow.\n- Read `app.txt` (1 line) — exact content: `before`\n- No files were written or modified; no todos were required for this read-only review task.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "estimated": false,
+            "input_tokens": 3074,
+            "output_tokens": 175,
+            "total_tokens": 3249,
+            "duration_ms": 1803.7440000000001,
+            "cache_read_tokens": 2176,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 3074,
+        "output_tokens": 175,
+        "total_tokens": 3249,
+        "duration_ms": 1803.7440000000001,
+        "cache_read_tokens": 2176,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 1631.036,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "ff85586ed5a14a8da4202f30593a427a",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "4540a11f4a22426aabfeb01763b890a5",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "I can't fit 2000 numbered entries in one response — that exceeds output limits. Next step: I'll write them in batches (e.g., 100 entries per response) as valid JSON, starting with entries 1–100, then continue on request until all 2000 are complete.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 125,
+            "total_tokens": 339,
+            "duration_ms": 1628.787,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 125,
+        "total_tokens": 339,
+        "duration_ms": 1628.787,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 1825.644,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "41485d16daa441b2be7a6f8c54b75d18",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "5d842280f08541f5a9788d6fb34b7298",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        }
+      ],
+      "stop_reason": "model_output_truncated",
+      "answer": "",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 128,
+            "total_tokens": 342,
+            "duration_ms": 1822.4119999999998,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 128,
+        "total_tokens": 342,
+        "duration_ms": 1822.4119999999998,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 1887.196,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "0f464ffd93434dbfb944eb1e626959f3",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "6df2424d583f44b8a3e3830dd378424c",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "A 2000-entry JSON object cannot fit in one response due to output limits. Next step: I'll generate it in chunks of ~200 entries per response, starting with entries 1–200, then continue sequentially until entry 2000 is reached. Please confirm to proceed with chunk 1.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 125,
+            "total_tokens": 339,
+            "duration_ms": 1884.9969999999998,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 125,
+        "total_tokens": 339,
+        "duration_ms": 1884.9969999999998,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 1778.301,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "4667d733af364d228b8c71fa2b870490",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "9068877efd6e46f3996512e0292169e9",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "A 2000-entry JSON object cannot fit in a single response due to output limits. Next step: I can deliver it in batches (e.g., 100 entries per response, 20 responses total), starting with entries 1–100. Please confirm to proceed with batch 1.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 123,
+            "total_tokens": 337,
+            "duration_ms": 1774.339,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 123,
+        "total_tokens": 337,
+        "duration_ms": 1774.339,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 1791.128,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "9657d27a1b9f4ebca04dde8b5872549c",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "ea99bed8fe5d43a1bd39c8da4d20a527",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "A 2000-entry JSON object cannot fit in one response due to output limits. Next step: I'll generate it in chunks of ~200 entries per response, starting with entries 1–200, then continue sequentially until all 2000 are complete. Please confirm to proceed with chunk 1.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 125,
+            "total_tokens": 339,
+            "duration_ms": 1786.2959999999998,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 125,
+        "total_tokens": 339,
+        "duration_ms": 1786.2959999999998,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 2026.864,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "9a01486260ce4cbd8cc10df6b5748464",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "dd13e60f742d4936983fd7de1edf537b",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "A 2000-entry JSON object cannot fit in a single response due to output limits. Next step: I can deliver it in batches (e.g., 100 entries per response, 20 responses total), starting with entries 1–100. Please confirm to proceed with batch 1.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 123,
+            "total_tokens": 337,
+            "duration_ms": 2022.723,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 123,
+        "total_tokens": 337,
+        "duration_ms": 2022.723,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 1736.854,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "d1416fde84244acc84b935c17fa824aa",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "7bdb165576f549619e88e008966e0ef0",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        }
+      ],
+      "stop_reason": "model_output_truncated",
+      "answer": "",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 128,
+            "total_tokens": 342,
+            "duration_ms": 1732.5230000000001,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 128,
+        "total_tokens": 342,
+        "duration_ms": 1732.5230000000001,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 1744.459,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "6cc415a67a5446e6a50db731efea7729",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "d4ec9b7744dc4c2987951371c440bd46",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        }
+      ],
+      "stop_reason": "model_output_truncated",
+      "answer": "",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 128,
+            "total_tokens": 342,
+            "duration_ms": 1739.946,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 128,
+        "total_tokens": 342,
+        "duration_ms": 1739.946,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 2489.748,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "1db8978c45b2486da44551922b36bd75",
+          "generation_attempt": 0,
+          "role": "truncate_demo",
+          "finish_reason": "output_limit",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "c45608cdd96b4b2bbe47a71241cb959e",
+          "generation_attempt": 1,
+          "role": "truncate_demo",
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "A 2000-entry JSON object cannot fit in a single response due to output limits. Next step: I can deliver it in batches (e.g., 100 entries per response, 20 responses total), starting with entries 1–100. Please confirm to proceed with batch 1.",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "estimated": false,
+            "input_tokens": 214,
+            "output_tokens": 123,
+            "total_tokens": 337,
+            "duration_ms": 2485.057,
+            "cache_read_tokens": 0,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 214,
+        "output_tokens": 123,
+        "total_tokens": 337,
+        "duration_ms": 2485.057,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 839.534,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "79a23cd4ee18497bbda0abef779c7c41",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151215.07258
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 822.122,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 822.122,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 769.963,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "2c93a0cf80b1465c8f6fb46de7b38fe9",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151215.3363578
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 755.42,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 755.42,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 670.311,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "41f72d6b9f154607996e6ddb965cc043",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151215.5630138
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 656.328,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 656.328,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 1023.131,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "7ec386c1d7d54f46a682c58e5520c9cf",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151216.097016
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 1009.982,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 1009.982,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 773.104,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "aa66a5546ab142569b7018b0dd3ff6e3",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151216.111985
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 759.584,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 759.584,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 832.259,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "a4b11e9b4dc74d158947504027a0fa64",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151216.395977
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 820.218,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 820.218,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 945.462,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "2266bda523374bf9a8cb93c04c38ceca",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151217.043658
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 931.407,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 931.407,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 967.289,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "4ee09dd99f6e4467abe6b5791030061d",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151217.0796502
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 962.178,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 962.178,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 1082.895,
+      "passed": true,
+      "approval_count": 1,
+      "rules": [
+        {
+          "id": "2d3b49bb6a894db5b4b5ae2d7b88e71b",
+          "tool": "FileReadTool",
+          "resource": "file:app.txt",
+          "allowed": true,
+          "scope": "session",
+          "match_scope": "exact",
+          "last_used": 1792151217.481048
+        }
+      ],
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "approval_demo": {
+            "estimated": false,
+            "input_tokens": 355,
+            "output_tokens": 40,
+            "total_tokens": 395,
+            "duration_ms": 1074.824,
+            "cache_read_tokens": 128,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 1
+          }
+        },
+        "estimated": false,
+        "input_tokens": 355,
+        "output_tokens": 40,
+        "total_tokens": 395,
+        "duration_ms": 1074.824,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 686.991,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "dcc1a10a593042298951f7a074ee24c0",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-a6a8be1688874702a90151573ef47df9.log",
+          "output_bytes": 20,
+          "retained_bytes": 20,
+          "output_truncated": false,
+          "stderr": "intentional failure\n",
+          "duration_ms": 24
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "8e3167b086b24fbda94b0b73f4fe9c5a",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-8682e9c99380463fa14abd1060301a46.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 324
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "26cf7964a6c049449b6baf2f3f9550ca",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-b7a944faff944b19b87d1af422c74da6.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 335
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 679.561,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "49ea85f2c6934b288747d2288e9a9bf8",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-7ec195e0731a42668a6e3fd8a63599eb.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 19
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "941a0b0a2ce64e26a3bed0d78ef59d13",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-f61e5acdfcf04984afbed744781bb945.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 322
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "df0166ee522d4643b6b3ecfc2e9e3765",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-07336ea5a8b74b349fd586072ce0f84d.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 335
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 698.407,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "8e8c2455b0e546a0903865ce5bb70683",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-51844186d79448f692136b5ffdfffee8.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 19
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "daa8b29038a94f8bbf8f95b41040b236",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-4c9360f271e2424baff446de84ae7920.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 341
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "4543dacb7ca64a2aa360a99e4019490b",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-132aaa2f64ba488dbb4f907091b8c635.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 336
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 689.94,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "381b1a3a2d1d4b1f953ccd5264e3ff36",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-53ba7c8bc04e410facaa84206e41e6c9.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 20
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "33a265086a8e42ca9e7217cf8579e1ec",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-04cebf0cfc0147b1811a07a0070ca80d.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 339
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "fb1a15d429444fec897d66c049e4b461",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-788cbc768dd546d4b688fab4196365fb.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 329
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 702.867,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "13bd96783f43452b9a948a7c763fdd7d",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-ca0563e55adc4e5981d489787485dbff.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 18
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "6b68c973f7a74522875cedaeecb5f519",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-1c5793caf4b8409899f81cc356cbdb5e.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 339
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "ce15ea8dc8fa4851a74d96b97bb2b5a1",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-d20ceeff5ae343a698af04e4d918af76.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 343
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 711.645,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "b2ef2b2c442940c4b7562e02099de210",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-feb1b17f747244b8a50b08a3209aea85.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 19
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "fa5c15216da448299a34593bf2de6e53",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-fa458f7d91a0490b8a84e00fe6984bcc.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 343
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "7c2e081d9290415ab8e712c197ce7689",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-950ae4a4c6654eb9bbf7541cfea96ee1.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 347
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 703.071,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "8307e6e6158145fc886e1a9e418cc0b3",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-1c810a8243bf4074a9d0c53f033e8263.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 20
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "120ad6b2e4ef42d4ab7f9e8971df12f8",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-6d464c7891044d6d999a387aa2816d57.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 346
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "1b954bd244e648049d1d25883f8a8e10",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-1a69e89290dd48a0baaaeb71e9603450.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 334
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 701.98,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "209ee8bf0e7448a0b64db76256153575",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-fc403035d1864d809150efd55a84c749.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 19
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "eeeeee7c2e0d464e80a122222d20f5fd",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-6b514fa42c6c4158bd21a9555430ea82.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 345
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "cce01f8e69b8457784e6117f56c2bfd3",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-d158577ea6b7441a9993b1dbcc41924a.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 336
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 634.042,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "a12d3d2b0fc6478da6b92acb40fe30ad",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-d8edc85967a24de4afcf4b6ba3ba5ef8.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 18
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "bcd0a9d7547b406883c5540c9f469a00",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-d1a75bb72f874407b3a1793e4494a099.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 321
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "1b3e8e5b791c457796933727006b7122",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-6f5120f9ec944a84ae14bc32773bec9f.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 293
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 1231.945,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1207.351,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1207.351,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 1647.333,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1626.091,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1626.091,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 1554.852,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1533.589,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1533.589,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 1846.905,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1801.509,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1801.509,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 1503.164,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1469.219,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1469.219,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 1818.419,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1782.578,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1782.578,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 1243.989,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 66,
+            "total_tokens": 651,
+            "duration_ms": 1206.444,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 66,
+        "total_tokens": 651,
+        "duration_ms": 1206.444,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 1754.23,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1726.913,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1726.913,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 1315.404,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "estimated": false,
+            "input_tokens": 585,
+            "output_tokens": 59,
+            "total_tokens": 644,
+            "duration_ms": 1275.484,
+            "cache_read_tokens": 256,
+            "cache_creation_tokens": null,
+            "cache_usage_incomplete": true,
+            "requests": 2
+          }
+        },
+        "estimated": false,
+        "input_tokens": 585,
+        "output_tokens": 59,
+        "total_tokens": 644,
+        "duration_ms": 1275.484,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true
+      }
+    }
+  ],
+  "passed": true,
+  "summary": [
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 44253.964,
+        "median": 47932.767,
+        "max": 48016.685
+      },
+      "requests": {
+        "min": 28,
+        "median": 30,
+        "max": 30
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 10195.044,
+        "median": 11558.829,
+        "max": 12420.229
+      },
+      "requests": {
+        "min": 10,
+        "median": 11,
+        "max": 11
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 10485.056,
+        "median": 10557.092,
+        "max": 10988.437
+      },
+      "requests": {
+        "min": 10,
+        "median": 10,
+        "max": 11
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 33505.702,
+        "median": 37442.849,
+        "max": 37974.102
+      },
+      "requests": {
+        "min": 22,
+        "median": 25,
+        "max": 26
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 39535.337,
+        "median": 43562.557,
+        "max": 47323.838
+      },
+      "requests": {
+        "min": 29,
+        "median": 32,
+        "max": 34
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 34113.045,
+        "median": 37427.087,
+        "max": 41204.342
+      },
+      "requests": {
+        "min": 22,
+        "median": 25,
+        "max": 28
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1784.154,
+        "median": 2113.005,
+        "max": 2164.23
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 2056.719,
+        "median": 2595.83,
+        "max": 2597.361
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1838.554,
+        "median": 2228.763,
+        "max": 2878.588
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1631.036,
+        "median": 1825.644,
+        "max": 1887.196
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1778.301,
+        "median": 1791.128,
+        "max": 2026.864
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1736.854,
+        "median": 1744.459,
+        "max": 2489.748
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 670.311,
+        "median": 769.963,
+        "max": 839.534
+      },
+      "requests": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 773.104,
+        "median": 832.259,
+        "max": 1023.131
+      },
+      "requests": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 945.462,
+        "median": 967.289,
+        "max": 1082.895
+      },
+      "requests": {
+        "min": 1,
+        "median": 1,
+        "max": 1
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 679.561,
+        "median": 686.991,
+        "max": 698.407
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 689.94,
+        "median": 702.867,
+        "max": 711.645
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 634.042,
+        "median": 701.98,
+        "max": 703.071
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1231.945,
+        "median": 1554.852,
+        "max": 1647.333
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1503.164,
+        "median": 1818.419,
+        "max": 1846.905
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 1243.989,
+        "median": 1315.404,
+        "max": 1754.23
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    }
+  ]
+}

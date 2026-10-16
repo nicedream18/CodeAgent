@@ -69,17 +69,13 @@ def bound_value(
         if isinstance(item, str):
             return len(item) <= (512 if metadata else field_limit + 64)
         if isinstance(item, dict):
-            content_count = sum(
-                1 for key in item if depth != 0 or key not in OUTPUT_METADATA
-            )
+            content_count = sum(1 for key in item if depth != 0 or key not in OUTPUT_METADATA)
             return content_count <= max_items and all(
                 already_bounded(v, depth + 1, depth == 0 and key in OUTPUT_METADATA)
                 for key, v in item.items()
             )
         if isinstance(item, (list, tuple)):
-            return len(item) <= max_items and all(
-                already_bounded(v, depth + 1) for v in item
-            )
+            return len(item) <= max_items and all(already_bounded(v, depth + 1) for v in item)
         return True
 
     if isinstance(value, dict) and value.get("output_truncated"):
@@ -87,9 +83,7 @@ def bound_value(
             if len(encoded(value)) <= total_limit and already_bounded(value):
                 return value
         except (ValueError, RecursionError):
-            value = dict(
-                value
-            )  # Circular/unserializable inputs use the bounded visitor.
+            value = dict(value)  # Circular/unserializable inputs use the bounded visitor.
     remaining = total_limit - 768
     nodes = 0
     omitted = 0
@@ -107,13 +101,8 @@ def bound_value(
             available = max(0, min(field_limit, (remaining - 64) // 2))
             if len(item) > available:
                 omitted += len(item) - available
-                reasons.add(
-                    "field_limit" if len(item) > field_limit else "result_limit"
-                )
-                item = (
-                    item[:available]
-                    + f"\n… [{len(item) - available} characters omitted]"
-                )
+                reasons.add("field_limit" if len(item) > field_limit else "result_limit")
+                item = item[:available] + f"\n… [{len(item) - available} characters omitted]"
             # JSON escaping can require up to six characters per character.
             while len(encoded(item)) > remaining and len(item) > 16:
                 item = item[: len(item) // 2] + "… [omitted]"
@@ -188,9 +177,7 @@ def _store_result(workspace: Path, value: Any) -> str:
     size = 0
     try:
         with temporary.open("wb") as handle:
-            for chunk in json.JSONEncoder(ensure_ascii=False, default=str).iterencode(
-                value
-            ):
+            for chunk in json.JSONEncoder(ensure_ascii=False, default=str).iterencode(value):
                 data = chunk.encode("utf-8")
                 size += len(data)
                 if size > 16 * 1024 * 1024:

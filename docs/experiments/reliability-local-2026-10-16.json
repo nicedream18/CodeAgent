@@ -1,0 +1,3390 @@
+{
+  "created_at": "2026-10-16T11:27:03.809663+00:00",
+  "head": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": false,
+  "model": "fixed offline fixture",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-reliability-l5m1mjhy",
+  "runs": [
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 600.765,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.823,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2067,
+            "output_tokens": 180,
+            "total_tokens": 2247,
+            "duration_ms": 2.653,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12193,
+            "output_tokens": 383,
+            "total_tokens": 12576,
+            "duration_ms": 2.301,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 17302,
+            "output_tokens": 451,
+            "total_tokens": 17753,
+            "duration_ms": 4.102,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 8480,
+            "output_tokens": 230,
+            "total_tokens": 8710,
+            "duration_ms": 2.3019999999999996,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 41458,
+        "output_tokens": 1363,
+        "total_tokens": 42821,
+        "duration_ms": 13.181000000000001,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 559.794,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.247,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2067,
+            "output_tokens": 180,
+            "total_tokens": 2247,
+            "duration_ms": 2.274,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12193,
+            "output_tokens": 383,
+            "total_tokens": 12576,
+            "duration_ms": 1.9140000000000001,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 17302,
+            "output_tokens": 451,
+            "total_tokens": 17753,
+            "duration_ms": 2.898,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 8480,
+            "output_tokens": 230,
+            "total_tokens": 8710,
+            "duration_ms": 2.51,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 41458,
+        "output_tokens": 1363,
+        "total_tokens": 42821,
+        "duration_ms": 10.843,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 534.467,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.201,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2067,
+            "output_tokens": 180,
+            "total_tokens": 2247,
+            "duration_ms": 2.166,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12193,
+            "output_tokens": 383,
+            "total_tokens": 12576,
+            "duration_ms": 1.978,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 17302,
+            "output_tokens": 451,
+            "total_tokens": 17753,
+            "duration_ms": 2.995,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 8480,
+            "output_tokens": 230,
+            "total_tokens": 8710,
+            "duration_ms": 2.3040000000000003,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 41458,
+        "output_tokens": 1363,
+        "total_tokens": 42821,
+        "duration_ms": 10.644,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 352.847,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 6,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.213,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 17151,
+            "output_tokens": 451,
+            "total_tokens": 17602,
+            "duration_ms": 3.018,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 6946,
+            "output_tokens": 230,
+            "total_tokens": 7176,
+            "duration_ms": 2.117,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 25513,
+        "output_tokens": 800,
+        "total_tokens": 26313,
+        "duration_ms": 6.348,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 355.151,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 6,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.199,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 17151,
+            "output_tokens": 451,
+            "total_tokens": 17602,
+            "duration_ms": 3.075,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 6946,
+            "output_tokens": 230,
+            "total_tokens": 7176,
+            "duration_ms": 2.543,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 25513,
+        "output_tokens": 800,
+        "total_tokens": 26313,
+        "duration_ms": 6.817,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 356.939,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 6,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.233,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 17151,
+            "output_tokens": 451,
+            "total_tokens": 17602,
+            "duration_ms": 3.271,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 6946,
+            "output_tokens": 230,
+            "total_tokens": 7176,
+            "duration_ms": 2.084,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 25513,
+        "output_tokens": 800,
+        "total_tokens": 26313,
+        "duration_ms": 6.587999999999999,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 354.903,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 6,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.252,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 17151,
+            "output_tokens": 451,
+            "total_tokens": 17602,
+            "duration_ms": 3.083,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 6946,
+            "output_tokens": 230,
+            "total_tokens": 7176,
+            "duration_ms": 2.135,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 25513,
+        "output_tokens": 800,
+        "total_tokens": 26313,
+        "duration_ms": 6.470000000000001,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 354.6,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 6,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.329,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 17151,
+            "output_tokens": 451,
+            "total_tokens": 17602,
+            "duration_ms": 3.082,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 6946,
+            "output_tokens": 230,
+            "total_tokens": 7176,
+            "duration_ms": 3.008,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 25513,
+        "output_tokens": 800,
+        "total_tokens": 26313,
+        "duration_ms": 7.419,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 356.209,
+      "passed": true,
+      "selected": [
+        "light"
+      ],
+      "metrics": {
+        "requests": 6,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1416,
+            "output_tokens": 119,
+            "total_tokens": 1535,
+            "duration_ms": 1.515,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 17151,
+            "output_tokens": 451,
+            "total_tokens": 17602,
+            "duration_ms": 3.408,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 6946,
+            "output_tokens": 230,
+            "total_tokens": 7176,
+            "duration_ms": 2.383,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 25513,
+        "output_tokens": 800,
+        "total_tokens": 26313,
+        "duration_ms": 7.306,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 555.049,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.223,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2677,
+            "output_tokens": 312,
+            "total_tokens": 2989,
+            "duration_ms": 2.266,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12745,
+            "output_tokens": 452,
+            "total_tokens": 13197,
+            "duration_ms": 1.959,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 19334,
+            "output_tokens": 749,
+            "total_tokens": 20083,
+            "duration_ms": 3.267,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 9317,
+            "output_tokens": 344,
+            "total_tokens": 9661,
+            "duration_ms": 2.248,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 45546,
+        "output_tokens": 1990,
+        "total_tokens": 47536,
+        "duration_ms": 10.963,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 542.352,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.368,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2677,
+            "output_tokens": 312,
+            "total_tokens": 2989,
+            "duration_ms": 2.259,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12745,
+            "output_tokens": 452,
+            "total_tokens": 13197,
+            "duration_ms": 1.9220000000000002,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 19334,
+            "output_tokens": 749,
+            "total_tokens": 20083,
+            "duration_ms": 3.0359999999999996,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 9317,
+            "output_tokens": 344,
+            "total_tokens": 9661,
+            "duration_ms": 2.276,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 45546,
+        "output_tokens": 1990,
+        "total_tokens": 47536,
+        "duration_ms": 10.861,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 542.373,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.224,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2677,
+            "output_tokens": 312,
+            "total_tokens": 2989,
+            "duration_ms": 2.402,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12745,
+            "output_tokens": 452,
+            "total_tokens": 13197,
+            "duration_ms": 2.235,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 19334,
+            "output_tokens": 749,
+            "total_tokens": 20083,
+            "duration_ms": 3.1719999999999997,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 9317,
+            "output_tokens": 344,
+            "total_tokens": 9661,
+            "duration_ms": 3.209,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 45546,
+        "output_tokens": 1990,
+        "total_tokens": 47536,
+        "duration_ms": 12.242000000000003,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 465.131,
+      "passed": true,
+      "selected": [
+        "light",
+        "full"
+      ],
+      "metrics": {
+        "requests": 12,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.252,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 29152,
+            "output_tokens": 1312,
+            "total_tokens": 30464,
+            "duration_ms": 5.350999999999999,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 5
+          },
+          "repoAgent": {
+            "input_tokens": 2676,
+            "output_tokens": 312,
+            "total_tokens": 2988,
+            "duration_ms": 1.778,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 11605,
+            "output_tokens": 452,
+            "total_tokens": 12057,
+            "duration_ms": 1.676,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "verifier": {
+            "input_tokens": 8785,
+            "output_tokens": 344,
+            "total_tokens": 9129,
+            "duration_ms": 1.7309999999999999,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 53691,
+        "output_tokens": 2553,
+        "total_tokens": 56244,
+        "duration_ms": 11.788,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 456.107,
+      "passed": true,
+      "selected": [
+        "light",
+        "full"
+      ],
+      "metrics": {
+        "requests": 12,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.433,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 29152,
+            "output_tokens": 1312,
+            "total_tokens": 30464,
+            "duration_ms": 4.971,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 5
+          },
+          "repoAgent": {
+            "input_tokens": 2676,
+            "output_tokens": 312,
+            "total_tokens": 2988,
+            "duration_ms": 1.818,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 11605,
+            "output_tokens": 452,
+            "total_tokens": 12057,
+            "duration_ms": 1.866,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "verifier": {
+            "input_tokens": 8785,
+            "output_tokens": 344,
+            "total_tokens": 9129,
+            "duration_ms": 1.83,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 53691,
+        "output_tokens": 2553,
+        "total_tokens": 56244,
+        "duration_ms": 11.918,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 477.116,
+      "passed": true,
+      "selected": [
+        "light",
+        "full"
+      ],
+      "metrics": {
+        "requests": 12,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.333,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "codeAgent": {
+            "input_tokens": 29152,
+            "output_tokens": 1312,
+            "total_tokens": 30464,
+            "duration_ms": 5.111999999999999,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 5
+          },
+          "repoAgent": {
+            "input_tokens": 2676,
+            "output_tokens": 312,
+            "total_tokens": 2988,
+            "duration_ms": 1.813,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 11605,
+            "output_tokens": 452,
+            "total_tokens": 12057,
+            "duration_ms": 1.697,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "verifier": {
+            "input_tokens": 8785,
+            "output_tokens": 344,
+            "total_tokens": 9129,
+            "duration_ms": 1.8119999999999998,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 53691,
+        "output_tokens": 2553,
+        "total_tokens": 56244,
+        "duration_ms": 11.767000000000003,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 580.661,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.262,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2677,
+            "output_tokens": 312,
+            "total_tokens": 2989,
+            "duration_ms": 2.287,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12745,
+            "output_tokens": 452,
+            "total_tokens": 13197,
+            "duration_ms": 2.049,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 19334,
+            "output_tokens": 749,
+            "total_tokens": 20083,
+            "duration_ms": 3.4349999999999996,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 9317,
+            "output_tokens": 344,
+            "total_tokens": 9661,
+            "duration_ms": 2.324,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 45546,
+        "output_tokens": 1990,
+        "total_tokens": 47536,
+        "duration_ms": 11.357,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 618.341,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.245,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2677,
+            "output_tokens": 312,
+            "total_tokens": 2989,
+            "duration_ms": 2.214,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12745,
+            "output_tokens": 452,
+            "total_tokens": 13197,
+            "duration_ms": 1.962,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 19334,
+            "output_tokens": 749,
+            "total_tokens": 20083,
+            "duration_ms": 3.9479999999999995,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 9317,
+            "output_tokens": 344,
+            "total_tokens": 9661,
+            "duration_ms": 2.39,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 45546,
+        "output_tokens": 1990,
+        "total_tokens": 47536,
+        "duration_ms": 11.759,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 581.322,
+      "passed": true,
+      "selected": [
+        "full"
+      ],
+      "metrics": {
+        "requests": 10,
+        "roles": {
+          "intent_router": {
+            "input_tokens": 1473,
+            "output_tokens": 133,
+            "total_tokens": 1606,
+            "duration_ms": 1.305,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 1
+          },
+          "repoAgent": {
+            "input_tokens": 2677,
+            "output_tokens": 312,
+            "total_tokens": 2989,
+            "duration_ms": 2.229,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "planner": {
+            "input_tokens": 12745,
+            "output_tokens": 452,
+            "total_tokens": 13197,
+            "duration_ms": 1.915,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          },
+          "codeAgent": {
+            "input_tokens": 19334,
+            "output_tokens": 749,
+            "total_tokens": 20083,
+            "duration_ms": 3.4610000000000003,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 3
+          },
+          "verifier": {
+            "input_tokens": 9317,
+            "output_tokens": 344,
+            "total_tokens": 9661,
+            "duration_ms": 2.2640000000000002,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 45546,
+        "output_tokens": 1990,
+        "total_tokens": 47536,
+        "duration_ms": 11.174000000000001,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      },
+      "file_change_records": [
+        "app.txt",
+        "config.txt"
+      ],
+      "actual_contents": {
+        "app.txt": "after",
+        "config.txt": "after"
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 9.374,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9703,
+            "output_tokens": 113,
+            "total_tokens": 9816,
+            "duration_ms": 0.054,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9703,
+        "output_tokens": 113,
+        "total_tokens": 9816,
+        "duration_ms": 0.054,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 8.387,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9703,
+            "output_tokens": 113,
+            "total_tokens": 9816,
+            "duration_ms": 0.045,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9703,
+        "output_tokens": 113,
+        "total_tokens": 9816,
+        "duration_ms": 0.045,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 8.34,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9703,
+            "output_tokens": 113,
+            "total_tokens": 9816,
+            "duration_ms": 0.047,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9703,
+        "output_tokens": 113,
+        "total_tokens": 9816,
+        "duration_ms": 0.047,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 8.457,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9705,
+            "output_tokens": 113,
+            "total_tokens": 9818,
+            "duration_ms": 0.044,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9705,
+        "output_tokens": 113,
+        "total_tokens": 9818,
+        "duration_ms": 0.044,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 7.84,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9705,
+            "output_tokens": 113,
+            "total_tokens": 9818,
+            "duration_ms": 0.041999999999999996,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9705,
+        "output_tokens": 113,
+        "total_tokens": 9818,
+        "duration_ms": 0.041999999999999996,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 8.365,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9705,
+            "output_tokens": 113,
+            "total_tokens": 9818,
+            "duration_ms": 0.05,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9705,
+        "output_tokens": 113,
+        "total_tokens": 9818,
+        "duration_ms": 0.05,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 7.685,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9703,
+            "output_tokens": 113,
+            "total_tokens": 9816,
+            "duration_ms": 0.041999999999999996,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9703,
+        "output_tokens": 113,
+        "total_tokens": 9816,
+        "duration_ms": 0.041999999999999996,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 8.166,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9703,
+            "output_tokens": 113,
+            "total_tokens": 9816,
+            "duration_ms": 0.043,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9703,
+        "output_tokens": 113,
+        "total_tokens": 9816,
+        "duration_ms": 0.043,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 7.985,
+      "passed": true,
+      "answer": "SKILL_MARKER before",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "codeAgent": {
+            "input_tokens": 9703,
+            "output_tokens": 113,
+            "total_tokens": 9816,
+            "duration_ms": 0.043,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 9703,
+        "output_tokens": 113,
+        "total_tokens": 9816,
+        "duration_ms": 0.043,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 0.389,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "20f53325284d4c41b87b70bc2e638384",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "d1b1568befb14b45923b764e913a15de",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.059,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.059,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 0.326,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "4743aa5aaeb7473c8c5017d114c3a538",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "8b2462cd12984234a343e201b9557cc8",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.049,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.049,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 0.298,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "10333fc5179948c9a0e85a314f195744",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "631295cf771f48e6bf529568a4af3deb",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.044,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.044,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 0.278,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "362354f28742419c8803e21c472d3ea8",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "584d0b466ace4b678372440f672c4cdc",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.037,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.037,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 0.434,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "077d9c6839ad40bf84faca4cbae1ff76",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "4522af771abd4c4e8004d5e3f859d61e",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.036000000000000004,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.036000000000000004,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 0.446,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "f1e9f84be7024843aeb2e31557429b97",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "67d4ed4f82f64b8199c3d95062711d34",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.039,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.039,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 0.274,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "33647030ae38492db74cec246b0f5755",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "af6ef93017ec43db94971a1ef07ca2db",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.036,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.036,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 0.463,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "b904cde398294772949642d335aa1512",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "7404053c420a4d2c88a0c5c3f02140c4",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.037,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.037,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 0.236,
+      "passed": true,
+      "stream_ends": [
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "b3efced67c8941649f388968c8bc4af2",
+          "generation_attempt": 0,
+          "finish_reason": "model_output_truncated",
+          "raw_finish_reason": "length",
+          "status": "failed",
+          "error": "model_output_truncated"
+        },
+        {
+          "type": "llm_stream_end",
+          "node": "truncate_demo",
+          "stream_id": "a707e54ec797408092032e67a368e67a",
+          "generation_attempt": 1,
+          "finish_reason": "completed",
+          "raw_finish_reason": "stop",
+          "status": "finished",
+          "error": ""
+        }
+      ],
+      "stop_reason": null,
+      "answer": "Complete concise response",
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "truncate_demo": {
+            "input_tokens": 996,
+            "output_tokens": 150,
+            "total_tokens": 1146,
+            "duration_ms": 0.037000000000000005,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 996,
+        "output_tokens": 150,
+        "total_tokens": 1146,
+        "duration_ms": 0.037000000000000005,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 12.135,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 10.453,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 10.943,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 10.252,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 10.156,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 10.214,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 10.422,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 9.89,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 10.372,
+      "passed": false,
+      "approval_count": 0,
+      "rules": [],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 600.074,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "78baada3309d4cbf9fa6c389388d95c1",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-33842c0877724f26ac7cea05fa7b4e97.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 19
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "7006d74d5ce24de7aeb0dad9725d508e",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-dcb185a3492a4d10b940fa826d1d53f7.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 289
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "c5f777298c314b6a97e496a53e840379",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-e97b51e07ce043319b0bacecd2cd9df0.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 291
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 615.706,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "4c422e68e0f14a0eaeaa12d78cd0bb3b",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-808b4a238d194688999f3ab9ea1bb244.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "978aa85c49c647e39d4bb83368d1d0df",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-f442a00fd2684cf0b3ac79dc960e7bfa.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 288
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "fbaa8f2993ef4aee8f6b2345aef486f6",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-dc122f315e96433d9687c522af30b5c2.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 309
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 603.257,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "e1f318d7b3e04c3caad41b4cace060cb",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-a94df9284a004fcab8c064ec2b42c2a2.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "0f838db5da6c40d69885c8b2dc7e7d48",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-74542c3f542c49db9b6a1cf8eb1249c6.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 294
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "e0fe027688cb4111890f3939109c722b",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-fc472486386a4665be513dd8f599c3fd.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 290
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 607.255,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "94ac0d4b257a4b259ae6694f11107a47",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-c6f83b95afec4c1d8b997228d08b237f.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "8e53a7b3735242d2827d12cf20f1d25c",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-c7f35cae32e6480d92027384ccf39b0e.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 290
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "52bc9dc889a340e496954438fd81a7f5",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-d34f31ce2f06438d8c86bfeddc2ef26d.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 298
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 604.66,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "09bc9dcef6094b6f8d1d73516ab9bc2e",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-83759a9fbf8e4fef9e12fc39c8d81a16.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "d84cce51c5c6466f8a85902d6a005d95",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-1048fd5ec7714edd854298df5fe47f47.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 289
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "1f69e83602ef42c6832c2810e78a07b4",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-e65a2fa70e754b829ea435e66e4aeff5.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 290
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 597.048,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "b211de3e68f3489cb804a1620597dbcb",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-b30749a1e80d4765af90daea8b06c4ce.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "74ee47d282eb4998947742a146f62339",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-dd1f371a121243b783440b3634e81c0a.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 288
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "8bdf54f0862e4e3faa4b4f13b536d5d7",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-43acf87b02314fb6b63431e58ea49fdd.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 290
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 598.206,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "001d935cfb4d4f1286f6c15a16edcfdf",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-a4f7408a35034f62a7e1765f2fca3d1a.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "ef33979eec564bffb5a2411ebf14954d",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-883b4dfecf22403c81761c0495f82f33.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 288
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "26389d0914764e3285ee6196568f495c",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-67e8b48a0039497aa7445526fdafa61f.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 291
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 602.371,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "20de4d5f8ee343d3a90ff4781eded073",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-1b9a7d07adef411b973836aa8e72d1f5.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "62e05a2f480240e7b924fce61b48dc13",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-63e11113d2574354809f7cf7ecd49e8f.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 292
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "ff83fd301ec54527a7fcbe449b451c71",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-83c281055cce487c81f9cc711c960b11.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 291
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 601.206,
+      "passed": true,
+      "errors": [
+        {
+          "server": "bad",
+          "error": "RuntimeError: MCP bad discover: connection_closed: unhandled errors in a TaskGroup (1 sub-exception)"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "72fd39c547c24193b106d9ec73982969",
+          "server": "bad",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "failed",
+          "reason": "connection_closed",
+          "error": "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-762ff2462ee94d9e8a259b8c279f3490.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 17
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "ea7eb20a42244fa596668a1982103d9e",
+          "server": "echo",
+          "phase": "discover",
+          "tool_call_id": "",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-2dbda8946fb24047bb3191981ac9abb7.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 290
+        },
+        {
+          "type": "mcp_diagnostic",
+          "operation_id": "66de8a38deb04dd9947751f993c53ad9",
+          "server": "echo",
+          "phase": "call",
+          "tool_call_id": "after-fault",
+          "status": "finished",
+          "reason": "",
+          "error": "",
+          "full_output_path": ".mokioclaw/diagnostics/mcp-stderr-1f6c708ba1234e569dd4129d79fb2855.log",
+          "output_bytes": 0,
+          "retained_bytes": 0,
+          "output_truncated": false,
+          "stderr": "",
+          "duration_ms": 292
+        }
+      ],
+      "metrics": {}
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "repeat": 1,
+      "duration_ms": 14.028,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.366,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.366,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "repeat": 2,
+      "duration_ms": 12.523,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.2,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.2,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "repeat": 3,
+      "duration_ms": 12.012,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.059,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.059,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "repeat": 1,
+      "duration_ms": 11.829,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.0380000000000003,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.0380000000000003,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "repeat": 2,
+      "duration_ms": 12.201,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.13,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.13,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "repeat": 3,
+      "duration_ms": 13.171,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.226,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.226,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "repeat": 1,
+      "duration_ms": 11.872,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.0789999999999997,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.0789999999999997,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "repeat": 2,
+      "duration_ms": 11.724,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.049,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.049,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "repeat": 3,
+      "duration_ms": 11.815,
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 2.109,
+            "cache_read_tokens": null,
+            "cache_usage_incomplete": true,
+            "cache_creation_tokens": null,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 2.109,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "estimated": true
+      }
+    }
+  ],
+  "passed": false,
+  "summary": [
+    {
+      "scenario": "single_file",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 534.467,
+        "median": 559.794,
+        "max": 600.765
+      },
+      "requests": {
+        "min": 10,
+        "median": 10,
+        "max": 10
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 352.847,
+        "median": 355.151,
+        "max": 356.939
+      },
+      "requests": {
+        "min": 6,
+        "median": 6,
+        "max": 6
+      }
+    },
+    {
+      "scenario": "single_file",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 354.6,
+        "median": 354.903,
+        "max": 356.209
+      },
+      "requests": {
+        "min": 6,
+        "median": 6,
+        "max": 6
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 542.352,
+        "median": 542.373,
+        "max": 555.049
+      },
+      "requests": {
+        "min": 10,
+        "median": 10,
+        "max": 10
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 456.107,
+        "median": 465.131,
+        "max": 477.116
+      },
+      "requests": {
+        "min": 12,
+        "median": 12,
+        "max": 12
+      }
+    },
+    {
+      "scenario": "cross_module",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 580.661,
+        "median": 581.322,
+        "max": 618.341
+      },
+      "requests": {
+        "min": 10,
+        "median": 10,
+        "max": 10
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 8.34,
+        "median": 8.387,
+        "max": 9.374
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 7.84,
+        "median": 8.365,
+        "max": 8.457
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "explicit_skill",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 7.685,
+        "median": 7.985,
+        "max": 8.166
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 0.298,
+        "median": 0.326,
+        "max": 0.389
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 0.278,
+        "median": 0.434,
+        "max": 0.446
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "truncation",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 0.236,
+        "median": 0.274,
+        "max": 0.463
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 0.0,
+      "duration_ms": {
+        "min": 10.453,
+        "median": 10.943,
+        "max": 12.135
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 0.0,
+      "duration_ms": {
+        "min": 10.156,
+        "median": 10.214,
+        "max": 10.252
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "approval",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 0.0,
+      "duration_ms": {
+        "min": 9.89,
+        "median": 10.372,
+        "max": 10.422
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 600.074,
+        "median": 603.257,
+        "max": 615.706
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 597.048,
+        "median": 604.66,
+        "max": 607.255
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "mcp_fault",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 598.206,
+        "median": 601.206,
+        "max": 602.371
+      },
+      "requests": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "full",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 12.012,
+        "median": 12.523,
+        "max": 14.028
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "light",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 11.829,
+        "median": 12.201,
+        "max": 13.171
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    },
+    {
+      "scenario": "correction",
+      "mode": "auto",
+      "n": 3,
+      "success_rate": 1.0,
+      "duration_ms": {
+        "min": 11.724,
+        "median": 11.815,
+        "max": 11.872
+      },
+      "requests": {
+        "min": 2,
+        "median": 2,
+        "max": 2
+      }
+    }
+  ]
+}

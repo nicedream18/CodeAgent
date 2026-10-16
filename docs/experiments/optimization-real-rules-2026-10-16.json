@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-10-16T09:41:01.199932+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": true,
+  "model": "deepseek-chat",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-eyvpc4z3",
+  "results": {
+    "rules": {
+      "passed": true,
+      "reply": "src/app.py 定义了一个简单的加法函数 `add(a, b)`，返回两数之和。DIR_OK ROOT_OK",
+      "stream_matches_result": true,
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "rules_demo": {
+            "input_tokens": 200,
+            "output_tokens": 26,
+            "total_tokens": 226,
+            "duration_ms": 805.908,
+            "requests": 1
+          }
+        },
+        "input_tokens": 200,
+        "output_tokens": 26,
+        "total_tokens": 226,
+        "duration_ms": 805.908,
+        "estimated": false
+      },
+      "duration_ms": 1038.764
+    }
+  },
+  "passed": true
+}

@@ -62,10 +62,7 @@ def test_unfinished_persisted_task_is_marked_interrupted(tmp_path: Path) -> None
     manager = SubagentTaskManager(tmp_path)
     task = manager.get(run_id)
     assert task and task["status"] == "interrupted"
-    assert (
-        manager.events(run_id, after_seq=1)[0]["event"]["type"]
-        == "subagent_task_interrupted"
-    )
+    assert manager.events(run_id, after_seq=1)[0]["event"]["type"] == "subagent_task_interrupted"
 
 
 def test_subagent_queue_limit_and_queued_cancel(tmp_path: Path) -> None:
@@ -157,9 +154,7 @@ def test_read_only_subagents_run_concurrently(tmp_path: Path) -> None:
             )
             for i in range(2)
         ]
-        assert all(
-            _wait_for(manager, task["subagent_run_id"], "completed") for task in tasks
-        )
+        assert all(_wait_for(manager, task["subagent_run_id"], "completed") for task in tasks)
     finally:
         manager.close()
 

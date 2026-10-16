@@ -1,0 +1,503 @@
+{
+  "created_at": "2026-10-16T10:04:09.849651+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": false,
+  "model": "local deterministic fixture",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-t_wqtl_n",
+  "results": {
+    "rules": {
+      "passed": true,
+      "reply": "ROOT_OK DIR_OK 项目规则已加载。",
+      "stream_matches_result": true,
+      "metrics": {
+        "requests": 1,
+        "roles": {
+          "rules_demo": {
+            "input_tokens": 841,
+            "output_tokens": 41,
+            "total_tokens": 882,
+            "duration_ms": 0.029,
+            "requests": 1
+          }
+        },
+        "input_tokens": 841,
+        "output_tokens": 41,
+        "total_tokens": 882,
+        "duration_ms": 0.029,
+        "estimated": true
+      },
+      "duration_ms": 3.518
+    },
+    "search": {
+      "passed": true,
+      "backend": "rg",
+      "rg_ms": 34.749,
+      "python_ms": 16.373,
+      "matches": [
+        {
+          "path": "中文.py",
+          "line": 1,
+          "text": "def needle():"
+        }
+      ],
+      "duration_ms": 87.726
+    },
+    "inbox": {
+      "passed": true,
+      "corrections": [
+        {
+          "message_id": "demo-message",
+          "text": "不要修改数据库",
+          "seq": 1,
+          "status": "applied"
+        }
+      ],
+      "completed_todo_retained": true,
+      "duration_ms": 0.71
+    },
+    "mcp": {
+      "passed": true,
+      "initial_mcp_tools": 0,
+      "deferred_initial_schema_bytes": 3928,
+      "eager_initial_schema_bytes": 4755,
+      "deferred_servers_started": [
+        "echo"
+      ],
+      "eager_servers_started": [
+        "echo",
+        "metrics",
+        "notes"
+      ],
+      "loaded_tools": [
+        {
+          "name": "MCP_echo_echo",
+          "description": "MCP server echo: Return the supplied text with a short prefix."
+        }
+      ],
+      "operations": [
+        {
+          "phase": "discover",
+          "status": "finished"
+        },
+        {
+          "phase": "call",
+          "status": "finished"
+        }
+      ],
+      "result": {
+        "ok": true,
+        "error_type": "",
+        "error": "",
+        "content": [
+          "echo: hello"
+        ],
+        "structured_content": null,
+        "retryable": false
+      },
+      "duration_ms": 1667.144
+    },
+    "hooks": {
+      "passed": true,
+      "result": {
+        "ok": false,
+        "error_type": "permission_denied",
+        "error": "生成目录禁止直接修改",
+        "retryable": false
+      },
+      "events": [
+        {
+          "type": "hook_result",
+          "hook": "rule-0",
+          "event": "PreToolUse",
+          "tool_name": "FileWriteTool",
+          "tool_call_id": "FileWriteTool-call",
+          "action": "block",
+          "message": "生成目录禁止直接修改"
+        }
+      ],
+      "duration_ms": 6.328
+    },
+    "rewind": {
+      "passed": true,
+      "preview": {
+        "ok": true,
+        "run_id": "local-27a5b8b649d943938f9c18463ee8e3ea",
+        "changes": [
+          {
+            "change_id": "d9a885641c10498f98f15eb99cb4182e",
+            "path": "app.txt",
+            "status": "ready",
+            "diff": "--- app.txt\n+++ restored/app.txt\n@@ -1 +1 @@\n-after\n+before",
+            "diff_truncated": false
+          }
+        ],
+        "applied": false,
+        "coverage": "FileWriteTool/FileEditTool only; Bash/MCP changes are not covered"
+      },
+      "restored": {
+        "ok": true,
+        "run_id": "local-27a5b8b649d943938f9c18463ee8e3ea",
+        "changes": [
+          {
+            "change_id": "d9a885641c10498f98f15eb99cb4182e",
+            "path": "app.txt",
+            "status": "restored",
+            "diff": "--- app.txt\n+++ restored/app.txt\n@@ -1 +1 @@\n-after\n+before",
+            "diff_truncated": false
+          }
+        ],
+        "applied": true,
+        "coverage": "FileWriteTool/FileEditTool only; Bash/MCP changes are not covered"
+      },
+      "duration_ms": 3.17
+    },
+    "workflows": {
+      "passed": true,
+      "runs": [
+        {
+          "mode": "full",
+          "passed": true,
+          "selected": [
+            "full"
+          ],
+          "duration_ms": 535.065,
+          "metrics": {
+            "requests": 10,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1416,
+                "output_tokens": 119,
+                "total_tokens": 1535,
+                "duration_ms": 0.481,
+                "requests": 1
+              },
+              "repoAgent": {
+                "input_tokens": 2067,
+                "output_tokens": 180,
+                "total_tokens": 2247,
+                "duration_ms": 0.7849999999999999,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 12145,
+                "output_tokens": 383,
+                "total_tokens": 12528,
+                "duration_ms": 0.677,
+                "requests": 2
+              },
+              "codeAgent": {
+                "input_tokens": 17302,
+                "output_tokens": 451,
+                "total_tokens": 17753,
+                "duration_ms": 0.959,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 8480,
+                "output_tokens": 230,
+                "total_tokens": 8710,
+                "duration_ms": 0.859,
+                "requests": 2
+              }
+            },
+            "input_tokens": 41410,
+            "output_tokens": 1363,
+            "total_tokens": 42773,
+            "duration_ms": 3.761,
+            "estimated": true
+          },
+          "file_change_records": [
+            "app.txt"
+          ]
+        },
+        {
+          "mode": "light",
+          "passed": true,
+          "selected": [
+            "light"
+          ],
+          "duration_ms": 376.412,
+          "metrics": {
+            "requests": 6,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1416,
+                "output_tokens": 119,
+                "total_tokens": 1535,
+                "duration_ms": 0.493,
+                "requests": 1
+              },
+              "codeAgent": {
+                "input_tokens": 17151,
+                "output_tokens": 451,
+                "total_tokens": 17602,
+                "duration_ms": 1.077,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 6946,
+                "output_tokens": 230,
+                "total_tokens": 7176,
+                "duration_ms": 0.849,
+                "requests": 2
+              }
+            },
+            "input_tokens": 25513,
+            "output_tokens": 800,
+            "total_tokens": 26313,
+            "duration_ms": 2.4190000000000005,
+            "estimated": true
+          },
+          "file_change_records": [
+            "app.txt"
+          ]
+        },
+        {
+          "mode": "auto",
+          "passed": true,
+          "selected": [
+            "light"
+          ],
+          "duration_ms": 391.876,
+          "metrics": {
+            "requests": 6,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1416,
+                "output_tokens": 119,
+                "total_tokens": 1535,
+                "duration_ms": 0.41,
+                "requests": 1
+              },
+              "codeAgent": {
+                "input_tokens": 17151,
+                "output_tokens": 451,
+                "total_tokens": 17602,
+                "duration_ms": 1.154,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 6946,
+                "output_tokens": 230,
+                "total_tokens": 7176,
+                "duration_ms": 0.9119999999999999,
+                "requests": 2
+              }
+            },
+            "input_tokens": 25513,
+            "output_tokens": 800,
+            "total_tokens": 26313,
+            "duration_ms": 2.4760000000000004,
+            "estimated": true
+          },
+          "file_change_records": [
+            "app.txt"
+          ]
+        }
+      ],
+      "duration_ms": 1303.959
+    },
+    "cross_module": {
+      "passed": true,
+      "runs": [
+        {
+          "mode": "full",
+          "passed": true,
+          "selected": [
+            "full"
+          ],
+          "duration_ms": 547.436,
+          "metrics": {
+            "requests": 10,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1473,
+                "output_tokens": 133,
+                "total_tokens": 1606,
+                "duration_ms": 0.49,
+                "requests": 1
+              },
+              "repoAgent": {
+                "input_tokens": 2677,
+                "output_tokens": 312,
+                "total_tokens": 2989,
+                "duration_ms": 0.8859999999999999,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 12697,
+                "output_tokens": 452,
+                "total_tokens": 13149,
+                "duration_ms": 0.758,
+                "requests": 2
+              },
+              "codeAgent": {
+                "input_tokens": 19334,
+                "output_tokens": 749,
+                "total_tokens": 20083,
+                "duration_ms": 1.098,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 9317,
+                "output_tokens": 344,
+                "total_tokens": 9661,
+                "duration_ms": 0.871,
+                "requests": 2
+              }
+            },
+            "input_tokens": 45498,
+            "output_tokens": 1990,
+            "total_tokens": 47488,
+            "duration_ms": 4.103,
+            "estimated": true
+          },
+          "file_change_records": [
+            "app.txt",
+            "config.txt"
+          ]
+        },
+        {
+          "mode": "light",
+          "passed": true,
+          "selected": [
+            "light",
+            "full"
+          ],
+          "duration_ms": 443.988,
+          "metrics": {
+            "requests": 12,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1473,
+                "output_tokens": 133,
+                "total_tokens": 1606,
+                "duration_ms": 0.494,
+                "requests": 1
+              },
+              "codeAgent": {
+                "input_tokens": 29152,
+                "output_tokens": 1312,
+                "total_tokens": 30464,
+                "duration_ms": 1.642,
+                "requests": 5
+              },
+              "repoAgent": {
+                "input_tokens": 2676,
+                "output_tokens": 312,
+                "total_tokens": 2988,
+                "duration_ms": 0.5980000000000001,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 11557,
+                "output_tokens": 452,
+                "total_tokens": 12009,
+                "duration_ms": 0.544,
+                "requests": 2
+              },
+              "verifier": {
+                "input_tokens": 8785,
+                "output_tokens": 344,
+                "total_tokens": 9129,
+                "duration_ms": 0.555,
+                "requests": 2
+              }
+            },
+            "input_tokens": 53643,
+            "output_tokens": 2553,
+            "total_tokens": 56196,
+            "duration_ms": 3.833,
+            "estimated": true
+          },
+          "file_change_records": [
+            "app.txt",
+            "config.txt"
+          ]
+        },
+        {
+          "mode": "auto",
+          "passed": true,
+          "selected": [
+            "full"
+          ],
+          "duration_ms": 563.726,
+          "metrics": {
+            "requests": 10,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1473,
+                "output_tokens": 133,
+                "total_tokens": 1606,
+                "duration_ms": 0.4,
+                "requests": 1
+              },
+              "repoAgent": {
+                "input_tokens": 2677,
+                "output_tokens": 312,
+                "total_tokens": 2989,
+                "duration_ms": 0.868,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 12697,
+                "output_tokens": 452,
+                "total_tokens": 13149,
+                "duration_ms": 0.6759999999999999,
+                "requests": 2
+              },
+              "codeAgent": {
+                "input_tokens": 19334,
+                "output_tokens": 749,
+                "total_tokens": 20083,
+                "duration_ms": 1.043,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 9317,
+                "output_tokens": 344,
+                "total_tokens": 9661,
+                "duration_ms": 0.877,
+                "requests": 2
+              }
+            },
+            "input_tokens": 45498,
+            "output_tokens": 1990,
+            "total_tokens": 47488,
+            "duration_ms": 3.864,
+            "estimated": true
+          },
+          "file_change_records": [
+            "app.txt",
+            "config.txt"
+          ]
+        }
+      ],
+      "duration_ms": 1555.817
+    },
+    "steering": {
+      "passed": true,
+      "reply": "已收到",
+      "discarded_calls": 1,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 584,
+            "output_tokens": 138,
+            "total_tokens": 722,
+            "duration_ms": 0.835,
+            "requests": 2
+          }
+        },
+        "input_tokens": 584,
+        "output_tokens": 138,
+        "total_tokens": 722,
+        "duration_ms": 0.835,
+        "estimated": true
+      },
+      "duration_ms": 12.078
+    }
+  },
+  "passed": true
+}

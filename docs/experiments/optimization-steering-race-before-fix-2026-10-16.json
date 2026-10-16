@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-10-16T09:41:01.198445+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": true,
+  "model": "deepseek-chat",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-kdmnmgfx",
+  "results": {
+    "steering": {
+      "passed": false,
+      "reply": "已收到",
+      "discarded_calls": 0,
+      "metrics": {
+        "requests": 2,
+        "roles": {
+          "steering_demo": {
+            "input_tokens": 585,
+            "output_tokens": 66,
+            "total_tokens": 651,
+            "duration_ms": 2013.998,
+            "requests": 2
+          }
+        },
+        "input_tokens": 585,
+        "output_tokens": 66,
+        "total_tokens": 651,
+        "duration_ms": 2013.998,
+        "estimated": false
+      },
+      "duration_ms": 2256.78
+    }
+  },
+  "passed": false
+}

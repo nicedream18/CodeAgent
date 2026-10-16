@@ -17,6 +17,10 @@ CURRENT_RUN: ContextVar[RunControl | None] = ContextVar("mokioclaw_run", default
 
 class RunControl:
     def __init__(self) -> None:
+        from mokioclaw.core.run_inbox import RunInbox
+
+        self.inbox = RunInbox()
+        self.pending_stream_ends = {}
         self.cancel_event = threading.Event()
         self.status = "running"
         self.event_sink = None
@@ -67,9 +71,7 @@ class RunControl:
                     finally:
                         loop.close()
 
-                self._thread = threading.Thread(
-                    target=serve, name="mokio-transport", daemon=True
-                )
+                self._thread = threading.Thread(target=serve, name="mokio-transport", daemon=True)
                 self._thread.start()
                 ready.wait()
             return self._loop
@@ -126,9 +128,7 @@ class RunControl:
             if not cleaned.is_set():
                 future.cancel()
                 if not cleaned.wait(2):
-                    raise RuntimeError(
-                        "Async transport did not close after cancellation"
-                    )
+                    raise RuntimeError("Async transport did not close after cancellation")
 
     def run_async(self, factory):
         async def once():

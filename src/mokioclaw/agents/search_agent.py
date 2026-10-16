@@ -7,9 +7,11 @@ from typing import Any
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
 from mokioclaw.core.run_control import RunInterrupted, check_run
+from mokioclaw.core.tool_loop import ToolConversation
 from mokioclaw.core.tool_output import bound_tool_result
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import SEARCH_AGENT_PROMPT
+from mokioclaw.providers.model_policy import create_role_model
 from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 from mokioclaw.tools.execution import (
     execute_tool,
@@ -29,12 +31,11 @@ def run_search_agent(
     max_loops: int = 4,
 ) -> dict[str, Any]:
     writer = writer or (lambda _: None)
-    model = create_model()
+    model = create_role_model(create_model, state["runtime"], "searchAgent")
     runtime = state["runtime"]
     search_tools = (
         [build_tool(runtime, "WebSearchTool")]
-        if runtime.active_agent_tools is None
-        or "WebSearchTool" in runtime.active_agent_tools
+        if runtime.active_agent_tools is None or "WebSearchTool" in runtime.active_agent_tools
         else []
     )
     search_agent = model.bind_tools(search_tools)
@@ -59,58 +60,58 @@ def run_search_agent(
 
     budget_exhausted = False
     rounds = max_loops + (1 if state["runtime"].active_subagent_budget else 0)
-    for _ in range(rounds):
-        response = invoke_streaming(
-            search_agent, messages, writer=writer, node="searchAgent", state=state
-        )
-        produced_messages.append(response)
-        messages.append(response)
-        tool_calls = getattr(response, "tool_calls", None) or []
-        if not tool_calls:
+    conversation = ToolConversation(
+        messages,
+        state=state,
+        writer=writer,
+        node="searchAgent",
+        invoke=invoke_streaming,
+        produced=produced_messages,
+    )
+    for response, tool_calls in conversation.rounds(rounds, lambda: search_agent):
+        if not getattr(response, "tool_calls", None):
             break
-        for call in tool_calls:
-            args = call.get("args") or {}
-            query = str(args.get("query", ""))
-            if query:
-                queries.append(query)
-            writer(
-                {
-                    "type": "tool_call",
-                    "node": "searchAgent",
-                    "name": call.get("name"),
-                    "args": args,
-                }
-            )
-            tool_result = _execute_search_tool(call, state=state, on_retry=writer)
-            event = _tool_result_event(tool_result)
-            tool_events.append(event)
-            writer(event)
-            parsed = _parse_tool_content(tool_result.content)
-            if isinstance(parsed, dict):
-                if parsed.get("answer"):
-                    answers.append(str(parsed["answer"]))
-                for item in parsed.get("results", []) or []:
-                    if isinstance(item, dict):
-                        sources.append(item)
-                state["sources"] = _dedupe_sources(
-                    list(state.get("sources") or []) + sources
-                )
-                if answers:
-                    state["research_notes"] = "\n".join(answers)
+        with conversation.batch(tool_calls) as pending_calls:
+            for call in pending_calls:
+                args = call.get("args") or {}
+                query = str(args.get("query", ""))
+                if query:
+                    queries.append(query)
                 writer(
                     {
-                        "type": "search_results",
-                        "query": parsed.get("query", query),
-                        "answer": parsed.get("answer", ""),
-                        "sources": parsed.get("results", []),
+                        "type": "tool_call",
+                        "node": "searchAgent",
+                        "name": call.get("name"),
+                        "args": args,
                     }
                 )
-            produced_messages.append(tool_result)
-            messages.append(tool_result)
-            budget = state["runtime"].active_subagent_budget
-            if budget is not None and budget.exhausted:
-                budget_exhausted = True
-                break
+                tool_result = _execute_search_tool(call, state=state, on_retry=writer)
+                event = _tool_result_event(tool_result)
+                tool_events.append(event)
+                writer(event)
+                parsed = _parse_tool_content(tool_result.content)
+                if isinstance(parsed, dict):
+                    if parsed.get("answer"):
+                        answers.append(str(parsed["answer"]))
+                    for item in parsed.get("results", []) or []:
+                        if isinstance(item, dict):
+                            sources.append(item)
+                    state["sources"] = _dedupe_sources(list(state.get("sources") or []) + sources)
+                    if answers:
+                        state["research_notes"] = "\n".join(answers)
+                    writer(
+                        {
+                            "type": "search_results",
+                            "query": parsed.get("query", query),
+                            "answer": parsed.get("answer", ""),
+                            "sources": parsed.get("results", []),
+                        }
+                    )
+                conversation.append(tool_result)
+                budget = state["runtime"].active_subagent_budget
+                if budget is not None and budget.exhausted:
+                    budget_exhausted = True
+                    break
         if budget_exhausted:
             break
 
@@ -159,9 +160,7 @@ def _execute_search_tool(
             if runtime is not None
             else None
         )
-        result = budget_failure or tool_failure_result(
-            f"unknown tool: {name}", tool_name=name
-        )
+        result = budget_failure or tool_failure_result(f"unknown tool: {name}", tool_name=name)
     else:
         try:
             result = execute_tool(
@@ -174,7 +173,7 @@ def _execute_search_tool(
             )
         except RunInterrupted:
             raise
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
             result = tool_failure_result(exc, tool_name=name)
     return ToolMessage(
         content=json.dumps(

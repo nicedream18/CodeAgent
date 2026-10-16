@@ -17,11 +17,7 @@ def _normalize_items(items: Any) -> list[str]:
         try:
             decoded = json.loads(stripped)
         except json.JSONDecodeError:
-            return [
-                line.strip("- ").strip()
-                for line in stripped.splitlines()
-                if line.strip()
-            ]
+            return [line.strip("- ").strip() for line in stripped.splitlines() if line.strip()]
         return _normalize_items(decoded)
     if isinstance(items, dict):
         value = (

@@ -16,9 +16,7 @@ from mokioclaw.core.session import (
 def test_session_create_save_and_context(tmp_path) -> None:
     session = load_or_create_session(tmp_path)
     turn = append_user_turn(session, "帮我创建一个 app.py")
-    append_assistant_turn(
-        session, turn=turn, route="workflow", content="created app.py"
-    )
+    append_assistant_turn(session, turn=turn, route="workflow", content="created app.py")
     save_session(tmp_path, session)
 
     assert session_file(tmp_path).exists()
@@ -38,9 +36,7 @@ def test_session_history_is_compacted(tmp_path) -> None:
 
     for idx in range(25):
         turn = append_user_turn(session, f"user turn {idx}")
-        append_assistant_turn(
-            session, turn=turn, route="chat", content=f"assistant turn {idx}"
-        )
+        append_assistant_turn(session, turn=turn, route="chat", content=f"assistant turn {idx}")
 
     save_session(tmp_path, session)
     saved = json.loads(session_file(tmp_path).read_text(encoding="utf-8"))

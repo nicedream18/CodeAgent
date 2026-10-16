@@ -38,9 +38,7 @@ def run(workspace: Path) -> dict:
     expected = "PASS_" + uuid4().hex[:12]
     source = "https://example.test/context-governance-source"
     text = (
-        ("Historical filler line for budget experiment.\n" * 5000)
-        + "\nTAIL_CRITERION: "
-        + expected
+        ("Historical filler line for budget experiment.\n" * 5000) + "\nTAIL_CRITERION: " + expected
     )
     (workspace / "spec.txt").write_text(text, encoding="utf-8")
     control = ContextControl()
@@ -67,9 +65,7 @@ def run(workspace: Path) -> dict:
             "source equals the given URL",
         ],
     }
-    tools = {
-        name: build_tool(runtime, name) for name in ("FileReadTool", "FileWriteTool")
-    }
+    tools = {name: build_tool(runtime, name) for name in ("FileReadTool", "FileWriteTool")}
     model = create_model().bind_tools(list(tools.values()))
     messages = [
         SystemMessage(
@@ -128,10 +124,8 @@ def run(workspace: Path) -> dict:
     seed_history("automatic")
     manual = None
     writes = 0
-    for step in range(6):
-        response = invoke_streaming(
-            model, messages, state=state, writer=writer, node="demo"
-        )
+    for _step in range(6):
+        response = invoke_streaming(model, messages, state=state, writer=writer, node="demo")
         messages.append(response)
         calls = getattr(response, "tool_calls", [])
         if not calls:
@@ -154,19 +148,13 @@ def run(workspace: Path) -> dict:
                     tool_call_id=call["id"],
                 )
             )
-            if (
-                name == "FileWriteTool"
-                and result.get("ok")
-                and not result.get("already_applied")
-            ):
+            if name == "FileWriteTool" and result.get("ok") and not result.get("already_applied"):
                 writes += 1
         if manual is None:
             seed_history("manual")
             manual = control.request()
             print(
-                json.dumps(
-                    {"manual_request": manual["request_id"], "status": manual["status"]}
-                ),
+                json.dumps({"manual_request": manual["request_id"], "status": manual["status"]}),
                 flush=True,
             )
     report = json.loads((workspace / "report.json").read_text(encoding="utf-8"))
@@ -175,8 +163,7 @@ def run(workspace: Path) -> dict:
     automatic = [
         event
         for event in events
-        if event.get("type") == "context_compression"
-        and event.get("reason") == "automatic"
+        if event.get("type") == "context_compression" and event.get("reason") == "automatic"
     ]
     assert automatic, "automatic compaction did not occur"
     assert manual and control.get(manual["request_id"])["status"] == "applied"
@@ -294,9 +281,7 @@ def run_workflow(workspace: Path) -> dict:
     assert verified, "the workflow verifier did not pass"
     budgets = [event for event in events if event.get("type") == "context_budget"]
     assert all(event["input_tokens"] <= event["token_limit"] for event in budgets)
-    compactions = [
-        event for event in events if event.get("type") == "context_compression"
-    ]
+    compactions = [event for event in events if event.get("type") == "context_compression"]
     assert compactions, "full workflow did not trigger compaction"
     actual_writes = sum(
         event.get("type") == "tool_result"
@@ -319,9 +304,7 @@ def run_workflow(workspace: Path) -> dict:
         "successful_writes": actual_writes,
         "events": events,
     }
-    (workspace / "acceptance.json").write_text(
-        json.dumps(result, ensure_ascii=False, indent=2)
-    )
+    (workspace / "acceptance.json").write_text(json.dumps(result, ensure_ascii=False, indent=2))
     return result
 
 

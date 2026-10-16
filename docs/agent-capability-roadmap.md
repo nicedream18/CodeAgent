@@ -1,5 +1,7 @@
 # MokioClaw Agent 能力扩展：学习与实验路线
 
+七阶段增量优化已接入本路线的原有能力：项目规则 → 仓库探索 → 补充指令 → MCP 按需目录 → hooks → 文件回退 → 流程/模型预算。实现导读见 [设计说明](optimization-design.md)，逐阶段实验和回归数据见 [验收记录](optimization-acceptance.md)。默认保留完整多 Agent 流程。
+
 这份路线把新增能力拆成独立章节。每一章先运行实验，再实现功能，最后用验收用例确认边界行为。现有 CLI、TUI 和 Python event generator 保持可用；CLI/TUI 默认通过本机 daemon 运行，Python API 默认仍在当前进程执行。
 
 ## 章节顺序

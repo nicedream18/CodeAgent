@@ -35,21 +35,14 @@ def test_cancel_rpc_is_idempotent_wakes_approval_and_preserves_terminal_state(tm
     daemon.runs[record.run_id] = record
     waiter = ApprovalWaiter(ApprovalRequest("a1", "write", "file"))
     record.waiters["a1"] = waiter
-    assert (
-        request(daemon, "cancel_run", run_id="missing")["error_type"] == "unknown_run"
-    )
+    assert request(daemon, "cancel_run", run_id="missing")["error_type"] == "unknown_run"
     assert request(daemon, "cancel_run", run_id=record.run_id)["cancel_requested"]
     assert waiter.event.is_set() and not waiter.decision.approved
     request(daemon, "cancel_run", run_id=record.run_id)
-    assert (
-        sum(row["event"]["type"] == "run_cancel_requested" for row in record.events)
-        == 1
-    )
+    assert sum(row["event"]["type"] == "run_cancel_requested" for row in record.events) == 1
     assert record.status == "running"
     record.run_control.finish("interrupted")
-    assert (
-        request(daemon, "cancel_run", run_id=record.run_id)["status"] == "interrupted"
-    )
+    assert request(daemon, "cancel_run", run_id=record.run_id)["status"] == "interrupted"
     finished = RunRecord("done", tmp_path / "done")
     finished.status = finished.run_control.finish("finished")
     daemon.runs["done"] = finished
@@ -85,14 +78,10 @@ def test_real_graph_cancel_during_router_has_one_trace_and_no_next_node(
 
     def consume():
         try:
-            stream = (
-                agent.stream_session_events if session else agent.stream_agent_events
-            )
+            stream = agent.stream_session_events if session else agent.stream_agent_events
             options = {"session_workspace" if session else "workspace": tmp_path}
-            received.extend(
-                stream("任务", run_control=control, approval_mode="deny", **options)
-            )
-        except BaseException as exc:
+            received.extend(stream("任务", run_control=control, approval_mode="deny", **options))
+        except BaseException as exc:  # noqa: BLE001 — capture thread control signals for assertions
             failures.append(exc)
 
     worker = threading.Thread(target=consume)
@@ -106,19 +95,10 @@ def test_real_graph_cancel_during_router_has_one_trace_and_no_next_node(
     assert len(traces) == 1
     summary = json.loads((traces[0] / "summary.json").read_text())
     assert summary["status"] == "interrupted"
-    checkpoint = json.loads(
-        (tmp_path / ".mokioclaw/checkpoints/checkpoint.json").read_text()
-    )
+    checkpoint = json.loads((tmp_path / ".mokioclaw/checkpoints/checkpoint.json").read_text())
     assert checkpoint["status"] == "interrupted"
-    rows = [
-        json.loads(line)
-        for line in (traces[0] / "events.jsonl").read_text().splitlines()
-    ]
-    ends = [
-        row["payload"]["payload"]
-        for row in rows
-        if row["type"] == "custom:llm_stream_end"
-    ]
+    rows = [json.loads(line) for line in (traces[0] / "events.jsonl").read_text().splitlines()]
+    ends = [row["payload"]["payload"] for row in rows if row["type"] == "custom:llm_stream_end"]
     assert len(ends) == 1 and ends[0]["status"] == "interrupted"
     assert (tmp_path / ends[0]["full_output_path"]).read_text() == "部分路由文本"
     assert received[-1]["event"]["status"] == "interrupted"
@@ -140,15 +120,10 @@ def test_graph_failure_still_writes_failed_trace_and_checkpoint(tmp_path, monkey
     with pytest.raises(ValueError, match="broken graph"):
         list(agent.stream_agent_events("test", workspace=tmp_path))
     summaries = list(tmp_path.glob(".mokioclaw/traces/*/summary.json"))
-    assert (
-        len(summaries) == 1
-        and json.loads(summaries[0].read_text())["status"] == "failed"
-    )
+    assert len(summaries) == 1 and json.loads(summaries[0].read_text())["status"] == "failed"
 
 
-def test_background_child_control_is_independent_and_loop_is_closed(
-    tmp_path, monkeypatch
-):
+def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, monkeypatch):
     from mokioclaw.agents.registry import SubagentDefinition, SubagentRegistry
     from mokioclaw.graph import nodes
 
@@ -246,7 +221,7 @@ def test_live_daemon_cancel_foreground_preserves_background_work(tmp_path, monke
     def consume():
         try:
             received.extend(daemon_client.run_via_daemon("run", "test", options={}))
-        except BaseException as exc:
+        except BaseException as exc:  # noqa: BLE001 — capture thread control signals for assertions
             errors.append(exc)
 
     consumer = threading.Thread(target=consume)
@@ -301,16 +276,12 @@ def test_daemon_cancellation_unblocks_approval_without_execution(tmp_path, monke
     daemon.executor.shutdown()
 
 
-def test_tui_real_ctrl_c_stream_state_partial_text_and_approval_release(
-    tmp_path, monkeypatch
-):
+def test_tui_real_ctrl_c_stream_state_partial_text_and_approval_release(tmp_path, monkeypatch):
     from mokioclaw.cli.tui import app as tui
     from mokioclaw.cli.tui.approval import ApprovalGate
 
     calls = []
-    monkeypatch.setattr(
-        tui, "cancel_run", lambda run: calls.append(run) or {"ok": True}
-    )
+    monkeypatch.setattr(tui, "cancel_run", lambda run: calls.append(run) or {"ok": True})
 
     async def scenario():
         app = tui.MokioClawTuiApp(workspace=tmp_path)
@@ -341,9 +312,7 @@ def test_tui_real_ctrl_c_stream_state_partial_text_and_approval_release(
                 )
             await pilot.pause(0.1)
             assert "末尾" in str(app.query_one(".model-preview", Static).render())
-            assert "[bold]开头[/bold]" in str(
-                app.query_one(".model-full", Static).render()
-            )
+            assert "[bold]开头[/bold]" in str(app.query_one(".model-full", Static).render())
             gate = ApprovalGate(ApprovalRequest("a1", "write", "file"))
             app.post_message(tui.ApprovalRequestedMessage(gate))
             await pilot.pause(0.05)
@@ -384,15 +353,11 @@ def test_cli_sigint_cancels_known_run_and_drains_final_status(monkeypatch):
         raise KeyboardInterrupt()
 
     monkeypatch.setattr(cli, "stream_agent_events", stream)
-    monkeypatch.setattr(
-        cli, "cancel_run", lambda run: calls.append(run) or {"ok": True}
-    )
+    monkeypatch.setattr(cli, "cancel_run", lambda run: calls.append(run) or {"ok": True})
     monkeypatch.setattr(
         cli,
         "iter_run_events",
-        lambda *_args, **_kwargs: iter(
-            [{"type": "daemon_run_finished", "status": "interrupted"}]
-        ),
+        lambda *_args, **_kwargs: iter([{"type": "daemon_run_finished", "status": "interrupted"}]),
     )
     result = CliRunner().invoke(cli.app, ["test task"])
     assert result.exit_code == 130
@@ -429,12 +394,10 @@ def test_tui_quit_does_not_cancel_run_and_unblocks_worker(tmp_path, monkeypatch)
         }
 
     async def scenario():
-        app = tui.MokioClawTuiApp(
-            initial_task="test", workspace=tmp_path, stream_factory=stream
-        )
+        app = tui.MokioClawTuiApp(initial_task="test", workspace=tmp_path, stream_factory=stream)
         async with app.run_test(size=(90, 30)) as pilot:
-            await pilot.pause(0.05)
-            assert waiting.is_set()
+            # Wait for the worker handshake, independent of machine scheduling.
+            assert await asyncio.to_thread(waiting.wait, 2)
             await pilot.press("ctrl+q")
         release.set()
         await asyncio.sleep(0.05)
@@ -447,9 +410,7 @@ def test_tui_quit_does_not_cancel_run_and_unblocks_worker(tmp_path, monkeypatch)
 
 
 @pytest.mark.parametrize("mode", ["light", "strict"])
-def test_resume_reads_original_checkpoint_before_new_start_snapshot(
-    tmp_path, monkeypatch, mode
-):
+def test_resume_reads_original_checkpoint_before_new_start_snapshot(tmp_path, monkeypatch, mode):
     from mokioclaw.core import agent
     from mokioclaw.core.checkpoint import CheckpointManager, normalize_resume_task
 
@@ -480,13 +441,8 @@ def test_resume_reads_original_checkpoint_before_new_start_snapshot(
     assert normalize_resume_task(seen["task"]) == "ORIGINAL_TASK"
     assert seen["acceptance_criteria"] == ["ORIGINAL_CRITERION"]
     assert seen["todos"][0]["id"] == "t1"
-    trace_rows = (
-        next(tmp_path.glob(".mokioclaw/traces/*/events.jsonl")).read_text().splitlines()
-    )
-    assert (
-        normalize_resume_task(json.loads(trace_rows[0])["payload"]["task"])
-        == "ORIGINAL_TASK"
-    )
+    trace_rows = next(tmp_path.glob(".mokioclaw/traces/*/events.jsonl")).read_text().splitlines()
+    assert normalize_resume_task(json.loads(trace_rows[0])["payload"]["task"]) == "ORIGINAL_TASK"
     assert len(list(tmp_path.glob(".mokioclaw/traces/*/summary.json"))) == 1
 
 
@@ -504,9 +460,7 @@ def test_late_cancel_reply_cannot_affect_next_tui_run(tmp_path, ok):
             gate = ApprovalGate(ApprovalRequest("a1", "write", "file"))
             app._approval_gates.append(gate)
             app.post_message(
-                tui.AgentEventMessage(
-                    {"type": "ui_cancel_result", "run_id": "old-run", "ok": ok}
-                )
+                tui.AgentEventMessage({"type": "ui_cancel_result", "run_id": "old-run", "ok": ok})
             )
             await pilot.pause(0.03)
             assert gate.decision is None

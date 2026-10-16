@@ -29,9 +29,7 @@ def test_trace_recorder_writes_events_summary_and_timeline(tmp_path: Path) -> No
             "result": {"ok": True},
         }
     )
-    event = trace.end(
-        status="finished", latest_node="final", final_state={"passed": True}
-    )
+    event = trace.end(status="finished", latest_node="final", final_state={"passed": True})
 
     assert event is not None
     assert event["type"] == "trace_summary"
@@ -50,9 +48,7 @@ def test_trace_recorder_trims_long_payload(tmp_path: Path) -> None:
     long_text = "x" * 5000
 
     trace.start({"task": "demo"})
-    trace.record_custom_event(
-        {"type": "tool_result", "result": {"ok": True, "stdout": long_text}}
-    )
+    trace.record_custom_event({"type": "tool_result", "result": {"ok": True, "stdout": long_text}})
 
     line = (trace.root / "events.jsonl").read_text(encoding="utf-8").splitlines()[-1]
     payload = json.loads(line)["payload"]
@@ -64,9 +60,7 @@ def test_trace_recorder_counts_failed_tools_and_approvals(tmp_path: Path) -> Non
     runtime = RuntimeState(workspace=tmp_path, trace_mode="on")
     trace = TraceRecorder(runtime, task="demo")
 
-    trace.record_custom_event(
-        {"type": "tool_call", "node": "codeAgent", "name": "BashTool"}
-    )
+    trace.record_custom_event({"type": "tool_call", "node": "codeAgent", "name": "BashTool"})
     trace.record_custom_event(
         {
             "type": "tool_result",
@@ -84,9 +78,7 @@ def test_trace_recorder_counts_failed_tools_and_approvals(tmp_path: Path) -> Non
 
 
 def test_trace_records_permission_lifecycle_for_one_tool_call(tmp_path: Path) -> None:
-    trace = TraceRecorder(
-        RuntimeState(workspace=tmp_path, trace_mode="on"), task="demo"
-    )
+    trace = TraceRecorder(RuntimeState(workspace=tmp_path, trace_mode="on"), task="demo")
     trace.record_custom_event(
         {
             "type": "permission_requested",
@@ -126,9 +118,7 @@ def test_trace_records_permission_lifecycle_for_one_tool_call(tmp_path: Path) ->
 def test_trace_summarizes_correlated_subagent_handoffs_and_budget(
     tmp_path: Path,
 ) -> None:
-    trace = TraceRecorder(
-        RuntimeState(workspace=tmp_path, trace_mode="on"), task="delegate"
-    )
+    trace = TraceRecorder(RuntimeState(workspace=tmp_path, trace_mode="on"), task="delegate")
     trace.record_custom_event(
         {
             "type": "handoff",

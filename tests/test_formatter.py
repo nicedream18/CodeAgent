@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from mokioclaw.cli.formatter import (
+    render_chat_response,
     render_checkpoint_resumed,
     render_checkpoint_saved,
     render_context_compression,
     render_context_monitor,
-    render_chat_response,
     render_intent_decision,
     render_memory_snapshot,
     render_plan,
@@ -69,9 +69,7 @@ def test_render_verifier_handles_model_checks(capsys) -> None:
             "passed": True,
             "attempts": 1,
             "verifier_summary": "looks good",
-            "verification_checks": [
-                {"name": "html", "passed": True, "detail": "file exists"}
-            ],
+            "verification_checks": [{"name": "html", "passed": True, "detail": "file exists"}],
         }
     )
 

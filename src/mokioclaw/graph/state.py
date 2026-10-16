@@ -64,6 +64,15 @@ class LayeredMemory(TypedDict, total=False):
 
 class MokioGraphState(TypedDict, total=False):
     task: str
+    explicit_skill: str | None
+    repo_context: str
+    repo_explored: bool
+    inbox_reference: str
+    workflow_hint: dict[str, Any]
+    workflow_escalate: bool
+    workflow_upgraded: bool
+    stop_reason: str
+    project_instructions: list[dict[str, Any]]
     latest_user_corrections: list[dict[str, Any]]
     runtime: RuntimeState
     messages: Annotated[list[BaseMessage], add_messages]

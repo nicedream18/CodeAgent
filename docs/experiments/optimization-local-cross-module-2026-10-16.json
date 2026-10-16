@@ -1,0 +1,176 @@
+{
+  "created_at": "2026-10-16T10:01:23.544844+00:00",
+  "source_ref": "a41b0536dc36d9e4b59e457327d49605ed7a3bcb",
+  "real_model": false,
+  "model": "local deterministic fixture",
+  "workspace": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokioclaw-optimization-32_8oy0o",
+  "results": {
+    "cross_module": {
+      "passed": true,
+      "runs": [
+        {
+          "mode": "full",
+          "passed": true,
+          "selected": [
+            "full"
+          ],
+          "duration_ms": 587.612,
+          "metrics": {
+            "requests": 10,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1473,
+                "output_tokens": 133,
+                "total_tokens": 1606,
+                "duration_ms": 0.6,
+                "requests": 1
+              },
+              "repoAgent": {
+                "input_tokens": 2677,
+                "output_tokens": 312,
+                "total_tokens": 2989,
+                "duration_ms": 0.8069999999999999,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 12697,
+                "output_tokens": 452,
+                "total_tokens": 13149,
+                "duration_ms": 0.625,
+                "requests": 2
+              },
+              "codeAgent": {
+                "input_tokens": 19334,
+                "output_tokens": 749,
+                "total_tokens": 20083,
+                "duration_ms": 0.897,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 9317,
+                "output_tokens": 344,
+                "total_tokens": 9661,
+                "duration_ms": 1.006,
+                "requests": 2
+              }
+            },
+            "input_tokens": 45498,
+            "output_tokens": 1990,
+            "total_tokens": 47488,
+            "duration_ms": 3.9349999999999996,
+            "estimated": true
+          }
+        },
+        {
+          "mode": "light",
+          "passed": true,
+          "selected": [
+            "light",
+            "full"
+          ],
+          "duration_ms": 500.975,
+          "metrics": {
+            "requests": 12,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1473,
+                "output_tokens": 133,
+                "total_tokens": 1606,
+                "duration_ms": 0.533,
+                "requests": 1
+              },
+              "codeAgent": {
+                "input_tokens": 29152,
+                "output_tokens": 1312,
+                "total_tokens": 30464,
+                "duration_ms": 1.572,
+                "requests": 5
+              },
+              "repoAgent": {
+                "input_tokens": 2676,
+                "output_tokens": 312,
+                "total_tokens": 2988,
+                "duration_ms": 0.595,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 11557,
+                "output_tokens": 452,
+                "total_tokens": 12009,
+                "duration_ms": 0.583,
+                "requests": 2
+              },
+              "verifier": {
+                "input_tokens": 8785,
+                "output_tokens": 344,
+                "total_tokens": 9129,
+                "duration_ms": 0.577,
+                "requests": 2
+              }
+            },
+            "input_tokens": 53643,
+            "output_tokens": 2553,
+            "total_tokens": 56196,
+            "duration_ms": 3.86,
+            "estimated": true
+          }
+        },
+        {
+          "mode": "auto",
+          "passed": true,
+          "selected": [
+            "full"
+          ],
+          "duration_ms": 592.042,
+          "metrics": {
+            "requests": 10,
+            "roles": {
+              "intent_router": {
+                "input_tokens": 1473,
+                "output_tokens": 133,
+                "total_tokens": 1606,
+                "duration_ms": 0.487,
+                "requests": 1
+              },
+              "repoAgent": {
+                "input_tokens": 2677,
+                "output_tokens": 312,
+                "total_tokens": 2989,
+                "duration_ms": 0.8089999999999999,
+                "requests": 2
+              },
+              "planner": {
+                "input_tokens": 12697,
+                "output_tokens": 452,
+                "total_tokens": 13149,
+                "duration_ms": 0.753,
+                "requests": 2
+              },
+              "codeAgent": {
+                "input_tokens": 19334,
+                "output_tokens": 749,
+                "total_tokens": 20083,
+                "duration_ms": 3.367,
+                "requests": 3
+              },
+              "verifier": {
+                "input_tokens": 9317,
+                "output_tokens": 344,
+                "total_tokens": 9661,
+                "duration_ms": 0.903,
+                "requests": 2
+              }
+            },
+            "input_tokens": 45498,
+            "output_tokens": 1990,
+            "total_tokens": 47488,
+            "duration_ms": 6.319,
+            "estimated": true
+          }
+        }
+      ],
+      "duration_ms": 1683.519
+    }
+  },
+  "passed": true
+}

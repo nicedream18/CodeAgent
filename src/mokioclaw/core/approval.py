@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Literal
 from uuid import uuid4
-
 
 VALID_APPROVAL_MODES = {"inline", "auto", "deny"}
 
@@ -15,12 +15,19 @@ class ApprovalRequest:
     risk_reason: str
     tool_name: str = "BashTool"
     tool_call_id: str = ""
+    run_id: str = ""
+    args_digest: str = ""
+    context_version: int = 0
+    policy_version: int = 0
+    rule_preview: str = ""
 
 
 @dataclass(frozen=True)
 class ApprovalDecision:
     approved: bool
     reason: str = ""
+    scope: Literal["once", "session", "project"] = "once"
+    match_scope: Literal["exact", "directory"] = "exact"
 
 
 RISK_PATTERNS = [

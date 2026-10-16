@@ -33,7 +33,11 @@ def _serialized(method):
     @wraps(method)
     def call(self, *args, **kwargs):
         with self._lock:
-            return method(self, *args, **kwargs)
+            try:
+                return method(self, *args, **kwargs)
+            except OSError as exc:
+                self.errors.append(f"{type(exc).__name__}: {exc}")
+                return None
 
     return call
 
@@ -90,7 +94,11 @@ class TraceRecorder:
         self.stream_nodes: dict[str, str] = {}
         if self.enabled:
             runtime.trace_id = self.trace_id
-            self.root.mkdir(parents=True, exist_ok=True)
+            try:
+                self.root.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                self.errors.append(f"{type(exc).__name__}: {exc}")
+                self.mode = "off"
 
     @property
     def enabled(self) -> bool:
@@ -113,6 +121,23 @@ class TraceRecorder:
                 "resumed": resumed,
                 "resume": resume_event or {},
                 "max_attempts": inputs.get("max_attempts"),
+                "agent_profiles": {
+                    name: {
+                        key: value
+                        for key, value in profile.items()
+                        if key
+                        in {
+                            "source",
+                            "version",
+                            "base",
+                            "allowed_tools",
+                            "max_tool_calls",
+                            "model_profile",
+                        }
+                    }
+                    for name, profile in self.runtime.agent_profiles.items()
+                },
+                "agent_profile_diagnostics": self.runtime.agent_profile_diagnostics,
                 "checkpoint_mode": getattr(self.runtime, "checkpoint_mode", ""),
             },
         )
@@ -151,8 +176,7 @@ class TraceRecorder:
                 )
                 self.context_methods.add(str(event.get("estimation_method", "unknown")))
             elif (
-                event_type == "context_compression"
-                and event.get("status", "applied") == "applied"
+                event_type == "context_compression" and event.get("status", "applied") == "applied"
             ):
                 self.context_metrics["compactions"] += 1
             elif event_type == "context_compression_failed":
@@ -189,35 +213,24 @@ class TraceRecorder:
                         "status": "failed",
                     }
                 )
-            self.stream_buffers[stream_id] = DiagnosticArtifact(
-                self.workspace, "model-stream"
-            )
+            self.stream_buffers[stream_id] = DiagnosticArtifact(self.workspace, "model-stream")
             self.stream_nodes[stream_id] = str(event.get("node", "model"))
         elif event_type == "llm_token":
             if stream_id not in self.stream_buffers:
-                self.stream_buffers[stream_id] = DiagnosticArtifact(
-                    self.workspace, "model-stream"
-                )
+                self.stream_buffers[stream_id] = DiagnosticArtifact(self.workspace, "model-stream")
                 self.stream_nodes[stream_id] = str(event.get("node", "model"))
-            self.stream_buffers[stream_id].write(
-                str(event.get("text", "")).encode("utf-8")
-            )
+            self.stream_buffers[stream_id].write(str(event.get("text", "")).encode("utf-8"))
             return
         elif event_type == "llm_stream_end":
             artifact = self.stream_buffers.pop(stream_id, None)
             self.stream_nodes.pop(stream_id, None)
             if artifact is not None:
-                event = {
-                    **event,
-                    **artifact.finish(),
-                    "text": artifact.tail.decode("utf-8", errors="replace"),
-                }
+                event.update(artifact.finish())
+                event["text"] = artifact.tail.decode("utf-8", errors="replace")
         if event_type == "tool_retry":
             self.tool_retries += 1
             error_type = str(event.get("error_type", "tool_error"))
-            self.tool_retry_errors[error_type] = (
-                self.tool_retry_errors.get(error_type, 0) + 1
-            )
+            self.tool_retry_errors[error_type] = self.tool_retry_errors.get(error_type, 0) + 1
         elif event_type == "tool_call":
             self.tool_calls += 1
         elif event_type == "tool_result":
@@ -226,17 +239,12 @@ class TraceRecorder:
                 if result.get("ok") is False:
                     self.failed_tool_calls += 1
                     error_type = str(result.get("error_type", "tool_error"))
-                    self.tool_error_types[error_type] = (
-                        self.tool_error_types.get(error_type, 0) + 1
-                    )
+                    self.tool_error_types[error_type] = self.tool_error_types.get(error_type, 0) + 1
                 stop_reason = str(result.get("retry_stop_reason", ""))
                 if stop_reason in self.tool_retry_stops:
                     self.tool_retry_stops[stop_reason] += 1
                 call_id = str(event.get("tool_call_id", ""))
-                if (
-                    result.get("requires_approval")
-                    and call_id not in self.permission_call_ids
-                ):
+                if result.get("requires_approval") and call_id not in self.permission_call_ids:
                     self.approval_count += 1
         elif event_type == "permission_requested":
             self.permission_decisions["requested"] += 1
@@ -318,9 +326,7 @@ class TraceRecorder:
                 update = event.get(node)
                 if isinstance(update, dict):
                     self.final_status = (
-                        "passed"
-                        if "PASSED" in str(update.get("final_answer", ""))
-                        else "failed"
+                        "passed" if "PASSED" in str(update.get("final_answer", "")) else "failed"
                     )
         self.record(
             "graph_update",
@@ -369,17 +375,29 @@ class TraceRecorder:
             return
         try:
             self.sequence += 1
+            kind = event_type.removeprefix("custom:")
+            detail = payload.get("payload", payload)
             line = {
                 "seq": self.sequence,
                 "timestamp": utc_now(),
                 "elapsed_ms": self.elapsed_ms(),
                 "type": event_type,
+                "layer": "llm" if kind.startswith("llm_") or kind == "model_usage" else "event",
+                "direction": "CORE→LLM"
+                if kind in {"llm_stream_start", "llm_request"}
+                else "LLM→CORE"
+                if kind.startswith("llm_") or kind == "model_usage"
+                else "CORE",
+                "run_id": getattr(self.runtime, "run_id", ""),
+                "stream_id": detail.get("stream_id"),
+                "tool_call_id": detail.get("tool_call_id"),
+                "event_id": detail.get("event_id"),
                 "payload": compact_payload(payload),
             }
             with (self.root / EVENTS_FILE).open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(line, ensure_ascii=False, default=str) + "\n")
             self._timeline(format_timeline_line(line))
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
             self.errors.append(f"{type(exc).__name__}: {exc}")
 
     def write_summary(self) -> dict[str, Any] | None:
@@ -392,7 +410,7 @@ class TraceRecorder:
                 build_timeline_markdown(summary, self.timeline_items()),
                 encoding="utf-8",
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 — fault boundary; control signals are handled separately
             self.errors.append(f"{type(exc).__name__}: {exc}")
             summary = self.summary_payload()
         return trace_summary_event(summary)
@@ -414,6 +432,7 @@ class TraceRecorder:
         return {
             "trace_id": self.trace_id,
             "status": self.status,
+            "model_metrics": self.runtime.model_metrics,
             "workspace": str(self.workspace),
             "trace_dir": str(self.root),
             "events_file": str(self.root / EVENTS_FILE),
@@ -443,8 +462,7 @@ class TraceRecorder:
             },
             "background_subagent_status_counts": self._background_subagent_status_counts(),
             "background_subagents": [
-                self.background_subagents[key]
-                for key in sorted(self.background_subagents)
+                self.background_subagents[key] for key in sorted(self.background_subagents)
             ],
             "handoffs": [self.handoffs[key] for key in sorted(self.handoffs)],
             "skill_load_successes": self.skill_load_successes,
@@ -492,7 +510,9 @@ def trace_summary_event(summary: dict[str, Any]) -> dict[str, Any]:
 
 
 def compact_payload(value: Any, *, limit: int = MAX_PAYLOAD_TEXT) -> Any:
-    safe = json_safe(value)
+    from mokioclaw.providers.payload_trace import redact
+
+    safe = redact(json_safe(value))
     return _trim_nested(safe, limit=limit)
 
 
@@ -562,9 +582,7 @@ def build_timeline_markdown(summary: dict[str, Any], timeline: list[str]) -> str
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
-    )
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     tmp.replace(path)
 
 

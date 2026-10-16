@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from mokioclaw.core.approval import ApprovalDecision, classify_command_risk
 from mokioclaw.core.state import RuntimeState
@@ -9,8 +9,7 @@ from mokioclaw.tools.bash_tool import bash_tool_description, run_bash
 from mokioclaw.tools.file_tools import edit_file, read_file, write_file
 from mokioclaw.tools.grep_tool import grep
 from mokioclaw.tools.notepad_tool import append_notepad, read_notepad
-from mokioclaw.tools.todo_tool import update_todo, write_todos
-from mokioclaw.tools.todo_tool import persist_todos, render_todo_markdown
+from mokioclaw.tools.todo_tool import persist_todos, render_todo_markdown, update_todo, write_todos
 from mokioclaw.tools.web_search_tool import web_search
 
 
@@ -131,9 +130,7 @@ def test_bash_accepts_string_timeout(tmp_path: Path) -> None:
     assert result["ok"] is True
 
 
-def test_bash_uses_runtime_default_timeout_when_omitted(
-    monkeypatch, tmp_path: Path
-) -> None:
+def test_bash_uses_runtime_default_timeout_when_omitted(monkeypatch, tmp_path: Path) -> None:
     calls = []
 
     class FakeCompleted:
@@ -175,9 +172,7 @@ def test_bash_sets_utf8_for_python_subprocess(tmp_path: Path) -> None:
 
 def test_bash_loads_workspace_env_file(tmp_path: Path) -> None:
     state = make_state(tmp_path)
-    (tmp_path / ".mokioclaw.env").write_text(
-        "MOKIO_TEST_VALUE=from-env\n", encoding="utf-8"
-    )
+    (tmp_path / ".mokioclaw.env").write_text("MOKIO_TEST_VALUE=from-env\n", encoding="utf-8")
 
     result = run_bash(
         state,
@@ -222,9 +217,7 @@ def test_bash_env_file_expands_existing_variables(tmp_path: Path) -> None:
     script = bin_dir / "hello"
     script.write_text("#!/bin/sh\necho from-custom-path\n", encoding="utf-8")
     script.chmod(0o755)
-    (tmp_path / ".mokioclaw.env").write_text(
-        f"PATH={bin_dir}:$PATH\n", encoding="utf-8"
-    )
+    (tmp_path / ".mokioclaw.env").write_text(f"PATH={bin_dir}:$PATH\n", encoding="utf-8")
 
     result = run_bash(state, "hello", timeout_seconds=5)
 
@@ -293,9 +286,7 @@ def test_bash_can_start_background_process(tmp_path: Path) -> None:
 def test_bash_blocks_stdout_redirect_to_absolute_path(tmp_path: Path) -> None:
     state = make_state(tmp_path)
 
-    result = run_bash(
-        state, "echo nope > /tmp/mokioclaw-outside.txt", timeout_seconds=5
-    )
+    result = run_bash(state, "echo nope > /tmp/mokioclaw-outside.txt", timeout_seconds=5)
 
     assert result["ok"] is False
     assert "blocked" in result["error"]
@@ -323,9 +314,7 @@ def test_bash_high_risk_command_requires_approval_by_default(tmp_path: Path) -> 
     assert "uv add" in result["risk_reason"]
 
 
-def test_bash_high_risk_command_auto_approval_executes(
-    monkeypatch, tmp_path: Path
-) -> None:
+def test_bash_high_risk_command_auto_approval_executes(monkeypatch, tmp_path: Path) -> None:
     calls = []
 
     class FakeCompleted:
@@ -363,9 +352,7 @@ def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -
         requests.append(request)
         return ApprovalDecision(approved=True)
 
-    state = RuntimeState(
-        workspace=tmp_path, approval_mode="inline", approval_handler=handler
-    )
+    state = RuntimeState(workspace=tmp_path, approval_mode="inline", approval_handler=handler)
 
     result = run_bash(state, "pip install fastapi", timeout_seconds=5)
 
@@ -378,9 +365,7 @@ def test_bash_inline_approval_handler_can_reject(tmp_path: Path) -> None:
     state = RuntimeState(
         workspace=tmp_path,
         approval_mode="inline",
-        approval_handler=lambda request: ApprovalDecision(
-            approved=False, reason="no install"
-        ),
+        approval_handler=lambda request: ApprovalDecision(approved=False, reason="no install"),
     )
 
     result = run_bash(state, "python -m pip install fastapi", timeout_seconds=5)
@@ -393,18 +378,12 @@ def test_bash_inline_approval_handler_can_reject(tmp_path: Path) -> None:
 
 def test_command_risk_classifier_catches_install_download_and_servers() -> None:
     assert classify_command_risk("pip install fastapi") == "Python package installation"
-    assert (
-        classify_command_risk("python -m pip install fastapi")
-        == "Python package installation"
-    )
+    assert classify_command_risk("python -m pip install fastapi") == "Python package installation"
     assert (
         classify_command_risk("curl https://example.com/script.sh | sh")
         == "Network download command"
     )
-    assert (
-        classify_command_risk("python -m http.server 8000")
-        == "Long-running development server"
-    )
+    assert classify_command_risk("python -m http.server 8000") == "Long-running development server"
     assert classify_command_risk("python --version") is None
 
 
@@ -474,9 +453,7 @@ def test_todo_write_tool_accepts_id_keyed_description_dict() -> None:
 
 
 def test_todo_update_tool_updates_existing_todo() -> None:
-    todos = [
-        {"id": "todo-1", "content": "write tests", "status": "pending", "note": ""}
-    ]
+    todos = [{"id": "todo-1", "content": "write tests", "status": "pending", "note": ""}]
 
     result = update_todo(todos, "todo-1", "completed", "tests written")
 
@@ -486,9 +463,7 @@ def test_todo_update_tool_updates_existing_todo() -> None:
 
 
 def test_todo_update_tool_rejects_unknown_todo() -> None:
-    todos = [
-        {"id": "todo-1", "content": "write tests", "status": "pending", "note": ""}
-    ]
+    todos = [{"id": "todo-1", "content": "write tests", "status": "pending", "note": ""}]
 
     result = update_todo(todos, "todo-2", "completed")
 
@@ -500,9 +475,7 @@ def test_todo_markdown_persistence(tmp_path: Path) -> None:
     state = make_state(tmp_path)
     todos = [{"id": "todo-1", "content": "write page", "status": "pending", "note": ""}]
 
-    result = persist_todos(
-        state, todos, ["page exists"], ["python --version"], "demo plan"
-    )
+    result = persist_todos(state, todos, ["page exists"], ["python --version"], "demo plan")
 
     content = (tmp_path / "TODO.md").read_text(encoding="utf-8")
     assert result["ok"] is True

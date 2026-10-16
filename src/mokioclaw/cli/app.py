@@ -40,11 +40,7 @@ class MokioClawGroup(TyperGroup):
                 break
             if arg.startswith("-"):
                 remaining.append(arg)
-                if (
-                    "=" not in arg
-                    and index + 1 < len(args)
-                    and not args[index + 1].startswith("-")
-                ):
+                if "=" not in arg and index + 1 < len(args) and not args[index + 1].startswith("-"):
                     remaining.append(args[index + 1])
                     index += 2
                     continue
@@ -107,20 +103,14 @@ def daemon_status_command() -> None:
     if status is None:
         safe_echo("MokioClaw daemon is stopped.")
         return
-    active_runs = sum(
-        run_status == "running" for run_status in status.get("runs", {}).values()
-    )
-    safe_echo(
-        f"MokioClaw daemon is running (pid {status.get('pid')}); active runs: {active_runs}."
-    )
+    active_runs = sum(run_status == "running" for run_status in status.get("runs", {}).values())
+    safe_echo(f"MokioClaw daemon is running (pid {status.get('pid')}); active runs: {active_runs}.")
 
 
 @daemon_app.command("stop")
 def daemon_stop_command() -> None:
     safe_echo(
-        "MokioClaw daemon stopped."
-        if stop_daemon()
-        else "MokioClaw daemon is already stopped."
+        "MokioClaw daemon stopped." if stop_daemon() else "MokioClaw daemon is already stopped."
     )
 
 
@@ -150,26 +140,26 @@ def main(
         ),
     ] = 3,
     approval_mode: Annotated[
-        Literal["inline", "auto", "deny"],
+        Literal["inline", "auto", "deny"] | None,
         typer.Option(
             "--approval-mode",
             help="Human approval mode for high-risk BashTool commands: inline, auto, or deny.",
         ),
-    ] = "inline",
+    ] = None,
     checkpoint_mode: Annotated[
-        Literal["light", "strict", "off"],
-        typer.Option(
-            "--checkpoint-mode", help="Checkpoint mode: light, strict, or off."
-        ),
-    ] = "light",
+        Literal["light", "strict", "off"] | None,
+        typer.Option("--checkpoint-mode", help="Checkpoint mode: light, strict, or off."),
+    ] = None,
     trace_mode: Annotated[
-        Literal["on", "off"],
+        Literal["on", "off"] | None,
         typer.Option("--trace-mode", help="Trace logging mode: on or off."),
-    ] = "on",
+    ] = None,
     resume: Annotated[
         Path | None,
         typer.Option("--resume", help="Resume from an existing MokioClaw workspace."),
     ] = None,
+    skill: str | None = typer.Option(None, "--skill"),
+    workflow_mode: Literal["full", "light", "auto"] | None = typer.Option(None, "--workflow-mode"),
 ) -> None:
     if ctx.invoked_subcommand is not None:
         return
@@ -185,9 +175,10 @@ def main(
         "mokioclaw stage 5: MultiAgent + context/harness engineering",
         fg=typer.colors.MAGENTA,
     )
-    approval_handler = _inline_approval_handler if approval_mode == "inline" else None
+    approval_handler = _inline_approval_handler if approval_mode in {None, "inline"} else None
     iterator = stream_agent_events(
         task,
+        **({"skill": skill} if skill else {}),
         workspace=workspace,
         max_attempts=max_attempts,
         approval_mode=approval_mode,
@@ -196,6 +187,7 @@ def main(
         resume_workspace=resume,
         trace_mode=trace_mode,
         use_daemon=True,
+        **({"workflow_mode": workflow_mode} if workflow_mode is not None else {}),
     )
     run_id, status = None, "finished"
     while True:
@@ -206,20 +198,16 @@ def main(
                     run_id = payload.get("run_id")
                 if event.get("type") == "daemon_run_finished":
                     status = event.get("status", status)
-                elif (
-                    isinstance(payload, dict) and payload.get("type") == "run_finished"
-                ):
+                elif isinstance(payload, dict) and payload.get("type") == "run_finished":
                     status = payload.get("status", status)
                 print_event(event)
             break
         except KeyboardInterrupt:
             if not run_id:
-                raise typer.Exit(130)
+                raise typer.Exit(130) from None
             cancel_run(run_id)
             safe_echo("cancelling")
-            iterator = iter_run_events(
-                run_id, approval_handler=lambda _: ApprovalDecision(False)
-            )
+            iterator = iter_run_events(run_id, approval_handler=lambda _: ApprovalDecision(False))
     if status != "finished":
         raise typer.Exit(130 if status == "interrupted" else 1)
 
@@ -233,6 +221,38 @@ def cancel_command(run_id: str) -> None:
         raise typer.Exit(1)
 
 
+@app.command("send")
+def send_command(run_id: str, text: str, message_id: str | None = None) -> None:
+    """Queue a correction for a running foreground task."""
+    from uuid import uuid4
+
+    from mokioclaw.core.daemon_client import submit_run_message
+
+    result = submit_run_message(run_id, message_id or uuid4().hex, text)
+    safe_echo(json.dumps(result, ensure_ascii=False, indent=2))
+    if not result.get("ok"):
+        raise typer.Exit(1)
+
+
+@app.command("rewind")
+def rewind_command(
+    workspace: Annotated[Path, typer.Option("--workspace", "-w")],
+    run_id: str | None = None,
+    file: Annotated[list[str] | None, typer.Option("--file")] = None,
+    apply: bool = typer.Option(False, "--apply"),
+) -> None:
+    """Preview file-tool changes; --apply restores matching files."""
+    from mokioclaw.core.changes import rewind
+
+    try:
+        result = rewind(workspace, run_id, files=file, apply=apply)
+    except (OSError, ValueError, RuntimeError) as exc:
+        result = {"ok": False, "error": str(exc)}
+    safe_echo(json.dumps(result, ensure_ascii=False, indent=2))
+    if not result.get("ok"):
+        raise typer.Exit(1)
+
+
 @app.command("tui")
 def tui(
     task: Annotated[
@@ -240,9 +260,7 @@ def tui(
     ] = None,
     workspace: Annotated[
         Path | None,
-        typer.Option(
-            "--workspace", "-w", help="Workspace for the persistent TUI coding session."
-        ),
+        typer.Option("--workspace", "-w", help="Workspace for the persistent TUI coding session."),
     ] = None,
     max_attempts: Annotated[
         int,
@@ -252,26 +270,26 @@ def tui(
         ),
     ] = 3,
     approval_mode: Annotated[
-        Literal["inline", "auto", "deny"],
+        Literal["inline", "auto", "deny"] | None,
         typer.Option(
             "--approval-mode",
             help="Human approval mode for high-risk BashTool commands: inline, auto, or deny.",
         ),
-    ] = "inline",
+    ] = None,
     checkpoint_mode: Annotated[
-        Literal["light", "strict", "off"],
-        typer.Option(
-            "--checkpoint-mode", help="Checkpoint mode: light, strict, or off."
-        ),
-    ] = "light",
+        Literal["light", "strict", "off"] | None,
+        typer.Option("--checkpoint-mode", help="Checkpoint mode: light, strict, or off."),
+    ] = None,
     trace_mode: Annotated[
-        Literal["on", "off"],
+        Literal["on", "off"] | None,
         typer.Option("--trace-mode", help="Trace logging mode: on or off."),
-    ] = "on",
+    ] = None,
     resume: Annotated[
         Path | None,
         typer.Option("--resume", help="Resume from an existing MokioClaw workspace."),
     ] = None,
+    skill: str | None = typer.Option(None, "--skill"),
+    workflow_mode: Literal["full", "light", "auto"] | None = typer.Option(None, "--workflow-mode"),
 ) -> None:
     """Open the Textual terminal interface."""
     configure_console()
@@ -279,12 +297,14 @@ def tui(
 
     MokioClawTuiApp(
         initial_task=task,
+        skill=skill,
         workspace=workspace,
         max_attempts=max_attempts,
         approval_mode=approval_mode,
         checkpoint_mode=checkpoint_mode,
         trace_mode=trace_mode,
         resume=resume,
+        **({"workflow_mode": workflow_mode} if workflow_mode is not None else {}),
     ).run()
 
 
@@ -355,9 +375,7 @@ def compact_command(
     if request_id:
         raise typer.BadParameter("--request-id requires --run-id")
     try:
-        result = compact_session_history(
-            workspace.expanduser(), keep_recent=keep_recent
-        )
+        result = compact_session_history(workspace.expanduser(), keep_recent=keep_recent)
     except RuntimeError as exc:
         raise typer.BadParameter(str(exc)) from exc
     safe_echo(
@@ -372,7 +390,7 @@ def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
 
     console.print(
         Panel(
-            f"Requested operation:\n{request.command}\n\nReason:\n{request.risk_reason}",
+            f"Requested operation:\n{request.command}\n\nReason:\n{request.risk_reason}\nResource: {request.rule_preview}",
             title=f"Human Approval · {request.tool_name}",
             border_style="yellow",
             box=box.ROUNDED,
@@ -380,7 +398,11 @@ def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
     )
     try:
         answer = (
-            typer.prompt("Approve? [y/N]", default="n", show_default=False)
+            typer.prompt(
+                "Approve? [y/N; s=session allow, d=session deny, p=project allow, x=project deny; append -dir for file parent directory]",
+                default="n",
+                show_default=False,
+            )
             .strip()
             .lower()
         )
@@ -388,7 +410,106 @@ def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
         # Click converts SIGINT at a prompt into Abort; forward the run signal.
         raise KeyboardInterrupt from None
     console.print()
+    choices = {
+        "s": (True, "session"),
+        "d": (False, "session"),
+        "p": (True, "project"),
+        "x": (False, "project"),
+    }
+    directory = answer.endswith("-dir")
+    selected = answer.removesuffix("-dir")
+    if selected in choices:
+        if directory and request.tool_name not in {"FileReadTool", "FileWriteTool", "FileEditTool"}:
+            return ApprovalDecision(False, "Directory rules apply only to file tools.")
+        approved, scope = choices[selected]
+        return ApprovalDecision(
+            approved, scope=scope, match_scope="directory" if directory else "exact"
+        )
     approved = answer in {"y", "yes"}
     return ApprovalDecision(
         approved=approved, reason="" if approved else "Rejected by human operator."
+    )
+
+
+@app.command("trace")
+def trace_command(
+    workspace: Path | None = None,
+    run_id: str | None = None,
+    layer: str | None = None,
+    direction: str | None = None,
+    follow: bool = False,
+    raw: bool = False,
+) -> None:
+    """Read existing traces, optionally following new records; never execute work."""
+    import time
+
+    from mokioclaw.core.daemon_client import daemon_state_dir
+    from mokioclaw.core.transport_trace import TraceReader
+
+    reader = TraceReader()
+    try:
+        while True:
+            for _path, record in reader.read(workspace, daemon_root=daemon_state_dir()):
+                payload = record.get("payload", {})
+                if run_id and (record.get("run_id") or payload.get("run_id")) != run_id:
+                    continue
+                if layer and record.get("layer", "event") != layer:
+                    continue
+                if direction and record.get("direction", "CORE") != direction:
+                    continue
+                if raw:
+                    typer.echo(json.dumps(record, ensure_ascii=False))
+                else:
+                    safe_echo(
+                        f"{record.get('timestamp', '')} {record.get('layer', 'event')} {record.get('direction', 'CORE')} {record.get('type')} run={record.get('run_id', '')}"
+                    )
+            if not follow:
+                return
+            time.sleep(0.2)
+    except KeyboardInterrupt:
+        return
+
+
+permissions_app = typer.Typer(help="Inspect or revoke user-owned project approval rules.")
+app.add_typer(permissions_app, name="permissions")
+
+
+@permissions_app.command("list")
+def permissions_list(
+    workspace: Path = typer.Option(..., "--workspace", "-w"), session_id: str = ""
+) -> None:
+    from mokioclaw.core.daemon_client import permissions
+
+    safe_echo(
+        json.dumps(permissions(workspace, session_id=session_id), ensure_ascii=False, indent=2)
+    )
+
+
+@permissions_app.command("revoke")
+def permissions_revoke(
+    rule_id: str, workspace: Path = typer.Option(..., "--workspace", "-w"), session_id: str = ""
+) -> None:
+    from mokioclaw.core.daemon_client import permissions
+
+    safe_echo(
+        json.dumps(
+            permissions(workspace, action="revoke", rule_id=rule_id, session_id=session_id),
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+
+@permissions_app.command("clear")
+def permissions_clear(
+    workspace: Path = typer.Option(..., "--workspace", "-w"), session_id: str = ""
+) -> None:
+    from mokioclaw.core.daemon_client import permissions
+
+    safe_echo(
+        json.dumps(
+            permissions(workspace, action="clear", session_id=session_id),
+            ensure_ascii=False,
+            indent=2,
+        )
     )

@@ -1,0 +1,60 @@
+# 复制到工作区 .mokioclaw/config.toml；未启用的配置使用项目原有默认值。
+[runtime]
+workflow_mode = "full"             # full | light | auto
+mcp_loading = "deferred"           # deferred | eager
+run_token_limit = 0                # 0 表示不限制运行级预算
+rewind_quota_bytes = 67108864       # 完整原始字节备份，64 MiB
+# approval_mode = "inline"
+# checkpoint_mode = "light"
+# trace_mode = "on"
+
+[runtime.subagent_configs.repoAgent]
+max_tool_calls = 8
+# model_profile = "explorer"
+
+[search]
+backend = "auto"                   # auto（优先 rg）| python
+
+[hooks]
+timeout_seconds = 2
+
+[[hooks.rules]]
+name = "protect-generated"
+event = "PreToolUse"
+tool = "File[WE]*Tool"
+action = "block"
+message = "生成目录通过构建流程更新，请修改对应源文件。"
+args = { file_path = '^(?:\./)?generated/' }
+
+[[hooks.rules]]
+name = "verify-file-change"
+event = "PostToolUse"
+tool = "FileEditTool"
+action = "add_context"
+message = "读取修改后的文件，并验证用户验收标准。"
+
+[[hooks.rules]]
+name = "completion-report"
+event = "RunFinished"
+action = "report"
+message = "请在 trace 中核对工具结果、验证结论和模型用量。"
+
+# 角色模型示例：取消下列注释并填入可信模型配置。
+# [model_profiles.explorer]
+# model = "your-model"
+# base_url = "https://your-provider.example/v1"
+# api_key_env = "EXPLORER_API_KEY"
+# context_tokens = 32768
+# output_tokens = 2048
+#
+# [model_roles]
+# repoAgent = "explorer"
+# planner = "explorer"
+# verifier = "explorer"
+# context_compressor = "explorer"
+#
+# [[runtime.mcp_servers]]
+# name = "echo"
+# description = "本地回显工具，用于测试 MCP"
+# command = "/absolute/path/to/.venv/bin/python"
+# args = ["/absolute/path/to/examples/mcp/echo_server.py"]
