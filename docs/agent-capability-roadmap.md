@@ -12,7 +12,7 @@
 | 4. 可配置 Subagent | 任务委派、上下文隔离、结果契约、预算 | 让 planner 将研究交给 searchAgent，再把证据交给 codeAgent | Subagent 串行运行；工具限制和循环上限生效；handoff、证据、未完成项可追踪 |
 | 5. 上下文治理 | token 水位、输出裁剪、保留关键记忆、compact | 让工具返回超长文本并让对话超过水位；执行 `/compact` 或 `mokioclaw compact` | 模型输出预留预算；长工具字段有截断标记；摘要保留任务和未完成 TODO |
 | 6. MCP stdio | MCP initialize/list/call、子进程生命周期和 schema | 用 `examples/mcp/echo_server.py` 作为本地 MCP server 调用 echo | 工具进入统一权限、重试、输出裁剪、事件和 trace 路径；服务异常返回结构化错误 |
-| 7. Token streaming | 增量响应、工具调用 chunk 聚合、UI 渲染 | 用慢响应 mock 模型观察 Rich/TUI 的增量文字 | 最终消息与聚合文本一致；工具调用 chunk 保留；trace 保存压缩后的完整输出摘要 |
+| 7. Token streaming | 增量响应、工具调用 chunk 聚合、UI 渲染 | 用慢响应 mock 模型观察 Rich/TUI 的增量文字 | 最终消息与聚合文本一致；工具调用 chunk 保留；流与工具事件可关联；中断时保留部分文本及日志引用 |
 | 8. Daemon 与 IPC | JSON-RPC 2.0、NDJSON、事件订阅、断线恢复 | CLI/TUI 同时订阅任务；关闭一个客户端后重连；在另一个客户端批准操作 | daemon 只监听 loopback；客户端自动托管 daemon；run 事件持久化并按序号续订；客户端断开不取消任务 |
 
 ## 配置实验
@@ -159,6 +159,10 @@ MOKIO_MCP_SERVERS='[{"name":"example","command":".venv/bin/python","args":["exam
 MOKIO_CONTEXT_TOKEN_LIMIT=400000
 MOKIO_MODEL_CONTEXT_RESERVE_TOKENS=8192
 MOKIO_CONTEXT_OUTPUT_LIMIT_CHARS=12000
+MOKIO_CONTEXT_RESULT_LIMIT_CHARS=24000
+MOKIO_CONTEXT_SAFETY_TOKENS=1024
+MOKIO_CONTEXT_HIGH_RATIO=0.85
+MOKIO_CONTEXT_TARGET_RATIO=0.60
 MOKIO_TOOL_RETRY_LIMIT=2
 MOKIO_MCP_TIMEOUT_SECONDS=30
 MOKIO_DAEMON_DIR=~/.mokioclaw/daemon
@@ -166,6 +170,8 @@ MOKIO_DAEMON_PORT=8765
 ```
 
 CLI/TUI 首次运行会自动启动本机 daemon。可用 `uv run mokioclaw daemon status` 查看状态，用 `uv run mokioclaw daemon stop` 关闭。
+
+上下文治理的详细实现、自动/手动压缩实验和验收映射见 [完善计划](context-governance-plan.md) 与 [验收记录](context-governance-acceptance.md)。运行中的 TUI 可按 `Ctrl+K` 请求压缩；CLI 可使用 `compact --run-id ... --wait 30`。所有 token 数均注明估算方式，完整工具结果与来源通过磁盘引用补读。
 
 ## 系统数据流
 
@@ -191,3 +197,5 @@ Reconnectable client               └─ trace / checkpoint
 6. 检查 workspace trace、daemon run event log、TODO 和最终验收结果。
 
 测试使用 fake model 和临时 MCP stdio server，不依赖真实模型凭据或外部网络；端到端演示才需要模型和对应 MCP 服务配置。
+
+MCP stdio 与 token streaming 的运行取消、故障边界、实验和验收记录见 [MCP 与流式输出验收](mcp-streaming-acceptance.md)。

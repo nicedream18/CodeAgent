@@ -10,6 +10,7 @@ from rich.pretty import Pretty
 from rich.table import Table
 from rich.text import Text
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.message import Message
 from textual.widgets import Collapsible, Footer, Header, Input, Static
@@ -19,7 +20,7 @@ from mokioclaw.cli.tui.approval import ApprovalGate, ApprovalModal
 from mokioclaw.cli.tui.logo import render_logo
 from mokioclaw.core.agent import stream_session_events
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
-from mokioclaw.core.daemon_client import subagent_status
+from mokioclaw.core.daemon_client import cancel_run, subagent_status
 from mokioclaw.core.paths import default_workspace
 from mokioclaw.core.session import compact_session_history
 
@@ -192,7 +193,8 @@ class MokioClawTuiApp(App[None]):
     """
 
     BINDINGS = [
-        ("ctrl+c", "cancel_or_quit", "Cancel/Quit"),
+        Binding("ctrl+k", "compact_context", "Compact", priority=True),
+        Binding("ctrl+c", "cancel_or_quit", "Cancel/Quit", priority=True),
         ("ctrl+l", "clear_events", "Clear"),
         ("ctrl+q", "quit", "Quit"),
     ]
@@ -234,7 +236,15 @@ class MokioClawTuiApp(App[None]):
         self.todos: list[dict[str, Any]] = []
         self._state_lock = Lock()
         self._llm_streams: dict[str, list[str]] = {}
+        self._stream_cards = {}
+        self._stream_widgets = {}
+        self._dirty_streams = set()
+        self._approval_gates = []
+        self._cancel_requested = False
         self._known_subagents: dict[str, dict[str, Any]] = {}
+        self.active_run_id: str | None = None
+        self.latest_context_budget = "(waiting)"
+        self.latest_context_compression = "(none)"
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -257,12 +267,13 @@ class MokioClawTuiApp(App[None]):
                     id="task-input",
                 )
                 yield Static(
-                    "Enter send · /new · /compact · /subagents · /subagent <id>",
+                    "Enter send · /new · /compact · Ctrl+K compact run · /subagents",
                     id="hint",
                 )
         yield Footer()
 
     def on_mount(self) -> None:
+        self.set_interval(0.05, self._flush_model_streams)
         self._write_welcome()
         self._refresh_sidebar()
         self.query_one("#task-input", Input).focus()
@@ -273,18 +284,15 @@ class MokioClawTuiApp(App[None]):
         if event.input.id != "task-input":
             return
         task = event.value.strip()
+        if task == "/compact":
+            event.input.value = ""
+            self.action_compact_context()
+            return
         if not task or self.running:
             return
         event.input.value = ""
         if task == "/new":
             self.start_new_session()
-            return
-        if task == "/compact":
-            result = compact_session_history(self.session_workspace)
-            self.notify(
-                f"Compacted {result['compacted']} turn(s); kept {result['kept']}."
-            )
-            self._refresh_sidebar()
             return
         if task == "/subagents":
             if not self._known_subagents:
@@ -318,38 +326,96 @@ class MokioClawTuiApp(App[None]):
             return
         self.start_task(task, None)
 
+    def _flush_model_streams(self) -> None:
+        for stream_id in list(self._dirty_streams):
+            self._dirty_streams.discard(stream_id)
+            parts = self._llm_streams.get(stream_id)
+            card = self._stream_cards.get(stream_id)
+            if parts is not None and card is not None:
+                content = "".join(parts)
+                preview, full = self._stream_widgets[stream_id]
+                preview.update(Text(content[-180:] or "Waiting for text…"))
+                full.update(Text(content))
+
+    def _release_approval_gates(self) -> None:
+        with self._state_lock:
+            gates, self._approval_gates = self._approval_gates, []
+        for gate in gates:
+            gate.resolve(False)
+        if self.screen_stack and isinstance(self.screen, ApprovalModal):
+            self.screen.dismiss(False)
+
+    def on_unmount(self) -> None:
+        self._release_approval_gates()
+
     def on_agent_event_message(self, message: AgentEventMessage) -> None:
         envelope = message.event
+        if envelope.get("type") in {"run_cancel_requested", "ui_cancel_result"}:
+            if envelope.get("run_id") and envelope["run_id"] != self.active_run_id:
+                return
+            if envelope.get("ok", True):
+                self._release_approval_gates()
+                self.query_one("#status", Static).update("cancelling")
+            else:
+                self._cancel_requested = False
+                self.notify(
+                    str(envelope.get("error", "Cancel failed")), severity="error"
+                )
+            return
         payload = (
             envelope.get("event") if envelope.get("type") == "custom_event" else None
         )
+        if isinstance(payload, dict) and payload.get("type") == "run_started":
+            self.active_run_id = payload.get("run_id")
+            if self._cancel_requested:
+                self._send_cancel()
         if isinstance(payload, dict) and payload.get("type") in {
             "llm_stream_start",
             "llm_token",
             "llm_stream_end",
         }:
             node = str(payload.get("node", "model"))
-            if payload["type"] == "llm_stream_start":
-                self._llm_streams[node] = []
-                return
+            stream_id = str(payload.get("stream_id") or node)
+            if stream_id not in self._stream_cards:
+                preview = Static(Text("Waiting for text…"), classes="model-preview")
+                full = Static(Text(""), classes="model-full")
+                self._stream_widgets[stream_id] = (preview, full)
+                card = Collapsible(
+                    full, title=f"Model · {node} · running", collapsed=True
+                )
+                container = Vertical(preview, card, classes="event-card event-info")
+                container.styles.height = "auto"
+                self._stream_cards[stream_id] = card
+                self._llm_streams[stream_id] = []
+                self.query_one("#events", VerticalScroll).mount(container)
             if payload["type"] == "llm_token":
-                self._llm_streams.setdefault(node, []).append(
-                    str(payload.get("text", ""))
+                self._llm_streams[stream_id].append(str(payload.get("text", "")))
+                self._dirty_streams.add(stream_id)
+            elif payload["type"] == "llm_stream_end":
+                self._dirty_streams.add(stream_id)
+                self._flush_model_streams()
+                card = self._stream_cards.pop(stream_id)
+                self._stream_widgets.pop(stream_id, None)
+                card.title = f"Model · {node} · {payload.get('status', 'finished')}"
+                self._llm_streams.pop(stream_id, None)
+                status = payload.get("status", "finished")
+                self.query_one("#status", Static).update(
+                    "cancelling"
+                    if self._cancel_requested
+                    else ("running" if status == "finished" else status)
                 )
-                preview = "".join(self._llm_streams[node])[-180:]
-                self.query_one("#status", Static).update(f"{node} · {preview}")
-                return
-            content = "".join(self._llm_streams.pop(node, []))
-            if content:
-                self._mount_event_card(
-                    f"Model · {node}", content[-4000:], category="info", collapsed=False
-                )
-            self.query_one("#status", Static).update("running")
             return
-        self._handle_event(message.event)
+        self._handle_event(envelope)
 
     def on_run_finished_message(self, message: RunFinishedMessage) -> None:
         self.running = False
+        self._release_approval_gates()
+        self._flush_model_streams()
+        for card in self._stream_cards.values():
+            card.title = f"{card.title.rsplit(' · ', 1)[0]} · {message.status}"
+        self._stream_cards.clear()
+        self._stream_widgets.clear()
+        self._llm_streams.clear()
         self.resume = None
         self.query_one("#task-input", Input).disabled = False
         self.query_one("#task-input", Input).focus()
@@ -359,6 +425,12 @@ class MokioClawTuiApp(App[None]):
         self._refresh_sidebar()
 
     def on_approval_requested_message(self, message: ApprovalRequestedMessage) -> None:
+        if self._cancel_requested:
+            message.gate.resolve(False)
+            return
+        with self._state_lock:
+            if message.gate not in self._approval_gates:
+                self._approval_gates.append(message.gate)
         workspace = self.latest_workspace or str(self.workspace or "")
         self.push_screen(
             ApprovalModal(message.gate.request, workspace),
@@ -366,23 +438,81 @@ class MokioClawTuiApp(App[None]):
         )
 
     def action_cancel_or_quit(self) -> None:
-        if self.running:
-            self.notify(
-                "A run is active. Press Ctrl+Q to quit and let checkpoint handle recovery.",
-                severity="warning",
-            )
+        if not self.running:
+            self.exit()
             return
-        self.exit()
+        if self._cancel_requested:
+            return
+        self._cancel_requested = True
+        self.query_one("#status", Static).update("cancelling")
+        if self.active_run_id:
+            self._send_cancel()
+
+    def _send_cancel(self) -> None:
+        run_id = self.active_run_id
+
+        def cancel():
+            try:
+                result = cancel_run(run_id)
+            except Exception as exc:
+                result = {"ok": False, "error": str(exc)}
+            self._post_from_worker(
+                AgentEventMessage(
+                    {**result, "run_id": run_id, "type": "ui_cancel_result"}
+                ),
+            )
+
+        self.run_worker(cancel, thread=True, group="cancel-run")
 
     def action_clear_events(self) -> None:
         self.query_one("#events", VerticalScroll).remove_children()
         self._write_welcome()
+
+    def action_compact_context(self) -> None:
+        if self.running and not self.active_run_id:
+            self.notify(
+                "Run is starting; request compact again once its ID is available."
+            )
+            return
+        run_id = self.active_run_id if self.running else None
+        workspace = self.session_workspace
+
+        def compact() -> None:
+            try:
+                if run_id:
+                    from mokioclaw.core.daemon_client import compact_run
+
+                    result = compact_run(run_id)
+                    event = {**result, "type": "context_compact_request"}
+                else:
+                    result = compact_session_history(workspace)
+                    event = {
+                        **result,
+                        "type": "context_compression",
+                        "reason": "manual",
+                        "agent": "session",
+                    }
+            except Exception as exc:  # noqa: BLE001 - surface worker failures as UI events
+                event = {
+                    "type": "context_compression_failed",
+                    "status": "failed",
+                    "scope": "run" if run_id else "session",
+                    "error": str(exc),
+                }
+            self.call_from_thread(
+                self.post_message,
+                AgentEventMessage({"type": "custom_event", "event": event}),
+            )
+
+        self.run_worker(compact, thread=True, exclusive=True, group="context-compact")
 
     def start_task(self, task: str, resume: Path | None = None) -> None:
         if self.running:
             self.notify("MokioClaw is already running a task.", severity="warning")
             return
         self.running = True
+        self.active_run_id = None
+        self._cancel_requested = False
         self.run_count += 1
         self.todos = []
         self.failed_tool_count = 0
@@ -397,6 +527,17 @@ class MokioClawTuiApp(App[None]):
             exclusive=False,
             name=f"mokioclaw-run-{self.run_count}",
         )
+
+    def _post_from_worker(self, message) -> bool:
+        if not self.is_running:
+            return False
+        try:
+            self.call_from_thread(self.post_message, message)
+        except RuntimeError:
+            if self.is_running:
+                raise
+            return False
+        return True
 
     def _run_stream(self, task: str, resume: Path | None) -> None:
         status = "finished"
@@ -415,7 +556,15 @@ class MokioClawTuiApp(App[None]):
                 trace_mode=self.trace_mode,
                 use_daemon=True,
             ):
-                self.call_from_thread(self.post_message, AgentEventMessage(event))
+                payload = event.get("event", {})
+                if event.get("type") == "daemon_run_finished":
+                    status = event.get("status", status)
+                elif (
+                    isinstance(payload, dict) and payload.get("type") == "run_finished"
+                ):
+                    status = payload.get("status", status)
+                if not self._post_from_worker(AgentEventMessage(event)):
+                    return
         except KeyboardInterrupt:
             status = "interrupted"
         except Exception as exc:
@@ -424,19 +573,25 @@ class MokioClawTuiApp(App[None]):
                 "type": "custom_event",
                 "event": {"type": "tui_error", "error": f"{type(exc).__name__}: {exc}"},
             }
-            self.call_from_thread(self.post_message, AgentEventMessage(error_event))
+            self._post_from_worker(AgentEventMessage(error_event))
         finally:
-            self.call_from_thread(self.post_message, RunFinishedMessage(status))
+            self._post_from_worker(RunFinishedMessage(status))
 
     def _approval_handler(self, request: ApprovalRequest) -> ApprovalDecision:
         gate = ApprovalGate(request)
-        self.call_from_thread(self.post_message, ApprovalRequestedMessage(gate))
+        with self._state_lock:
+            self._approval_gates.append(gate)
+        if not self._post_from_worker(ApprovalRequestedMessage(gate)):
+            gate.resolve(False)
         return gate.wait()
 
     def _resolve_approval(self, gate: ApprovalGate) -> Callable[[bool | None], None]:
         def resolve(result: bool | None) -> None:
             approved = bool(result)
             gate.resolve(approved)
+            with self._state_lock:
+                if gate in self._approval_gates:
+                    self._approval_gates.remove(gate)
             self._refresh_sidebar()
 
         return resolve
@@ -453,6 +608,7 @@ class MokioClawTuiApp(App[None]):
     def _update_state_from_event(self, event: dict[str, Any]) -> None:
         with self._state_lock:
             if event.get("type") == "workspace":
+                self.active_run_id = event.get("run_id") or self.active_run_id
                 self.latest_workspace = str(event.get("path", ""))
                 self.session_workspace = Path(self.latest_workspace)
                 return
@@ -467,6 +623,14 @@ class MokioClawTuiApp(App[None]):
                 self._update_from_payload(event)
 
     def _update_from_payload(self, payload: dict[str, Any]) -> None:
+        if payload.get("type") == "context_budget":
+            self.latest_context_budget = f"{payload.get('input_tokens')} / {payload.get('token_limit')} est. · {payload.get('agent', '')}"
+        if payload.get("type") == "context_compression":
+            self.latest_context_compression = f"{payload.get('before_tokens')} → {payload.get('after_tokens')} est. · {payload.get('scope', 'run')}"
+        if payload.get("type") == "context_compression_failed":
+            self.latest_context_compression = (
+                "failed: " + str(payload.get("error", ""))[:80]
+            )
         if isinstance(payload.get("todos"), list):
             self.todos = payload["todos"]
         if payload.get("type") == "tool_call":
@@ -560,6 +724,8 @@ class MokioClawTuiApp(App[None]):
                 f"tools {tools}",
                 f"approvals {approvals}",
                 f"todos {todos}",
+                f"context {self.latest_context_budget}",
+                f"compact {self.latest_context_compression}",
             ]
         )
         table = Table.grid(padding=(0, 1))
@@ -575,6 +741,8 @@ class MokioClawTuiApp(App[None]):
         table.add_row("tools", tools)
         table.add_row("approvals", approvals)
         table.add_row("todos", todos)
+        table.add_row("context", self.latest_context_budget)
+        table.add_row("compact", self.latest_context_compression)
         self.query_one("#side-state", Static).update(table)
 
     def _todo_sidebar_text(self) -> str:
@@ -665,8 +833,10 @@ class MokioClawTuiApp(App[None]):
         if summary.category == "memory":
             return "memory snapshot updated"
         if summary.category == "context":
-            return self._first_matching_line(
-                body, ("tokens:", "compress:", "next:")
+            primary = self._first_matching_line(body, ("tokens:", "compress:", "next:"))
+            scope = self._first_matching_line(body, ("scope:", "status:"))
+            return shorten(
+                " · ".join(part for part in (primary, scope) if part), 200
             ) or shorten(body, 160)
         if summary.category == "checkpoint":
             status = self._line_value(body, "status") or self._line_value(body, "mode")
@@ -789,6 +959,8 @@ class MokioClawTuiApp(App[None]):
         self.failed_tool_count = 0
         self.tool_count = 0
         self.approval_count = 0
+        self.latest_context_budget = "(waiting)"
+        self.latest_context_compression = "(none)"
         self._refresh_sidebar()
         self._mount_event_card(
             "New Session",

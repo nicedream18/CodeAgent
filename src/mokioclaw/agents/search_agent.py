@@ -6,6 +6,8 @@ from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
+from mokioclaw.core.run_control import RunInterrupted, check_run
+from mokioclaw.core.tool_output import bound_tool_result
 from mokioclaw.graph.state import MokioGraphState
 from mokioclaw.prompts.stage3 import SEARCH_AGENT_PROMPT
 from mokioclaw.providers.openai_provider import create_model, invoke_streaming
@@ -59,7 +61,7 @@ def run_search_agent(
     rounds = max_loops + (1 if state["runtime"].active_subagent_budget else 0)
     for _ in range(rounds):
         response = invoke_streaming(
-            search_agent, messages, writer=writer, node="searchAgent"
+            search_agent, messages, writer=writer, node="searchAgent", state=state
         )
         produced_messages.append(response)
         messages.append(response)
@@ -90,6 +92,11 @@ def run_search_agent(
                 for item in parsed.get("results", []) or []:
                     if isinstance(item, dict):
                         sources.append(item)
+                state["sources"] = _dedupe_sources(
+                    list(state.get("sources") or []) + sources
+                )
+                if answers:
+                    state["research_notes"] = "\n".join(answers)
                 writer(
                     {
                         "type": "search_results",
@@ -113,7 +120,7 @@ def run_search_agent(
         "summary": summary,
         "queries": queries,
         "sources": _dedupe_sources(sources),
-        "messages": produced_messages,
+        "messages": messages[2:],
         "tool_events": tool_events,
         "stop_reason": "tool_budget_exhausted" if budget_exhausted else None,
         "unresolved": (
@@ -139,6 +146,7 @@ def _execute_search_tool(
     name = call.get("name", "")
     args = call.get("args") or {}
     runtime = state.get("runtime") if state else None
+    check_run(runtime)
     tool = build_tool(runtime, name) if runtime is not None else None
     if name != "WebSearchTool" or tool is None:
         budget_failure = (
@@ -164,10 +172,17 @@ def _execute_search_tool(
                 on_event=on_retry,
                 tool_call_id=call.get("id"),
             )
+        except RunInterrupted:
+            raise
         except Exception as exc:
             result = tool_failure_result(exc, tool_name=name)
     return ToolMessage(
-        content=json.dumps(result, ensure_ascii=False),
+        content=json.dumps(
+            bound_tool_result(result, runtime, tool_name=name, writer=on_retry)
+            if runtime is not None
+            else result,
+            ensure_ascii=False,
+        ),
         name=name,
         tool_call_id=call.get("id") or f"{name}-call",
     )

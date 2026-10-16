@@ -8,7 +8,6 @@ from uuid import uuid4
 
 from mokioclaw.core.checkpoint import workspace_manifest
 
-
 SESSION_ROOT = Path(".mokioclaw") / "session"
 SESSION_FILE = "session.json"
 SESSION_SUMMARY_FILE = "SESSION_SUMMARY.md"
@@ -49,6 +48,9 @@ def append_user_turn(session: dict[str, Any], content: str) -> int:
     turn = int(session.get("turn_index", 0)) + 1
     session["turn_index"] = turn
     session["last_task"] = content
+    session.setdefault("user_requirements", []).append(
+        {"turn": turn, "content": content}
+    )
     _append_turn(
         session,
         {
@@ -103,16 +105,64 @@ def save_session(workspace: Path, session: dict[str, Any]) -> dict[str, Any]:
 
 
 def compact_session_history(workspace: Path, *, keep_recent: int = 4) -> dict[str, Any]:
+    from mokioclaw.core.session_lock import session_writer
+
+    with session_writer(workspace):
+        return _compact_saved_session(workspace, keep_recent=keep_recent)
+
+
+def _compact_saved_session(workspace: Path, *, keep_recent: int = 4) -> dict[str, Any]:
     if keep_recent < 1:
         raise ValueError("keep_recent must be at least 1")
     session = load_or_create_session(workspace)
     turns = list(session.get("recent_turns", []))
+    from langchain_core.messages import HumanMessage
+
+    from mokioclaw.core.checkpoint import read_checkpoint
+    from mokioclaw.core.context_budget import estimate_messages
+    from mokioclaw.core.context_compaction import _atomic_json, critical_facts
+
+    before = estimate_messages(
+        None, [HumanMessage(content=build_session_context(workspace, session))]
+    )[0]
+    checkpoint = read_checkpoint(workspace)
+    fact_state = {**checkpoint.get("summary", {}), "task": session.get("last_task", "")}
+    try:
+        catalogue = json.loads(
+            (workspace / ".mokioclaw/checkpoints/context-facts.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        fact_state.update(
+            {key: value for key, value in catalogue.items() if key != "task"}
+        )
+    except (OSError, ValueError):
+        catalogue = {}
+    facts = critical_facts(fact_state)
+    facts["user_requirements"] = session.get("user_requirements") or [
+        {"turn": turn.get("turn"), "content": turn.get("content", "")}
+        for turn in turns
+        if turn.get("role") == "user"
+    ]
+    session["compaction_facts"] = facts
+    session["context_version"] = int(session.get("context_version", 0)) + 1
+    facts_file = session_dir(workspace) / f"facts-{session['context_version']}.json"
+    _atomic_json(facts_file, facts)
+    session["compaction_facts"]["full_facts_path"] = facts_file.relative_to(
+        workspace
+    ).as_posix()
     if len(turns) <= keep_recent:
         return {
             "ok": True,
             "compacted": 0,
             "kept": len(turns),
             "summary": session.get("summary", ""),
+            "scope": "session",
+            "status": "noop",
+            "before_tokens": before,
+            "after_tokens": before,
+            "estimated": True,
+            "estimation_method": "utf8_bytes",
         }
     older, kept = turns[:-keep_recent], turns[-keep_recent:]
     additions = []
@@ -121,21 +171,32 @@ def compact_session_history(workspace: Path, *, keep_recent: int = 4) -> dict[st
         route = f"/{turn.get('route')}" if turn.get("route") else ""
         summary = turn.get("summary") or turn.get("content", "")
         additions.append(
-            f"turn {turn.get('turn')}: {role}{route}: {trim_text(str(summary), 260)}"
+            f"turn {turn.get('turn')}: {role}{route}: {_head_tail(str(summary), 520)}"
         )
     session["summary"] = trim_text(
         "\n".join(
             part for part in [str(session.get("summary", "")), *additions] if part
         ),
-        MAX_SESSION_SUMMARY,
+        1800,
     )
     session["recent_turns"] = kept
     save_session(workspace, session)
+    after = estimate_messages(
+        None, [HumanMessage(content=build_session_context(workspace, session))]
+    )[0]
     return {
         "ok": True,
         "compacted": len(older),
         "kept": len(kept),
         "summary": session.get("summary", ""),
+        "scope": "session",
+        "status": "applied",
+        "before_tokens": before,
+        "after_tokens": after,
+        "estimated": True,
+        "estimation_method": "utf8_bytes",
+        "context_version": session["context_version"],
+        "full_facts_path": facts_file.relative_to(workspace).as_posix(),
     }
 
 
@@ -168,15 +229,51 @@ def build_session_context(
         "workspace": str(workspace),
         "summary": trim_text(str(session.get("summary", "")), 1800),
         "last_route": session.get("last_route", ""),
+        "last_run_status": session.get("last_run_status", ""),
         "last_task": trim_text(str(session.get("last_task", "")), 600),
         "last_final_answer": trim_text(str(session.get("last_final_answer", "")), 900),
         "recent_turns": recent_turns,
         "recent_files": files,
+        "compaction_facts": {
+            key: value
+            for key, value in session.get("compaction_facts", {}).items()
+            if key not in {"task", "user_requirements"}
+        },
+        "user_requirements": session.get("user_requirements", []),
     }
-    return trim_text(
-        json.dumps(payload, ensure_ascii=False, indent=2, default=str),
-        MAX_SESSION_CONTEXT,
+    source_projection = payload["compaction_facts"].get("sources", [])
+    if len(json.dumps(source_projection, ensure_ascii=False)) > 3000:
+        payload["compaction_facts"]["sources"] = {
+            "count": len(source_projection),
+            "full_facts_path": payload["compaction_facts"].get("full_facts_path", ""),
+        }
+    # Required user corrections are never cut through a serialized JSON string.
+    # The request guard will report if those requirements cannot fit the window.
+    context_limit = (
+        MAX_SESSION_CONTEXT // 2
+        if session.get("context_version")
+        else MAX_SESSION_CONTEXT
     )
+    while (
+        len(json.dumps(payload, ensure_ascii=False)) > context_limit
+        and payload["recent_turns"]
+    ):
+        payload["recent_turns"].pop(0)
+    if session.get("context_version"):
+        while (
+            len(json.dumps(payload, ensure_ascii=False)) > context_limit
+            and payload["summary"]
+        ):
+            payload["summary"] = payload["summary"][: len(payload["summary"]) // 2]
+        if len(json.dumps(payload, ensure_ascii=False)) > context_limit:
+            payload["last_final_answer"] = ""
+    return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+
+
+def _head_tail(text: str, limit: int) -> str:
+    if len(text) <= limit:
+        return text
+    return text[: limit // 2] + "\n…\n" + text[-limit // 2 :]
 
 
 def session_started_event(
@@ -267,6 +364,7 @@ def _normalize_session(raw: dict[str, Any], workspace: Path) -> dict[str, Any]:
     session.setdefault("turn_index", 0)
     session.setdefault("summary", "")
     session.setdefault("recent_turns", [])
+    session.setdefault("last_run_status", "")
     session.setdefault("last_route", "")
     session.setdefault("last_task", "")
     session.setdefault("last_final_answer", "")

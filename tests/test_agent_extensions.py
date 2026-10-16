@@ -65,10 +65,17 @@ def test_context_monitor_reserves_model_budget(monkeypatch, tmp_path: Path) -> N
         "mokioclaw.graph.nodes.estimate_context_tokens", lambda state: 850
     )
     result = context_monitor_node(
-        {"runtime": RuntimeState(workspace=tmp_path), "task": "demo"}
+        {
+            "runtime": RuntimeState(
+                workspace=tmp_path,
+                model_context_reserve_tokens=200,
+                context_safety_tokens=0,
+            ),
+            "task": "demo",
+        }
     )
     assert result["context_should_compress"] is True
-    assert result["context_token_limit"] == 800
+    assert result["context_token_limit"] == 680
 
 
 def test_invalid_tool_policy_is_rejected() -> None:
@@ -675,6 +682,7 @@ def test_streaming_model_emits_tokens_and_returns_assembled_message() -> None:
     message = invoke_streaming(_StreamingModel(), [], writer=events.append, node="demo")
     assert message.content == "hello"
     assert [event["type"] for event in events] == [
+        "context_budget",
         "llm_stream_start",
         "llm_token",
         "llm_token",

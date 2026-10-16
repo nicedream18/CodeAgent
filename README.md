@@ -71,11 +71,30 @@ uv run mokioclaw "帮我查阅明日方舟阿米娅，并编写一个 HTML 介�
 - verifier 的失败原因、下一步建议和风险
 - workspace 内 `TODO.md` 和 `NOTEPAD.md` 中的持久上下文
 
-默认压缩阈值是 `400000` token，可通过环境变量调整。为了演示压缩效果，可以临时设置小阈值：
+每次模型调用前都会检查实际消息与工具 schema 的估算预算，包括子 Agent 的工具循环。默认窗口为 `400000`，扣除 `8192` 输出预留和 `1024` 安全余量后，在可用输入预算的 85% 提前压缩，目标降到 60%。输出预留同时作为模型生成上限；窗口必须大于预留量与安全余量，过小的配置会明确报错。
+
+工具结果默认单字段最多保留约 `12000` 字符，整份序列化结果最多 `24000` 字符，并限制集合、深度和遍历数量。裁剪后返回标记与完整输出位置。长单行可以通过 `FileReadTool(char_offset=..., char_limit=...)` 补读；Bash 长输出保留头尾，完整日志仍可读取。统一结果产物（`.mokioclaw/tool-results/`）默认最多保留 32 份，每份不超过 16 MiB，超过限制会明确返回产物保存错误；Bash 输出日志另保留最近 32 份。
+
+为了演示压缩效果，可以运行真实模型验收脚本（会调用 `.env` 中配置的模型）：
 
 ```bash
-MOKIO_CONTEXT_TOKEN_LIMIT=2000 uv run mokioclaw "帮我查阅明日方舟阿米娅，并编写一个 HTML 介绍人物"
+uv run python examples/context_governance_demo.py --workspace /tmp/mokio-context-demo
 ```
+
+脚本会用实际文件工具结果构造长历史，触发自动和手动压缩，随后由真实模型补读规格末尾、创建报告，并通过独立断言验收。使用全新的工作区重复实验。
+
+手动压缩：TUI 空闲时输入 `/compact` 压缩保存的会话；任务运行时按 `Ctrl+K`，在下一次完整工具调用组结束后压缩主任务上下文。CLI 提供：
+
+```bash
+uv run mokioclaw compact --workspace ./workspace --keep-recent 4
+uv run mokioclaw compact --run-id run-xxxxxxxxxxxx --wait 30
+uv run mokioclaw compact --run-id run-xxxxxxxxxxxx --request-id compact-xxxxxxxxxxxx
+uv run mokioclaw compact --run-id run-xxxxxxxxxxxx --request-id compact-xxxxxxxxxxxx --cancel
+```
+
+运行中请求返回 `pending`，完成后变为 `applied`、`noop` 或 `failed`。有活动会话写入者时，离线 workspace compact 返回 `session_busy`，避免覆盖运行中的会话。TUI、CLI 与 trace 都标明作用范围和估算方式。Python 本地执行可以传入 `ContextControl`，通过 `request()` 请求下一次调用前压缩，无需 daemon。
+
+任务、最新用户修正、验收标准和 TODO 状态由运行时保留；模型只摘要历史观察。压缩失败会降级或明确停止超限请求。完整事实与版本保存在 `.mokioclaw/context/`，来源目录位于 `.mokioclaw/memory/`；必要要求本身无法装入窗口时，需要增大窗口或缩小任务范围。参见 [完善计划](docs/context-governance-plan.md) 和 [验收记录](docs/context-governance-acceptance.md)。
 
 ### 分层记忆
 
@@ -335,7 +354,7 @@ uv run mokioclaw --workspace .mokioclaw/workspaces/demo "帮我查阅明日方�
 
 MokioClaw 在现有 MultiAgent、Context Engineering 和 Harness 能力上继续补充通用工具权限、失败重试、SKILL.md、可配置 Subagent、MCP stdio、模型 token streaming 与本机 daemon/IPC。每章包含概念、实验和验收步骤，见 [Agent 能力扩展路线](docs/agent-capability-roadmap.md)。
 
-CLI 和 TUI 会自动连接本机 daemon，任务事件会写入 daemon run event log；客户端断开后任务继续运行。可以用 `mokioclaw daemon status` 查看 daemon，用 `mokioclaw daemon stop` 停止。直接调用 `stream_agent_events()` 或 `stream_session_events()` 的 Python 代码仍在当前进程运行。
+CLI 和 TUI 会自动连接本机 daemon，任务事件会写入 daemon run event log；客户端断开后任务继续运行。按 `Ctrl+C` 会显式取消当前前台任务，已启动的后台 Subagent 继续运行；TUI 的 `Ctrl+Q` 保留退出界面的行为。也可运行 `mokioclaw cancel <run-id>`。可以用 `mokioclaw daemon status` 查看 daemon，用 `mokioclaw daemon stop` 停止。直接调用 `stream_agent_events()` 或 `stream_session_events()` 的 Python 代码仍在当前进程运行。
 
 workspace Skill 放在 `.mokioclaw/skills/<skill-name>/SKILL.md`；用户级 Skill 放在 `~/.mokioclaw/skills/<skill-name>/SKILL.md`。MCP stdio server 通过 `MOKIO_MCP_SERVERS` JSON 数组配置。工具策略、Subagent 调用上限等实验配置也收录在学习路线文档中。
 
@@ -351,6 +370,14 @@ TAVILY_API_KEY=...
 MOKIO_CONTEXT_TOKEN_LIMIT=400000
 MOKIO_MODEL_CONTEXT_RESERVE_TOKENS=8192
 MOKIO_CONTEXT_OUTPUT_LIMIT_CHARS=12000
+MOKIO_CONTEXT_RESULT_LIMIT_CHARS=24000
+MOKIO_CONTEXT_MAX_ITEMS=100
+MOKIO_CONTEXT_MAX_DEPTH=8
+MOKIO_CONTEXT_MAX_NODES=1000
+MOKIO_CONTEXT_SAFETY_TOKENS=1024
+MOKIO_CONTEXT_HIGH_RATIO=0.85
+MOKIO_CONTEXT_TARGET_RATIO=0.60
+MOKIO_MODEL_OUTPUT_PARAMETER=max_tokens
 MOKIO_TOOL_RETRY_LIMIT=2
 MOKIO_TOOL_POLICIES='{"FileWriteTool":"ask"}'
 MOKIO_BASH_DENY_PATTERNS='["\\bdeploy\\b"]'
@@ -386,3 +413,5 @@ uv run pytest -q
 ```bash
 uv run mokioclaw "帮我查阅明日方舟阿米娅，并编写一个 HTML 介绍人物"
 ```
+
+MCP 故障诊断、模型流式输出、取消链路和可复现实验见 [MCP 与流式输出验收](docs/mcp-streaming-acceptance.md)。

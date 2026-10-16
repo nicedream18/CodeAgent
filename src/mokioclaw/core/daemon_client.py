@@ -101,6 +101,38 @@ def stop_daemon() -> bool:
     return True
 
 
+def cancel_run(run_id: str) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(address, "cancel_run", {"run_id": run_id})
+
+
+def compact_run(run_id: str) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(address, "compact_run", {"run_id": run_id})
+
+
+def compact_status(run_id: str, request_id: str) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(
+        address, "compact_status", {"run_id": run_id, "request_id": request_id}
+    )
+
+
+def compact_cancel(run_id: str, request_id: str) -> dict[str, Any]:
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
+    return _request(
+        address, "compact_cancel", {"run_id": run_id, "request_id": request_id}
+    )
+
+
 def subagent_status(run_id: str, *, wait_seconds: float = 0) -> dict[str, Any]:
     address = ensure_daemon(start=False)
     if not address:
@@ -160,6 +192,14 @@ def run_via_daemon(
     serialized["task"] = task
     started = _request(address, "start_run", {"mode": mode, "options": serialized})
     run_id = started["run_id"]
+    yield from iter_run_events(run_id, approval_handler=approval_handler)
+
+
+def iter_run_events(run_id: str, *, approval_handler=None):
+    """Attach to an existing run; reconnect without starting another run."""
+    address = ensure_daemon(start=False)
+    if not address:
+        raise RuntimeError("MokioClaw daemon is stopped")
     after_seq = 0
     while True:
         request_id = uuid4().hex
@@ -191,6 +231,8 @@ def run_via_daemon(
                         item = message.get("params", {})
                         after_seq = max(after_seq, int(item.get("seq", 0)))
                         event = item.get("event", {})
+                        if isinstance(event, dict):
+                            event = {**event, "run_id": run_id}
                         if (
                             isinstance(event, dict)
                             and event.get("type") == "daemon_approval_request"
@@ -223,6 +265,12 @@ def run_via_daemon(
                         yield event
                     elif message.get("method") == "stream_end":
                         return
+        except KeyboardInterrupt:
+            # SIGINT cancels explicitly; socket disconnects continue to reconnect.
+            cancel_run(run_id)
+            approval_handler = lambda _request: ApprovalDecision(
+                False, "Run cancelling."
+            )
         except (OSError, json.JSONDecodeError, ConnectionError):
             time.sleep(0.2)
             refreshed = ensure_daemon(start=False)

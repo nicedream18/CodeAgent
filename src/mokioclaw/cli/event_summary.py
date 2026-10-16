@@ -45,6 +45,18 @@ def summarize_event(event: dict[str, Any]) -> EventSummary:
 
 def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
     event_type = event.get("type", "event")
+    if event_type == "mcp_diagnostic":
+        return EventSummary(
+            f"MCP · {event.get('server')} · {event.get('phase')}",
+            f"status: {event.get('status')} | reason: {event.get('reason', '')} | {event.get('duration_ms')} ms\n"
+            f"{event.get('error', '')}\n{event.get('stderr', '')}\n"
+            f"log: {event.get('full_output_path', '')} | truncated: {event.get('output_truncated', False)}",
+            "error" if event.get("status") == "failed" else "info",
+        )
+    if event_type in {"run_started", "run_finished"}:
+        return EventSummary(
+            "Run", f"{event.get('run_id', '')} {event.get('status', 'running')}", "info"
+        )
     if event_type == "intent_decision":
         route = str(event.get("route", "workflow"))
         return EventSummary(
@@ -164,6 +176,39 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
         return EventSummary(
             "Memory Snapshot", _format_memory_snapshot(event), "memory", "cyan"
         )
+    if event_type == "context_budget":
+        return EventSummary(
+            "Context Budget",
+            (
+                f"tokens: {event.get('input_tokens')} / {event.get('token_limit')} (estimated)\n"
+                f"scope: {event.get('scope')} · agent: {event.get('agent')}\n"
+                f"reserve: {event.get('reserved_tokens')} · safety: {event.get('safety_tokens')}\n"
+                f"method: {event.get('estimation_method')}"
+            ),
+            "context",
+            "blue",
+        )
+    if event_type in {"context_compact_request", "context_compression_failed"}:
+        return EventSummary(
+            "Context Compact",
+            (
+                f"status: {event.get('status')} · scope: {event.get('scope', 'run')}\n"
+                f"request: {event.get('request_id', '')}\n"
+                f"{event.get('error', '')}"
+            ),
+            "context",
+            "red" if event.get("status") == "failed" else "yellow",
+        )
+    if event_type == "tool_output_truncated":
+        return EventSummary(
+            "Tool Output Truncated",
+            (
+                f"tool: {event.get('tool_name')}\nretained characters: {event.get('retained_characters')}\n"
+                f"reasons: {event.get('reasons')}\nfull output: {event.get('full_output_path')}"
+            ),
+            "context",
+            "yellow",
+        )
     if event_type == "context_monitor":
         return EventSummary(
             "Context Monitor",
@@ -184,6 +229,7 @@ def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
             "Context Compression",
             (
                 f"tokens: {compression.get('before_tokens')} -> {compression.get('after_tokens')}\n"
+                f"scope: {compression.get('scope', 'run')} · reason: {compression.get('reason', 'automatic')} · status: {compression.get('status', 'applied')} (estimated)\n"
                 f"removed messages: {compression.get('removed_messages')}\n"
                 f"next: {compression.get('next_node')}\n"
                 f"{shorten(compression.get('summary', ''), 500)}"

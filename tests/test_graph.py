@@ -222,7 +222,11 @@ def test_context_monitor_does_not_compress_below_limit(
     )
     result = context_monitor_node(
         {
-            "runtime": RuntimeState(workspace=tmp_path),
+            "runtime": RuntimeState(
+                workspace=tmp_path,
+                model_context_reserve_tokens=20,
+                context_safety_tokens=0,
+            ),
             "task": "demo",
             "context_next_node": "verifier",
         }
@@ -240,7 +244,11 @@ def test_context_monitor_compresses_at_limit(monkeypatch, tmp_path: Path) -> Non
     )
     result = context_monitor_node(
         {
-            "runtime": RuntimeState(workspace=tmp_path),
+            "runtime": RuntimeState(
+                workspace=tmp_path,
+                model_context_reserve_tokens=20,
+                context_safety_tokens=0,
+            ),
             "task": "demo",
             "context_next_node": "planner",
         }

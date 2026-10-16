@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Callable, Literal
-from typing import Any
+from typing import Any, Callable, Literal
 
 from langchain_core.tools import BaseTool, StructuredTool
 
@@ -10,11 +9,10 @@ from mokioclaw.core.state import RuntimeState
 from mokioclaw.tools.bash_tool import bash_tool_description, run_bash
 from mokioclaw.tools.file_tools import edit_file, read_file, write_file
 from mokioclaw.tools.grep_tool import grep
-from mokioclaw.tools.notepad_tool import append_notepad, read_notepad
-from mokioclaw.tools.web_search_tool import build_web_search_tool
-from mokioclaw.tools.skills import build_load_skill_tool
 from mokioclaw.tools.mcp_tools import build_mcp_tools
-
+from mokioclaw.tools.notepad_tool import append_notepad, read_notepad
+from mokioclaw.tools.skills import build_load_skill_tool
+from mokioclaw.tools.web_search_tool import build_web_search_tool
 
 ToolFactory = Callable[[RuntimeState], BaseTool]
 ToolProfile = Literal["execution", "read_only"]
@@ -38,10 +36,10 @@ class ToolSpec:
 def _file_read(state: RuntimeState) -> StructuredTool:
     return StructuredTool.from_function(
         name="FileReadTool",
-        func=lambda file_path, offset=0, limit=2000: read_file(
-            state, file_path, offset, limit
+        func=lambda file_path, offset=0, limit=2000, char_offset=None, char_limit=8000: (
+            read_file(state, file_path, offset, limit, char_offset, char_limit)
         ),
-        description="Read a UTF-8 text file inside the workspace. Supports offset and limit.",
+        description="Read a UTF-8 text file inside the workspace. Use offset/limit for lines, or char_offset/char_limit for a long single line or a saved tool result. Returned next_char_offset supports further reading.",
     )
 
 

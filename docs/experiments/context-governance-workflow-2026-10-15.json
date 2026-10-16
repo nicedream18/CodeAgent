@@ -1,0 +1,329 @@
+{
+  "date": "2026-10-15",
+  "status": "passed",
+  "model": "deepseek-chat",
+  "method": "Public stream_agent_events API, real router/planner/codeAgent/verifier, no seeded message history.",
+  "configuration": {
+    "window": 48000,
+    "output_reserve": 2048,
+    "safety": 1024,
+    "high_ratio": 0.75,
+    "target_ratio": 0.45,
+    "codeAgent_max_tool_calls": 20,
+    "max_attempts": 2
+  },
+  "workflow_verifier_passed": true,
+  "artifact_verified": true,
+  "report": {
+    "criterion": "PASS_71c5ed570b68",
+    "source": "https://example.test/context-workflow-source"
+  },
+  "request_count": 90,
+  "successful_file_writes": 1,
+  "compactions": [
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 51645,
+      "after_tokens": 15211,
+      "context_version": 1,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 53987,
+      "after_tokens": 15211,
+      "context_version": 2,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 55811,
+      "after_tokens": 15211,
+      "context_version": 3,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 53973,
+      "after_tokens": 15207,
+      "context_version": 4,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 55252,
+      "after_tokens": 15207,
+      "context_version": 5,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 53936,
+      "after_tokens": 17641,
+      "context_version": 6,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57253,
+      "after_tokens": 18015,
+      "context_version": 7,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57627,
+      "after_tokens": 18013,
+      "context_version": 8,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56778,
+      "after_tokens": 18009,
+      "context_version": 9,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57621,
+      "after_tokens": 18010,
+      "context_version": 10,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 36072,
+      "after_tokens": 11116,
+      "context_version": 11,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 53304,
+      "after_tokens": 18104,
+      "context_version": 12,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56872,
+      "after_tokens": 18247,
+      "context_version": 13,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57014,
+      "after_tokens": 18241,
+      "context_version": 14,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57009,
+      "after_tokens": 18241,
+      "context_version": 15,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57008,
+      "after_tokens": 18257,
+      "context_version": 16,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 57011,
+      "after_tokens": 18241,
+      "context_version": 17,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 53161,
+      "after_tokens": 18031,
+      "context_version": 18,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56785,
+      "after_tokens": 18108,
+      "context_version": 19,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56862,
+      "after_tokens": 18098,
+      "context_version": 20,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56852,
+      "after_tokens": 18108,
+      "context_version": 21,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56862,
+      "after_tokens": 18108,
+      "context_version": 22,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "codeAgent",
+      "reason": "automatic",
+      "before_tokens": 56862,
+      "after_tokens": 18112,
+      "context_version": 23,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 34150,
+      "after_tokens": 11108,
+      "context_version": 24,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "graph",
+      "reason": "graph_watermark",
+      "before_tokens": 36530,
+      "after_tokens": 32941,
+      "context_version": 25,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 42542,
+      "after_tokens": 33123,
+      "context_version": 26,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 40200,
+      "after_tokens": 32795,
+      "context_version": 27,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 40020,
+      "after_tokens": 32925,
+      "context_version": 28,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 40030,
+      "after_tokens": 32931,
+      "context_version": 29,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 40182,
+      "after_tokens": 32929,
+      "context_version": 30,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "planner",
+      "reason": "automatic",
+      "before_tokens": 40172,
+      "after_tokens": 32929,
+      "context_version": 31,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "graph",
+      "reason": "graph_watermark",
+      "before_tokens": 34860,
+      "after_tokens": 36841,
+      "context_version": 32,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "agent": "graph",
+      "reason": "graph_watermark",
+      "before_tokens": 42615,
+      "after_tokens": 30541,
+      "context_version": 33,
+      "estimated": true,
+      "estimation_method": "utf8_bytes"
+    }
+  ],
+  "budget_checks_passed": true,
+  "initial_failure_and_fix": "An initial full-flow run exposed None-valued legacy summary fields. Normalizing optional text and a registered-runner regression test fixed startup. Later checks added authoritative TODO synchronization and no-op handling for identical file writes. The final full-flow run passed with one actual write.",
+  "limitations": [
+    "Compatible-endpoint token counts use conservative UTF-8 byte estimates, not reported usage.",
+    "The 20-call specialist budget is an explicit experiment setting; the application default remains 10.",
+    "The real model may repeat read requests after compaction; execution remains bounded by existing tool and workflow limits."
+  ]
+}

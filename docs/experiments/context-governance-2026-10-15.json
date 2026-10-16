@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-15",
+  "status": "passed",
+  "model": "deepseek-chat",
+  "harness": "examples/context_governance_demo.py",
+  "method": "Seed history using actual bounded FileReadTool results; continue with the configured real model and production provider/tool executor. This is a seeded tool-loop acceptance, not a full supervisor CLI run.",
+  "budget": {
+    "window": 24000,
+    "output_reserve": 1024,
+    "safety": 512,
+    "high_ratio": 0.85,
+    "target_ratio": 0.6
+  },
+  "compactions": [
+    {
+      "reason": "automatic",
+      "before_tokens": 53573,
+      "after_tokens": 3384,
+      "context_version": 1,
+      "degraded": false,
+      "target_reached": true,
+      "estimation_method": "utf8_bytes"
+    },
+    {
+      "reason": "manual",
+      "before_tokens": 56918,
+      "after_tokens": 3437,
+      "context_version": 2,
+      "degraded": false,
+      "target_reached": true,
+      "estimation_method": "utf8_bytes"
+    }
+  ],
+  "manual_run": {
+    "status": "applied",
+    "scope": "run",
+    "before_tokens": 56918,
+    "after_tokens": 3437,
+    "context_version": 2
+  },
+  "manual_session": {
+    "status": "applied",
+    "scope": "session",
+    "before_tokens": 7470,
+    "after_tokens": 3181,
+    "compacted": 7,
+    "kept": 2,
+    "estimation_method": "utf8_bytes"
+  },
+  "report": {
+    "criterion": "PASS_57b5e4a53bd3",
+    "source": "https://example.test/context-governance-source"
+  },
+  "verification": {
+    "artifact_matches_spec_tail_and_source": true,
+    "successful_writes": 1,
+    "all_requests_within_estimated_input_budget": true,
+    "source_retained_in_real_followup_after_session_compact": true
+  },
+  "limitations": [
+    "Token counts are conservative estimates for this compatible endpoint, not reported API usage.",
+    "The harness seeds tool history; automated tests separately cover the codeAgent loop, daemon RPC, TUI controls, recovery and background concurrency."
+  ]
+}

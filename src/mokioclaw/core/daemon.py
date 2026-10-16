@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 import secrets
-import socket
 import socketserver
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -13,6 +12,8 @@ from typing import Any
 from uuid import uuid4
 
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
+from mokioclaw.core.context_control import CURRENT_CONTROL, ContextControl
+from mokioclaw.core.run_control import CURRENT_RUN, RunControl, RunInterrupted
 from mokioclaw.core.subagent_tasks import (
     SubagentTaskManager,
     reset_daemon_context,
@@ -37,6 +38,8 @@ class RunRecord:
         self.status = "running"
         self.waiters: dict[str, ApprovalWaiter] = {}
         self.subscribers = 0
+        self.context_control = ContextControl()
+        self.run_control = RunControl()
         self._load_events()
 
     def _load_events(self) -> None:
@@ -161,6 +164,61 @@ class AgentDaemon:
         if not secrets.compare_digest(str(params.get("token", "")), self.token):
             return _error(request_id, -32001, "unauthorized local client")
         method = request.get("method")
+        if method == "cancel_run":
+            with self.lock:
+                record = self.runs.get(str(params.get("run_id", "")))
+            if record is None:
+                return _result(request_id, {"ok": False, "error_type": "unknown_run"})
+            with record.condition:
+                if record.status == "running" and record.run_control.cancel():
+                    for waiter in record.waiters.values():
+                        waiter.decision = ApprovalDecision(
+                            False, "Run cancelled by user."
+                        )
+                        waiter.event.set()
+                    if not any(
+                        item["event"].get("type") == "run_cancel_requested"
+                        for item in record.events
+                    ):
+                        record.append(
+                            {"type": "run_cancel_requested", "run_id": record.run_id}
+                        )
+                return _result(
+                    request_id,
+                    {
+                        "ok": True,
+                        "run_id": record.run_id,
+                        "status": record.run_control.status
+                        if record.run_control.status != "running"
+                        else record.status,
+                        "cancel_requested": record.run_control.cancel_event.is_set(),
+                    },
+                )
+        if method in {"compact_run", "compact_status", "compact_cancel"}:
+            run_id = str(params.get("run_id", ""))
+            with self.lock:
+                record = self.runs.get(run_id)
+            if record is None:
+                return _result(request_id, {"ok": False, "error_type": "unknown_run"})
+            if method == "compact_status":
+                return _result(
+                    request_id,
+                    record.context_control.get(str(params.get("request_id", ""))),
+                )
+            if method == "compact_cancel":
+                result = record.context_control.cancel(
+                    str(params.get("request_id", ""))
+                )
+                record.append({"type": "context_compact_request", **result})
+                return _result(request_id, result)
+            if record.status != "running":
+                return _result(
+                    request_id,
+                    {"ok": False, "status": "failed", "error_type": "run_finished"},
+                )
+            result = record.context_control.request()
+            record.append({"type": "context_compact_request", **result})
+            return _result(request_id, result)
         if method == "start_run":
             run_id = self.start_run(params)
             return _result(request_id, {"run_id": run_id})
@@ -220,6 +278,9 @@ class AgentDaemon:
         )
         run_id = f"run-{uuid4().hex[:12]}"
         record = RunRecord(run_id, self.runs_dir / run_id)
+        record.append(
+            {"type": "custom_event", "event": {"type": "run_started", "run_id": run_id}}
+        )
         with self.lock:
             self.runs[run_id] = record
         (record.root / "run.json").write_text(
@@ -232,6 +293,8 @@ class AgentDaemon:
         return run_id
 
     def _run_task(self, record: RunRecord, mode: str, options: dict[str, Any]) -> None:
+        control_token = CURRENT_CONTROL.set(record.context_control)
+        run_token = CURRENT_RUN.set(record.run_control)
         os.environ["MOKIO_DAEMON_WORKER"] = "1"
         context_token = set_daemon_context(
             self.subagent_manager, record.run_id, record.append
@@ -239,7 +302,9 @@ class AgentDaemon:
 
         def approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             waiter = ApprovalWaiter(request)
-            record.waiters[request.id] = waiter
+            with record.condition:
+                record.run_control.check()
+                record.waiters[request.id] = waiter
             record.append(
                 {"type": "daemon_approval_request", "request": asdict(request)}
             )
@@ -252,7 +317,9 @@ class AgentDaemon:
             if not waiter.event.wait(timeout=approval_timeout_seconds):
                 record.waiters.pop(request.id, None)
                 return ApprovalDecision(False, "Approval request timed out.")
-            record.waiters.pop(request.id, None)
+            with record.condition:
+                record.waiters.pop(request.id, None)
+            record.run_control.check()
             return waiter.decision or ApprovalDecision(
                 False, "Approval was not resolved."
             )
@@ -278,13 +345,21 @@ class AgentDaemon:
             stream = stream_session_events if mode == "session" else stream_agent_events
             for event in stream(options.get("task"), **common, **path_options):
                 record.append(event)
-            record.status = "finished"
+            record.status = record.run_control.finish("finished")
+        except (RunInterrupted, KeyboardInterrupt):
+            record.run_control.cancel()
+            record.status = record.run_control.finish("interrupted")
         except BaseException as exc:
             record.append(
                 {"type": "daemon_run_error", "error": f"{type(exc).__name__}: {exc}"}
             )
-            record.status = "failed"
+            record.status = record.run_control.finish("failed")
         finally:
+            record.run_control.close()
+            for failed in record.context_control.close():
+                record.append({"type": "context_compact_request", **failed})
+            CURRENT_CONTROL.reset(control_token)
+            CURRENT_RUN.reset(run_token)
             reset_daemon_context(context_token)
             try:
                 metadata_path = record.root / "run.json"

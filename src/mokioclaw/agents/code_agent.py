@@ -7,7 +7,9 @@ from typing import Any
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.tools import StructuredTool
 
+from mokioclaw.core.run_control import RunInterrupted, check_run
 from mokioclaw.core.state import RuntimeState
+from mokioclaw.core.tool_output import bound_tool_result
 from mokioclaw.graph.memory import (
     build_layered_memory,
     format_layered_memory_for_prompt,
@@ -36,12 +38,16 @@ def run_code_agent(
     max_loops: int = 10,
 ) -> dict[str, Any]:
     runtime = state["runtime"]
+    check_run(runtime)
     todos = [dict(todo) for todo in state.get("todos", [])]
     writer = writer or (lambda _: None)
     memory = build_layered_memory({**state, "todos": todos}, node="codeAgent")
     writer(memory_event(memory, node="codeAgent"))
     model = create_model()
     registered_tools = build_tools(runtime)
+    from mokioclaw.tools.mcp_tools import emit_mcp_diagnostics
+
+    emit_mcp_diagnostics(runtime, writer)
     if runtime.active_agent_tools is not None:
         registered_tools = [
             tool
@@ -74,7 +80,7 @@ def run_code_agent(
     final_response_allowance = 1 if runtime.active_subagent_budget is not None else 0
     for _ in range(max_loops + final_response_allowance):
         response = invoke_streaming(
-            code_agent, messages, writer=writer, node="codeAgent"
+            code_agent, messages, writer=writer, node="codeAgent", state=state
         )
         produced_messages.append(response)
         messages.append(response)
@@ -93,6 +99,7 @@ def run_code_agent(
             tool_result, todos = execute_code_agent_tool(
                 runtime, todos, call, on_retry=writer, on_event=writer
             )
+            state["todos"] = todos
             event = tool_result_event(tool_result, node="codeAgent")
             tool_events.append(event)
             writer(event)
@@ -136,7 +143,7 @@ def run_code_agent(
         "ok": not budget_exhausted,
         "summary": summary,
         "todos": todos or state.get("todos", []),
-        "messages": produced_messages,
+        "messages": messages[2:],
         "tool_events": tool_events,
         "stop_reason": "tool_budget_exhausted" if budget_exhausted else None,
         "unresolved": (
@@ -155,6 +162,7 @@ def execute_code_agent_tool(
     on_retry=None,
     on_event=None,
 ):
+    check_run(runtime)
     name = call.get("name", "")
     args = call.get("args") or {}
     if name == "TodoUpdateTool":
@@ -167,8 +175,6 @@ def execute_code_agent_tool(
             on_event=on_event,
             tool_call_id=call.get("id"),
         )
-        if result.get("ok"):
-            todos = result["todos"]
     else:
         tools = {tool.name: tool for tool in build_tools(runtime)}
         tool = tools.get(name)
@@ -192,11 +198,18 @@ def execute_code_agent_tool(
                     on_event=on_event,
                     tool_call_id=call.get("id"),
                 )
+            except RunInterrupted:
+                raise
             except Exception as exc:
                 result = tool_failure_result(exc, tool_name=name)
     tool_call_id = call.get("id") or f"{name}-call"
     return ToolMessage(
-        content=json.dumps(result, ensure_ascii=False),
+        content=json.dumps(
+            bound_tool_result(
+                result, runtime, tool_name=name, writer=on_event or on_retry
+            ),
+            ensure_ascii=False,
+        ),
         name=name,
         tool_call_id=tool_call_id,
     ), todos
@@ -217,9 +230,15 @@ def tool_result_event(tool_message: ToolMessage, *, node: str) -> dict[str, Any]
 
 
 def _build_todo_update_tool(todos: list[dict[str, str]]) -> StructuredTool:
+    def apply(todo_id, status, note=""):
+        result = update_todo(todos, todo_id, status, note)
+        if result.get("ok"):
+            todos[:] = result["todos"]
+        return result
+
     return StructuredTool.from_function(
         name="TodoUpdateTool",
-        func=lambda todo_id, status, note="": update_todo(todos, todo_id, status, note),
+        func=apply,
         description="Update one existing todo status. Args: todo_id, status, optional note.",
     )
 

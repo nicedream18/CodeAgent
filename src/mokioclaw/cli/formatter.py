@@ -49,6 +49,9 @@ def _shorten(value: Any, limit: int = 260) -> str:
 
 def print_event(event: dict[str, Any]) -> None:
     event_type = event.get("type")
+    if event_type == "run_cancel_requested":
+        console.print("\ncancelling")
+        return
     if event_type == "workspace":
         console.print(
             Panel(
@@ -72,17 +75,25 @@ def print_custom_event(event: dict[str, Any]) -> None:
     event_type = event.get("type")
     if event_type == "llm_stream_start":
         node = str(event.get("node", "model"))
-        _active_llm_streams.add(node)
-        console.print(f"[{node}] ", end="")
+        _active_llm_streams.add(str(event.get("stream_id") or node))
+        console.print(Text(f"[{node}] "), end="")
         return
     if event_type == "llm_token":
-        console.print(str(event.get("text", "")), end="")
+        console.print(Text(str(event.get("text", ""))), end="")
         return
     if event_type == "llm_stream_end":
-        node = str(event.get("node", "model"))
+        node = str(event.get("stream_id") or event.get("node", "model"))
         if node in _active_llm_streams:
             console.print()
             _active_llm_streams.discard(node)
+        if event.get("status") in {"failed", "interrupted"}:
+            console.print(Text(f"Model stream {event['status']}"), style="yellow")
+        return
+    if event_type in {"mcp_diagnostic", "run_started", "run_finished"}:
+        from mokioclaw.cli.event_summary import summarize_custom_event
+
+        summary = summarize_custom_event(event)
+        console.print(Panel(Text(summary.body), title=summary.title, box=box.ROUNDED))
         return
     if event_type == "intent_decision":
         render_intent_decision(event)
@@ -151,6 +162,17 @@ def print_custom_event(event: dict[str, Any]) -> None:
         return
     if event_type == "context_compression":
         render_context_compression(event)
+        return
+    if event_type in {
+        "context_budget",
+        "context_compact_request",
+        "context_compression_failed",
+        "tool_output_truncated",
+    }:
+        from mokioclaw.cli.event_summary import summarize_custom_event
+
+        summary = summarize_custom_event(event)
+        console.print(Panel(summary.body, title=summary.title, box=box.ROUNDED))
         return
     if event_type == "checkpoint_saved":
         render_checkpoint_saved(event)
@@ -371,6 +393,8 @@ def render_context_compression(update: dict[str, Any]) -> None:
         event = update
     lines = [
         f"tokens: {event.get('before_tokens')} -> {event.get('after_tokens')}",
+        f"scope: {event.get('scope', 'run')}; status: {event.get('status', 'applied')}; estimated",
+        f"reason: {event.get('reason', 'automatic')}; method: {event.get('estimation_method', 'estimated')}",
         f"removed messages: {event.get('removed_messages')}",
         f"next: {event.get('next_node')}",
     ]

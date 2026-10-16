@@ -64,6 +64,7 @@ class LayeredMemory(TypedDict, total=False):
 
 class MokioGraphState(TypedDict, total=False):
     task: str
+    latest_user_corrections: list[dict[str, Any]]
     runtime: RuntimeState
     messages: Annotated[list[BaseMessage], add_messages]
     plan_summary: str
@@ -90,6 +91,7 @@ class MokioGraphState(TypedDict, total=False):
     verifier_summary: str
     verification_checks: list[VerificationCheck]
     context_summary: str
+    context_version: int
     context_token_count: int
     context_token_limit: int
     context_should_compress: bool

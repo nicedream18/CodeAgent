@@ -42,13 +42,27 @@ def build_layered_memory(
     runtime = state["runtime"]
     notepad = read_notepad(runtime)
     history = read_history_summary(runtime)
-    sources = [
+    all_sources = [
         {
             "title": source.get("title", ""),
             "url": source.get("url", ""),
         }
         for source in state.get("sources", [])
     ]
+    sources = all_sources[-30:]
+    source_catalogue = ""
+    if len(json.dumps(all_sources, ensure_ascii=False)) > 4000:
+        import hashlib
+
+        from mokioclaw.core.context_compaction import _atomic_json
+
+        digest = hashlib.sha256(
+            json.dumps(all_sources, ensure_ascii=False).encode()
+        ).hexdigest()[:24]
+        source_catalogue = f".mokioclaw/memory/sources-{digest}.json"
+        _atomic_json(runtime.workspace / source_catalogue, all_sources)
+        while len(json.dumps(sources, ensure_ascii=False)) > 4000 and sources:
+            sources.pop(0)
     working_memory = {
         "node": node,
         "task": state.get("task", ""),
@@ -61,6 +75,7 @@ def build_layered_memory(
         "todos": state.get("todos", []),
         "acceptance_criteria": state.get("acceptance_criteria", []),
         "verification_commands": state.get("verification_commands", []),
+        "latest_user_corrections": state.get("latest_user_corrections", []),
         "research_notes": _short_text(
             state.get("research_notes", ""), MAX_TEXT_CHARS["research_notes"]
         ),
@@ -72,7 +87,8 @@ def build_layered_memory(
         "verifier_summary": _short_text(
             state.get("verifier_summary", ""), MAX_TEXT_CHARS["verifier_summary"]
         ),
-        "verification_checks": state.get("verification_checks", []),
+        "verification_checks": state.get("verification_checks", [])[-20:],
+        "source_catalogue": source_catalogue,
         "last_error": _short_text(
             state.get("last_error", ""), MAX_TEXT_CHARS["last_error"]
         ),
@@ -194,6 +210,7 @@ def _trim_handoffs(handoffs: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _short_text(text: str, limit: int) -> str:
+    text = "" if text is None else str(text)
     if len(text) <= limit:
         return text
     return text[: limit - 3] + "..."

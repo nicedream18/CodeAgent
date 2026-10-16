@@ -23,20 +23,22 @@ from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from mokioclaw.agents.code_agent import run_code_agent as _DEFAULT_CODE_AGENT
 from mokioclaw.agents.registry import registered_subagents, run_subagent
 from mokioclaw.agents.search_agent import run_search_agent as _DEFAULT_SEARCH_AGENT
+from mokioclaw.core.run_control import RunInterrupted, check_run
 
 # Kept as patchable compatibility hooks for callers/tests that replace the
 # original specialist runners.
 run_code_agent = _DEFAULT_CODE_AGENT
 run_search_agent = _DEFAULT_SEARCH_AGENT
+from mokioclaw.core.context_budget import ContextBudget
+from mokioclaw.core.context_compaction import graph_context_updates
+from mokioclaw.core.tool_output import bound_tool_result
 from mokioclaw.graph.memory import (
     build_layered_memory,
     format_layered_memory_for_prompt,
     memory_event,
-    persist_history_summary,
 )
 from mokioclaw.graph.state import MokioGraphState, TodoItem, VerificationCheck
 from mokioclaw.prompts.stage3 import PLANNER_PROMPT, VERIFIER_PROMPT
-from mokioclaw.prompts.stage4 import CONTEXT_COMPRESSION_PROMPT
 from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 from mokioclaw.tools import build_read_only_tools
 from mokioclaw.tools.execution import execute_tool, tool_failure_result
@@ -112,6 +114,7 @@ def intent_router_node(state: MokioGraphState) -> dict[str, Any]:
             ],
             writer=writer,
             node="intent_router",
+            state=state,
         )
         parsed = _extract_json(str(response.content)) or {}
         candidate = str(parsed.get("route", "")).strip().lower()
@@ -126,6 +129,8 @@ def intent_router_node(state: MokioGraphState) -> dict[str, Any]:
                 or "router returned low-confidence or invalid route"
             )
             confidence = parsed_confidence
+    except RunInterrupted:
+        raise
     except Exception as exc:
         reason = f"router error: {type(exc).__name__}: {exc}"
 
@@ -158,8 +163,11 @@ def chat_responder_node(state: MokioGraphState) -> dict[str, Any]:
             ],
             writer=writer,
             node="chat_responder",
+            state=state,
         )
         text = str(getattr(response, "content", "") or "").strip()
+    except RunInterrupted:
+        raise
     except Exception as exc:
         text = f"这是轻量聊天分支，但模型回复暂不可用：{type(exc).__name__}: {exc}"
     if not text:
@@ -209,7 +217,9 @@ def planner_node(state: MokioGraphState) -> dict[str, Any]:
     )
 
     for _ in range(8):
-        response = invoke_streaming(planner, messages, writer=writer, node="planner")
+        response = invoke_streaming(
+            planner, messages, writer=writer, node="planner", state=working_state
+        )
         produced_messages.append(response)
         messages.append(response)
         tool_calls = getattr(response, "tool_calls", None) or []
@@ -246,6 +256,7 @@ def planner_node(state: MokioGraphState) -> dict[str, Any]:
         ),
         "metadata": metadata,
         "context_next_node": "verifier",
+        **graph_context_updates(working_state, messages, "planner"),
     }
 
 
@@ -265,6 +276,9 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
 
     model = create_model()
     verifier = model.bind_tools(build_read_only_tools(state["runtime"]))
+    from mokioclaw.tools.mcp_tools import emit_mcp_diagnostics
+
+    emit_mcp_diagnostics(state["runtime"], writer)
     messages: list[Any] = [
         SystemMessage(content=VERIFIER_PROMPT),
         HumanMessage(content=_verifier_input(state, memory)),
@@ -273,7 +287,9 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
     tool_events: list[dict[str, Any]] = []
 
     for _ in range(8):
-        response = invoke_streaming(verifier, messages, writer=writer, node="verifier")
+        response = invoke_streaming(
+            verifier, messages, writer=writer, node="verifier", state=state
+        )
         produced_messages.append(response)
         messages.append(response)
         tool_calls = getattr(response, "tool_calls", None) or []
@@ -367,26 +383,29 @@ def verifier_node(state: MokioGraphState) -> dict[str, Any]:
         "context_next_node": verifier_route(
             {**state, "passed": passed, "attempts": attempts}
         ),
+        **graph_context_updates(state, messages, "verifier"),
     }
 
 
 def context_monitor_node(state: MokioGraphState) -> dict[str, Any]:
     writer = _get_writer()
-    configured_limit = get_context_token_limit()
-    configured_reserve = int(
-        getattr(state.get("runtime"), "model_context_reserve_tokens", 0) or 0
-    )
-    reserve = min(max(0, configured_reserve), max(0, configured_limit // 5))
-    token_limit = max(1, configured_limit - reserve)
+    budget = ContextBudget.from_runtime(state.get("runtime"))
+    configured_limit = budget.window
+    reserve = budget.output
+    token_limit = budget.high
     token_count = estimate_context_tokens(state)
     should_compress = token_count >= token_limit
     next_node = state.get("context_next_node") or "verifier"
     event = {
         "type": "context_monitor",
+        "scope": "graph",
+        "estimation_method": "graph_state_estimate",
         "token_count": token_count,
         "token_limit": token_limit,
         "configured_token_limit": configured_limit,
         "reserved_tokens": reserve,
+        "safety_tokens": budget.safety,
+        "estimated": True,
         "should_compress": should_compress,
         "next_node": next_node,
         "message_count": len(state.get("messages", [])),
@@ -407,54 +426,50 @@ def context_monitor_route(state: MokioGraphState) -> str:
 
 
 def context_compressor_node(state: MokioGraphState) -> dict[str, Any]:
+    from mokioclaw.core.context_compaction import compact_messages
+
     writer = _get_writer()
     before_tokens = state.get("context_token_count") or estimate_context_tokens(state)
-    before_messages = list(state.get("messages", []))
-    memory = build_layered_memory(state, node="context_compressor")
-    writer(memory_event(memory, node="context_compressor"))
-    compressed = _compress_context_with_model(state, writer=writer)
-    summary = _format_compressed_context(compressed, state)
-    summary_message = AIMessage(content=summary)
-    persist_history_summary(state["runtime"], summary)
-
-    post_state: MokioGraphState = {
-        **state,
-        "messages": [summary_message],
-        "context_summary": summary,
-        "history_summary": summary,
-        "memory_snapshot": build_layered_memory(
-            {**state, "context_summary": summary, "history_summary": summary},
-            node="context_compressor",
-        ),
-        "research_notes": _short_text(state.get("research_notes", ""), 1200),
-        "agent_handoffs": _trim_handoffs(state.get("agent_handoffs", [])),
-        "last_error": _short_text(state.get("last_error", ""), 1600),
-        "code_agent_summary": _short_text(state.get("code_agent_summary", ""), 1200),
-        "verifier_summary": _short_text(state.get("verifier_summary", ""), 1200),
-    }
-    after_tokens = estimate_context_tokens(post_state)
-    compression_event = {
-        "before_tokens": int(before_tokens),
-        "after_tokens": int(after_tokens),
-        "removed_messages": len(before_messages),
-        "summary": _short_text(summary, 1200),
-        "next_node": state.get("context_next_node", "verifier"),
-    }
-    events = list(state.get("compression_events", [])) + [compression_event]
-    writer({"type": "context_compression", **compression_event})
+    historical = [
+        AIMessage(content=_message_text(m)) if isinstance(m, HumanMessage) else m
+        for m in state.get("messages", [])
+    ]
+    try:
+        model = create_model()
+    except RunInterrupted:
+        raise
+    except Exception:
+        model = None
+    replacement, event = compact_messages(
+        model,
+        historical,
+        state,
+        budget=ContextBudget.from_runtime(state["runtime"]),
+        node="graph",
+        reason="graph_watermark",
+        summarizer=lambda *_args: _compress_context_with_model(state, writer=writer),
+    )
+    summary = state.get("context_summary", "")
+    after_tokens = estimate_context_tokens({**state, "messages": replacement})
+    event.update(
+        scope="graph",
+        before_tokens=before_tokens,
+        after_tokens=after_tokens,
+        removed_messages=len(historical),
+        next_node=state.get("context_next_node", "verifier"),
+    )
+    state["compression_events"] = (
+        list(state.get("compression_events", []))[:-1] + [event]
+    )[-20:]
+    writer({**event, "type": "context_compression"})
     return {
-        "messages": [RemoveMessage(id=REMOVE_ALL_MESSAGES), summary_message],
+        "messages": [RemoveMessage(id=REMOVE_ALL_MESSAGES), *replacement],
         "context_summary": summary,
+        "history_summary": state.get("history_summary", summary),
+        "context_version": state["runtime"].context_version,
         "context_token_count": after_tokens,
         "context_should_compress": False,
-        "research_notes": post_state.get("research_notes", ""),
-        "agent_handoffs": post_state.get("agent_handoffs", []),
-        "last_error": post_state.get("last_error", ""),
-        "code_agent_summary": post_state.get("code_agent_summary", ""),
-        "verifier_summary": post_state.get("verifier_summary", ""),
-        "memory_snapshot": post_state.get("memory_snapshot", {}),
-        "history_summary": summary,
-        "compression_events": events,
+        "compression_events": state["compression_events"],
     }
 
 
@@ -522,13 +537,15 @@ def estimate_context_tokens(state: MokioGraphState) -> int:
     payload_message = HumanMessage(
         content=json.dumps(payload, ensure_ascii=False, default=str)
     )
+    from mokioclaw.core.context_budget import estimate_messages
+
     try:
         model = create_model()
-        return int(model.get_num_tokens_from_messages(messages + [payload_message]))
-    except Exception:
-        text = "\n".join(_message_text(message) for message in messages)
-        text += "\n" + payload_message.content
-        return max(1, len(text) // 4)
+    except RunInterrupted:
+        raise
+    except Exception:  # noqa: BLE001 - conservative estimate also works offline
+        model = None
+    return estimate_messages(model, messages + [payload_message], [])[0]
 
 
 def _build_planner_tools(state: MokioGraphState, writer) -> list[StructuredTool]:
@@ -605,6 +622,7 @@ def _call_registered_subagent_tool(
     *,
     run_in_background: bool = False,
 ) -> dict[str, Any]:
+    check_run(state["runtime"])
     name = str(subagent_name)
     handoff_id = str(uuid4())
     runtime = state["runtime"]
@@ -688,19 +706,37 @@ def _call_registered_subagent_tool(
         child_runtime.active_skill_name = None
         child_runtime.active_skill_source = None
         child_runtime.active_subagent_budget = None
+        from mokioclaw.core.run_control import RunControl
+
+        child_runtime.run_control = RunControl()
+        child_runtime.mcp_diagnostics = []
         child_runtime.subagent_applied_results = set()
+        from mokioclaw.core.context_control import ContextControl
+
+        child_runtime.context_control = ContextControl()
+        child_runtime.context_replacements = {}
+        child_runtime.context_checkpoint = {}
+        child_runtime.context_version = 0
+        child_runtime.context_request_sequence = 0
         child_runtime.subagent_registry = source_registry.copy()
         child_state["runtime"] = child_runtime
 
         def runner(child_writer, cancel_event):
             child_runtime.subagent_cancel_event = cancel_event
-            return run_subagent(
-                child_state,
-                name,
-                instruction,
-                writer=child_writer,
-                handoff_id=handoff_id,
-            )
+            from mokioclaw.core.run_control import CURRENT_RUN
+
+            token = CURRENT_RUN.set(child_runtime.run_control)
+            try:
+                return run_subagent(
+                    child_state,
+                    name,
+                    instruction,
+                    writer=child_writer,
+                    handoff_id=handoff_id,
+                )
+            finally:
+                CURRENT_RUN.reset(token)
+                child_runtime.run_control.close()
 
         writer(
             {
@@ -921,7 +957,24 @@ def _agent_result_tool(
             if definition and isinstance(updates, dict):
                 for key, value in updates.items():
                     if key in definition.state_update_fields:
-                        state[key] = copy.deepcopy(value)
+                        if key == "sources" and isinstance(value, list):
+                            merged = {
+                                source.get("url", str(source)): source
+                                for source in state.get("sources", [])
+                            }
+                            merged.update(
+                                {
+                                    source.get("url", str(source)): copy.deepcopy(
+                                        source
+                                    )
+                                    for source in value
+                                }
+                            )
+                            state[key] = list(merged.values())
+                        elif key == "research_notes" and state.get(key) and value:
+                            state[key] = str(value) + "\n\n" + str(state[key])
+                        else:
+                            state[key] = copy.deepcopy(value)
             applied.add(str(run_id))
             writer(
                 {
@@ -965,6 +1018,7 @@ def _agent_cancel_tool(state: MokioGraphState, run_id: str) -> dict[str, Any]:
 def _execute_planner_tool(
     state: MokioGraphState, writer, call: dict[str, Any]
 ) -> ToolMessage:
+    check_run(state.get("runtime") if state else None)
     name = call.get("name", "")
     args = call.get("args") or {}
     writer({"type": "tool_call", "node": "planner", "name": name, "args": args})
@@ -982,8 +1036,11 @@ def _execute_planner_tool(
                 on_event=writer,
                 tool_call_id=call.get("id"),
             )
+        except RunInterrupted:
+            raise
         except Exception as exc:
             result = tool_failure_result(exc, tool_name=name)
+    result = bound_tool_result(result, state["runtime"], tool_name=name, writer=writer)
     tool_message = ToolMessage(
         content=json.dumps(result, ensure_ascii=False),
         name=name,
@@ -996,6 +1053,7 @@ def _execute_planner_tool(
 def _execute_read_only_tool(
     state: MokioGraphState, call: dict[str, Any], *, on_retry=None
 ) -> ToolMessage:
+    check_run(state.get("runtime") if state else None)
     name = call.get("name", "")
     args = call.get("args") or {}
     tools = {tool.name: tool for tool in build_read_only_tools(state["runtime"])}
@@ -1012,8 +1070,13 @@ def _execute_read_only_tool(
                 on_event=on_retry,
                 tool_call_id=call.get("id"),
             )
+        except RunInterrupted:
+            raise
         except Exception as exc:
             result = tool_failure_result(exc, tool_name=name)
+    result = bound_tool_result(
+        result, state["runtime"], tool_name=name, writer=on_retry
+    )
     return ToolMessage(
         content=json.dumps(result, ensure_ascii=False),
         name=name,
@@ -1024,30 +1087,21 @@ def _execute_read_only_tool(
 def _compress_context_with_model(
     state: MokioGraphState, *, writer=None
 ) -> dict[str, Any]:
-    memory = build_layered_memory(state, node="context_compressor")
-    payload = {
-        "context_summary": state.get("context_summary", ""),
-        "memory": memory,
-        "messages": [
-            _message_snapshot(message) for message in state.get("messages", [])
-        ],
-    }
-    messages = [
-        SystemMessage(content=CONTEXT_COMPRESSION_PROMPT),
-        HumanMessage(content=json.dumps(payload, ensure_ascii=False, default=str)),
-    ]
+    from mokioclaw.core.context_compaction import _model_observations, _observations
+
+    extract = _observations([[message] for message in state.get("messages", [])])
     try:
-        response = invoke_streaming(
-            create_model(), messages, writer=writer, node="context_compressor"
+        return _model_observations(
+            state,
+            extract,
+            writer,
+            ContextBudget.from_runtime(state["runtime"]),
+            model_factory=create_model,
         )
-        parsed = _extract_json(str(response.content))
-        if parsed:
-            return parsed
+    except RunInterrupted:
+        raise
     except Exception as exc:
         return _fallback_compression(state, error=f"{type(exc).__name__}: {exc}")
-    return _fallback_compression(
-        state, error="compressor model did not return valid JSON"
-    )
 
 
 def _fallback_compression(state: MokioGraphState, *, error: str = "") -> dict[str, Any]:
@@ -1079,35 +1133,6 @@ def _fallback_compression(state: MokioGraphState, *, error: str = "") -> dict[st
         ],
         "next_steps": state.get("context_next_node", ""),
         "risks": error,
-    }
-
-
-def _format_compressed_context(
-    compressed: dict[str, Any], state: MokioGraphState
-) -> str:
-    payload = {
-        "type": "mokio_context_summary",
-        "task": state.get("task", ""),
-        "plan_summary": state.get("plan_summary", ""),
-        "todos": state.get("todos", []),
-        "acceptance_criteria": state.get("acceptance_criteria", []),
-        "verification_commands": state.get("verification_commands", []),
-        "attempts": state.get("attempts", 0),
-        "passed": state.get("passed"),
-        "compression": compressed,
-    }
-    return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
-
-
-def _context_payload(state: MokioGraphState) -> dict[str, Any]:
-    return build_layered_memory(state, node="graph")
-
-
-def _message_snapshot(message: Any) -> dict[str, str]:
-    return {
-        "type": type(message).__name__,
-        "name": str(getattr(message, "name", "") or ""),
-        "content": _short_text(_message_text(message), 2000),
     }
 
 
@@ -1395,6 +1420,16 @@ def _is_amiya_task(task: str) -> bool:
 
 def _get_writer():
     try:
-        return get_stream_writer()
+        raw_writer = get_stream_writer()
     except RuntimeError:
-        return lambda _: None
+        raw_writer = lambda _: None
+    from mokioclaw.core.run_control import CURRENT_RUN
+
+    control = CURRENT_RUN.get()
+
+    def write(event):
+        if control is not None and control.event_sink is not None:
+            control.event_sink(event)
+        raw_writer(event)
+
+    return write

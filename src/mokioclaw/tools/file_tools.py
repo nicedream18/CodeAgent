@@ -55,6 +55,8 @@ def read_file(
     file_path: str,
     offset: int | str = 0,
     limit: int | str = MAX_READ_LINES,
+    char_offset: int | None = None,
+    char_limit: int = 8000,
 ) -> dict[str, Any]:
     try:
         path = resolve_workspace_path(state, file_path)
@@ -81,6 +83,31 @@ def read_file(
         return {"ok": False, "error": "limit must be > 0"}
 
     text = read_text_lossy(path)
+    if char_offset is not None:
+        if (
+            not isinstance(char_offset, int)
+            or char_offset < 0
+            or not isinstance(char_limit, int)
+            or char_limit < 1
+        ):
+            return {
+                "ok": False,
+                "error": "char_offset must be nonnegative and char_limit must be positive",
+            }
+        char_limit = min(char_limit, state.context_output_limit_chars)
+        selected_text = text[char_offset : char_offset + char_limit]
+        complete = char_offset == 0 and len(selected_text) == len(text)
+        state.record_read(path, complete=complete)
+        return {
+            "ok": True,
+            "path": display_path(state, path),
+            "content": selected_text,
+            "char_offset": char_offset,
+            "total_characters": len(text),
+            "complete": complete,
+            "model_visible_complete": complete,
+            "next_char_offset": char_offset + len(selected_text),
+        }
     lines = text.splitlines()
     limit_value = min(limit_value, MAX_READ_LINES)
     selected = lines[offset_value : offset_value + limit_value]
@@ -97,6 +124,7 @@ def read_file(
         "offset": offset_value,
         "limit": limit_value,
         "complete": complete,
+        "model_visible_complete": complete,
         "content": numbered,
     }
 
@@ -121,6 +149,15 @@ def write_file(state: RuntimeState, file_path: str, content: str) -> dict[str, A
                 "error": "file changed after it was read. Read it again before writing.",
             }
         original = read_text_lossy(path)
+        if original == content:
+            return {
+                "ok": True,
+                "type": "unchanged",
+                "already_applied": True,
+                "path": display_path(state, path),
+                "lines": len(content.splitlines()),
+                "diff": "",
+            }
     else:
         original = ""
 

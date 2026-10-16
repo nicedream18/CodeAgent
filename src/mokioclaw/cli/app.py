@@ -14,7 +14,9 @@ from mokioclaw.cli.formatter import print_event, safe_echo, safe_secho
 from mokioclaw.core.agent import stream_agent_events
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 from mokioclaw.core.daemon_client import (
+    cancel_run,
     daemon_status,
+    iter_run_events,
     iter_subagent_events,
     stop_daemon,
     subagent_cancel,
@@ -184,7 +186,7 @@ def main(
         fg=typer.colors.MAGENTA,
     )
     approval_handler = _inline_approval_handler if approval_mode == "inline" else None
-    for event in stream_agent_events(
+    iterator = stream_agent_events(
         task,
         workspace=workspace,
         max_attempts=max_attempts,
@@ -194,8 +196,41 @@ def main(
         resume_workspace=resume,
         trace_mode=trace_mode,
         use_daemon=True,
-    ):
-        print_event(event)
+    )
+    run_id, status = None, "finished"
+    while True:
+        try:
+            for event in iterator:
+                payload = event.get("event", {})
+                if isinstance(payload, dict) and payload.get("type") == "run_started":
+                    run_id = payload.get("run_id")
+                if event.get("type") == "daemon_run_finished":
+                    status = event.get("status", status)
+                elif (
+                    isinstance(payload, dict) and payload.get("type") == "run_finished"
+                ):
+                    status = payload.get("status", status)
+                print_event(event)
+            break
+        except KeyboardInterrupt:
+            if not run_id:
+                raise typer.Exit(130)
+            cancel_run(run_id)
+            safe_echo("cancelling")
+            iterator = iter_run_events(
+                run_id, approval_handler=lambda _: ApprovalDecision(False)
+            )
+    if status != "finished":
+        raise typer.Exit(130 if status == "interrupted" else 1)
+
+
+@app.command("cancel")
+def cancel_command(run_id: str) -> None:
+    """Cancel a foreground run while keeping detached Subagents running."""
+    result = cancel_run(run_id)
+    safe_echo(json.dumps(result, ensure_ascii=False, indent=2))
+    if not result.get("ok"):
+        raise typer.Exit(1)
 
 
 @app.command("tui")
@@ -256,22 +291,79 @@ def tui(
 @app.command("compact")
 def compact_command(
     workspace: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--workspace",
             "-w",
             help="Workspace whose saved session history should be compacted.",
         ),
-    ],
+    ] = None,
     keep_recent: Annotated[
         int,
         typer.Option("--keep-recent", min=1, help="Number of recent turns to retain."),
     ] = 4,
+    run_id: Annotated[
+        str | None,
+        typer.Option("--run-id", help="Request compaction of an active daemon run."),
+    ] = None,
+    request_id: Annotated[
+        str | None,
+        typer.Option("--request-id", help="Inspect a prior compact request."),
+    ] = None,
+    wait_seconds: Annotated[float, typer.Option("--wait", min=0, max=30)] = 0,
+    cancel: Annotated[
+        bool,
+        typer.Option(
+            "--cancel",
+            help="Cancel a pending compact request; requires --run-id and --request-id.",
+        ),
+    ] = False,
 ) -> None:
-    """Compact a saved session's older turns into its durable summary."""
-    result = compact_session_history(workspace.expanduser(), keep_recent=keep_recent)
+    """Compact a saved session or request compaction of a running Agent."""
+    if (workspace is None) == (run_id is None):
+        raise typer.BadParameter("provide exactly one of --workspace or --run-id")
+    if cancel and (not run_id or not request_id):
+        raise typer.BadParameter("--cancel requires --run-id and --request-id")
+    if run_id:
+        import time
+
+        from mokioclaw.core.daemon_client import (
+            compact_cancel,
+            compact_run,
+            compact_status,
+        )
+
+        result = (
+            compact_cancel(run_id, request_id)
+            if cancel
+            else compact_status(run_id, request_id)
+            if request_id
+            else compact_run(run_id)
+        )
+        deadline = time.monotonic() + wait_seconds
+        while (
+            result.get("ok", True)
+            and result.get("status") in {"pending", "applying"}
+            and time.monotonic() < deadline
+        ):
+            time.sleep(min(0.2, max(0, deadline - time.monotonic())))
+            result = compact_status(run_id, result["request_id"])
+        safe_echo(json.dumps(result, ensure_ascii=False, indent=2))
+        if not result.get("ok", True) or result.get("status") == "failed":
+            raise typer.Exit(1)
+        return
+    if request_id:
+        raise typer.BadParameter("--request-id requires --run-id")
+    try:
+        result = compact_session_history(
+            workspace.expanduser(), keep_recent=keep_recent
+        )
+    except RuntimeError as exc:
+        raise typer.BadParameter(str(exc)) from exc
     safe_echo(
-        f"Compacted {result['compacted']} turn(s); kept {result['kept']} recent turn(s)."
+        f"Compacted {result['compacted']} turn(s); kept {result['kept']} recent turn(s).\n"
+        f"scope: session; status: {result['status']}; estimated tokens: "
+        f"{result['before_tokens']} -> {result['after_tokens']}"
     )
 
 
@@ -286,9 +378,15 @@ def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             box=box.ROUNDED,
         )
     )
-    answer = (
-        typer.prompt("Approve? [y/N]", default="n", show_default=False).strip().lower()
-    )
+    try:
+        answer = (
+            typer.prompt("Approve? [y/N]", default="n", show_default=False)
+            .strip()
+            .lower()
+        )
+    except typer.Abort:
+        # Click converts SIGINT at a prompt into Abort; forward the run signal.
+        raise KeyboardInterrupt from None
     console.print()
     approved = answer in {"y", "yes"}
     return ApprovalDecision(

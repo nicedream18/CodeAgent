@@ -4,13 +4,12 @@ import json
 import shlex
 import shutil
 import subprocess
-from dataclasses import is_dataclass, asdict
+from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from langchain_core.messages import BaseMessage, messages_from_dict, message_to_dict
-
+from langchain_core.messages import BaseMessage, message_to_dict, messages_from_dict
 
 VALID_CHECKPOINT_MODES = {"light", "strict", "off"}
 CHECKPOINT_ROOT = Path(".mokioclaw") / "checkpoints"
@@ -57,7 +56,16 @@ class CheckpointManager:
         if not self.enabled:
             return None
 
+        context_checkpoint = getattr(self.runtime, "context_checkpoint", {})
+        if context_checkpoint.get("context_version", 0) > state.get(
+            "context_version", 0
+        ):
+            state = {**state, **context_checkpoint}
+
         self.root.mkdir(parents=True, exist_ok=True)
+        from mokioclaw.core.context_compaction import _atomic_json, critical_facts
+
+        _atomic_json(self.root / "context-facts.json", critical_facts(state))
         if event is not None and self.mode == "strict":
             self._append_event(event)
 
@@ -337,11 +345,20 @@ def serialize_state(state: dict[str, Any]) -> dict[str, Any]:
             serialized[key] = [serialize_message(message) for message in value]
             continue
         serialized[key] = json_safe(value)
+    runtime = state.get("runtime")
+    if runtime is not None:
+        serialized["applied_subagent_results"] = sorted(
+            runtime.subagent_applied_results
+        )
     return serialized
 
 
 def deserialize_state(data: dict[str, Any], runtime: Any) -> dict[str, Any]:
     state = dict(data)
+    runtime.context_version = int(state.get("context_version", 0))
+    if runtime.context_control is not None:
+        runtime.context_control.version = runtime.context_version
+    runtime.subagent_applied_results.update(state.get("applied_subagent_results", []))
     messages = state.get("messages")
     if isinstance(messages, list):
         state["messages"] = deserialize_messages(messages)
@@ -373,6 +390,12 @@ def state_summary(state: dict[str, Any]) -> dict[str, Any]:
     sources = state.get("sources", [])
     return {
         "plan_summary": trim_text(state.get("plan_summary", ""), 1200),
+        "context_version": state.get("context_version", 0),
+        "latest_user_corrections": json_safe(state.get("latest_user_corrections", [])),
+        "agent_handoffs": json_safe(state.get("agent_handoffs", [])),
+        "applied_subagent_results": sorted(
+            getattr(state.get("runtime"), "subagent_applied_results", set())
+        ),
         "todos": json_safe(todos),
         "todo_count": len(todos) if isinstance(todos, list) else 0,
         "acceptance_criteria": json_safe(state.get("acceptance_criteria", [])),
@@ -603,6 +626,10 @@ def should_skip_workspace_path(rel: Path) -> bool:
 
 def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> None:
     for key in (
+        "context_version",
+        "latest_user_corrections",
+        "agent_handoffs",
+        "applied_subagent_results",
         "plan_summary",
         "todos",
         "acceptance_criteria",
@@ -615,6 +642,32 @@ def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> Non
     ):
         if key in summary and summary[key]:
             inputs[key] = summary[key]
+    runtime = inputs.get("runtime")
+    if runtime is not None:
+        runtime.context_version = int(inputs.get("context_version", 0))
+        if runtime.context_control is not None:
+            runtime.context_control.version = runtime.context_version
+        facts_file = checkpoint_dir(runtime.workspace) / "context-facts.json"
+        try:
+            facts = json.loads(facts_file.read_text(encoding="utf-8"))
+            for key in (
+                "sources",
+                "latest_user_corrections",
+                "todos",
+                "acceptance_criteria",
+                "verification_commands",
+            ):
+                if key in facts:
+                    inputs[key] = facts[key]
+            runtime.subagent_applied_results.update(
+                facts.get("applied_subagent_results", [])
+            )
+        except (OSError, ValueError):
+            # Older checkpoints have no separate complete fact catalogue.
+            inputs["metadata"] = {
+                **inputs.get("metadata", {}),
+                "context_facts_available": False,
+            }
 
 
 def _markdown_items(items: list[Any]) -> list[str]:

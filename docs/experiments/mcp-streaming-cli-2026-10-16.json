@@ -1,0 +1,10 @@
+{
+  "client_exit_code": 130,
+  "daemon_status": "interrupted",
+  "trace_status": "interrupted",
+  "chat_stream_end_status": "interrupted",
+  "partial_text_characters": 51,
+  "experiment_dir": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-cli-stream-20261016-6vvdvo7d",
+  "workspace": "/Users/nicedream/xm/MokioAgent/.mokioclaw/workspaces/workspace-20261016-142646-b69607",
+  "partial_text": "# Python生成器工作原理详解（20节）\n\n## 第1节：什么是生成器\n生成器是Python中一种"
+}

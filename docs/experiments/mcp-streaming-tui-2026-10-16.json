@@ -1,0 +1,27 @@
+{
+  "model": "deepseek-chat",
+  "ui": "Textual run_test with actual Ctrl+C key",
+  "cancel_transport": "local RunControl callback; daemon RPC separately verified by real CLI",
+  "runs": [
+    {
+      "status": "finished",
+      "delta_count": 25,
+      "rendered_matches_deltas": true,
+      "aggregate_matches_rendered": true,
+      "cancel_via_ctrl_c": false,
+      "text_characters": 47,
+      "trace_dir": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-tui-real-20261016-q3cq73us/.mokioclaw/traces/trace-20261016-142948-e31dc1",
+      "cancel_to_ready_ms": null
+    },
+    {
+      "status": "interrupted",
+      "delta_count": 6,
+      "rendered_matches_deltas": true,
+      "aggregate_matches_rendered": null,
+      "cancel_via_ctrl_c": true,
+      "text_characters": 16,
+      "trace_dir": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-tui-real-20261016-ri3evvwn/.mokioclaw/traces/trace-20261016-142949-b4ec93",
+      "cancel_to_ready_ms": 154
+    }
+  ]
+}

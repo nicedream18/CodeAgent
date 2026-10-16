@@ -56,6 +56,13 @@ Rules:
 - If a todo is impossible, call TodoUpdateTool with status "blocked" and explain.
 - Use FileWriteTool for new files.
 - Use FileReadTool before editing existing files.
+- Tool results may be truncated. Read the needed lines with offset/limit, or
+  use char_offset/char_limit for very long single lines and saved outputs.
+  Follow full_output_path/stdout_path/stderr_path when a complete result is needed.
+- After context compression, recover required facts from the structured summary
+  and its full_facts_path; do not repeat completed file writes or commands.
+- Use the current TODO states in the newest structured summary when older
+  initial context lists a task that has since been completed.
 - Use FileEditTool for focused edits.
 - Use BashTool for non-interactive checks.
 - Use NotepadAppendTool to record durable findings, decisions, important files,

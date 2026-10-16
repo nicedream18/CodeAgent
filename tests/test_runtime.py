@@ -96,7 +96,7 @@ def test_create_runtime_reads_trace_env(monkeypatch, tmp_path: Path) -> None:
     assert runtime.trace_mode == "off"
 
 
-def test_stream_agent_events_routes_model_chat_without_workspace(
+def test_stream_agent_events_routes_model_chat_with_unified_trace(
     monkeypatch, tmp_path: Path
 ) -> None:
     from mokioclaw.core.agent import stream_agent_events
@@ -138,8 +138,8 @@ def test_stream_agent_events_routes_model_chat_without_workspace(
         event["event"]["type"]
         for event in events
         if event.get("type") == "custom_event"
-    ] == ["intent_decision", "chat_response"]
-    assert not (tmp_path / ".mokioclaw").exists()
+    ] == ["run_started", "intent_decision", "chat_response", "checkpoint_saved", "trace_summary", "run_finished"]
+    assert len(list((tmp_path / ".mokioclaw/traces").iterdir())) == 1
 
 
 def test_stream_agent_events_routes_model_workflow_to_complex_graph(
@@ -180,7 +180,8 @@ def test_stream_agent_events_routes_model_workflow_to_complex_graph(
         )
     )
 
-    assert events[0]["event"]["type"] == "intent_decision"
+    assert events[0]["event"]["type"] == "run_started"
+    assert any(event.get("event", {}).get("type") == "intent_decision" for event in events)
     assert any(event.get("type") == "workspace" for event in events)
 
 
@@ -524,7 +525,7 @@ def test_stream_agent_events_resume_skips_entry_router(
     )
 
 
-def test_stream_session_events_chat_writes_session_without_harness(
+def test_stream_session_events_chat_writes_session_and_trace(
     monkeypatch, tmp_path: Path
 ) -> None:
     from mokioclaw.core.agent import stream_session_events
@@ -578,8 +579,8 @@ def test_stream_session_events_chat_writes_session_without_harness(
     ]
     assert "session_started" in custom_types
     assert "session_turn_saved" in custom_types
-    assert not (tmp_path / ".mokioclaw" / "checkpoints").exists()
-    assert not (tmp_path / ".mokioclaw" / "traces").exists()
+    assert (tmp_path / ".mokioclaw" / "checkpoints").exists()
+    assert len(list((tmp_path / ".mokioclaw" / "traces").iterdir())) == 1
     assert (tmp_path / ".mokioclaw" / "session" / "session.json").exists()
     assert (tmp_path / "SESSION_SUMMARY.md").exists()
 

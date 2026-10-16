@@ -459,8 +459,31 @@ def _format_captured_output(
         stderr_path.write_text(stderr, encoding="utf-8", errors="replace")
         output["stderr_path"] = str(stderr_path.relative_to(state.workspace))
         output["stderr_truncated"] = True
-    output["stdout"] = stdout[:max_output_chars]
-    output["stderr"] = stderr[:max_output_chars]
+
+    def preview(text: str) -> str:
+        if len(text) <= max_output_chars:
+            return text
+        marker = "\n…\n"
+        if max_output_chars < len(marker) + 2:
+            return text[-max_output_chars:]
+        head = (max_output_chars - len(marker)) // 2
+        return text[:head] + marker + text[-(max_output_chars - len(marker) - head) :]
+
+    output["stdout"] = preview(stdout)
+    output["stderr"] = preview(stderr)
+    protected = {output.get("stdout_path"), output.get("stderr_path")}
+    logs = []
+    for path in output_dir.glob("*.log"):
+        try:
+            logs.append((path.stat().st_mtime_ns, path))
+        except FileNotFoundError:
+            continue
+    for _, path in sorted(logs, reverse=True)[32:]:
+        if str(path.relative_to(state.workspace)) not in protected:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                continue  # Retention failures must not change the command result.
     return output
 
 

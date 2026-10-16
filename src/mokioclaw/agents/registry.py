@@ -9,6 +9,7 @@ from typing import Any
 
 from mokioclaw.agents.code_agent import run_code_agent
 from mokioclaw.agents.search_agent import run_search_agent
+from mokioclaw.core.run_control import RunInterrupted, check_run
 from mokioclaw.core.state import RuntimeState, SubagentToolBudget
 from mokioclaw.graph.state import MokioGraphState
 
@@ -126,6 +127,7 @@ def default_subagents() -> dict[str, SubagentDefinition]:
                 "acceptance_criteria",
                 "verification_commands",
                 "session_context",
+                "latest_user_corrections",
             ),
             state_update_fields=frozenset(
                 {"todos", "code_agent_summary", "last_actor_summary"}
@@ -385,6 +387,7 @@ def run_subagent(
     handoff_id: str = "",
 ) -> dict[str, Any]:
     runtime = state["runtime"]
+    check_run(runtime)
     registry = runtime.subagent_registry or _GLOBAL_REGISTRY
     definition = registry.get(name)
     if definition is None:
@@ -471,6 +474,8 @@ def run_subagent(
             legacy_state=legacy_state,
             legacy_before=legacy_before,
         )
+    except RunInterrupted:
+        raise
     except Exception as exc:
         result = SubagentResult(
             ok=False,

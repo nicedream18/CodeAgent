@@ -1,0 +1,27 @@
+{
+  "real_model": true,
+  "runs": [
+    {
+      "status": "finished",
+      "model": "deepseek-chat",
+      "delta_count": 19,
+      "text": "生成器是一种通过特定规则或算法逐步产生序列、值或对象的工具或函数。",
+      "aggregate_matches_deltas": true,
+      "first_token_ms": 936,
+      "cancel_to_stopped_ms": null,
+      "trace_dir": "/tmp/mokio-stream-real-20261016/.mokioclaw/traces/trace-20261016-142603-a62c18",
+      "stream_id": "b95bc120993b4cc0951679fe11e811b5"
+    },
+    {
+      "status": "interrupted",
+      "model": "deepseek-chat",
+      "delta_count": 2,
+      "text": "好的，",
+      "aggregate_matches_deltas": null,
+      "first_token_ms": 687,
+      "cancel_to_stopped_ms": 4,
+      "trace_dir": "/tmp/mokio-stream-real-20261016/.mokioclaw/traces/trace-20261016-142604-c644a2",
+      "stream_id": "3c4accb4266f4570bbf7af0a4c4335ab"
+    }
+  ]
+}

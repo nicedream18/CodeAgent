@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import json
+import threading
 import time
 from dataclasses import asdict, is_dataclass
 from datetime import UTC, datetime
+from functools import wraps
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
 from langchain_core.messages import BaseMessage, message_to_dict
+
+from mokioclaw.core.artifacts import DiagnosticArtifact
 
 VALID_TRACE_MODES = {"on", "off"}
 TRACE_ROOT = Path(".mokioclaw") / "traces"
@@ -25,8 +29,18 @@ def normalize_trace_mode(mode: str | None) -> str:
     return normalized if normalized in VALID_TRACE_MODES else "on"
 
 
+def _serialized(method):
+    @wraps(method)
+    def call(self, *args, **kwargs):
+        with self._lock:
+            return method(self, *args, **kwargs)
+
+    return call
+
+
 class TraceRecorder:
     def __init__(self, runtime: Any, task: str = "") -> None:
+        self._lock = threading.RLock()
         self.runtime = runtime
         self.workspace = runtime.workspace
         self.mode = normalize_trace_mode(getattr(runtime, "trace_mode", "on"))
@@ -59,12 +73,21 @@ class TraceRecorder:
         self.subagent_budget_exhaustions = 0
         self.subagent_result_status = {"ok": 0, "failed": 0}
         self.background_subagents: dict[str, dict[str, Any]] = {}
+        self.context_metrics = {
+            "compactions": 0,
+            "truncations": 0,
+            "failures": 0,
+            "max_input_tokens": 0,
+        }
+        self.context_methods: set[str] = set()
+        self.context_event_ids: set[str] = set()
         self.handoffs: dict[str, dict[str, Any]] = {}
         self.final_status = ""
         self.timeline_head: list[str] = []
         self.timeline_tail: list[str] = []
         self.timeline_omitted = 0
-        self.stream_buffers: dict[str, list[str]] = {}
+        self.stream_buffers: dict[str, DiagnosticArtifact] = {}
+        self.stream_nodes: dict[str, str] = {}
         if self.enabled:
             runtime.trace_id = self.trace_id
             self.root.mkdir(parents=True, exist_ok=True)
@@ -94,10 +117,48 @@ class TraceRecorder:
             },
         )
 
+    @_serialized
+    def record_emitted_event(self, event):
+        """Persist before LangGraph can discard queued events on cancellation."""
+        if not self.enabled:
+            return
+        self.record_custom_event(event)
+        event["trace_id"] = self.trace_id
+        event["trace_seq"] = self.sequence
+
+    @_serialized
     def record_custom_event(self, event: dict[str, Any]) -> None:
         if not self.enabled:
             return
+        if event.get("trace_id") == self.trace_id and "trace_seq" in event:
+            return
         event_type = str(event.get("type", "custom_event"))
+        if event_type in {
+            "context_budget",
+            "context_compression",
+            "context_compression_failed",
+            "tool_output_truncated",
+        }:
+            event_id = event.get("event_id")
+            if event_id and event_id in self.context_event_ids:
+                return
+            if event_id:
+                self.context_event_ids.add(event_id)
+            if event_type == "context_budget":
+                self.context_metrics["max_input_tokens"] = max(
+                    self.context_metrics["max_input_tokens"],
+                    int(event.get("input_tokens", 0)),
+                )
+                self.context_methods.add(str(event.get("estimation_method", "unknown")))
+            elif (
+                event_type == "context_compression"
+                and event.get("status", "applied") == "applied"
+            ):
+                self.context_metrics["compactions"] += 1
+            elif event_type == "context_compression_failed":
+                self.context_metrics["failures"] += 1
+            elif event_type == "tool_output_truncated":
+                self.context_metrics["truncations"] += 1
         if event_type == "tool_result" and event.get("name") == "LoadSkillTool":
             result = event.get("result")
             if isinstance(result, dict):
@@ -118,16 +179,39 @@ class TraceRecorder:
                 }
             else:
                 event = {**event, "result": "[Skill load result redacted]"}
+        stream_id = str(event.get("stream_id") or event.get("node", "model"))
         if event_type == "llm_stream_start":
-            self.stream_buffers[str(event.get("node", "model"))] = []
+            if stream_id in self.stream_buffers:
+                self.record_custom_event(
+                    {
+                        "type": "llm_stream_end",
+                        "stream_id": stream_id,
+                        "status": "failed",
+                    }
+                )
+            self.stream_buffers[stream_id] = DiagnosticArtifact(
+                self.workspace, "model-stream"
+            )
+            self.stream_nodes[stream_id] = str(event.get("node", "model"))
         elif event_type == "llm_token":
-            self.stream_buffers.setdefault(str(event.get("node", "model")), []).append(
-                str(event.get("text", ""))
+            if stream_id not in self.stream_buffers:
+                self.stream_buffers[stream_id] = DiagnosticArtifact(
+                    self.workspace, "model-stream"
+                )
+                self.stream_nodes[stream_id] = str(event.get("node", "model"))
+            self.stream_buffers[stream_id].write(
+                str(event.get("text", "")).encode("utf-8")
             )
             return
         elif event_type == "llm_stream_end":
-            node = str(event.get("node", "model"))
-            event = {**event, "text": "".join(self.stream_buffers.pop(node, []))}
+            artifact = self.stream_buffers.pop(stream_id, None)
+            self.stream_nodes.pop(stream_id, None)
+            if artifact is not None:
+                event = {
+                    **event,
+                    **artifact.finish(),
+                    "text": artifact.tail.decode("utf-8", errors="replace"),
+                }
         if event_type == "tool_retry":
             self.tool_retries += 1
             error_type = str(event.get("error_type", "tool_error"))
@@ -223,6 +307,7 @@ class TraceRecorder:
             },
         )
 
+    @_serialized
     def record_graph_update(self, event: dict[str, Any]) -> None:
         if not self.enabled:
             return
@@ -245,6 +330,7 @@ class TraceRecorder:
             },
         )
 
+    @_serialized
     def end(
         self,
         *,
@@ -254,6 +340,18 @@ class TraceRecorder:
     ) -> dict[str, Any] | None:
         if not self.enabled:
             return None
+        if self.status != "running":
+            return self.write_summary()
+        for stream_id in list(self.stream_buffers):
+            self.record_custom_event(
+                {
+                    "type": "llm_stream_end",
+                    "stream_id": stream_id,
+                    "node": self.stream_nodes.get(stream_id, "model"),
+                    "status": "interrupted" if status == "interrupted" else "failed",
+                    "reason": "run_ended_before_stream_end",
+                }
+            )
         self.status = status
         payload = {
             "status": status,
@@ -265,6 +363,7 @@ class TraceRecorder:
         self.record("run_end", payload)
         return self.write_summary()
 
+    @_serialized
     def record(self, event_type: str, payload: dict[str, Any]) -> None:
         if not self.enabled:
             return
@@ -338,6 +437,10 @@ class TraceRecorder:
             "subagent_budget_exhaustions": self.subagent_budget_exhaustions,
             "subagent_result_status": dict(self.subagent_result_status),
             "background_subagent_total": len(self.background_subagents),
+            "context_governance": {
+                **self.context_metrics,
+                "estimation_methods": sorted(self.context_methods),
+            },
             "background_subagent_status_counts": self._background_subagent_status_counts(),
             "background_subagents": [
                 self.background_subagents[key]

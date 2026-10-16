@@ -59,7 +59,20 @@ class RuntimeState:
     bash_allow_patterns: list[str] = field(default_factory=list)
     tool_retry_limit: int = 2
     context_output_limit_chars: int = 12000
+    context_result_limit_chars: int = 24000
+    context_max_items: int = 100
+    context_max_depth: int = 8
+    context_max_nodes: int = 1000
+    context_token_limit: int | None = None
     model_context_reserve_tokens: int = 8192
+    context_safety_tokens: int = 1024
+    context_high_ratio: float = 0.85
+    context_target_ratio: float = 0.60
+    context_control: Any = None
+    context_version: int = 0
+    context_request_sequence: int = 0
+    context_replacements: dict[str, list[Any]] = field(default_factory=dict)
+    context_checkpoint: dict[str, Any] = field(default_factory=dict)
     active_skill_tools: set[str] | None = None
     active_skill_permissions: set[str] | None = None
     active_skill_name: str | None = None
@@ -76,9 +89,26 @@ class RuntimeState:
     parent_run_id: str | None = None
     subagent_parent_writer: Any = None
     subagent_cancel_event: Any = None
+    run_control: Any = None
+    mcp_diagnostics: list[dict[str, Any]] = field(default_factory=list)
     subagent_applied_results: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
+        if self.mcp_timeout_seconds <= 0:
+            raise ValueError("MCP timeout must be positive")
+        if (
+            self.context_result_limit_chars < 1024
+            or min(
+                self.context_output_limit_chars,
+                self.context_max_items,
+                self.context_max_depth,
+                self.context_max_nodes,
+            )
+            <= 0
+        ):
+            raise ValueError(
+                "invalid tool result budget: total must be at least 1024 and all limits positive"
+            )
         self.approval_mode = normalize_approval_mode(self.approval_mode)
         self.checkpoint_mode = normalize_checkpoint_mode(self.checkpoint_mode)
         self.trace_mode = normalize_trace_mode(self.trace_mode)

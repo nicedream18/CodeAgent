@@ -8,6 +8,7 @@ from typing import Any, Literal
 from langchain_core.tools import BaseTool
 from pydantic import ValidationError
 
+from mokioclaw.core.run_control import RunInterrupted, check_run
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.tool_context import (
     ToolCallContext,
@@ -176,7 +177,47 @@ def _validate_tool_args(tool: BaseTool, args: dict[str, Any]) -> dict[str, Any] 
     return None
 
 
-def execute_tool(
+def execute_tool(runtime, tool, args, **kwargs) -> Any:
+    from mokioclaw.core.tool_output import bound_tool_result
+
+    result = _execute_tool(runtime, tool, args, **kwargs)
+    bounded = bound_tool_result(
+        result,
+        runtime,
+        tool_name=tool.name,
+        tool_call_id=kwargs.get("tool_call_id") or f"{tool.name}-call",
+        writer=kwargs.get("on_event") or kwargs.get("on_retry"),
+    )
+    writer = kwargs.get("on_event") or kwargs.get("on_retry")
+    if (
+        writer
+        and isinstance(bounded, dict)
+        and not bounded.get("output_truncated")
+        and any(
+            bounded.get(key)
+            for key in ("stdout_truncated", "stderr_truncated", "truncated")
+        )
+    ):
+        from uuid import uuid4
+
+        from mokioclaw.core.tool_output import encoded
+
+        writer(
+            {
+                "type": "tool_output_truncated",
+                "event_id": uuid4().hex,
+                "tool_name": tool.name,
+                "tool_call_id": kwargs.get("tool_call_id") or f"{tool.name}-call",
+                "retained_characters": len(encoded(bounded)),
+                "reasons": ["native_output_limit"],
+                "full_output_path": bounded.get("stdout_path")
+                or bounded.get("stderr_path"),
+            }
+        )
+    return bounded
+
+
+def _execute_tool(
     runtime: RuntimeState,
     tool: BaseTool,
     args: dict[str, Any],
@@ -186,6 +227,7 @@ def execute_tool(
     tool_call_id: str | None = None,
     budget_reserved: bool = False,
 ) -> Any:
+    check_run(runtime)
     call_id = tool_call_id or f"{tool.name}-call"
 
     if not budget_reserved:
@@ -254,6 +296,7 @@ def execute_tool(
     denied = authorize_tool(
         runtime, tool.name, args, tool_call_id=call_id, event_writer=on_event
     )
+    check_run(runtime)
     if denied is not None:
         return {
             **denied,
@@ -278,7 +321,9 @@ def execute_tool(
     try:
         for attempt in range(max_retries + 1):
             try:
+                check_run(runtime)
                 result = tool.invoke(args)
+                check_run(runtime)
                 skill_event(result)
                 if isinstance(result, dict) and result.get("ok") is False:
                     error_type, classified_retryable = classify_tool_failure(result)
@@ -326,10 +371,10 @@ def execute_tool(
                         max_retries=max_retries,
                         tool_retry_hint=tool_retry_hint,
                     )
-                    return _truncate_result(
-                        {**result, **failure}, runtime.context_output_limit_chars
-                    )
-                return _truncate_result(result, runtime.context_output_limit_chars)
+                    return {**result, **failure}
+                return result
+            except RunInterrupted:
+                raise
             except Exception as exc:
                 skill_event(error=exc)
                 error_type, retryable = classify_tool_failure(exc)
@@ -395,6 +440,7 @@ def reserve_subagent_tool_call(
     on_event: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any] | None:
     """Reserve one model-requested tool call, including invalid or denied calls."""
+    check_run(runtime)
     budget = runtime.active_subagent_budget
     if budget is None:
         return None
@@ -455,23 +501,6 @@ def reserve_subagent_tool_call(
 
 
 def _truncate_result(value: Any, limit: int) -> Any:
-    truncated = False
-    omitted = 0
+    from mokioclaw.core.tool_output import bound_value
 
-    def visit(item: Any) -> Any:
-        nonlocal truncated, omitted
-        if isinstance(item, str) and len(item) > limit:
-            truncated = True
-            omitted += len(item) - limit
-            return item[:limit] + f"\n… [{len(item) - limit} characters omitted]"
-        if isinstance(item, dict):
-            return {key: visit(child) for key, child in item.items()}
-        if isinstance(item, list):
-            return [visit(child) for child in item]
-        return item
-
-    result = visit(value)
-    if truncated and isinstance(result, dict):
-        result["output_truncated"] = True
-        result["omitted_characters"] = omitted
-    return result
+    return bound_value(value, field_limit=limit)

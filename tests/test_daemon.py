@@ -63,7 +63,8 @@ def test_daemon_runs_task_streams_events_and_roundtrips_approval(
                 ),
             )
         )
-        assert [event.get("type") for event in events] == ["workspace", "custom_event"]
+        assert [event.get("type") for event in events] == ["custom_event", "workspace", "custom_event"]
+        assert events[0]["event"]["type"] == "run_started"
         assert events[-1]["event"]["approved"] is True
         assert approvals and approvals[0].id == "approval-demo"
         status = daemon_status(start=False)
