@@ -5,7 +5,9 @@ from __future__ import annotations
 import asyncio
 import queue
 import threading
+from collections.abc import Callable
 from contextvars import ContextVar
+from typing import Any
 
 
 class RunInterrupted(Exception):
@@ -19,6 +21,7 @@ class RunControl:
     def __init__(self) -> None:
         from mokioclaw.core.run_inbox import RunInbox
 
+        self.runtime_initializer: Callable[[Any], None] | None = None
         self.inbox = RunInbox()
         self.pending_stream_ends = {}
         self.cancel_event = threading.Event()

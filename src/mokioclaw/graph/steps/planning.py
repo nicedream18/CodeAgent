@@ -104,7 +104,7 @@ def planner_node(state: api.MokioGraphState) -> dict[str, api.Any]:
 
 def _build_planner_tools(state: api.MokioGraphState, writer) -> list[api.StructuredTool]:
     registry = state["runtime"].subagent_registry or api.registered_subagents()
-    return [
+    tools = [
         api.StructuredTool.from_function(
             name="CallRepoAgentTool",
             func=lambda instruction: api._call_registered_subagent_tool(
@@ -173,6 +173,14 @@ def _build_planner_tools(state: api.MokioGraphState, writer) -> list[api.Structu
             description="Request cancellation of a background Subagent run. Args: run_id.",
         ),
     ]
+
+    if state["runtime"].evaluation_mode:
+        tools = [
+            t
+            for t in tools
+            if t.name not in {"CallSearchAgentTool", "AgentResultTool", "AgentCancelTool"}
+        ]
+    return tools
 
 
 def _todo_write_tool(

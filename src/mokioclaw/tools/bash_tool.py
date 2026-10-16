@@ -164,12 +164,20 @@ def run_bash(
     normalized_command = _normalize_command(command)
     background = _coerce_bool(run_in_background)
 
-    handled = _handle_tail_command(state, normalized_command)
+    handled = (
+        _handle_tail_command(state, normalized_command)
+        if state.execution_backend == "local"
+        else None
+    )
     if handled is not None:
-        return handled
-    handled = _handle_workspace_query(state, normalized_command)
+        return {**handled, "backend": "local"}
+    handled = (
+        _handle_workspace_query(state, normalized_command)
+        if state.execution_backend == "local"
+        else None
+    )
     if handled is not None:
-        return handled
+        return {**handled, "backend": "local"}
 
     blocked = _looks_dangerous(normalized_command)
     if blocked:
@@ -178,6 +186,14 @@ def run_bash(
             "error": f"blocked potentially dangerous command pattern: {blocked}",
         }
 
+    from mokioclaw.core.execution_backend import BackendUnavailable, execution_fingerprint
+
+    if background and state.execution_backend == "docker":
+        return {"ok": False, "error": "Docker backend does not support background Bash", "backend": "docker", "retryable": False}
+    try:
+        execution_fingerprint(state)
+    except BackendUnavailable as exc:
+        return {"ok": False, "error": str(exc), "error_type": "execution_unavailable", "backend": state.execution_backend, "retryable": False}
     context = current_tool_call_context()
     # Calls through execute_tool have already passed the unified policy gate.
     # Direct calls to run_bash retain their standalone approval safeguard.
@@ -189,52 +205,42 @@ def run_bash(
     if approval is not None and not approval.get("approved"):
         return approval
 
-    started = time.perf_counter()
-    env, env_error = _build_env(state)
-    if env_error is not None:
-        return {"ok": False, "error": env_error}
-    max_output_chars = _state_int(state, "bash_max_output_chars", DEFAULT_MAX_OUTPUT_CHARS)
+    from mokioclaw.core.execution_backend import BackendUnavailable, ExecutionRequest, backend_for
+
+    if background and state.execution_backend == "docker":
+        return {
+            "ok": False,
+            "error": "Docker backend does not support background Bash",
+            "backend": "docker",
+            "retryable": False,
+        }
+    env = {}
+    if state.execution_backend == "local":
+        env, env_error = _build_env(state)
+        if env_error is not None:
+            return {"ok": False, "error": env_error}
     if background:
         return _run_background(state, normalized_command, env, approval)
     try:
-        completed = subprocess.run(
-            normalized_command,
-            cwd=state.workspace,
-            shell=True,
-            capture_output=True,
-            timeout=timeout,
-            env=env,
+        result = backend_for(state).run(
+            ExecutionRequest(
+                state.workspace,
+                normalized_command,
+                timeout,
+                _state_int(state, "bash_max_output_chars", DEFAULT_MAX_OUTPUT_CHARS),
+                env,
+                state.run_id,
+            )
         )
-    except subprocess.TimeoutExpired as exc:
+        return {**result.as_dict(), "command": normalized_command, **(approval or {})}
+    except BackendUnavailable as exc:
         return {
             "ok": False,
-            "timed_out": True,
-            "exit_code": None,
-            **_format_captured_output(
-                state,
-                _decode_output(exc.stdout),
-                _decode_output(exc.stderr),
-                max_output_chars,
-            ),
-            "duration_ms": round((time.perf_counter() - started) * 1000),
-            **(approval or {}),
+            "error": str(exc),
+            "error_type": "execution_unavailable",
+            "retryable": False,
+            "backend": state.execution_backend,
         }
-
-    output = _format_captured_output(
-        state,
-        _decode_output(completed.stdout),
-        _decode_output(completed.stderr),
-        max_output_chars,
-    )
-    return {
-        "ok": completed.returncode == 0,
-        "timed_out": False,
-        "command": normalized_command,
-        "exit_code": completed.returncode,
-        **output,
-        "duration_ms": round((time.perf_counter() - started) * 1000),
-        **(approval or {}),
-    }
 
 
 def _resolve_approval(state: RuntimeState, command: str) -> dict[str, Any] | None:
@@ -243,7 +249,11 @@ def _resolve_approval(state: RuntimeState, command: str) -> dict[str, Any] | Non
         return None
 
     context = current_tool_call_context()
-    request = make_approval_request(command, risk_reason)
+    from dataclasses import replace
+
+    from mokioclaw.core.execution_backend import execution_fingerprint
+
+    request = replace(make_approval_request(command, risk_reason), execution_context=execution_fingerprint(state))
     if context is not None:
         request = type(request)(
             id=request.id,
@@ -251,6 +261,7 @@ def _resolve_approval(state: RuntimeState, command: str) -> dict[str, Any] | Non
             risk_reason=request.risk_reason,
             tool_name=request.tool_name,
             tool_call_id=context.tool_call_id,
+            execution_context=request.execution_context,
         )
     base = {
         "requires_approval": True,

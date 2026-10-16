@@ -92,6 +92,7 @@ class ApprovalModal(ModalScreen[bool | ApprovalDecision]):
         with Container(id="approval-dialog"):
             yield Static(f"Human Approval · {self.request.tool_name}", id="approval-title")
             yield Static(f"Risk: {self.request.risk_reason}")
+            yield Static("Execution: " + self.request.execution_context)
             yield Static(f"Workspace: {self.workspace}")
             yield Static(Text(self.request.command, overflow="fold"), id="approval-command")
             yield Static("Approve this tool call?  y/Enter = approve · n/Esc = deny")

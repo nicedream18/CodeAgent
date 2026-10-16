@@ -213,6 +213,7 @@ class MokioClawTuiApp(App[None]):
         trace_mode: Literal["on", "off"] | None = None,
         resume: Path | None = None,
         stream_factory: StreamFactory = stream_session_events,
+        execution_backend: str | None = None,
         workflow_mode: str | None = None,
         skill: str | None = None,
     ) -> None:
@@ -226,6 +227,7 @@ class MokioClawTuiApp(App[None]):
         self.trace_mode = trace_mode
         self.resume = resume
         self.stream_factory = stream_factory
+        self.execution_backend = execution_backend
         self.workflow_mode = workflow_mode
         self._initial_skill = skill
         self.running = False
@@ -767,6 +769,7 @@ class MokioClawTuiApp(App[None]):
                 checkpoint_mode=self.checkpoint_mode,
                 resume_workspace=resume,
                 trace_mode=self.trace_mode,
+                **({"execution_backend": self.execution_backend} if self.execution_backend is not None else {}),
                 **({"workflow_mode": self.workflow_mode} if self.workflow_mode is not None else {}),
                 use_daemon=True,
             ):

@@ -9,9 +9,10 @@ REQUEST_BUDGET = ContextVar("mokio_request_budget", default=None)
 
 
 class RunBudgetExceeded(BaseException):
-    def __init__(self, message="Run token budget exhausted"):
+    def __init__(self, message="Run token budget exhausted", reason="token_budget_exhausted"):
         super().__init__(message)
         self.state = {}
+        self.reason = reason
 
 
 def create_role_model(factory, runtime, role):
@@ -47,8 +48,9 @@ def begin_request(runtime, role, snapshot, budget):
     metrics = runtime.model_metrics
     reserve = snapshot.input_tokens + budget.output
     limit = runtime.run_token_limit
-    if limit and metrics.get("total_tokens", 0) + reserve > limit:
-        error = RunBudgetExceeded()
+    requests_exceeded = runtime.run_request_limit and metrics.get("requests", 0) >= runtime.run_request_limit
+    if requests_exceeded or (limit and metrics.get("total_tokens", 0) + reserve > limit):
+        error = RunBudgetExceeded("Model request budget exhausted", "request_budget_exhausted") if requests_exceeded else RunBudgetExceeded()
         error.state = {
             key: copy.deepcopy(value)
             for key, value in (runtime.foreground_state or {}).items()

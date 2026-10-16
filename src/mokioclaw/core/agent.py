@@ -51,6 +51,7 @@ def create_runtime(
     checkpoint_mode: str | None = None,
     resume_from: Path | None = None,
     trace_mode: str | None = None,
+    execution_backend: str | None = None,
     workflow_mode: str | None = None,
     skill: str | None = None,
 ) -> RuntimeState:
@@ -100,6 +101,7 @@ def create_runtime(
     configure_runtime(
         runtime,
         explicit={
+            "execution_backend": execution_backend,
             "workflow_mode": workflow_mode,
             "approval_mode": approval_mode,
             "checkpoint_mode": checkpoint_mode,
@@ -132,6 +134,9 @@ def create_runtime(
                 runtime.workspace / ".mokioclaw/inbox" / f"{runtime.run_id}.json"
             )
             runtime.run_control.inbox._save()
+    initializer = getattr(runtime.run_control, "runtime_initializer", None)
+    if initializer is not None:
+        initializer(runtime)
     return runtime
 
 
@@ -146,6 +151,7 @@ def stream_agent_events(
     resume_workspace: Path | None = None,
     trace_mode: str | None = None,
     use_daemon: bool = False,
+    execution_backend: str | None = None,
     workflow_mode: str | None = None,
     skill: str | None = None,
     context_control=None,
@@ -160,6 +166,7 @@ def stream_agent_events(
         "resume_workspace": resume_workspace,
         "trace_mode": trace_mode,
         "use_daemon": use_daemon,
+        "execution_backend": execution_backend,
         "workflow_mode": workflow_mode,
         "skill": skill,
     }
@@ -184,6 +191,7 @@ def _stream_agent_events(
     resume_workspace: Path | None = None,
     trace_mode: str | None = None,
     use_daemon: bool = False,
+    execution_backend: str | None = None,
     workflow_mode: str | None = None,
     skill: str | None = None,
     _lifecycle=None,
@@ -203,6 +211,7 @@ def _stream_agent_events(
                 "checkpoint_mode": checkpoint_mode,
                 "resume_workspace": resume_workspace,
                 "trace_mode": trace_mode,
+                "execution_backend": execution_backend,
                 "workflow_mode": workflow_mode,
                 "skill": skill,
             },
@@ -247,6 +256,7 @@ def stream_session_events(
     resume_workspace: Path | None = None,
     trace_mode: str | None = None,
     use_daemon: bool = False,
+    execution_backend: str | None = None,
     workflow_mode: str | None = None,
     skill: str | None = None,
     context_control=None,
@@ -261,6 +271,7 @@ def stream_session_events(
         "resume_workspace": resume_workspace,
         "trace_mode": trace_mode,
         "use_daemon": use_daemon,
+        "execution_backend": execution_backend,
         "workflow_mode": workflow_mode,
         "skill": skill,
     }

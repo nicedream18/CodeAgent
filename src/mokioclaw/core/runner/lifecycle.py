@@ -81,6 +81,7 @@ def _controlled_stream(stream, task, options, control, *, session, execution_con
                 checkpoint_mode=options["checkpoint_mode"],
                 trace_mode=options["trace_mode"],
                 resume_from=options["resume_workspace"],
+                execution_backend=options.get("execution_backend"),
                 workflow_mode=options.get("workflow_mode"),
                 skill=options.get("skill"),
             )
@@ -91,6 +92,33 @@ def _controlled_stream(stream, task, options, control, *, session, execution_con
                     runtime, task=task, max_attempts=options["max_attempts"]
                 )
                 lifecycle.state.update(lifecycle.resume_inputs)
+                import json
+
+                from mokioclaw.core.checkpoint import checkpoint_dir
+                from mokioclaw.core.execution_backend import execution_fingerprint
+
+                saved_context = json.loads(
+                    (checkpoint_dir(selected) / "checkpoint.json").read_text()
+                ).get("execution_context", {"backend": "local", "image_digest": ""})
+                current_context = execution_fingerprint(runtime)
+                previous_context = (
+                    "local"
+                    if saved_context.get("backend", "local") == "local"
+                    else "docker:" + saved_context.get("image_digest", "")
+                )
+                if current_context != previous_context:
+                    lifecycle.resume_inputs.update(
+                        messages=[],
+                        passed=False,
+                        verification_results=[],
+                        context_next_node="planner",
+                    )
+                    lifecycle.resume_inputs.setdefault("metadata", {})[
+                        "execution_context_changed"
+                    ] = True
+                    runtime.read_files.clear()
+                    lifecycle.state.update(lifecycle.resume_inputs)
+
                 runtime.explicit_skill = options.get("skill") or lifecycle.resume_inputs.get(
                     "explicit_skill"
                 )
@@ -166,14 +194,14 @@ def _controlled_stream(stream, task, options, control, *, session, execution_con
             except api.RunBudgetExceeded as exc:
                 status = "failed"
                 lifecycle.state.update(exc.state)
-                lifecycle.state["stop_reason"] = "token_budget_exhausted"
-                lifecycle.state["final_answer"] = "运行 token 预算已耗尽，当前进展已保存。"
+                lifecycle.state["stop_reason"] = exc.reason
+                lifecycle.state["final_answer"] = f"运行预算已耗尽，当前进展已保存：{exc.reason}"
                 event = {
                     "type": "run_budget_exhausted",
                     "event_id": api.uuid4().hex,
                     "run_id": runtime.run_id,
                     "message": lifecycle.state["final_answer"],
-                    "stop_reason": "token_budget_exhausted",
+                    "stop_reason": exc.reason,
                 }
                 lifecycle.record_emitted(event)
                 yield {"type": "custom_event", "event": event}

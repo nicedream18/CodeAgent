@@ -7,7 +7,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, model_validator
 
 PROTOCOL_VERSION = 1
-CAPABILITIES = ["typed_protocol", "explicit_skill", "approval_memory", "layered_trace"]
+CAPABILITIES = ["typed_protocol", "explicit_skill", "approval_memory", "layered_trace", "execution_backend"]
 
 
 class Contract(BaseModel):
@@ -44,6 +44,7 @@ class RunOptions(Contract):
     approval_mode: Literal["inline", "auto", "deny"] | None = None
     checkpoint_mode: Literal["light", "strict", "off"] | None = None
     trace_mode: Literal["on", "off"] | None = None
+    execution_backend: Literal["local", "docker"] | None = None
     workflow_mode: Literal["full", "light", "auto"] | None = None
     skill: str | None = None
 
@@ -183,6 +184,7 @@ class ApprovalData(Contract):
     context_version: int = 0
     policy_version: int = 0
     rule_preview: str = ""
+    execution_context: str = "local"
 
 
 class ApprovalEvent(Event):

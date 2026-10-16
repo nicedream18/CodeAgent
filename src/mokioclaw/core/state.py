@@ -45,9 +45,14 @@ class RuntimeConfig:
     """Configuration defaults; mutable execution fields live in RuntimeState."""
 
     settings: dict[str, Any] = field(default_factory=dict)
+    execution_backend: str = "local"
+    docker_image: str = "mokioclaw-execution:0.2.0"
     workflow_mode: str = "full"
     mcp_loading: str = "deferred"
     run_token_limit: int = 0
+    run_request_limit: int = 0
+    run_tool_limit: int = 0
+    evaluation_mode: bool = False
     rewind_quota_bytes: int = 64 * 1024 * 1024
     approval_mode: str = "inline"
     approval_handler: Callable[[ApprovalRequest], ApprovalDecision | bool] | None = None
@@ -79,6 +84,7 @@ class RuntimeConfig:
 @dataclass
 class RuntimeState(RuntimeConfig):
     workspace: Path
+    execution_image_digest: str = ""
     light_active: bool = False
     light_target: str | None = None
     light_escalation: bool = False
@@ -126,6 +132,8 @@ class RuntimeState(RuntimeConfig):
     subagent_applied_results: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
+        if self.execution_backend not in {"local", "docker"}:
+            raise ValueError("execution_backend must be local or docker")
         if self.mcp_timeout_seconds <= 0:
             raise ValueError("MCP timeout must be positive")
         if (

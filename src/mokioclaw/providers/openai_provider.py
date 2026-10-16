@@ -71,6 +71,7 @@ def create_model(*, role=None, runtime=None) -> ChatOpenAI:
         model=model,
         base_url=base_url,
         temperature=0,
+        max_retries=int(profile.get("max_retries", 2)),
         output_parameter=parameter,
         mokio_profile=profile,
         **{parameter: int(profile.get("output_tokens", budget.output))},

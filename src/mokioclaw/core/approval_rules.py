@@ -70,7 +70,9 @@ class ApprovalRules:
         workspace: Path,
         session_id: str = "",
         session_cache: dict[str, list[dict[str, Any]]] | None = None,
+        execution_context: str = "local",
     ):
+        self.execution_context = execution_context
         self.workspace = workspace.expanduser().resolve()
         self.project = hashlib.sha256(os.path.normcase(str(self.workspace)).encode()).hexdigest()
         self.path = Path.home() / ".mokioclaw/project-permissions" / f"{self.project}.json"
@@ -126,7 +128,11 @@ class ApprovalRules:
             return "file:" + path.relative_to(self.workspace).as_posix()
         if tool == "BashTool":
             return (
-                "bash:"
+                (
+                    "bash:"
+                    if self.execution_context == "local"
+                    else "bash@" + self.execution_context + ":"
+                )
                 + str(args.get("command", "")).strip()
                 + ":"
                 + args_digest({k: v for k, v in args.items() if k != "command"})
@@ -251,6 +257,11 @@ def runtime_rules(runtime: Any) -> ApprovalRules:
     if not runtime.run_id:
         runtime.run_id = "local-" + uuid4().hex
     cache = getattr(getattr(runtime, "run_control", None), "approval_sessions", None)
+    from mokioclaw.core.execution_backend import execution_fingerprint
+
     return ApprovalRules(
-        runtime.workspace, getattr(runtime, "session_id", "") or runtime.run_id, cache
+        runtime.workspace,
+        getattr(runtime, "session_id", "") or runtime.run_id,
+        cache,
+        execution_context=execution_fingerprint(runtime),
     )

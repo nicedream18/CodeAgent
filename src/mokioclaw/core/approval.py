@@ -20,6 +20,7 @@ class ApprovalRequest:
     context_version: int = 0
     policy_version: int = 0
     rule_preview: str = ""
+    execution_context: str = "local"
 
 
 @dataclass(frozen=True)

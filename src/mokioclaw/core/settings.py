@@ -38,6 +38,8 @@ def configure_runtime(runtime, *, explicit: dict | None = None) -> None:
     runtime.settings = settings
     # Configuration cannot replace live control objects or execution state.
     configurable = {
+        "execution_backend",
+        "docker_image",
         "workflow_mode",
         "mcp_loading",
         "run_token_limit",
@@ -95,6 +97,8 @@ def configure_runtime(runtime, *, explicit: dict | None = None) -> None:
             }:
                 value = float(raw)
             elif name in {
+                "execution_backend",
+                "docker_image",
                 "workflow_mode",
                 "mcp_loading",
                 "approval_mode",

@@ -193,6 +193,8 @@ def run_via_daemon(
     serialized = {
         key: str(value) if isinstance(value, Path) else value for key, value in options.items()
     }
+    if serialized.get("execution_backend") is None:
+        serialized.pop("execution_backend", None)
     serialized["task"] = task
     if serialized.get("skill"):
         capabilities = _request(address, "status", {}).get("capabilities", [])
@@ -200,6 +202,10 @@ def run_via_daemon(
             raise RuntimeError(
                 "Daemon does not support explicit_skill; update/restart it after active tasks finish"
             )
+    if serialized.get("execution_backend") == "docker":
+        capabilities = _request(address, "status", {}).get("capabilities", [])
+        if "execution_backend" not in capabilities:
+            raise RuntimeError("Daemon does not support Docker; update/restart it after active tasks finish")
     started = _request(address, "start_run", {"mode": mode, "options": serialized})
     run_id = started["run_id"]
     yield from iter_run_events(run_id, approval_handler=approval_handler)

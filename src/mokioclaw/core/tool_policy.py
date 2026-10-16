@@ -190,6 +190,7 @@ def _request_approval(
         context_version=runtime.context_version,
         policy_version=rules.version(),
         rule_preview=rules.resource(name, args, runtime.mcp_servers),
+        execution_context=rules.execution_context,
     )
     if runtime.approval_mode == "auto":
         _emit(
@@ -237,8 +238,11 @@ def _request_approval(
 
     check_run(runtime)
     check_redirect(runtime)
+    from mokioclaw.core.execution_backend import execution_fingerprint
+
     if (
-        request.context_version != runtime.context_version
+        request.execution_context != execution_fingerprint(runtime)
+        or request.context_version != runtime.context_version
         or request.args_digest != args_digest(args)
         or request.policy_version != rules.version()
     ):

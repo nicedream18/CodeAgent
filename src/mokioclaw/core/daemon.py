@@ -13,6 +13,7 @@ from uuid import uuid4
 
 from mokioclaw.core.approval import ApprovalDecision, ApprovalRequest
 from mokioclaw.core.context_control import CURRENT_CONTROL, ContextControl
+from mokioclaw.core.protocol import CAPABILITIES
 from mokioclaw.core.run_control import CURRENT_RUN, RunControl, RunInterrupted
 from mokioclaw.core.subagent_tasks import (
     SubagentTaskManager,
@@ -372,12 +373,7 @@ class AgentDaemon:
                 request_id,
                 {
                     "protocol_version": 1,
-                    "capabilities": [
-                        "typed_protocol",
-                        "explicit_skill",
-                        "approval_memory",
-                        "layered_trace",
-                    ],
+                    "capabilities": CAPABILITIES,
                     "pid": os.getpid(),
                     "runs": {key: run.status for key, run in self.runs.items()},
                 },

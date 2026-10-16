@@ -55,7 +55,7 @@ def run_code_agent(
     writer(memory_event(memory, node="codeAgent"))
     model = create_role_model(create_model, state["runtime"], "codeAgent")
     registered_tools = build_tools(runtime)
-    if runtime.light_active:
+    if runtime.light_active and not runtime.evaluation_mode:
         registered_tools = [
             tool
             for tool in registered_tools
@@ -99,7 +99,7 @@ def run_code_agent(
                 content="Explicitly required Skill " + runtime.explicit_skill + ":\n" + str(loaded)
             ),
         )
-    if runtime.light_active:
+    if runtime.light_active and not runtime.evaluation_mode:
         messages.insert(
             1,
             SystemMessage(
@@ -121,7 +121,7 @@ def run_code_agent(
     final_response_allowance = 1 if runtime.active_subagent_budget is not None else 0
     for _ in range(max_loops + final_response_allowance):
         current_tools = build_tools(runtime)
-        if runtime.light_active:
+        if runtime.light_active and not runtime.evaluation_mode:
             current_tools = [
                 tool
                 for tool in current_tools

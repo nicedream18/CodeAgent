@@ -107,6 +107,7 @@ class CheckpointManager:
         summary = state_summary(state)
         return {
             "version": 1,
+            "execution_context": {"backend": self.runtime.execution_backend, "image_digest": self.runtime.execution_image_digest},
             "updated_at": utc_now(),
             "mode": self.mode,
             "status": status,

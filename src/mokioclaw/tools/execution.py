@@ -289,6 +289,13 @@ def _execute_tool(
             }
         )
 
+    if runtime.evaluation_mode and args.get("run_in_background"):
+        return {
+            "ok": False,
+            "error": "Background execution is disabled by evaluation profile",
+            "error_type": "permission_denied",
+            "retryable": False,
+        }
     # Reject malformed arguments before opening an approval prompt.
     invalid = _validate_tool_args(tool, args)
     if invalid is not None:
@@ -317,7 +324,9 @@ def _execute_tool(
             if runtime.light_target is not None and target != runtime.light_target:
                 runtime.light_escalation = True
             runtime.light_target = runtime.light_target or target
-        if tool.name in {"BashTool", "NotepadAppendTool"} or tool.name.startswith("MCP_"):
+        if not runtime.evaluation_mode and (
+            tool.name in {"BashTool", "NotepadAppendTool"} or tool.name.startswith("MCP_")
+        ):
             runtime.light_escalation = True
         if runtime.light_escalation:
             return {
@@ -366,6 +375,9 @@ def _execute_tool(
     permissions = runtime_rules(runtime)
     authorized_version = permissions.version()
     authorized_context = runtime.context_version
+    from mokioclaw.core.execution_backend import execution_fingerprint
+
+    authorized_execution = execution_fingerprint(runtime)
     authorized_args = args_digest(args)
     spec = tool_spec_for(tool.name)
     is_idempotent = bool(spec and spec.idempotent)
@@ -381,7 +393,8 @@ def _execute_tool(
                 from mokioclaw.core.run_inbox import mark_tool_started
 
                 if (
-                    permissions.version() != authorized_version
+                    execution_fingerprint(runtime) != authorized_execution
+                    or permissions.version() != authorized_version
                     or runtime.context_version != authorized_context
                     or args_digest(args) != authorized_args
                 ):
@@ -391,6 +404,15 @@ def _execute_tool(
                         "error": "Authorization changed before execution; reconsider this call.",
                         "retryable": False,
                     }
+                if (
+                    runtime.run_tool_limit
+                    and runtime.tool_execution_count >= runtime.run_tool_limit
+                ):
+                    from mokioclaw.providers.model_policy import RunBudgetExceeded
+
+                    raise RunBudgetExceeded(
+                        "Tool execution budget exhausted", "tool_budget_exhausted"
+                    )
                 mark_tool_started()
                 runtime.tool_execution_count += 1
                 result = tool.invoke(args)

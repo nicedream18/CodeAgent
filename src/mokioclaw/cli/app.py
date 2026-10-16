@@ -159,6 +159,7 @@ def main(
         typer.Option("--resume", help="Resume from an existing MokioClaw workspace."),
     ] = None,
     skill: str | None = typer.Option(None, "--skill"),
+    execution_backend: Literal["local", "docker"] | None = typer.Option(None, "--execution-backend"),
     workflow_mode: Literal["full", "light", "auto"] | None = typer.Option(None, "--workflow-mode"),
 ) -> None:
     if ctx.invoked_subcommand is not None:
@@ -187,6 +188,7 @@ def main(
         resume_workspace=resume,
         trace_mode=trace_mode,
         use_daemon=True,
+        **({"execution_backend": execution_backend} if execution_backend is not None else {}),
         **({"workflow_mode": workflow_mode} if workflow_mode is not None else {}),
     )
     run_id, status = None, "finished"
@@ -289,6 +291,7 @@ def tui(
         typer.Option("--resume", help="Resume from an existing MokioClaw workspace."),
     ] = None,
     skill: str | None = typer.Option(None, "--skill"),
+    execution_backend: Literal["local", "docker"] | None = typer.Option(None, "--execution-backend"),
     workflow_mode: Literal["full", "light", "auto"] | None = typer.Option(None, "--workflow-mode"),
 ) -> None:
     """Open the Textual terminal interface."""
@@ -304,6 +307,7 @@ def tui(
         checkpoint_mode=checkpoint_mode,
         trace_mode=trace_mode,
         resume=resume,
+        **({"execution_backend": execution_backend} if execution_backend is not None else {}),
         **({"workflow_mode": workflow_mode} if workflow_mode is not None else {}),
     ).run()
 
@@ -390,7 +394,7 @@ def _inline_approval_handler(request: ApprovalRequest) -> ApprovalDecision:
 
     console.print(
         Panel(
-            f"Requested operation:\n{request.command}\n\nReason:\n{request.risk_reason}\nResource: {request.rule_preview}",
+            f"Requested operation:\n{request.command}\n\nReason:\n{request.risk_reason}\nResource: {request.rule_preview}\nExecution: {request.execution_context}",
             title=f"Human Approval · {request.tool_name}",
             border_style="yellow",
             box=box.ROUNDED,
@@ -513,3 +517,20 @@ def permissions_clear(
             indent=2,
         )
     )
+
+
+@app.command("doctor")
+def doctor_command(
+    execution_backend: Literal["local", "docker"] = typer.Option("local", "--execution-backend"),
+    image: str = typer.Option("mokioclaw-execution:0.2.0", "--image"),
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
+    """Check backend availability without executing a model request."""
+    import json
+
+    from mokioclaw.core.execution_backend import doctor
+
+    result = doctor(execution_backend, image)
+    typer.echo(json.dumps(result, ensure_ascii=False, indent=2) if json_output else str(result))
+    if not result["ok"]:
+        raise typer.Exit(1)

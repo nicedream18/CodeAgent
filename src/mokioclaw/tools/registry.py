@@ -76,7 +76,11 @@ def _bash(state: RuntimeState) -> StructuredTool:
         func=lambda command, timeout_seconds=None, run_in_background=False: run_bash(
             state, command, timeout_seconds, run_in_background
         ),
-        description=bash_tool_description(),
+        description=(
+            "Run a foreground POSIX shell in an offline Docker workspace. Fresh shell per call; Python and prepared dependencies are installed. No online package installation or background Bash. "
+            if state.execution_backend == "docker"
+            else bash_tool_description()
+        ),
     )
 
 
@@ -270,6 +274,8 @@ def _build_registry(state: RuntimeState) -> ToolRegistry:
     registry = ToolRegistry()
     for spec in TOOL_SPECS:
         if spec.factory is not None:
+            if state.evaluation_mode and spec.name in {"WebSearchTool", "ToolSearchTool"}:
+                continue
             if spec.name == "ToolSearchTool" and not state.mcp_servers:
                 continue
             registry.register(spec.factory(state), spec)

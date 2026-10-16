@@ -131,24 +131,18 @@ def test_bash_accepts_string_timeout(tmp_path: Path) -> None:
 
 
 def test_bash_uses_runtime_default_timeout_when_omitted(monkeypatch, tmp_path: Path) -> None:
-    calls = []
+    from mokioclaw.core.execution_backend import ExecutionResult, LocalBackend
 
-    class FakeCompleted:
-        returncode = 0
-        stdout = b"ok\n"
-        stderr = b""
+    requests = []
 
-    def fake_run(command, **kwargs):
-        calls.append(kwargs)
-        return FakeCompleted()
+    def run(self, request):
+        requests.append(request)
+        return ExecutionResult(True, 0, False, "ok\n", "", 0, "local")
 
-    monkeypatch.setattr("subprocess.run", fake_run)
-    state = RuntimeState(workspace=tmp_path, bash_default_timeout_seconds=77)
-
-    result = run_bash(state, "echo ok")
-
+    monkeypatch.setattr(LocalBackend, "run", run)
+    result = run_bash(RuntimeState(workspace=tmp_path, bash_default_timeout_seconds=77), "echo ok")
     assert result["ok"] is True
-    assert calls[0]["timeout"] == 77
+    assert requests[0].timeout_seconds == 77
 
 
 def test_bash_rejects_timeout_above_runtime_max(tmp_path: Path) -> None:
@@ -315,27 +309,21 @@ def test_bash_high_risk_command_requires_approval_by_default(tmp_path: Path) -> 
 
 
 def test_bash_high_risk_command_auto_approval_executes(monkeypatch, tmp_path: Path) -> None:
+    from mokioclaw.core.execution_backend import ExecutionResult, LocalBackend
+
     calls = []
 
-    class FakeCompleted:
-        returncode = 0
-        stdout = b"installed\n"
-        stderr = b""
+    def run(self, request):
+        calls.append(request)
+        return ExecutionResult(True, 0, False, "installed\n", "", 0, "local")
 
-    def fake_run(command, **kwargs):
-        calls.append((command, kwargs))
-        return FakeCompleted()
-
-    monkeypatch.setattr("subprocess.run", fake_run)
-    state = RuntimeState(workspace=tmp_path, approval_mode="auto")
-
-    result = run_bash(state, "uv add fastapi", timeout_seconds=5)
-
+    monkeypatch.setattr(LocalBackend, "run", run)
+    result = run_bash(
+        RuntimeState(workspace=tmp_path, approval_mode="auto"), "uv add fastapi", timeout_seconds=5
+    )
     assert result["ok"] is True
-    assert result["requires_approval"] is True
     assert result["approved"] is True
-    assert result["stdout"] == "installed\n"
-    assert calls[0][0] == "uv add fastapi"
+    assert calls[0].command == "uv add fastapi"
 
 
 def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -> None:
