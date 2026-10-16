@@ -316,6 +316,11 @@ def _invoke_once(
         status = "interrupted"
         raise
     except BaseException as exc:
+        from openai import OpenAIError
+
+        if runtime is not None and runtime.evaluation_mode and isinstance(exc, OpenAIError):
+            error = "provider_" + type(exc).__name__
+            raise ModelGenerationStopped(error) from None
         error = f"{type(exc).__name__}: {exc}"[:500]
         raise
     finally:

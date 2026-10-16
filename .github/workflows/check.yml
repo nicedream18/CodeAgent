@@ -9,3 +9,14 @@ jobs:
         with:
           python-version: '3.13'
       - run: make check
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.13'
+      - run: uv sync --frozen
+      - run: docker build -t mokioclaw-execution:0.2.0 docker/execution
+      - run: make check-docker

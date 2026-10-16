@@ -534,3 +534,8 @@ def doctor_command(
     typer.echo(json.dumps(result, ensure_ascii=False, indent=2) if json_output else str(result))
     if not result["ok"]:
         raise typer.Exit(1)
+
+
+from mokioclaw.evaluation.cli import app as evaluation_app  # noqa: E402
+
+app.add_typer(evaluation_app, name="eval")

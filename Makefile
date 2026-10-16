@@ -4,6 +4,7 @@ check:
 	uv run ruff check src tests scripts examples
 	uv run mypy
 	uv run python scripts/gen_protocol_doc.py --check
+	uv run python scripts/gen_eval_doc.py --check
 	uv run pytest -q
 	git diff --check
 lint:
@@ -14,6 +15,8 @@ test:
 protocol:
 	uv run python scripts/gen_protocol_doc.py
 
-.PHONY: check-docker
+.PHONY: check-docker eval-images
 check-docker:
-	MOKIO_TEST_DOCKER=1 uv run pytest -q tests/test_execution_backend.py
+	uv run python scripts/check_docker.py
+eval-images:
+	uv run python scripts/prepare_eval_images.py
