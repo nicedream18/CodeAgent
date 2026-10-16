@@ -112,12 +112,14 @@ def baseline_stream(task: str, **options: Any) -> Any:
 def main(spec_path: Path) -> None:
     from mokioclaw.core.agent import _controlled_stream, stream_agent_events
     from mokioclaw.core.run_control import RunControl
+    from mokioclaw.evaluation.process_control import watch_parent
 
     spec = json.loads(spec_path.read_text())
     config = EvalTrialConfig.model_validate(spec["config"])
     workspace = Path(spec["workspace"])
     control = RunControl()
     previous_sigterm = signal.signal(signal.SIGTERM, lambda *_: control.cancel())
+    watcher = watch_parent(control, spec, spec_path)
     control.runtime_initializer = lambda runtime: initialize(
         runtime, config, spec["image"], spec["owner"]
     )
@@ -238,6 +240,7 @@ def main(spec_path: Path) -> None:
             "run_id": getattr(runtime, "run_id", spec["owner"]),
         }
         Path(spec["output"]).write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n")
+        watcher.set()
         control.close()
         signal.signal(signal.SIGTERM, previous_sigterm)
 

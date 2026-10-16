@@ -702,6 +702,56 @@
       },
       "title": "Grade",
       "type": "object"
+    },
+    "EvalExperimentValidity": {
+      "additionalProperties": false,
+      "description": "A separate adjudication never rewrites frozen trial observations.",
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "default": "unreviewed",
+          "enum": [
+            "unreviewed",
+            "valid",
+            "invalid"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "recorded_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recorded At"
+        },
+        "issues": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "title": "EvalExperimentValidity",
+      "type": "object"
     }
   },
   "suite": {

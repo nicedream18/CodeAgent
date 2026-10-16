@@ -18,6 +18,20 @@ from mokioclaw.core.state import RuntimeState
 from mokioclaw.tools.bash_tool import run_bash
 
 
+@pytest.mark.parametrize("limit", [0, 1, 4])
+def test_tiny_preview_still_drains_large_output_without_unbounded_memory(tmp_path, limit):
+    import io
+
+    from mokioclaw.core.execution_backend import _Capture
+
+    capture = _Capture(tmp_path, limit, "preview-test")
+    capture.drain(io.BytesIO(b"x" * 3000000))
+    text, info = capture.finish("stdout")
+    assert len(text) <= limit
+    assert len(capture.head) + len(capture.tail) <= limit * 8
+    assert info["stdout_truncated"]
+
+
 def test_local_timeout_kills_descendants_and_output_is_bounded(tmp_path):
     import sys
 

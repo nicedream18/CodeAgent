@@ -15,6 +15,7 @@ from mokioclaw.evaluation.models import EvalTask, Grade
 from mokioclaw.evaluation.prepare import apply_patch, copy_source, file_hashes, sha
 
 IGNORED_OUTPUTS = {"TODO.md", "NOTEPAD.md", "HISTORY_SUMMARY.md"}
+MAX_TEST_REPORT_BYTES = 4 * 1024 * 1024
 
 
 def changed_paths(base: Path, candidate: Path) -> list[str]:
@@ -23,16 +24,21 @@ def changed_paths(base: Path, candidate: Path) -> list[str]:
 
 
 def _counts(path: Path) -> tuple[int, int, int, int]:
-    if not path.is_file():
+    if path.is_symlink() or not path.is_file():
         return 0, 0, 0, 0
     try:
-        root = ET.parse(path).getroot()
+        # Bound parsing of reports produced in a candidate-controlled process.
+        with path.open("rb") as handle:
+            payload = handle.read(MAX_TEST_REPORT_BYTES + 1)
+        if len(payload) > MAX_TEST_REPORT_BYTES:
+            return 0, 0, 0, 0
+        root = ET.fromstring(payload)
         cases = root.findall(".//testcase")
         failed = sum(c.find("failure") is not None for c in cases)
         errors = sum(c.find("error") is not None for c in cases)
         skipped = sum(c.find("skipped") is not None for c in cases)
         return len(cases), failed, errors, skipped
-    except ET.ParseError:
+    except (ET.ParseError, OSError):
         return 0, 0, 0, 0
 
 
@@ -123,7 +129,7 @@ def grade_candidate(
             )
             for label in ("target", "regression"):
                 xml = staging / f".{label}.xml"
-                if xml.exists():
+                if xml.is_file() and not xml.is_symlink() and xml.stat().st_size <= MAX_TEST_REPORT_BYTES:
                     shutil.copy2(xml, report_root / (label + ".xml"))
             target, tfail, terr, tskip = _counts(staging / ".target.xml")
             regression, rfail, rerr, rskip = _counts(staging / ".regression.xml")

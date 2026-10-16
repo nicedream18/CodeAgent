@@ -5,7 +5,13 @@ import json
 from pathlib import Path
 
 from mokioclaw.evaluation.catalog import CORE, TASKS, schedule
-from mokioclaw.evaluation.models import EvalTask, EvalTrialConfig, EvalTrialResult, Grade
+from mokioclaw.evaluation.models import (
+    EvalExperimentValidity,
+    EvalTask,
+    EvalTrialConfig,
+    EvalTrialResult,
+    Grade,
+)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--check", action="store_true")
@@ -14,7 +20,7 @@ record = {
     "schema_version": 1,
     "models": {
         cls.__name__: cls.model_json_schema()
-        for cls in [EvalTask, EvalTrialConfig, EvalTrialResult, Grade]
+        for cls in [EvalTask, EvalTrialConfig, EvalTrialResult, Grade, EvalExperimentValidity]
     },
     "suite": {
         "name": "internship-v1",

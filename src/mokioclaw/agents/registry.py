@@ -443,7 +443,9 @@ def run_subagent(
     budget = SubagentToolBudget(name, handoff_id, limit, event_writer)
     runtime.active_agent_tools = configured_tools
     runtime.active_subagent_budget = budget
-    runtime.model_profile = config.get("model_profile")
+    # A run-wide profile also governs synchronous children unless they explicitly
+    # select another profile. Clearing it silently restores provider defaults.
+    runtime.model_profile = config.get("model_profile") or previous_model_profile
     runtime.active_agent_prompt = runtime.agent_profiles.get(name, {}).get("system_prompt", "")
     runtime.active_agent_name = name
     legacy_state = None

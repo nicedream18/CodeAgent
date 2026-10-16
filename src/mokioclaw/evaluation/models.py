@@ -12,6 +12,15 @@ class Versioned(BaseModel):
     schema_version: Literal[1] = 1
 
 
+class EvalExperimentValidity(Versioned):
+    """A separate adjudication never rewrites frozen trial observations."""
+
+    status: Literal["unreviewed", "valid", "invalid"] = "unreviewed"
+    recorded_at: str | None = None
+    issues: list[str] = Field(default_factory=list)
+    evidence: list[str] = Field(default_factory=list)
+
+
 class EvalTask(Versioned):
     id: str
     version: str = "internship-v1"

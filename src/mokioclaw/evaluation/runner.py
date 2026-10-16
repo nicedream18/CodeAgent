@@ -12,14 +12,21 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from dotenv import load_dotenv
 
-from mokioclaw.core.execution_backend import BackendUnavailable, docker_cli
 from mokioclaw.evaluation.catalog import CORE, TASKS, schedule
 from mokioclaw.evaluation.grader import changed_paths, grade_candidate
-from mokioclaw.evaluation.models import EvalTask, EvalTrialConfig, EvalTrialResult
+from mokioclaw.evaluation.models import (
+    EvalExperimentValidity,
+    EvalTask,
+    EvalTrialConfig,
+    EvalTrialResult,
+)
 from mokioclaw.evaluation.prepare import copy_source, prepare_task, sha, tree_hash
+from mokioclaw.evaluation.process_control import cleanup_owner as _cleanup
+from mokioclaw.evaluation.process_control import stop_worker
 
 
 def now() -> str:
@@ -34,6 +41,24 @@ def write_json(path: Path, value: Any) -> None:
         handle.flush()
         os.fsync(handle.fileno())
     temp.replace(path)
+
+
+def _source_contract(repository: Path) -> dict[str, str]:
+    return {
+        "harness_revision": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repository, text=True
+        ).strip(),
+        "harness_source_sha256": tree_hash(repository / "src"),
+        "lock_sha256": sha((repository / "uv.lock").read_bytes()),
+        "prompt_sha256": tree_hash(repository / "src/mokioclaw/prompts"),
+    }
+
+
+def _verify_frozen(manifest: dict[str, Any], repository: Path, task_file: Path) -> None:
+    if any(manifest.get(k) != v for k, v in _source_contract(repository).items()):
+        raise ValueError("Frozen source changed during experiment; no further trial was started")
+    if sha(task_file.read_bytes()) != manifest["tasks"][task_file.parent.name]:
+        raise ValueError("Frozen task changed during experiment; no further trial was started")
 
 
 def _manifest(cache: Path, repository: Path) -> dict[str, Any]:
@@ -53,6 +78,7 @@ def _manifest(cache: Path, repository: Path) -> dict[str, Any]:
                 "temperature": 0,
                 "context": 32768,
                 "output": 4096,
+                "sdk_max_retries": 0,
                 "parameter": os.getenv("MOKIO_MODEL_OUTPUT_PARAMETER", "max_tokens"),
             },
             sort_keys=True,
@@ -130,25 +156,6 @@ def _worker_env(home: Path, repository: Path) -> dict[str, str]:
     return environment
 
 
-def _cleanup(owner: str) -> list[str]:
-    try:
-        ids = docker_cli(
-            [
-                "ps",
-                "-aq",
-                "--filter",
-                "label=mokioclaw.execution=true",
-                "--filter",
-                "label=mokioclaw.owner=" + owner,
-            ]
-        ).stdout.split()
-        if ids:
-            docker_cli(["rm", "--force", *ids])
-        return ids
-    except BackendUnavailable:
-        return ["cleanup-unconfirmed"]
-
-
 def _patch(base: Path, candidate: Path) -> str:
     import difflib
 
@@ -196,7 +203,7 @@ def run_trial(
     try:
         copy_source(task_root / "base", workspace)
         home.mkdir()
-        spec = {
+        spec: dict[str, Any] = {
             "config": config.model_dump(),
             "workspace": str(workspace),
             "owner": owner,
@@ -204,16 +211,26 @@ def run_trial(
             "requirement": task.requirement + "\n允许修改范围：" + ", ".join(task.allowed_paths),
             "events": str(directory / "events.jsonl"),
             "output": str(directory / "worker.json"),
+            "parent_pid": os.getpid(),
+            "worker_token": uuid4().hex,
         }
         write_json(directory / "spec.json", spec)
         with (directory / "worker.log").open("wb") as log:
             process = subprocess.Popen(
-                [sys.executable, "-m", "mokioclaw.evaluation.worker", str(directory / "spec.json")],
+                [
+                    sys.executable, "-m", "mokioclaw.evaluation.worker",
+                    str((directory / "spec.json").resolve()),
+                    "--worker-token", spec["worker_token"],
+                ],
                 cwd=home,
                 env=_worker_env(home, repository),
                 stdout=log,
                 stderr=log,
                 start_new_session=True,
+            )
+            write_json(
+                directory / "worker-process.json",
+                {"pid": process.pid, "token": spec["worker_token"]},
             )
             try:
                 process.wait(timeout=config.generation_seconds)
@@ -347,11 +364,24 @@ def _run_experiment(
         if receipt.exists():
             previous = EvalTrialResult.model_validate_json(receipt.read_text())
             if previous.execution_status == "running":
+                stop_worker(directory, experiment_id + "-" + config.trial_id)
+                worker_path = directory / "worker.json"
+                if not worker_path.exists():
+                    worker_path = directory / "worker.progress.json"
+                if worker_path.exists():
+                    worker = json.loads(worker_path.read_text())
+                    previous.model_metrics = worker.get("model_metrics", {})
+                    previous.tool_count = worker.get("tool_count", 0)
+                    previous.actual_path = worker.get("actual_path", [])
+                    previous.run_id = worker.get("run_id")
+                    previous.stream_ids = worker.get("stream_ids", [])
+                    previous.tool_call_ids = worker.get("tool_call_ids", [])
                 previous.execution_status = "interrupted"
                 previous.stop_reason = "runner_interrupted_before_finalization"
                 previous.ended_at = now()
                 write_json(receipt, previous.model_dump())
             continue  # Resume only trials without a start receipt; never retry.
+        _verify_frozen(manifest, repository, cache / "tasks" / config.task_id / "task.json")
         result = run_trial(experiment_id, config, cache, directory, repository)
         print(
             f"{config.trial_id}: {result.execution_status}, solved={result.task_solved}, valid={result.grade.valid}",
@@ -398,6 +428,12 @@ def report_experiment(cache: Path, experiment_id: str) -> dict[str, Any]:
             "task_solved": None,
         }
     manifest = json.loads(freeze.read_text())
+    validity_path = root / "validity.json"
+    validity = (
+        EvalExperimentValidity.model_validate_json(validity_path.read_text())
+        if validity_path.exists()
+        else EvalExperimentValidity()
+    )
     results = [
         EvalTrialResult.model_validate_json(p.read_text())
         for p in sorted(root.glob("trials/*/result.json"))
@@ -466,10 +502,13 @@ def report_experiment(cache: Path, experiment_id: str) -> dict[str, Any]:
         "schema_version": 1,
         "experiment_id": experiment_id,
         "real_model": True,
+        "validity": validity.model_dump(),
+        "comparison_valid": validity.status == "valid",
         "scheduled": len(manifest["trials"]),
         "recorded": len(results),
         "not_started": len(manifest["trials"]) - len(results),
         "solved": sum(r.task_solved for r in results),
+        "independent_artifact_passed": sum(r.grade.solved for r in results),
         "invalid_grades": sum(not r.grade.valid for r in results),
         "regression_failures": sum(r.grade.regression_failed > 0 for r in results),
         "out_of_scope": sum(bool(r.grade.out_of_scope) for r in results),
@@ -490,7 +529,15 @@ def report_experiment(cache: Path, experiment_id: str) -> dict[str, Any]:
     lines = [
         f"# {experiment_id}",
         "",
+        f"对照有效性：{validity.status}。" + (
+            "可用于本评测集的架构对照。"
+            if validity.status == "valid"
+            else "以下仅为诊断统计，不能据此比较架构优劣。"
+        ),
+        *["- " + issue for issue in validity.issues],
+        "",
         f"真实模型试验：{len(results)}/{len(manifest['trials'])}；解决 {record['solved']}；基础设施失败 {record['infrastructure_failures']}。",
+        f"独立产物验收通过 {record['independent_artifact_passed']}；其中未正常结束的运行仍不计为完成交付。",
         "",
         "| 架构 | 已记录 | 解决 | 请求 | 生成耗时 min/median/max(s) |",
         "|---|---:|---:|---:|---|",

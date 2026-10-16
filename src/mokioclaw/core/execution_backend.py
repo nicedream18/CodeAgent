@@ -55,7 +55,7 @@ class ExecutionBackend(Protocol):
 
 class _Capture:
     def __init__(self, workspace: Path, limit: int, kind: str):
-        self.limit = limit
+        self.limit = max(0, limit)
         self.head = b""
         self.tail = b""
         self.count = 0
@@ -70,8 +70,9 @@ class _Capture:
         try:
             while chunk := pipe.read(8192):
                 self.count += len(chunk)
-                self.head = (self.head + chunk)[: self.limit * 4]
-                self.tail = (self.tail + chunk)[-self.limit * 4 :]
+                if self.limit:
+                    self.head = (self.head + chunk)[: self.limit * 4]
+                    self.tail = (self.tail + chunk)[-self.limit * 4 :]
                 if self.artifact is not None and not self.error:
                     try:
                         self.artifact.write(chunk)
@@ -84,8 +85,11 @@ class _Capture:
         text = self.head.decode("utf-8", errors="replace")
         if self.count > len(self.head) or len(text) > self.limit:
             tail = self.tail.decode("utf-8", errors="replace")
-            half = max(1, (self.limit - 3) // 2)
-            text = text[:half] + "\n…\n" + tail[-(self.limit - 3 - half) :]
+            if self.limit < 5:
+                text = text[: self.limit]
+            else:
+                half = (self.limit - 3) // 2
+                text = text[:half] + "\n…\n" + tail[-(self.limit - 3 - half) :]
         info: dict[str, Any] = {key + "_truncated": self.count > len(text.encode())}
         if self.artifact is not None:
             try:

@@ -235,6 +235,12 @@ def _invoke_once(
                 "message_count": len(messages),
                 "input_estimate": _snapshot.input_tokens,
                 "output_budget": budget.output,
+                "model_config": {
+                    "model": profile.get("model"),
+                    "context_tokens": budget.window,
+                    "output_tokens": budget.output,
+                    "sdk_max_retries": profile.get("max_retries"),
+                },
                 **payload_reference(
                     runtime,
                     [m.model_dump() if hasattr(m, "model_dump") else str(m) for m in messages],
