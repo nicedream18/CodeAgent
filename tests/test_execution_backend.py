@@ -94,6 +94,7 @@ def test_docker_background_is_rejected_before_launch(tmp_path):
 )
 def test_real_docker_isolation_timeout_and_paths(tmp_path, monkeypatch):
     image = resolve_image(os.getenv("MOKIO_DOCKER_IMAGE", "mokioclaw-execution:0.2.0"))
+    owner = os.getenv("MOKIO_TEST_OWNER", "test-isolation")
     workspace = tmp_path / "中文 workspace"
     workspace.mkdir()
     workspace.chmod(0o777)
@@ -128,12 +129,12 @@ pathlib.Path('输出.txt').write_text('中文')
 print('isolation checks passed')
 PY"""
     backend = DockerBackend(image)
-    result = backend.run(ExecutionRequest(workspace, command, owner="test-isolation"))
+    result = backend.run(ExecutionRequest(workspace, command, owner=owner))
     assert result.ok, result.stderr
     assert (workspace / "输出.txt").read_text() == "中文"
     result = backend.run(
         ExecutionRequest(
-            workspace, "(sleep 3; touch late) & wait", timeout_seconds=0.7, owner="test-timeout"
+            workspace, "(sleep 3; touch late) & wait", timeout_seconds=0.7, owner=owner
         )
     )
     assert result.timed_out
@@ -142,13 +143,14 @@ PY"""
     from mokioclaw.core.execution_backend import docker_cli
 
     assert not docker_cli(
-        ["ps", "-aq", "--filter", "label=mokioclaw.owner=test-timeout"]
+        ["ps", "-aq", "--filter", "label=mokioclaw.owner=" + owner]
     ).stdout.strip()
     result = backend.run(
         ExecutionRequest(
             workspace,
             "python -c \"print('x'*3000000)\"; echo fault >&2; exit 7",
             max_output_chars=100,
+            owner=owner,
         )
     )
     assert not result.ok and result.exit_code == 7
@@ -156,7 +158,7 @@ PY"""
     assert (workspace / result.metadata["stdout_path"]).stat().st_size <= 1024 * 1024
     (workspace / "readonly.txt").write_text("a")
     (workspace / "readonly.txt").chmod(0o400)
-    assert not backend.run(ExecutionRequest(workspace, "echo b >> readonly.txt")).ok
+    assert not backend.run(ExecutionRequest(workspace, "echo b >> readonly.txt", owner=owner)).ok
 
 
 def test_missing_image_is_controlled(monkeypatch):

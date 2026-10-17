@@ -24,13 +24,14 @@ flowchart LR
 | 可复核内容 | 证据 |
 |---|---|
 | 366 项原始检查基线 | [基线记录](docs/experiments/internship-baseline-2026-10-16.json) |
-| 当前 444 项检查通过，真实 Docker 29 项通过 | [Goal 2 检查证据](docs/experiments/job-readiness-goal2/checks/) |
+| Goal 2 验收 444 项检查通过，真实 Docker 29 项通过 | [Goal 2 检查证据](docs/experiments/job-readiness-goal2/checks/) |
 | 真实 ARM64 容器隔离、输出和超时清理 | [Docker 实测](docs/experiments/docker-arm64-2026-10-16.json) |
 | 12 题缺陷版失败 / 参考修复通过 | [任务清单与验收](docs/experiments/internship-v1/) |
 | baseline/full/light/auto 公平比较口径 | [评测设计](docs/internship/evaluation.md) |
 | 56 次正式试验及 56 次无效对照均保留 | [实际结果](docs/experiments/internship-v1/RESULTS.md) |
 | 150 秒真实模型完整交付回放，另保留失败案例 | [演示](docs/internship/demo.md) |
 | 三个 v2 任务环境、角色诊断及完成预算预留 | [Goal 1 设计、离线实验与 B0/B1](docs/experiments/job-readiness-v1/) |
+| Linux CI、真实容器及 wheel 干净安装入口；远程待验收 | [Goal 3 操作与证据边界](docs/experiments/job-readiness-goal3/) |
 
 ## 快速运行
 

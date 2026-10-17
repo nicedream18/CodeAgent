@@ -1,0 +1,7 @@
+# Isolated PEP 517 build dependencies; runtime dependencies remain in uv.lock.
+hatchling==1.32.4
+packaging==26.2
+pathspec==1.1.1
+pluggy==1.6.0
+tomlkit==0.15.2
+trove-classifiers==2026.9.21.13

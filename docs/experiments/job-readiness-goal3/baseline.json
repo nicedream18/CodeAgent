@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-10-17T10:26:56.774716+00:00",
+  "observed_start_head": "8d8e4dab247918ed9e297bafd785858801d1e318",
+  "dirty_files_before_work": [],
+  "runtime_source_sha256": "4f72454c28444f1041dccfa199e1d24a8bd171ffe9bb5c4b47169b6bc9a29a4f",
+  "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+  "old_wheel_sha256": "937f67db6956aeafc9920f3d7f075c2918c397fe5506ffbc1f2728cbd5594c15",
+  "tags": [
+    "f8b1c3d7aa82a5fee01b143118d1418fe487e983 refs/tags/v0.2.0-rc.1"
+  ],
+  "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "uv": "uv 0.12.19 (bea138450 2026-09-24 aarch64-apple-darwin)",
+  "remote": {
+    "origin": "https://github.com/nicedream18/CodeAgent",
+    "visibility": "public",
+    "default_branch": "main",
+    "observed_main_sha": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+    "unpublished_commits_at_start": 20,
+    "upstream": "https://github.com/Wood-Q/MokioAgent"
+  },
+  "goal2_archive_index_sha256": "c5d30be578552feb7ccae6b52e78585ecdd13873498a955546e28a452c49d8cc",
+  "real_model_calls_authorized": false,
+  "remote_execution_authorized": false,
+  "historical_arm64_evidence": "../job-readiness-goal2/checks/make-check-docker.log"
+}

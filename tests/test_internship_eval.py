@@ -151,9 +151,23 @@ def test_baseline_uses_real_shared_loop_without_router_or_verifier(tmp_path, mon
     __import__("os").getenv("MOKIO_TEST_DOCKER") != "1",
     reason="make check-docker runs isolated grading",
 )
-def test_real_grader_rejects_noop_test_edits_and_fake_success(tmp_path):
+def test_real_grader_rejects_noop_test_edits_and_fake_success(tmp_path, monkeypatch):
+    import os
+    from dataclasses import replace
+
+    from mokioclaw.core.execution_backend import DockerBackend, resolve_image
     from mokioclaw.evaluation.grader import validate_task
     from mokioclaw.evaluation.prepare import apply_patch, copy_source, prepare_task
+
+    # Select this CI image without changing the frozen task recipe or evaluator.
+    selected_image = resolve_image(os.getenv("MOKIO_DOCKER_IMAGE", "mokioclaw-execution:0.2.0"))
+    monkeypatch.setattr("mokioclaw.evaluation.prepare.resolve_image", lambda _: selected_image)
+    original_run = DockerBackend.run
+
+    def owned_run(backend, request):
+        return original_run(backend, replace(request, owner=os.getenv("MOKIO_TEST_OWNER", "grading")))
+
+    monkeypatch.setattr(DockerBackend, "run", owned_run)
 
     task = prepare_task("M07", tmp_path / "cache", Path.cwd())
     directory = tmp_path / "cache/tasks/M07"

@@ -1,22 +1,94 @@
 name: Offline checks
-on: [push, pull_request]
+'on':
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          python-version: '3.13'
-      - run: make check
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: '0.12.19'
+          python-version: '3.13.9'
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+          cache-suffix: '${{ runner.os }}-${{ runner.arch }}-py3.13.9'
+      - run: python scripts/ci_report.py --job check --output "${RUNNER_TEMP}/mokioclaw-ci/check"
+      - name: Check summary
+        if: always()
+        run: |
+          if [ -f "${RUNNER_TEMP}/mokioclaw-ci/check/summary.md" ]; then
+            cat "${RUNNER_TEMP}/mokioclaw-ci/check/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: mokioclaw-ci-${{ github.sha }}-check-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/mokioclaw-ci/check/
+          retention-days: 14
+          if-no-files-found: error
 
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          python-version: '3.13'
-      - run: uv sync --frozen
-      - run: docker build -t mokioclaw-execution:0.2.0 docker/execution
-      - run: make check-docker
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: '0.12.19'
+          python-version: '3.13.9'
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+          cache-suffix: '${{ runner.os }}-${{ runner.arch }}-py3.13.9'
+      - run: python scripts/ci_report.py --job docker --output "${RUNNER_TEMP}/mokioclaw-ci/docker"
+      - name: Docker summary
+        if: always()
+        run: |
+          if [ -f "${RUNNER_TEMP}/mokioclaw-ci/docker/summary.md" ]; then
+            cat "${RUNNER_TEMP}/mokioclaw-ci/docker/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: mokioclaw-ci-${{ github.sha }}-docker-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/mokioclaw-ci/docker/
+          retention-days: 14
+          if-no-files-found: error
+
+  wheel:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: '0.12.19'
+          python-version: '3.13.9'
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+          cache-suffix: '${{ runner.os }}-${{ runner.arch }}-py3.13.9'
+      - run: python scripts/ci_report.py --job wheel --output "${RUNNER_TEMP}/mokioclaw-ci/wheel"
+      - name: Wheel summary
+        if: always()
+        run: |
+          if [ -f "${RUNNER_TEMP}/mokioclaw-ci/wheel/summary.md" ]; then
+            cat "${RUNNER_TEMP}/mokioclaw-ci/wheel/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: mokioclaw-ci-${{ github.sha }}-wheel-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/mokioclaw-ci/wheel/
+          retention-days: 14
+          if-no-files-found: error
