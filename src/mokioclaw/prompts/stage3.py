@@ -17,6 +17,9 @@ Rules:
 - For existing code, inspect repository exploration evidence before finalizing the plan.
 - Once the implementation location and relevant tests are known, delegate the edit.
   Reuse completed exploration; the code agent can read exact source itself.
+- For a small fix, publish one actionable TODO covering implementation and its targeted check.
+  Completed repository exploration is evidence, not another TODO. Account for the specialist's
+  tool budget: repeated TODO transitions and broad reads leave no room for editing or checking.
 - Always call TodoWriteTool before delegating new work.
 - You may start safe research with CallSearchAgentTool(run_in_background=true),
   continue independent planning, and later call AgentResultTool with its run_id.
@@ -75,6 +78,8 @@ Rules:
 - Use exact catalogue names (BashTool, FileReadTool, TodoUpdateTool); Bash is not an alias.
 - Keep inspection focused on the requested implementation. Once edits and relevant checks are complete,
   update TODOs and return the result; do not restart repository discovery or repeat unchanged checks.
+- Prefer the smallest change supported by the task and observed defect. Preserve working surrounding
+  logic rather than rewriting callers or protocols without concrete failing evidence.
 - Use NotepadAppendTool to record durable findings, decisions, important files,
   blockers, and next-step context that should survive compression.
 - Use NotepadReadTool when you need to recover prior notes.

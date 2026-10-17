@@ -5,6 +5,8 @@ from dataclasses import dataclass, replace
 from typing import Any, Literal
 
 from langchain_core.tools import BaseTool, StructuredTool
+from pydantic import ConfigDict, Field
+from pydantic import create_model as create_input_model
 
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.tools.bash_tool import bash_tool_description, run_bash
@@ -71,8 +73,19 @@ def _grep(state: RuntimeState) -> StructuredTool:
 
 
 def _bash(state: RuntimeState) -> StructuredTool:
+    args_schema = create_input_model(
+        "WorkspaceBashInput",
+        __config__=ConfigDict(extra="forbid"),
+        command=(str, ...),
+        timeout_seconds=(
+            float | None,
+            Field(default=None, gt=0, le=state.bash_max_timeout_seconds),
+        ),
+        run_in_background=(bool, False),
+    )
     return StructuredTool.from_function(
         name="BashTool",
+        args_schema=args_schema,
         func=lambda command, timeout_seconds=None, run_in_background=False: run_bash(
             state, command, timeout_seconds, run_in_background
         ),
@@ -80,7 +93,9 @@ def _bash(state: RuntimeState) -> StructuredTool:
             "Run a foreground POSIX shell in an offline Docker workspace. Fresh shell per call; Python and prepared dependencies are installed. No online package installation or background Bash. "
             if state.execution_backend == "docker"
             else bash_tool_description()
-        ),
+        )
+        + f" timeout_seconds must be at most {state.bash_max_timeout_seconds}; default is {state.bash_default_timeout_seconds}. "
+        "Output is already bounded and saved when large. For tests, preserve the command's exit status; do not pipe pytest into tail.",
     )
 
 

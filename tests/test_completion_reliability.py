@@ -273,3 +273,20 @@ def test_code_handoff_receives_repository_map_and_current_budget(tmp_path, monke
         assert len(notes) == 1
     assert "remaining: 10 of 10" in captured[0][1].content
     assert "remaining: 9 of 10" in captured[1][1].content
+
+
+def test_bash_schema_exposes_actual_timeout_bound_and_rejects_before_launch(tmp_path):
+    from mokioclaw.tools.execution import execute_tool
+    from mokioclaw.tools.registry import build_tool
+
+    runtime = RuntimeState(
+        workspace=tmp_path, bash_max_timeout_seconds=60, bash_default_timeout_seconds=60
+    )
+    tool = build_tool(runtime, "BashTool")
+    schema = tool.args_schema.model_json_schema()
+    assert schema["properties"]["timeout_seconds"]["anyOf"][0]["maximum"] == 60
+    result = execute_tool(
+        runtime, tool, {"command": "touch should-not-run", "timeout_seconds": 900}
+    )
+    assert not result["ok"] and result["error_type"] == "invalid_input"
+    assert not (tmp_path / "should-not-run").exists()

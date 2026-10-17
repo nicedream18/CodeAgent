@@ -106,6 +106,12 @@ def planner_node(state: api.MokioGraphState) -> dict[str, api.Any]:
 
 def _build_planner_tools(state: api.MokioGraphState, writer) -> list[api.StructuredTool]:
     registry = state["runtime"].subagent_registry or api.registered_subagents()
+    code_definition = registry.get("codeAgent")
+    code_budget = (
+        state["runtime"]
+        .subagent_configs.get("codeAgent", {})
+        .get("max_tool_calls", code_definition.max_tool_calls if code_definition else 10)
+    )
     tools = [
         api.StructuredTool.from_function(
             name="CallRepoAgentTool",
@@ -160,7 +166,7 @@ def _build_planner_tools(state: api.MokioGraphState, writer) -> list[api.Structu
             func=lambda instruction, run_in_background=False: api._call_code_agent_tool(
                 state, writer, instruction, run_in_background=run_in_background
             ),
-            description="Delegate implementation work to codeAgent. Args: instruction, optional run_in_background.",
+            description=f"Delegate implementation and targeted verification to codeAgent; its handoff budget is {code_budget} tool calls, including TODO updates. Reuse the repository map and keep small tasks to one implementation-and-check TODO. Args: instruction, optional run_in_background.",
         ),
         api.StructuredTool.from_function(
             name="AgentResultTool",
