@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-17T10:59:52.184401+00:00",
+  "recorded_at": "2026-10-17T11:08:51.514203+00:00",
   "goal": "Goal 3",
-  "status": "本地修复完成、远程复验待授权",
+  "status": "远程 Docker/wheel 通过，TUI 测试同步修复中",
   "local_preparation": "passed",
   "remote_execution_authorized": true,
   "remote_verified": false,
   "full_goal_complete": false,
-  "remote_commit": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
-  "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469",
+  "remote_commit": "ea542c06dac27e9f7b1d7aefdfdc9ac413e5ec75",
+  "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601",
   "job_urls": {
-    "wheel": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/job/117377085112",
-    "docker": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/job/117377085139",
-    "check": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/job/117377085144"
+    "docker": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/job/117380358953",
+    "wheel": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/job/117380359054",
+    "check": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/job/117380359152"
   },
   "artifact_urls": [
-    "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098846365/zip",
-    "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098776740/zip",
-    "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098373376/zip"
+    "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12099280184",
+    "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12098572964",
+    "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12098469929"
   ],
   "tested_code_commit": "e5bcf80acff9a094bd5e416e92e3cd34ac8afe6c",
   "source_and_checks_sha256": "6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8",
@@ -91,11 +91,11 @@
     "image_published": false
   },
   "real_model_calls": 0,
-  "remote_writes": 1,
+  "remote_writes": 2,
   "remaining": [
-    "Obtain approval for the exact additional repair/evidence commit range.",
-    "Push the approved repair and reuse its automatic Linux workflow.",
-    "Download and verify successful check/docker/wheel reports before declaring Goal 3 complete."
+    "Complete local and offline Linux checks for the TUI test synchronization repair.",
+    "Obtain approval for the exact new commit range before pushing.",
+    "Pass the repaired ordinary Linux check and retain successful Docker/wheel reports."
   ],
   "limits": [
     "Local ARM64 evidence does not prove remote Linux success.",
@@ -105,23 +105,27 @@
   "remote_result": {
     "conclusion": "failure",
     "jobs": {
-      "wheel": "failure",
-      "docker": "failure",
+      "docker": "success",
+      "wheel": "success",
       "check": "failure"
     },
-    "reports_uploaded": 3,
     "reports_downloaded": true,
-    "download_requires_login": false,
-    "evidence": "remote/39026034469/status.json",
     "artifact_sha256_verified": true,
-    "remote_python": "3.12.3"
+    "python": "3.13.9",
+    "check_pytest_counts": {
+      "passed": 454,
+      "failed": 1,
+      "skipped": 2,
+      "error": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "deselected": 0
+    },
+    "evidence": "remote/39027177601/status.json"
   },
   "local_repair": {
-    "state": "passed",
-    "tested_code_commit": "e5bcf80acff9a094bd5e416e92e3cd34ac8afe6c",
-    "source_and_checks_sha256": "6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8",
-    "evidence": "local-arm64-repair/",
-    "new_push_authorized": false,
-    "diagnostic_evidence": "local-linux-bootstrap/diagnosis.json"
+    "state": "testing",
+    "change": "TUI test waits for actual run completion instead of a fixed delay",
+    "new_push_authorized": false
   }
 }

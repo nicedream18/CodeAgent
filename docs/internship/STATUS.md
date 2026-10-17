@@ -1,6 +1,6 @@
 # 求职交付收敛状态
 
-## Goal 3：本地修复完成、远程复验待授权
+## Goal 3：远程 Docker/wheel 通过，TUI 测试同步修复中
 
 - 普通检查、真实 Docker、wheel 三作业已实现，支持 push/PR/手动触发；报告有配额、脱敏及失败记录。
 - 首轮本地被测代码：`9247f7f4d91841f817e071ebc1a1e18a24402147`，macOS ARM64、Python 3.13.9、uv 0.12.19。
@@ -11,7 +11,10 @@
 - 用户已授权的 22 个提交已推送至 `8ca634d`，[首次远程运行](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 三作业均失败，失败记录保留，不能判为 Linux 验收通过。
 - 三份失败 artifacts 已下载，GitHub SHA256 校验一致；原报告确认使用了 Python 3.12.3，冻结安装因要求 >=3.13 而失败。
 - 修复代码 `e5bcf80`：三个入口显式使用 uv 启动 Python 3.13.9。本地 Linux 对照、455/2 全量检查、29/0 真实 Docker 及干净 wheel 安装通过，新的提交尚未推送。
-- 本轮未请求真实模型或发布产物；后续修复推送需要按具体提交取得授权，Goal 3 尚未完整完成。
+- 第二次授权已推送 `ea542c0`，[远程复验](https://github.com/nicedream18/CodeAgent/actions/runs/39027177601) Docker/wheel 通过；check 为 454 passed、1 failed、2 skipped，失败是 TUI 固定 0.2 秒等待未覆盖实际线程收尾时间。
+- 三份远程报告已下载并校验摘要；真实 Linux x86_64 Docker 29/0、干净 wheel 安装均有通过证据，普通检查仍未通过。
+- 正在把三处 TUI 任务结束断言改为状态同步并验证；不改产品代码或评分逻辑，不跳过失败测试。
+- 本轮未请求真实模型或发布产物；再次修复推送仍需具体提交授权，Goal 3 尚未完整完成。
 
 当前证据：[修复后检查](../experiments/job-readiness-goal3/local-arm64-repair/check/summary.md)、[修复后 Docker](../experiments/job-readiness-goal3/local-arm64-repair/docker/summary.md)、[修复后 wheel](../experiments/job-readiness-goal3/local-arm64-repair/wheel/summary.md)。
 首轮证据：[本地验收](../experiments/job-readiness-goal3/acceptance.json)、[检查](../experiments/job-readiness-goal3/local-arm64/check/summary.md)、[Docker](../experiments/job-readiness-goal3/local-arm64/docker/summary.md)、[wheel](../experiments/job-readiness-goal3/local-arm64/wheel/summary.md)。

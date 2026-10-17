@@ -4,6 +4,7 @@ import asyncio
 from pathlib import Path
 
 from rich.text import Text
+from textual.widgets import Static
 from typer.testing import CliRunner
 
 from mokioclaw.cli.app import app
@@ -12,6 +13,16 @@ from mokioclaw.cli.tui import MokioClawTuiApp
 from mokioclaw.cli.tui.approval import ApprovalGate
 from mokioclaw.cli.tui.logo import render_logo
 from mokioclaw.core.approval import ApprovalRequest
+
+
+async def wait_for_completed_run(app, pilot, turn=1) -> None:
+    # Rendering and the worker's final message have no fixed wall-clock latency.
+    # Include run_count so the initial ready state cannot satisfy this wait.
+    async with asyncio.timeout(5):
+        while app.run_count < turn or app.running:
+            await pilot.pause()
+    await pilot.pause()
+    assert app.query_one("#status", Static).content == "finished; ready for next task"
 
 
 def test_tui_handoff_summary_reads_new_and_legacy_fields() -> None:
@@ -154,7 +165,7 @@ def test_tui_renders_fake_stream_events(tmp_path) -> None:
     async def run() -> None:
         app = MokioClawTuiApp(initial_task="demo task", stream_factory=fake_stream)
         async with app.run_test(size=(120, 36)) as pilot:
-            await pilot.pause(0.3)
+            await wait_for_completed_run(app, pilot)
             assert "workspace-a" in app.sidebar_text
             assert "trace-demo" in app.sidebar_text
             assert "session-demo" in app.sidebar_text
@@ -179,10 +190,11 @@ def test_tui_renders_lightweight_chat_response() -> None:
     async def run() -> None:
         app = MokioClawTuiApp(initial_task="你好", stream_factory=fake_stream)
         async with app.run_test(size=(100, 30)) as pilot:
-            await pilot.pause(0.2)
+            await wait_for_completed_run(app, pilot)
             assert app.run_count == 1
             assert app.latest_workspace
             assert not app.running
+            assert any("你好，我在。" in str(widget.content) for widget in app.query(Static))
 
     asyncio.run(run())
 
@@ -302,9 +314,9 @@ def test_tui_runs_multiple_tasks_in_same_session_workspace(tmp_path) -> None:
         app = MokioClawTuiApp(workspace=tmp_path / "session-workspace", stream_factory=fake_stream)
         async with app.run_test(size=(100, 30)) as pilot:
             app.start_task("first")
-            await pilot.pause(0.2)
+            await wait_for_completed_run(app, pilot, turn=1)
             app.start_task("second")
-            await pilot.pause(0.2)
+            await wait_for_completed_run(app, pilot, turn=2)
 
     asyncio.run(run())
 

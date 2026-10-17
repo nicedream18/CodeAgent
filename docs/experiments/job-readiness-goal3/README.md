@@ -4,6 +4,19 @@
 后续修复提交尚未获远程推送授权；软件包、镜像发布及真实模型调用仍未授权。
 最终状态和本轮证据见 ../../internship/STATUS.md；配置文件和本地 ARM64 结果不能代替远程 Linux 运行链接。
 
+## 第二次远程运行与 TUI 测试同步
+
+[39027177601](https://github.com/nicedream18/CodeAgent/actions/runs/39027177601) 对应 `ea542c0`：
+Docker 和 wheel 两作业 success，check 为 failure；三份报告均已下载，GitHub artifact SHA256 核对一致。
+远程确认 Python 已固定为 3.13.9，输入摘要与本地一致。
+[完整结果](remote/39027177601/status.json)：普通测试 454 passed、1 failed、2 skipped，
+失败为 `test_tui_renders_lightweight_chat_response` 在固定等待 0.2 秒后任务尚未收尾；Ruff、mypy 及文档检查已通过。
+真实 Docker 为 29 passed、0 skipped，linux/x86_64，镜像及 owner 清理有收据；wheel 干净安装与 CLI/资源检查通过。
+
+测试修复只调整 `tests/test_tui.py`：三处任务完成断言改为按运行轮次及 UI 完成状态有界等待，
+仍保留原断言，并额外核对 finished 状态及聊天正文。不改产品代码，不跳过测试，不重跑旧 CI 来掩盖失败。
+新的本地检查与 Linux 容器复验完成后另行记录；新增提交尚未获推送授权。
+
 ## 首次远程运行及入口修复
 
 [39026034469](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 对应 `8ca634d`，

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "job": "check",
+  "status": "failed",
+  "metadata": {
+    "commit": "ea542c06dac27e9f7b1d7aefdfdc9ac413e5ec75",
+    "source_and_checks_sha256": "6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8",
+    "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+    "python": "3.13.9 (main, Nov 19 2025, 22:47:49) [Clang 21.1.4 ]",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "recorded_at": "2026-10-17T11:02:38.223206+00:00",
+    "workflow": "Offline checks",
+    "job": "check",
+    "run_id": "39027177601",
+    "run_attempt": "1",
+    "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601",
+    "dirty": false,
+    "real_model_calls": 0,
+    "log_limit_bytes": 1048576,
+    "total_report_limit_bytes": 16777216,
+    "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)"
+  },
+  "steps": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.008,
+      "output_bytes": 38,
+      "log_bytes": 38,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (x86_64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 72.532,
+      "output_bytes": 6188,
+      "log_bytes": 6188,
+      "log_truncated": false,
+      "tail": "pydantic-core==2.46.4\n + pygments==2.20.0\n + pyjwt==2.15.1\n + pytest==9.0.3\n + python-dotenv==1.2.2\n + python-multipart==0.0.32\n + pyyaml==6.0.3\n + referencing==0.37.0\n + regex==2026.5.9\n + requests==2.34.1\n + requests-toolbelt==1.0.0\n + rich==15.0.0\n + rpds-py==2026.9.1\n + ruff==0.17.0\n + shellingham==1.5.4\n + sniffio==1.3.1\n + sse-starlette==3.5.0\n + starlette==1.7.0\n + tavily-python==0.7.24\n + tenacity==9.1.4\n + textual==8.2.6\n + tiktoken==0.12.0\n + tqdm==4.67.3\n + truststore==0.10.5\n + typer==0.25.1\n + typing-extensions==4.15.0\n + typing-inspection==0.4.2\n + uc-micro-py==2.0.0\n + urllib3==2.7.0\n + uuid-utils==0.15.0\n + uvicorn==0.54.0\n + xxhash==3.7.0\n + zstandard==0.25.0\nuv run ruff check src tests scripts examples\nAll checks passed!\nuv run mypy\nSuccess: no issues found in 31 source files\nuv run python scripts/gen_protocol_doc.py --check\nuv run python scripts/gen_eval_doc.py --check\nuv run pytest -q\n........................................................................ [ 15%]\n........................................................................ [ 31%]\n...............s........................................................ [ 47%]\n..............s......................................................... [ 63%]\n........................................................................ [ 78%]\n........................................................................ [ 94%]\n.................F.......                                                [100%]\n=================================== FAILURES ===================================\n__________________ test_tui_renders_lightweight_chat_response __________________\n\n    def test_tui_renders_lightweight_chat_response() -> None:\n        def fake_stream(*args, **kwargs):\n            yield {\n                \"type\": \"custom_event\",\n                \"event\": {\n                    \"type\": \"chat_response\",\n                    \"mode\": \"lightweight\",\n                    \"reason\": \"greeting\",\n                    \"response\": \"你好，我在。\",\n                },\n            }\n    \n        async def run() -> None:\n            app = MokioClawTuiApp(initial_task=\"你好\", stream_factory=fake_stream)\n            async with app.run_test(size=(100, 30)) as pilot:\n                await pilot.pause(0.2)\n                assert app.run_count == 1\n                assert app.latest_workspace\n                assert not app.running\n    \n>       asyncio.run(run())\n\ntests/test_tui.py:187: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n../../../.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py:195: in run\n    return runner.run(main)\n           ^^^^^^^^^^^^^^^^\n../../../.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py:118: in run\n    return self._loop.run_until_complete(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    async def run() -> None:\n        app = MokioClawTuiApp(initial_task=\"你好\", stream_factory=fake_stream)\n        async with app.run_test(size=(100, 30)) as pilot:\n            await pilot.pause(0.2)\n            assert app.run_count == 1\n            assert app.latest_workspace\n>           assert not app.running\nE           AssertionError: assert not True\nE            +  where True = MokioClawTuiApp(title='MokioClawTuiApp', classes={'-dark-mode'}, pseudo_classes={'nocolor', 'focus', 'dark'}).running\n\ntests/test_tui.py:185: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_tui.py::test_tui_renders_lightweight_chat_response - AssertionError: assert not True\n +  where True = MokioClawTuiApp(title='MokioClawTuiApp', classes={'-dark-mode'}, pseudo_classes={'nocolor', 'focus', 'dark'}).running\n1 failed, 454 passed, 2 skipped in 57.57s\nmake: *** [Makefile:8: check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "planned_steps": [
+    "uv-version",
+    "make-check",
+    "commit-whitespace"
+  ],
+  "checks": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.008,
+      "output_bytes": 38,
+      "log_bytes": 38,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (x86_64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 72.532,
+      "output_bytes": 6188,
+      "log_bytes": 6188,
+      "log_truncated": false,
+      "tail": "pydantic-core==2.46.4\n + pygments==2.20.0\n + pyjwt==2.15.1\n + pytest==9.0.3\n + python-dotenv==1.2.2\n + python-multipart==0.0.32\n + pyyaml==6.0.3\n + referencing==0.37.0\n + regex==2026.5.9\n + requests==2.34.1\n + requests-toolbelt==1.0.0\n + rich==15.0.0\n + rpds-py==2026.9.1\n + ruff==0.17.0\n + shellingham==1.5.4\n + sniffio==1.3.1\n + sse-starlette==3.5.0\n + starlette==1.7.0\n + tavily-python==0.7.24\n + tenacity==9.1.4\n + textual==8.2.6\n + tiktoken==0.12.0\n + tqdm==4.67.3\n + truststore==0.10.5\n + typer==0.25.1\n + typing-extensions==4.15.0\n + typing-inspection==0.4.2\n + uc-micro-py==2.0.0\n + urllib3==2.7.0\n + uuid-utils==0.15.0\n + uvicorn==0.54.0\n + xxhash==3.7.0\n + zstandard==0.25.0\nuv run ruff check src tests scripts examples\nAll checks passed!\nuv run mypy\nSuccess: no issues found in 31 source files\nuv run python scripts/gen_protocol_doc.py --check\nuv run python scripts/gen_eval_doc.py --check\nuv run pytest -q\n........................................................................ [ 15%]\n........................................................................ [ 31%]\n...............s........................................................ [ 47%]\n..............s......................................................... [ 63%]\n........................................................................ [ 78%]\n........................................................................ [ 94%]\n.................F.......                                                [100%]\n=================================== FAILURES ===================================\n__________________ test_tui_renders_lightweight_chat_response __________________\n\n    def test_tui_renders_lightweight_chat_response() -> None:\n        def fake_stream(*args, **kwargs):\n            yield {\n                \"type\": \"custom_event\",\n                \"event\": {\n                    \"type\": \"chat_response\",\n                    \"mode\": \"lightweight\",\n                    \"reason\": \"greeting\",\n                    \"response\": \"你好，我在。\",\n                },\n            }\n    \n        async def run() -> None:\n            app = MokioClawTuiApp(initial_task=\"你好\", stream_factory=fake_stream)\n            async with app.run_test(size=(100, 30)) as pilot:\n                await pilot.pause(0.2)\n                assert app.run_count == 1\n                assert app.latest_workspace\n                assert not app.running\n    \n>       asyncio.run(run())\n\ntests/test_tui.py:187: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n../../../.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py:195: in run\n    return runner.run(main)\n           ^^^^^^^^^^^^^^^^\n../../../.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py:118: in run\n    return self._loop.run_until_complete(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    async def run() -> None:\n        app = MokioClawTuiApp(initial_task=\"你好\", stream_factory=fake_stream)\n        async with app.run_test(size=(100, 30)) as pilot:\n            await pilot.pause(0.2)\n            assert app.run_count == 1\n            assert app.latest_workspace\n>           assert not app.running\nE           AssertionError: assert not True\nE            +  where True = MokioClawTuiApp(title='MokioClawTuiApp', classes={'-dark-mode'}, pseudo_classes={'nocolor', 'focus', 'dark'}).running\n\ntests/test_tui.py:185: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_tui.py::test_tui_renders_lightweight_chat_response - AssertionError: assert not True\n +  where True = MokioClawTuiApp(title='MokioClawTuiApp', classes={'-dark-mode'}, pseudo_classes={'nocolor', 'focus', 'dark'}).running\n1 failed, 454 passed, 2 skipped in 57.57s\nmake: *** [Makefile:8: check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "commit-whitespace",
+      "status": "not_started",
+      "exit_code": null,
+      "seconds": null
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "See sanitized step logs and explicit exit codes"
+  }
+}
