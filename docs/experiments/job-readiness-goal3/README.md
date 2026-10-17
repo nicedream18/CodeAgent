@@ -9,7 +9,8 @@
 [39026034469](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 对应 `8ca634d`，
 触发方式为 push，三个作业均 failed，三个失败报告上传步骤均 success。
 [远程状态与下载链接](remote/39026034469/status.json) 保留原失败，不改写为通过。
-API 下载返回 401，当前内置浏览器未登录；详细日志和报告正文仍待登录核对。
+初始 API 下载返回 401；用户登录内置浏览器后，三份报告均已下载并与 GitHub artifact SHA256 核对一致。
+原报告明确记录解释器为 `/usr/bin/python` 3.12.3，冻结安装因不满足 `>=3.13` 退出。
 
 本地 Linux 诊断发现入口未固定解释器：setup-uv v6 的 python-version 设置 UV_PYTHON，
 不会替换 shell 中的裸 python；报告器把 UV_PYTHON 设为自身 sys.executable，
@@ -17,7 +18,19 @@ API 下载返回 401，当前内置浏览器未登录；详细日志和报告正
 [实测诊断](local-linux-bootstrap/diagnosis.json) 中，默认 Python 3.12 时旧入口失败，
 显式 `uv run --no-project --python 3.13.9 python` 启动后 wheel 检查通过，实际报告解释器为 3.13.9。
 三个 workflow 入口均已修正，测试约束版本与 setup-uv 配置一致。
-这份 Linux ARM64 容器诊断不是远程 Linux 验收；远程失败的确切日志原因仍待核对。
+这份 Linux ARM64 容器诊断不是远程 Linux 验收；原远程失败原因已通过下载报告确认。
+
+## 修复后本地复验
+
+固定代码提交 `e5bcf80acff9a094bd5e416e92e3cd34ac8afe6c`，工作区干净。
+源码与检查输入 SHA256 为 `6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8`；
+后续归档提交仅增加文档证据，须核对同一输入摘要。
+
+- [普通检查](local-arm64-repair/check/report.json)：455 passed、2 skipped，Ruff、31 个 mypy 模块、文档和 diff 通过。
+- [真实 Docker](local-arm64-repair/docker/report.json)：29 passed、0 skipped，独立镜像及 owner 清理确认。
+- [wheel](local-arm64-repair/wheel/report.json)：仓库外干净安装、两种 CLI 和离线资源检查通过；wheel SHA 与首轮相同。
+
+状态：**本地修复完成、远程复验待授权**。原远程失败保留；修复版本尚未获得远程通过证据。
 
 ## 首轮本地结果（固定代码 9247f7f）
 
@@ -36,7 +49,7 @@ API 下载返回 401，当前内置浏览器未登录；详细日志和报告正
 
 新 wheel SHA256：`605001843b1c5e1ff3a105bf76abdbee5a17f43e1e19338d28522e1974f38359`。
 wheel 二进制未上传，旧 dist 保留；临时安装目录会随检查结束清理，实际路径及版本收据保留在报告中。
-[验收索引](acceptance.json) 明确标记远程未授权、未验收；当前没有远程 run/job/artifact 链接。
+[首轮本地验收](first-local-acceptance-9247f7f.json) 保留当时未授权状态；当前状态见 [验收索引](acceptance.json)，原远程失败链接与已下载报告见上节。
 
 ## 三个作业、同一入口
 
@@ -102,7 +115,7 @@ uv run python scripts/ci_push_manifest.py \
 它没有 push 或远程触发功能。扫描是项目凭证值和常见高置信模式检查，不等于通用 DLP 保证。
 目标 SHA、仓库/分支或远程基线改变后，必须重新核对清单。
 取得授权后再推送；push 会自动运行三作业，应复用该运行，不重复 dispatch。
-workflow_dispatch 的 GitHub 手动入口需默认分支包含配置；本轮拟推送目标 main，实际操作仍待授权。
+workflow_dispatch 的 GitHub 手动入口需默认分支包含配置；原批准版本已推送 main，后续修复推送仍待具体授权。
 
 远程通过后保存对应 commit 的 run/job/artifact 链接，并下载报告核对，不把 queued/running 当通过。
 本地 ARM64 与远程 Linux 分别归档，保留失败，不修改 Goal 1/2 原始记录。

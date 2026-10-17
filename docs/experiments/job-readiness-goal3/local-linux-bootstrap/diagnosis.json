@@ -24,9 +24,11 @@
     "result": "passed",
     "installed_package_verified": true
   },
-  "remote_logs_confirmed": false,
+  "remote_logs_confirmed": true,
   "remote_run": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469",
   "real_model_calls": 0,
   "official_setup_uv_action": "https://github.com/astral-sh/setup-uv/blob/d0cc045d04ccac9d8b7881df0226f9e82c39688e/action.yml",
-  "official_uv_guide": "https://docs.astral.sh/uv/guides/integration/github/"
+  "official_uv_guide": "https://docs.astral.sh/uv/guides/integration/github/",
+  "remote_python": "3.12.3",
+  "remote_reports": "../remote/39026034469/status.json"
 }

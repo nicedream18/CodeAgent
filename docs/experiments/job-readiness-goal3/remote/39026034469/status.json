@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-17T10:54:14.010657+00:00",
+  "recorded_at": "2026-10-17T10:59:52.171197+00:00",
   "run": {
     "id": 39026034469,
     "head_sha": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
@@ -298,12 +298,48 @@
       "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098373376/zip"
     }
   ],
-  "artifact_download_status": "requires_github_login",
-  "artifact_download_http_status": 401,
-  "logs_verified": false,
-  "reports_verified": false,
+  "artifact_download_status": "downloaded_digest_verified",
+  "artifact_download_http_status": null,
+  "logs_verified": true,
+  "reports_verified": true,
   "linux_acceptance": "failed",
   "original_run_preserved": true,
-  "diagnosis": "Python bootstrap mismatch reproduced locally; remote step logs require login before confirming the exact remote cause.",
-  "remote_repair_push_authorized": false
+  "diagnosis": "All three downloaded reports used /usr/bin/python 3.12.3; frozen installation rejected it against project.requires-python >=3.13. Bootstrap repair confirmed by local Linux controls.",
+  "remote_repair_push_authorized": false,
+  "remote_python": "3.12.3",
+  "download_receipts": [
+    {
+      "id": 12098846365,
+      "job": "check",
+      "archive_sha256": "25d062e03fe959d40f173aec55ff64df087ae1545ca054ced61069105739ca57",
+      "github_digest": "sha256:25d062e03fe959d40f173aec55ff64df087ae1545ca054ced61069105739ca57",
+      "github_digest_matches": true,
+      "archive_bytes": 2096,
+      "report": "check/report.json",
+      "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/artifacts/12098846365",
+      "extracted_report_verified": true
+    },
+    {
+      "id": 12098776740,
+      "job": "wheel",
+      "archive_sha256": "968014d3c435e2f86739542b03e2183078a425e542496c9aa3bf9f7b38e2aba5",
+      "github_digest": "sha256:968014d3c435e2f86739542b03e2183078a425e542496c9aa3bf9f7b38e2aba5",
+      "github_digest_matches": true,
+      "archive_bytes": 2236,
+      "report": "wheel/report.json",
+      "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/artifacts/12098776740",
+      "extracted_report_verified": true
+    },
+    {
+      "id": 12098373376,
+      "job": "docker",
+      "archive_sha256": "82216aed6ed160c8211ab7b5f1bf24c002a026bd6eabc48251672c1121d69f24",
+      "github_digest": "sha256:82216aed6ed160c8211ab7b5f1bf24c002a026bd6eabc48251672c1121d69f24",
+      "github_digest_matches": true,
+      "archive_bytes": 2121,
+      "report": "docker/report.json",
+      "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/artifacts/12098373376",
+      "extracted_report_verified": true
+    }
+  ]
 }

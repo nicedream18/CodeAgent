@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "job": "check",
+  "status": "failed",
+  "metadata": {
+    "commit": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
+    "source_and_checks_sha256": "96f8c79beaffd8fd4ee99ca37f5e6b8affe9bcf6e3e57104dbf372ffa64d5a87",
+    "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "recorded_at": "2026-10-17T10:44:21.955449+00:00",
+    "workflow": "Offline checks",
+    "job": "check",
+    "run_id": "39026034469",
+    "run_attempt": "1",
+    "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469",
+    "dirty": false,
+    "real_model_calls": 0,
+    "log_limit_bytes": 1048576,
+    "total_report_limit_bytes": 16777216,
+    "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)"
+  },
+  "steps": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.009,
+      "output_bytes": 38,
+      "log_bytes": 38,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (x86_64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 0.122,
+      "output_bytes": 271,
+      "log_bytes": 271,
+      "log_truncated": false,
+      "tail": "uv sync --frozen\nUsing CPython 3.12.3 interpreter at: /usr/bin/python\nerror: The requested interpreter resolved to Python 3.12.3, which is incompatible with the project's Python requirement: `>=3.13` (from `project.requires-python`)\nmake: *** [Makefile:3: check] Error 2\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "planned_steps": [
+    "uv-version",
+    "make-check",
+    "commit-whitespace"
+  ],
+  "checks": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.009,
+      "output_bytes": 38,
+      "log_bytes": 38,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (x86_64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 0.122,
+      "output_bytes": 271,
+      "log_bytes": 271,
+      "log_truncated": false,
+      "tail": "uv sync --frozen\nUsing CPython 3.12.3 interpreter at: /usr/bin/python\nerror: The requested interpreter resolved to Python 3.12.3, which is incompatible with the project's Python requirement: `>=3.13` (from `project.requires-python`)\nmake: *** [Makefile:3: check] Error 2\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "commit-whitespace",
+      "status": "not_started",
+      "exit_code": null,
+      "seconds": null
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "See sanitized step logs and explicit exit codes"
+  }
+}

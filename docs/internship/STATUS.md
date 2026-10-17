@@ -1,19 +1,20 @@
 # 求职交付收敛状态
 
-## Goal 3：远程首轮失败，入口修复待复验
+## Goal 3：本地修复完成、远程复验待授权
 
 - 普通检查、真实 Docker、wheel 三作业已实现，支持 push/PR/手动触发；报告有配额、脱敏及失败记录。
-- 本地被测代码：`9247f7f4d91841f817e071ebc1a1e18a24402147`，macOS ARM64、Python 3.13.9、uv 0.12.19。
+- 首轮本地被测代码：`9247f7f4d91841f817e071ebc1a1e18a24402147`，macOS ARM64、Python 3.13.9、uv 0.12.19。
 - `make check`：455 passed、2 skipped；Ruff、31 个严格 mypy 模块、协议/评测文档及 diff 检查通过。
 - 重新构建独立镜像后，真实 `make check-docker`：29 passed、0 skipped，linux/aarch64；本轮容器清理已确认。
 - wheel 在仓库外全新环境按锁安装，site-packages 导入、两种 CLI 入口、禁网 tokenizer 和文件读取均通过。
 - 引擎不可达、镜像缺失均实测为非零退出，未启动 pytest；旧 wheel、标签、缓存和 Goal 2 的 384 份产物摘要保持原样。
 - 用户已授权的 22 个提交已推送至 `8ca634d`，[首次远程运行](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 三作业均失败，失败记录保留，不能判为 Linux 验收通过。
-- 三份失败 artifacts 上传成功，但读取详细日志和下载正文需要 GitHub 登录（当前 HTTP 401），尚未核对报告内容。
-- 本地 Linux 已复现 Python 3.12 入口与 >=3.13 要求冲突；显式 uv 启动 3.13.9 后 wheel 检查通过。workflow 入口修复正在验证，新的提交尚未推送。
+- 三份失败 artifacts 已下载，GitHub SHA256 校验一致；原报告确认使用了 Python 3.12.3，冻结安装因要求 >=3.13 而失败。
+- 修复代码 `e5bcf80`：三个入口显式使用 uv 启动 Python 3.13.9。本地 Linux 对照、455/2 全量检查、29/0 真实 Docker 及干净 wheel 安装通过，新的提交尚未推送。
 - 本轮未请求真实模型或发布产物；后续修复推送需要按具体提交取得授权，Goal 3 尚未完整完成。
 
-证据：[本地验收](../experiments/job-readiness-goal3/acceptance.json)、[检查](../experiments/job-readiness-goal3/local-arm64/check/summary.md)、[Docker](../experiments/job-readiness-goal3/local-arm64/docker/summary.md)、[wheel](../experiments/job-readiness-goal3/local-arm64/wheel/summary.md)。
+当前证据：[修复后检查](../experiments/job-readiness-goal3/local-arm64-repair/check/summary.md)、[修复后 Docker](../experiments/job-readiness-goal3/local-arm64-repair/docker/summary.md)、[修复后 wheel](../experiments/job-readiness-goal3/local-arm64-repair/wheel/summary.md)。
+首轮证据：[本地验收](../experiments/job-readiness-goal3/acceptance.json)、[检查](../experiments/job-readiness-goal3/local-arm64/check/summary.md)、[Docker](../experiments/job-readiness-goal3/local-arm64/docker/summary.md)、[wheel](../experiments/job-readiness-goal3/local-arm64/wheel/summary.md)。
 设计、配额与远程授权范围见 [Goal 3](../experiments/job-readiness-goal3/README.md)。
 
 ## Goal 2：18 次有限真实任务验证已完成

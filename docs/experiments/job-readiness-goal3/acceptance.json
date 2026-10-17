@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-17T10:54:33.620024+00:00",
+  "recorded_at": "2026-10-17T10:59:52.184401+00:00",
   "goal": "Goal 3",
-  "status": "远程首轮失败，入口修复待复验",
+  "status": "本地修复完成、远程复验待授权",
   "local_preparation": "passed",
   "remote_execution_authorized": true,
   "remote_verified": false,
@@ -19,8 +19,8 @@
     "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098776740/zip",
     "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098373376/zip"
   ],
-  "tested_code_commit": "9247f7f4d91841f817e071ebc1a1e18a24402147",
-  "source_and_checks_sha256": "96f8c79beaffd8fd4ee99ca37f5e6b8affe9bcf6e3e57104dbf372ffa64d5a87",
+  "tested_code_commit": "e5bcf80acff9a094bd5e416e92e3cd34ac8afe6c",
+  "source_and_checks_sha256": "6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8",
   "archive_commit_note": "Final delivery commit adds only Goal 3 evidence and status documentation. Compare source_and_checks_sha256 rather than pretending these local reports ran at the later archive commit.",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
@@ -31,16 +31,16 @@
       "passed": 455,
       "skipped": 2,
       "strict_mypy_modules": 31,
-      "evidence": "local-arm64/check/report.json"
+      "evidence": "local-arm64-repair/check/report.json"
     },
     "real_docker": {
       "status": "passed",
       "passed": 29,
       "skipped": 0,
       "platform": "linux/aarch64",
-      "image": "sha256:afc92d0fcd12222d75af2b15bf31ede0b6c727a8ca6bb702deb3c5e0ff1bc28a",
+      "image": "sha256:cec043c6c4ecb5aeb49b48ab8248694cb39ec24fc10e49b3cf70d5e37c272df7",
       "cleanup_confirmed": true,
-      "evidence": "local-arm64/docker/report.json"
+      "evidence": "local-arm64-repair/docker/report.json"
     },
     "wheel": {
       "status": "passed",
@@ -52,8 +52,8 @@
       },
       "installed_probe": {
         "ok": true,
-        "installed_from": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-jyu4rx8w/venv/lib/python3.13/site-packages/mokioclaw/__init__.py",
-        "prefix": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-jyu4rx8w/venv",
+        "installed_from": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-v4h4dl0l/venv/lib/python3.13/site-packages/mokioclaw/__init__.py",
+        "prefix": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-v4h4dl0l/venv",
         "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
         "site_packages_verified": true,
         "network_disabled": true,
@@ -61,7 +61,7 @@
         "static_assets_verified": true,
         "credential_environment_empty": true
       },
-      "evidence": "local-arm64/wheel/report.json"
+      "evidence": "local-arm64-repair/wheel/report.json"
     },
     "negative_controls": {
       "status": "passed_expected_failures",
@@ -93,9 +93,9 @@
   "real_model_calls": 0,
   "remote_writes": 1,
   "remaining": [
-    "Log in to GitHub to read the original failed reports and confirm remote diagnostics.",
-    "Complete local repair checks and obtain approval for the exact additional commit range.",
-    "Run repaired Linux CI and download check/docker/wheel reports before marking complete."
+    "Obtain approval for the exact additional repair/evidence commit range.",
+    "Push the approved repair and reuse its automatic Linux workflow.",
+    "Download and verify successful check/docker/wheel reports before declaring Goal 3 complete."
   ],
   "limits": [
     "Local ARM64 evidence does not prove remote Linux success.",
@@ -110,13 +110,18 @@
       "check": "failure"
     },
     "reports_uploaded": 3,
-    "reports_downloaded": false,
-    "download_requires_login": true,
-    "evidence": "remote/39026034469/status.json"
+    "reports_downloaded": true,
+    "download_requires_login": false,
+    "evidence": "remote/39026034469/status.json",
+    "artifact_sha256_verified": true,
+    "remote_python": "3.12.3"
   },
   "local_repair": {
-    "state": "testing",
-    "evidence": "local-linux-bootstrap/diagnosis.json",
-    "new_push_authorized": false
+    "state": "passed",
+    "tested_code_commit": "e5bcf80acff9a094bd5e416e92e3cd34ac8afe6c",
+    "source_and_checks_sha256": "6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8",
+    "evidence": "local-arm64-repair/",
+    "new_push_authorized": false,
+    "diagnostic_evidence": "local-linux-bootstrap/diagnosis.json"
   }
 }
