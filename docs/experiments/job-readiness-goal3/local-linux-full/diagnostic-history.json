@@ -1,0 +1,75 @@
+{
+  "kind": "supplemental_local_linux_validation_not_remote_ci",
+  "preparation_network_allowed": true,
+  "actual_checks_network": "none",
+  "attempt1": {
+    "commit": "81921089662ef1a44f7f5a9ce256521d30ee60f0",
+    "pid_limit": 128,
+    "counts": {
+      "passed": 439,
+      "failed": 16,
+      "skipped": 2,
+      "error": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "deselected": 0
+    },
+    "diagnosis": "Whole test-host PID cap exhausted threads; also exposed a cancel-test producer/consumer synchronization assumption."
+  },
+  "attempt2": {
+    "commit": "fe53124394fc3a88bccb1532a3ecc9be223b9327",
+    "pid_limit": 1024,
+    "counts": {
+      "passed": 454,
+      "failed": 1,
+      "skipped": 2,
+      "error": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "deselected": 0
+    },
+    "diagnosis": "Only inline approval unit test failed: subprocess.run mock no longer intercepted LocalBackend Popen, so it attempted a real pip install while network was disabled."
+  },
+  "product_execution_limits_changed": false,
+  "product_execution_pid_limit": 128,
+  "real_model_calls": 0,
+  "final": {
+    "commit": "35162c0342f8600b3b7ce37d84ac55e5b0e3cee4",
+    "pid_limit": 1024,
+    "network": "none",
+    "UV_OFFLINE": true,
+    "counts": {
+      "passed": 455,
+      "failed": 0,
+      "skipped": 2,
+      "error": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "deselected": 0
+    },
+    "metadata": {
+      "commit": "35162c0342f8600b3b7ce37d84ac55e5b0e3cee4",
+      "source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
+      "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+      "python": "3.13.9 (main, Nov 19 2025, 22:48:34) [Clang 21.1.4 ]",
+      "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+      "machine": "aarch64",
+      "recorded_at": "2026-10-17T11:16:08.186356+00:00",
+      "workflow": null,
+      "job": null,
+      "run_id": null,
+      "run_attempt": null,
+      "run_url": null,
+      "dirty": false,
+      "real_model_calls": 0,
+      "log_limit_bytes": 1048576,
+      "total_report_limit_bytes": 16777216,
+      "uv": "uv 0.12.19 (aarch64-unknown-linux-gnu)"
+    },
+    "cleanup_confirmed": true,
+    "limits": [
+      "This local Linux ARM64 container is a trusted test host; product command containers retain their 128 PID limit.",
+      "This run cannot replace the pending remote Linux x86_64 CI verification."
+    ]
+  }
+}

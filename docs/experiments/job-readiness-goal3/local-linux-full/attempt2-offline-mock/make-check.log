@@ -1,0 +1,48 @@
+uv sync --frozen
+Checked 86 packages in 11ms
+uv run ruff check src tests scripts examples
+All checks passed!
+uv run mypy
+Success: no issues found in 31 source files
+uv run python scripts/gen_protocol_doc.py --check
+uv run python scripts/gen_eval_doc.py --check
+uv run pytest -q
+........................................................................ [ 15%]
+........................................................................ [ 31%]
+...............s........................................................ [ 47%]
+..............s......................................................... [ 63%]
+........................................................................ [ 78%]
+..........................................................F............. [ 94%]
+.........................                                                [100%]
+=================================== FAILURES ===================================
+________________ test_bash_inline_approval_handler_can_approve _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff857538c0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_inline_approval_hand0')
+
+    def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -> None:
+        requests = []
+    
+        class FakeCompleted:
+            returncode = 0
+            stdout = b"ok\n"
+            stderr = b""
+    
+        monkeypatch.setattr("subprocess.run", lambda command, **kwargs: FakeCompleted())
+    
+        def handler(request):
+            requests.append(request)
+            return ApprovalDecision(approved=True)
+    
+        state = RuntimeState(workspace=tmp_path, approval_mode="inline", approval_handler=handler)
+    
+        result = run_bash(state, "pip install fastapi", timeout_seconds=5)
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:347: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tools.py::test_bash_inline_approval_handler_can_approve - assert False is True
+1 failed, 454 passed, 2 skipped in 50.09s
+make: *** [Makefile:8: check] Error 1

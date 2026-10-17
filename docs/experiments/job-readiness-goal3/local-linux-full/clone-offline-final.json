@@ -1,0 +1,25 @@
+{
+  "command": [
+    "git",
+    "clone",
+    "--no-hardlinks",
+    "--no-local",
+    "--single-branch",
+    "--branch",
+    "master",
+    "/Users/nicedream/xm/MokioAgent",
+    "/Users/nicedream/.cache/mokioclaw/ci/goal3-20261017/linux-tui-validation/repo-offline-final"
+  ],
+  "status": "passed",
+  "exit_code": 0,
+  "log": "clone-offline-final.log",
+  "timeout_seconds": 60,
+  "timed_out": false,
+  "seconds": 0.769,
+  "output_bytes": 110,
+  "log_bytes": 110,
+  "log_truncated": false,
+  "tail": "Cloning into '/Users/nicedream/.cache/mokioclaw/ci/goal3-20261017/linux-tui-validation/repo-offline-final'...\n",
+  "output_complete": true,
+  "output_errors": []
+}

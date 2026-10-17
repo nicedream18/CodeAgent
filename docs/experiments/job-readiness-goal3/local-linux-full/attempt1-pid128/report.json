@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "job": "check",
+  "status": "failed",
+  "metadata": {
+    "commit": "81921089662ef1a44f7f5a9ce256521d30ee60f0",
+    "source_and_checks_sha256": "fb4d6317186c797ef90d58d6952a21d416ed111800c87231d133a3283c1d9f1d",
+    "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+    "python": "3.13.9 (main, Nov 19 2025, 22:48:34) [Clang 21.1.4 ]",
+    "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+    "machine": "aarch64",
+    "recorded_at": "2026-10-17T11:09:48.535632+00:00",
+    "workflow": null,
+    "job": null,
+    "run_id": null,
+    "run_attempt": null,
+    "run_url": null,
+    "dirty": false,
+    "real_model_calls": 0,
+    "log_limit_bytes": 1048576,
+    "total_report_limit_bytes": 16777216,
+    "uv": "uv 0.12.19 (aarch64-unknown-linux-gnu)"
+  },
+  "steps": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.005,
+      "output_bytes": 39,
+      "log_bytes": 39,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (aarch64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 56.176,
+      "output_bytes": 34874,
+      "log_bytes": 34874,
+      "log_truncated": false,
+      "tail": "ilot, turn=1)\n                app.start_task(\"second\")\n                await wait_for_completed_run(app, pilot, turn=2)\n    \n>       asyncio.run(run())\n\ntests/test_tui.py:321: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:194: in run\n    with Runner(debug=debug, loop_factory=loop_factory) as runner:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:62: in __exit__\n    self.close()\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:72: in close\n    loop.run_until_complete(\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:613: in shutdown_default_executor\n    thread.start()\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Thread(Thread-61 (_do_shutdown), stopped)>\n\n    def start(self):\n        \"\"\"Start the thread's activity.\n    \n        It must be called at most once per thread object. It arranges for the\n        object's run() method to be invoked in a separate thread of control.\n    \n        This method will raise a RuntimeError if called more than once on the\n        same thread object.\n    \n        \"\"\"\n        if not self._initialized:\n            raise RuntimeError(\"thread.__init__() not called\")\n    \n        if self._started.is_set():\n            raise RuntimeError(\"threads can only be started once\")\n    \n        with _active_limbo_lock:\n            _limbo[self] = self\n        try:\n            # Start joinable thread\n>           _start_joinable_thread(self._bootstrap, handle=self._handle,\n                                   daemon=self.daemon)\nE                                  RuntimeError: can't start new thread\n\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError\n=========================== short test summary info ============================\nFAILED tests/test_run_cancellation.py::test_real_graph_cancel_during_router_has_one_trace_and_no_next_node[False] - AssertionError: assert '' == '部分路由文本'\n  \n  - 部分路由文本\nFAILED tests/test_subagent_tasks.py::test_read_only_subagents_run_concurrently - AssertionError: Subagent run did not reach completed\nFAILED tests/test_tools.py::test_bash_runs_command_inside_workspace - RuntimeError: can't start new thread\nFAILED tests/test_tools.py::test_bash_accepts_string_timeout - assert False is True\nFAILED tests/test_tools.py::test_bash_sets_utf8_for_python_subprocess - assert False is True\nFAILED tests/test_tools.py::test_bash_loads_workspace_env_file - RuntimeError: can't start new thread\nFAILED tests/test_tools.py::test_bash_prefers_runtime_python_on_path - assert False is True\nFAILED tests/test_tools.py::test_bash_pip_shim_uses_runtime_python - assert False is True\nFAILED tests/test_tools.py::test_bash_env_file_expands_existing_variables - assert False is True\nFAILED tests/test_tools.py::test_bash_allows_dev_null_stderr_redirect - assert False is True\nFAILED tests/test_tools.py::test_bash_writes_long_output_to_workspace_log - assert False is True\nFAILED tests/test_tools.py::test_bash_can_start_background_process - BlockingIOError: [Errno 11] Resource temporarily unavailable\nFAILED tests/test_tools.py::test_bash_inline_approval_handler_can_approve - RuntimeError: can't start new thread\nFAILED tests/test_tui.py::test_tui_renders_fake_stream_events - RuntimeError: can't start new thread\nFAILED tests/test_tui.py::test_tui_renders_lightweight_chat_response - RuntimeError: can't start new thread\nFAILED tests/test_tui.py::test_tui_runs_multiple_tasks_in_same_session_workspace - RuntimeError: can't start new thread\n16 failed, 439 passed, 2 skipped in 44.05s\nmake: *** [Makefile:8: check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "planned_steps": [
+    "uv-version",
+    "make-check",
+    "commit-whitespace"
+  ],
+  "checks": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.005,
+      "output_bytes": 39,
+      "log_bytes": 39,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (aarch64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 56.176,
+      "output_bytes": 34874,
+      "log_bytes": 34874,
+      "log_truncated": false,
+      "tail": "ilot, turn=1)\n                app.start_task(\"second\")\n                await wait_for_completed_run(app, pilot, turn=2)\n    \n>       asyncio.run(run())\n\ntests/test_tui.py:321: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:194: in run\n    with Runner(debug=debug, loop_factory=loop_factory) as runner:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:62: in __exit__\n    self.close()\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:72: in close\n    loop.run_until_complete(\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:613: in shutdown_default_executor\n    thread.start()\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Thread(Thread-61 (_do_shutdown), stopped)>\n\n    def start(self):\n        \"\"\"Start the thread's activity.\n    \n        It must be called at most once per thread object. It arranges for the\n        object's run() method to be invoked in a separate thread of control.\n    \n        This method will raise a RuntimeError if called more than once on the\n        same thread object.\n    \n        \"\"\"\n        if not self._initialized:\n            raise RuntimeError(\"thread.__init__() not called\")\n    \n        if self._started.is_set():\n            raise RuntimeError(\"threads can only be started once\")\n    \n        with _active_limbo_lock:\n            _limbo[self] = self\n        try:\n            # Start joinable thread\n>           _start_joinable_thread(self._bootstrap, handle=self._handle,\n                                   daemon=self.daemon)\nE                                  RuntimeError: can't start new thread\n\n/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError\n=========================== short test summary info ============================\nFAILED tests/test_run_cancellation.py::test_real_graph_cancel_during_router_has_one_trace_and_no_next_node[False] - AssertionError: assert '' == '部分路由文本'\n  \n  - 部分路由文本\nFAILED tests/test_subagent_tasks.py::test_read_only_subagents_run_concurrently - AssertionError: Subagent run did not reach completed\nFAILED tests/test_tools.py::test_bash_runs_command_inside_workspace - RuntimeError: can't start new thread\nFAILED tests/test_tools.py::test_bash_accepts_string_timeout - assert False is True\nFAILED tests/test_tools.py::test_bash_sets_utf8_for_python_subprocess - assert False is True\nFAILED tests/test_tools.py::test_bash_loads_workspace_env_file - RuntimeError: can't start new thread\nFAILED tests/test_tools.py::test_bash_prefers_runtime_python_on_path - assert False is True\nFAILED tests/test_tools.py::test_bash_pip_shim_uses_runtime_python - assert False is True\nFAILED tests/test_tools.py::test_bash_env_file_expands_existing_variables - assert False is True\nFAILED tests/test_tools.py::test_bash_allows_dev_null_stderr_redirect - assert False is True\nFAILED tests/test_tools.py::test_bash_writes_long_output_to_workspace_log - assert False is True\nFAILED tests/test_tools.py::test_bash_can_start_background_process - BlockingIOError: [Errno 11] Resource temporarily unavailable\nFAILED tests/test_tools.py::test_bash_inline_approval_handler_can_approve - RuntimeError: can't start new thread\nFAILED tests/test_tui.py::test_tui_renders_fake_stream_events - RuntimeError: can't start new thread\nFAILED tests/test_tui.py::test_tui_renders_lightweight_chat_response - RuntimeError: can't start new thread\nFAILED tests/test_tui.py::test_tui_runs_multiple_tasks_in_same_session_workspace - RuntimeError: can't start new thread\n16 failed, 439 passed, 2 skipped in 44.05s\nmake: *** [Makefile:8: check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "commit-whitespace",
+      "status": "not_started",
+      "exit_code": null,
+      "seconds": null
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "See sanitized step logs and explicit exit codes"
+  }
+}

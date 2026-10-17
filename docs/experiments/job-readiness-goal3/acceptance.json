@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-17T11:08:51.514203+00:00",
+  "recorded_at": "2026-10-17T11:19:59.983048+00:00",
   "goal": "Goal 3",
-  "status": "远程 Docker/wheel 通过，TUI 测试同步修复中",
+  "status": "本地修复完成、远程普通检查待复验授权",
   "local_preparation": "passed",
   "remote_execution_authorized": true,
   "remote_verified": false,
@@ -19,8 +19,8 @@
     "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12098572964",
     "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12098469929"
   ],
-  "tested_code_commit": "e5bcf80acff9a094bd5e416e92e3cd34ac8afe6c",
-  "source_and_checks_sha256": "6bebff32160cee37f73d0e9c93d1f9d16e5dcfc49b2569a25f8be1de20aa4ad8",
+  "tested_code_commit": "35162c0342f8600b3b7ce37d84ac55e5b0e3cee4",
+  "source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
   "archive_commit_note": "Final delivery commit adds only Goal 3 evidence and status documentation. Compare source_and_checks_sha256 rather than pretending these local reports ran at the later archive commit.",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
@@ -31,16 +31,16 @@
       "passed": 455,
       "skipped": 2,
       "strict_mypy_modules": 31,
-      "evidence": "local-arm64-repair/check/report.json"
+      "evidence": "local-arm64-final/check/report.json"
     },
     "real_docker": {
       "status": "passed",
       "passed": 29,
       "skipped": 0,
       "platform": "linux/aarch64",
-      "image": "sha256:cec043c6c4ecb5aeb49b48ab8248694cb39ec24fc10e49b3cf70d5e37c272df7",
+      "image": "sha256:2bd547f7c24f1dd874fdb0a57dca942c7309970683e4a02aac06a7a9a1da81f2",
       "cleanup_confirmed": true,
-      "evidence": "local-arm64-repair/docker/report.json"
+      "evidence": "local-arm64-final/docker/report.json"
     },
     "wheel": {
       "status": "passed",
@@ -52,8 +52,8 @@
       },
       "installed_probe": {
         "ok": true,
-        "installed_from": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-v4h4dl0l/venv/lib/python3.13/site-packages/mokioclaw/__init__.py",
-        "prefix": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-v4h4dl0l/venv",
+        "installed_from": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-fad2vss4/venv/lib/python3.13/site-packages/mokioclaw/__init__.py",
+        "prefix": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-ci-fad2vss4/venv",
         "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
         "site_packages_verified": true,
         "network_disabled": true,
@@ -61,7 +61,7 @@
         "static_assets_verified": true,
         "credential_environment_empty": true
       },
-      "evidence": "local-arm64-repair/wheel/report.json"
+      "evidence": "local-arm64-final/wheel/report.json"
     },
     "negative_controls": {
       "status": "passed_expected_failures",
@@ -81,6 +81,16 @@
       "goal2_artifacts": 384,
       "historical_cache_manifests": 7,
       "evidence": "integrity-audit.json"
+    },
+    "offline_linux_full": {
+      "status": "passed",
+      "passed": 455,
+      "skipped": 2,
+      "network": "none",
+      "UV_OFFLINE": true,
+      "test_host_pid_limit": 1024,
+      "product_command_pid_limit": 128,
+      "evidence": "local-linux-full/final-offline/report.json"
     }
   },
   "reports": {
@@ -93,9 +103,9 @@
   "real_model_calls": 0,
   "remote_writes": 2,
   "remaining": [
-    "Complete local and offline Linux checks for the TUI test synchronization repair.",
-    "Obtain approval for the exact new commit range before pushing.",
-    "Pass the repaired ordinary Linux check and retain successful Docker/wheel reports."
+    "Approve the exact additional test repair and evidence commit range.",
+    "Push the approved candidate and reuse its automatic workflow; retain both earlier failed runs.",
+    "Verify all three Linux jobs and downloaded artifacts at the new approved commit."
   ],
   "limits": [
     "Local ARM64 evidence does not prove remote Linux success.",
@@ -124,8 +134,20 @@
     "evidence": "remote/39027177601/status.json"
   },
   "local_repair": {
-    "state": "testing",
-    "change": "TUI test waits for actual run completion instead of a fixed delay",
-    "new_push_authorized": false
+    "state": "passed",
+    "tested_code_commit": "35162c0342f8600b3b7ce37d84ac55e5b0e3cee4",
+    "source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
+    "changes": [
+      "TUI waits for actual turn completion and verifies rendered text",
+      "Cancellation test waits for the consumed llm_token event before cancelling",
+      "Approval unit test mocks LocalBackend and forbids actual process creation"
+    ],
+    "product_source_changed": false,
+    "new_push_authorized": false,
+    "evidence": [
+      "local-arm64-final/",
+      "local-linux-full/final-offline/",
+      "CI_FAILURES.md"
+    ]
   }
 }

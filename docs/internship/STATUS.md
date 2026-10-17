@@ -1,24 +1,17 @@
 # 求职交付收敛状态
 
-## Goal 3：远程 Docker/wheel 通过，TUI 测试同步修复中
+## Goal 3：本地修复完成、远程普通检查待复验授权
 
-- 普通检查、真实 Docker、wheel 三作业已实现，支持 push/PR/手动触发；报告有配额、脱敏及失败记录。
-- 首轮本地被测代码：`9247f7f4d91841f817e071ebc1a1e18a24402147`，macOS ARM64、Python 3.13.9、uv 0.12.19。
-- `make check`：455 passed、2 skipped；Ruff、31 个严格 mypy 模块、协议/评测文档及 diff 检查通过。
-- 重新构建独立镜像后，真实 `make check-docker`：29 passed、0 skipped，linux/aarch64；本轮容器清理已确认。
-- wheel 在仓库外全新环境按锁安装，site-packages 导入、两种 CLI 入口、禁网 tokenizer 和文件读取均通过。
-- 引擎不可达、镜像缺失均实测为非零退出，未启动 pytest；旧 wheel、标签、缓存和 Goal 2 的 384 份产物摘要保持原样。
-- 用户已授权的 22 个提交已推送至 `8ca634d`，[首次远程运行](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 三作业均失败，失败记录保留，不能判为 Linux 验收通过。
-- 三份失败 artifacts 已下载，GitHub SHA256 校验一致；原报告确认使用了 Python 3.12.3，冻结安装因要求 >=3.13 而失败。
-- 修复代码 `e5bcf80`：三个入口显式使用 uv 启动 Python 3.13.9。本地 Linux 对照、455/2 全量检查、29/0 真实 Docker 及干净 wheel 安装通过，新的提交尚未推送。
-- 第二次授权已推送 `ea542c0`，[远程复验](https://github.com/nicedream18/CodeAgent/actions/runs/39027177601) Docker/wheel 通过；check 为 454 passed、1 failed、2 skipped，失败是 TUI 固定 0.2 秒等待未覆盖实际线程收尾时间。
-- 三份远程报告已下载并校验摘要；真实 Linux x86_64 Docker 29/0、干净 wheel 安装均有通过证据，普通检查仍未通过。
-- 正在把三处 TUI 任务结束断言改为状态同步并验证；不改产品代码或评分逻辑，不跳过失败测试。
-- 本轮未请求真实模型或发布产物；再次修复推送仍需具体提交授权，Goal 3 尚未完整完成。
+- 最新被测代码：`35162c0342f8600b3b7ce37d84ac55e5b0e3cee4`，工作区干净；源码与检查输入摘要 `e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54`。
+- macOS ARM64 全量：455 passed、2 skipped；Ruff、31 个 mypy 模块、协议/评测文档及 diff 检查通过。
+- 本地真实 Docker：29 passed、0 skipped；独立镜像及 owner 清理确认。wheel 仓库外干净安装、两种 CLI 和离线资源检查通过。
+- 补充 Linux ARM64 全量：455 passed、2 skipped；依赖准备后禁网执行，UV_OFFLINE=1。它不能代替远程 x86_64 CI。
+- [首轮远程 8ca634d](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 因使用 Python 3.12.3 失败；[第二轮 ea542c0](https://github.com/nicedream18/CodeAgent/actions/runs/39027177601) Docker/wheel 通过，普通测试 454 passed、1 failed、2 skipped，失败为 TUI 固定等待时间。
+- 两轮全部报告均已下载并校验 GitHub SHA256。新增测试修复等待实际完成/token 事件，并修正审批单测过时 mock，禁止真实安装副作用；本地诊断失败均保留。
+- 产品源码、锁、Goal 2 的 384 份产物、7 份缓存、旧 wheel/标签保持原样；未请求真实模型或发布产物。
+- 新增提交尚未推送；需按具体清单授权后复验。Goal 3 尚未完整完成。
 
-当前证据：[修复后检查](../experiments/job-readiness-goal3/local-arm64-repair/check/summary.md)、[修复后 Docker](../experiments/job-readiness-goal3/local-arm64-repair/docker/summary.md)、[修复后 wheel](../experiments/job-readiness-goal3/local-arm64-repair/wheel/summary.md)。
-首轮证据：[本地验收](../experiments/job-readiness-goal3/acceptance.json)、[检查](../experiments/job-readiness-goal3/local-arm64/check/summary.md)、[Docker](../experiments/job-readiness-goal3/local-arm64/docker/summary.md)、[wheel](../experiments/job-readiness-goal3/local-arm64/wheel/summary.md)。
-设计、配额与远程授权范围见 [Goal 3](../experiments/job-readiness-goal3/README.md)。
+证据：[验收索引](../experiments/job-readiness-goal3/acceptance.json)、[故障复盘](../experiments/job-readiness-goal3/CI_FAILURES.md)、[设计和操作](../experiments/job-readiness-goal3/README.md)。
 
 ## Goal 2：18 次有限真实任务验证已完成
 

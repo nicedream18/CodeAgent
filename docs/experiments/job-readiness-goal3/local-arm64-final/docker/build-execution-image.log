@@ -1,0 +1,40 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 489B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/4] FROM docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f
+#4 resolve docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 38B done
+#5 DONE 0.0s
+
+#6 [2/4] RUN apt-get update && apt-get install -y --no-install-recommends git ripgrep && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/4] COPY requirements.txt /opt/mokio-requirements.txt
+#7 CACHED
+
+#8 [4/4] RUN pip install --no-cache-dir -r /opt/mokio-requirements.txt
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers done
+#9 exporting manifest sha256:b9a8f7e55c9311b7fbbf862dcef149baaa8e4a5e698de4b58af95c9569179a19 done
+#9 exporting config sha256:0984e4717f13af153582b9b6073346525c807982fd584e2bb56262aaa144e71d done
+#9 exporting attestation manifest sha256:6710c7e9cc230765a0c77f6b13d30b7177d4da71a4716f7bf2bc7e7c941a36bf 0.0s done
+#9 exporting manifest list sha256:2bd547f7c24f1dd874fdb0a57dca942c7309970683e4a02aac06a7a9a1da81f2 done
+#9 naming to docker.io/library/mokioclaw-ci:b39d67c98ee849e6
+#9 naming to docker.io/library/mokioclaw-ci:b39d67c98ee849e6 done
+#9 unpacking to docker.io/library/mokioclaw-ci:b39d67c98ee849e6 done
+#9 DONE 0.1s

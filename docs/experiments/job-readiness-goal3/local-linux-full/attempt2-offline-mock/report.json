@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "job": "check",
+  "status": "failed",
+  "metadata": {
+    "commit": "fe53124394fc3a88bccb1532a3ecc9be223b9327",
+    "source_and_checks_sha256": "c2616d09c4139bd0bae801e49ad5b9e301be6aa14d6b90a6aba0a1ce8cb6d45f",
+    "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+    "python": "3.13.9 (main, Nov 19 2025, 22:48:34) [Clang 21.1.4 ]",
+    "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+    "machine": "aarch64",
+    "recorded_at": "2026-10-17T11:12:56.507484+00:00",
+    "workflow": null,
+    "job": null,
+    "run_id": null,
+    "run_attempt": null,
+    "run_url": null,
+    "dirty": false,
+    "real_model_calls": 0,
+    "log_limit_bytes": 1048576,
+    "total_report_limit_bytes": 16777216,
+    "uv": "uv 0.12.19 (aarch64-unknown-linux-gnu)"
+  },
+  "steps": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.006,
+      "output_bytes": 39,
+      "log_bytes": 39,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (aarch64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 64.777,
+      "output_bytes": 2159,
+      "log_bytes": 2159,
+      "log_truncated": false,
+      "tail": "uv sync --frozen\nChecked 86 packages in 11ms\nuv run ruff check src tests scripts examples\nAll checks passed!\nuv run mypy\nSuccess: no issues found in 31 source files\nuv run python scripts/gen_protocol_doc.py --check\nuv run python scripts/gen_eval_doc.py --check\nuv run pytest -q\n........................................................................ [ 15%]\n........................................................................ [ 31%]\n...............s........................................................ [ 47%]\n..............s......................................................... [ 63%]\n........................................................................ [ 78%]\n..........................................................F............. [ 94%]\n.........................                                                [100%]\n=================================== FAILURES ===================================\n________________ test_bash_inline_approval_handler_can_approve _________________\n\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff857538c0>\ntmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_inline_approval_hand0')\n\n    def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -> None:\n        requests = []\n    \n        class FakeCompleted:\n            returncode = 0\n            stdout = b\"ok\\n\"\n            stderr = b\"\"\n    \n        monkeypatch.setattr(\"subprocess.run\", lambda command, **kwargs: FakeCompleted())\n    \n        def handler(request):\n            requests.append(request)\n            return ApprovalDecision(approved=True)\n    \n        state = RuntimeState(workspace=tmp_path, approval_mode=\"inline\", approval_handler=handler)\n    \n        result = run_bash(state, \"pip install fastapi\", timeout_seconds=5)\n    \n>       assert result[\"ok\"] is True\nE       assert False is True\n\ntests/test_tools.py:347: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_tools.py::test_bash_inline_approval_handler_can_approve - assert False is True\n1 failed, 454 passed, 2 skipped in 50.09s\nmake: *** [Makefile:8: check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "planned_steps": [
+    "uv-version",
+    "make-check",
+    "commit-whitespace"
+  ],
+  "checks": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.006,
+      "output_bytes": 39,
+      "log_bytes": 39,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (aarch64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 64.777,
+      "output_bytes": 2159,
+      "log_bytes": 2159,
+      "log_truncated": false,
+      "tail": "uv sync --frozen\nChecked 86 packages in 11ms\nuv run ruff check src tests scripts examples\nAll checks passed!\nuv run mypy\nSuccess: no issues found in 31 source files\nuv run python scripts/gen_protocol_doc.py --check\nuv run python scripts/gen_eval_doc.py --check\nuv run pytest -q\n........................................................................ [ 15%]\n........................................................................ [ 31%]\n...............s........................................................ [ 47%]\n..............s......................................................... [ 63%]\n........................................................................ [ 78%]\n..........................................................F............. [ 94%]\n.........................                                                [100%]\n=================================== FAILURES ===================================\n________________ test_bash_inline_approval_handler_can_approve _________________\n\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff857538c0>\ntmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_inline_approval_hand0')\n\n    def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -> None:\n        requests = []\n    \n        class FakeCompleted:\n            returncode = 0\n            stdout = b\"ok\\n\"\n            stderr = b\"\"\n    \n        monkeypatch.setattr(\"subprocess.run\", lambda command, **kwargs: FakeCompleted())\n    \n        def handler(request):\n            requests.append(request)\n            return ApprovalDecision(approved=True)\n    \n        state = RuntimeState(workspace=tmp_path, approval_mode=\"inline\", approval_handler=handler)\n    \n        result = run_bash(state, \"pip install fastapi\", timeout_seconds=5)\n    \n>       assert result[\"ok\"] is True\nE       assert False is True\n\ntests/test_tools.py:347: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_tools.py::test_bash_inline_approval_handler_can_approve - assert False is True\n1 failed, 454 passed, 2 skipped in 50.09s\nmake: *** [Makefile:8: check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "commit-whitespace",
+      "status": "not_started",
+      "exit_code": null,
+      "seconds": null
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "See sanitized step logs and explicit exit codes"
+  }
+}

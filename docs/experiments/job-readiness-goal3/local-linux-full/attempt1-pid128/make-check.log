@@ -1,0 +1,786 @@
+uv sync --frozen
+Checked 86 packages in 13ms
+uv run ruff check src tests scripts examples
+All checks passed!
+uv run mypy
+Success: no issues found in 31 source files
+uv run python scripts/gen_protocol_doc.py --check
+uv run python scripts/gen_eval_doc.py --check
+uv run pytest -q
+........................................................................ [ 15%]
+........................................................................ [ 31%]
+...............s........................................................ [ 47%]
+..............s......................................................... [ 63%]
+................................................F....................... [ 78%]
+................F.......................FF..FFFFF..FFF....F............. [ 94%]
+................FF....F..                                                [100%]
+=================================== FAILURES ===================================
+__ test_real_graph_cancel_during_router_has_one_trace_and_no_next_node[False] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_graph_cancel_during_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff701ab000>
+session = False
+
+    @pytest.mark.parametrize("session", [False, True])
+    def test_real_graph_cancel_during_router_has_one_trace_and_no_next_node(
+        tmp_path, monkeypatch, session
+    ):
+        from mokioclaw.core import agent
+        from mokioclaw.graph import nodes
+    
+        entered, closed = threading.Event(), threading.Event()
+        control = RunControl()
+    
+        class SlowModel:
+            async def astream(self, _messages):
+                try:
+                    yield AIMessageChunk(content="部分路由文本")
+                    entered.set()
+                    await asyncio.sleep(30)
+                finally:
+                    closed.set()
+    
+        monkeypatch.setattr(nodes, "create_model", lambda: SlowModel())
+        monkeypatch.setattr(
+            agent, "build_complex_workflow", lambda: pytest.fail("next workflow started")
+        )
+        received, failures = [], []
+    
+        def consume():
+            try:
+                stream = agent.stream_session_events if session else agent.stream_agent_events
+                options = {"session_workspace" if session else "workspace": tmp_path}
+                received.extend(stream("任务", run_control=control, approval_mode="deny", **options))
+            except BaseException as exc:  # noqa: BLE001 — capture thread control signals for assertions
+                failures.append(exc)
+    
+        worker = threading.Thread(target=consume)
+        worker.start()
+        assert entered.wait(3)
+        control.cancel()
+        worker.join(3)
+        assert not worker.is_alive() and not failures
+        assert closed.is_set()
+        traces = list((tmp_path / ".mokioclaw/traces").iterdir())
+        assert len(traces) == 1
+        summary = json.loads((traces[0] / "summary.json").read_text())
+        assert summary["status"] == "interrupted"
+        checkpoint = json.loads((tmp_path / ".mokioclaw/checkpoints/checkpoint.json").read_text())
+        assert checkpoint["status"] == "interrupted"
+        rows = [json.loads(line) for line in (traces[0] / "events.jsonl").read_text().splitlines()]
+        ends = [row["payload"]["payload"] for row in rows if row["type"] == "custom:llm_stream_end"]
+        assert len(ends) == 1 and ends[0]["status"] == "interrupted"
+>       assert (tmp_path / ends[0]["full_output_path"]).read_text() == "部分路由文本"
+E       AssertionError: assert '' == '部分路由文本'
+E         
+E         - 部分路由文本
+
+tests/test_run_cancellation.py:103: AssertionError
+__________________ test_read_only_subagents_run_concurrently ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_read_only_subagents_run_c0')
+
+    def test_read_only_subagents_run_concurrently(tmp_path: Path) -> None:
+        manager = SubagentTaskManager(tmp_path, max_running=2)
+        barrier = threading.Barrier(2)
+    
+        def overlap(_writer, _cancel):
+            barrier.wait(timeout=2)
+            return {"ok": True}
+    
+        try:
+            tasks = [
+                manager.submit(
+                    parent_run_id="p",
+                    handoff_id=f"h{i}",
+                    agent="searchAgent",
+                    instruction="research",
+                    runner=overlap,
+                )
+                for i in range(2)
+            ]
+>           assert all(_wait_for(manager, task["subagent_run_id"], "completed") for task in tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_subagent_tasks.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_subagent_tasks.py:157: in <genexpr>
+    assert all(_wait_for(manager, task["subagent_run_id"], "completed") for task in tasks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+manager = <mokioclaw.core.subagent_tasks.SubagentTaskManager object at 0xffff701927b0>
+run_id = 'subagent-a640e88107f8', expected = 'completed'
+
+    def _wait_for(manager: SubagentTaskManager, run_id: str, expected: str) -> dict:
+        deadline = time.monotonic() + 3
+        while time.monotonic() < deadline:
+            task = manager.get(run_id)
+            if task and task.get("status") == expected:
+                return task
+            time.sleep(0.01)
+>       raise AssertionError(f"Subagent run did not reach {expected}")
+E       AssertionError: Subagent run did not reach completed
+
+tests/test_subagent_tasks.py:25: AssertionError
+___________________ test_bash_runs_command_inside_workspace ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_runs_command_inside_0')
+
+    def test_bash_runs_command_inside_workspace(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+        (tmp_path / "hello.py").write_text("print('hello from smoke')\n", encoding="utf-8")
+    
+>       result = run_bash(state, "python hello.py", timeout_seconds=5)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_tools.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/tools/bash_tool.py:225: in run_bash
+    result = backend_for(state).run(
+src/mokioclaw/core/execution_backend.py:191: in run
+    return _collect(argv, request, "local", env=request.env or None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/mokioclaw/core/execution_backend.py:139: in _collect
+    thread.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Thread(Thread-53 (drain), stopped daemon)>
+
+    def start(self):
+        """Start the thread's activity.
+    
+        It must be called at most once per thread object. It arranges for the
+        object's run() method to be invoked in a separate thread of control.
+    
+        This method will raise a RuntimeError if called more than once on the
+        same thread object.
+    
+        """
+        if not self._initialized:
+            raise RuntimeError("thread.__init__() not called")
+    
+        if self._started.is_set():
+            raise RuntimeError("threads can only be started once")
+    
+        with _active_limbo_lock:
+            _limbo[self] = self
+        try:
+            # Start joinable thread
+>           _start_joinable_thread(self._bootstrap, handle=self._handle,
+                                   daemon=self.daemon)
+E                                  RuntimeError: can't start new thread
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError
+_______________________ test_bash_accepts_string_timeout _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_accepts_string_timeo0')
+
+    def test_bash_accepts_string_timeout(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+    
+        result = run_bash(state, "python --version", timeout_seconds="5")
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:130: AssertionError
+__________________ test_bash_sets_utf8_for_python_subprocess ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_sets_utf8_for_python0')
+
+    def test_bash_sets_utf8_for_python_subprocess(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+        (tmp_path / "emoji.py").write_text("print('🎮')\n", encoding="utf-8")
+    
+        result = run_bash(state, "python emoji.py", timeout_seconds=5)
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:163: AssertionError
+______________________ test_bash_loads_workspace_env_file ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_loads_workspace_env_0')
+
+    def test_bash_loads_workspace_env_file(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+        (tmp_path / ".mokioclaw.env").write_text("MOKIO_TEST_VALUE=from-env\n", encoding="utf-8")
+    
+>       result = run_bash(
+            state,
+            "python -c \"import os; print(os.environ['MOKIO_TEST_VALUE'])\"",
+            timeout_seconds=5,
+        )
+
+tests/test_tools.py:171: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/tools/bash_tool.py:225: in run_bash
+    result = backend_for(state).run(
+src/mokioclaw/core/execution_backend.py:191: in run
+    return _collect(argv, request, "local", env=request.env or None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/mokioclaw/core/execution_backend.py:139: in _collect
+    thread.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Thread(Thread-55 (drain), stopped daemon)>
+
+    def start(self):
+        """Start the thread's activity.
+    
+        It must be called at most once per thread object. It arranges for the
+        object's run() method to be invoked in a separate thread of control.
+    
+        This method will raise a RuntimeError if called more than once on the
+        same thread object.
+    
+        """
+        if not self._initialized:
+            raise RuntimeError("thread.__init__() not called")
+    
+        if self._started.is_set():
+            raise RuntimeError("threads can only be started once")
+    
+        with _active_limbo_lock:
+            _limbo[self] = self
+        try:
+            # Start joinable thread
+>           _start_joinable_thread(self._bootstrap, handle=self._handle,
+                                   daemon=self.daemon)
+E                                  RuntimeError: can't start new thread
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError
+___________________ test_bash_prefers_runtime_python_on_path ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_prefers_runtime_pyth0')
+
+    def test_bash_prefers_runtime_python_on_path(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+    
+        result = run_bash(
+            state,
+            'python -c "import sys; print(sys.executable)"',
+            timeout_seconds=5,
+        )
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:190: AssertionError
+____________________ test_bash_pip_shim_uses_runtime_python ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_pip_shim_uses_runtim0')
+
+    def test_bash_pip_shim_uses_runtime_python(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+    
+        result = run_bash(
+            state,
+            "pip --version",
+            timeout_seconds=5,
+        )
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:203: AssertionError
+________________ test_bash_env_file_expands_existing_variables _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_env_file_expands_exi0')
+
+    def test_bash_env_file_expands_existing_variables(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+        bin_dir = tmp_path / "bin"
+        bin_dir.mkdir()
+        script = bin_dir / "hello"
+        script.write_text("#!/bin/sh\necho from-custom-path\n", encoding="utf-8")
+        script.chmod(0o755)
+        (tmp_path / ".mokioclaw.env").write_text(f"PATH={bin_dir}:$PATH\n", encoding="utf-8")
+    
+        result = run_bash(state, "hello", timeout_seconds=5)
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:218: AssertionError
+__________________ test_bash_allows_dev_null_stderr_redirect ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_allows_dev_null_stde0')
+
+    def test_bash_allows_dev_null_stderr_redirect(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+    
+        result = run_bash(
+            state, "ls missing-file 2>/dev/null || echo File not found", timeout_seconds=5
+        )
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:249: AssertionError
+________________ test_bash_writes_long_output_to_workspace_log _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_writes_long_output_t0')
+
+    def test_bash_writes_long_output_to_workspace_log(tmp_path: Path) -> None:
+        state = RuntimeState(workspace=tmp_path, bash_max_output_chars=10)
+    
+        result = run_bash(state, "python -c \"print('x' * 50)\"", timeout_seconds=5)
+    
+>       assert result["ok"] is True
+E       assert False is True
+
+tests/test_tools.py:258: AssertionError
+____________________ test_bash_can_start_background_process ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_can_start_background0')
+
+    def test_bash_can_start_background_process(tmp_path: Path) -> None:
+        state = make_state(tmp_path)
+    
+>       result = run_bash(
+            state,
+            "python -c \"print('background')\"",
+            timeout_seconds=5,
+            run_in_background=True,
+        )
+
+tests/test_tools.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/tools/bash_tool.py:223: in run_bash
+    return _run_background(state, normalized_command, env, approval)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/mokioclaw/tools/bash_tool.py:488: in _run_background
+    process = subprocess.Popen(
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/subprocess.py:1039: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: 'python -c "print(\'background\')"'>
+args = ['/bin/sh', '-c', 'python -c "print(\'background\')"']
+executable = b'/bin/sh', preexec_fn = None, close_fds = True, pass_fds = ()
+cwd = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_can_start_background0')
+env = {'CI': '1', 'CI_PYTEST_REPORT': '/evidence/check-linux-offline/pytest-summary.json', 'CI_REPORT_TOKEN': '78395d007ad14d8ab5663395449b96b4', 'DOCKER_CONFIG': '/root/.docker', ...}
+startupinfo = None, creationflags = 0, shell = True, p2cread = 20, p2cwrite = -1
+c2pread = -1, c2pwrite = 13, errread = -1, errwrite = 18, restore_signals = True
+gid = None, gids = None, uid = None, umask = -1, start_new_session = True
+process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session, process_group):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and (not close_fds or _HAVE_POSIX_SPAWN_CLOSEFROM)
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread > 2)
+                and (c2pwrite == -1 or c2pwrite > 2)
+                and (errwrite == -1 or errwrite > 2)
+                and not start_new_session
+                and process_group == -1
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask < 0):
+            self._posix_spawn(args, executable, env, restore_signals, close_fds,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write < 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+>               self.pid = _fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        process_group, gid, gids, uid, umask,
+                        preexec_fn, _USE_VFORK)
+E                       BlockingIOError: [Errno 11] Resource temporarily unavailable
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/subprocess.py:1902: BlockingIOError
+________________ test_bash_inline_approval_handler_can_approve _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff730551d0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bash_inline_approval_hand0')
+
+    def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -> None:
+        requests = []
+    
+        class FakeCompleted:
+            returncode = 0
+            stdout = b"ok\n"
+            stderr = b""
+    
+        monkeypatch.setattr("subprocess.run", lambda command, **kwargs: FakeCompleted())
+    
+        def handler(request):
+            requests.append(request)
+            return ApprovalDecision(approved=True)
+    
+        state = RuntimeState(workspace=tmp_path, approval_mode="inline", approval_handler=handler)
+    
+>       result = run_bash(state, "pip install fastapi", timeout_seconds=5)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_tools.py:345: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/tools/bash_tool.py:225: in run_bash
+    result = backend_for(state).run(
+src/mokioclaw/core/execution_backend.py:191: in run
+    return _collect(argv, request, "local", env=request.env or None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/mokioclaw/core/execution_backend.py:139: in _collect
+    thread.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Thread(Thread-57 (drain), stopped daemon)>
+
+    def start(self):
+        """Start the thread's activity.
+    
+        It must be called at most once per thread object. It arranges for the
+        object's run() method to be invoked in a separate thread of control.
+    
+        This method will raise a RuntimeError if called more than once on the
+        same thread object.
+    
+        """
+        if not self._initialized:
+            raise RuntimeError("thread.__init__() not called")
+    
+        if self._started.is_set():
+            raise RuntimeError("threads can only be started once")
+    
+        with _active_limbo_lock:
+            _limbo[self] = self
+        try:
+            # Start joinable thread
+>           _start_joinable_thread(self._bootstrap, handle=self._handle,
+                                   daemon=self.daemon)
+E                                  RuntimeError: can't start new thread
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError
+_____________________ test_tui_renders_fake_stream_events ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_tui_renders_fake_stream_e0')
+
+    def test_tui_renders_fake_stream_events(tmp_path) -> None:
+        def fake_stream(*args, **kwargs):
+            yield {
+                "type": "custom_event",
+                "event": {
+                    "type": "session_started",
+                    "session_id": "session-demo",
+                    "workspace": str(tmp_path / "workspace-a"),
+                },
+            }
+            yield {"type": "workspace", "path": str(tmp_path / "workspace-a")}
+            yield {
+                "type": "custom_event",
+                "event": {
+                    "type": "todo_update",
+                    "plan_summary": "demo plan",
+                    "todos": [{"id": "todo-1", "content": "write file", "status": "in_progress"}],
+                },
+            }
+            yield {
+                "type": "graph_event",
+                "event": {"final": {"final_answer": "PASSED: wrote the file"}},
+            }
+            yield {
+                "type": "custom_event",
+                "event": {
+                    "type": "trace_summary",
+                    "trace_id": "trace-demo",
+                    "status": "finished",
+                    "trace_dir": str(tmp_path / "trace-demo"),
+                    "node_visits": {"final": 1},
+                    "tool_calls": 1,
+                    "failed_tool_calls": 0,
+                },
+            }
+    
+        async def run() -> None:
+            app = MokioClawTuiApp(initial_task="demo task", stream_factory=fake_stream)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await wait_for_completed_run(app, pilot)
+                assert "workspace-a" in app.sidebar_text
+                assert "trace-demo" in app.sidebar_text
+                assert "session-demo" in app.sidebar_text
+                assert app.run_count == 1
+                assert not app.running
+    
+>       asyncio.run(run())
+
+tests/test_tui.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:62: in __exit__
+    self.close()
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:72: in close
+    loop.run_until_complete(
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:613: in shutdown_default_executor
+    thread.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Thread(Thread-59 (_do_shutdown), stopped)>
+
+    def start(self):
+        """Start the thread's activity.
+    
+        It must be called at most once per thread object. It arranges for the
+        object's run() method to be invoked in a separate thread of control.
+    
+        This method will raise a RuntimeError if called more than once on the
+        same thread object.
+    
+        """
+        if not self._initialized:
+            raise RuntimeError("thread.__init__() not called")
+    
+        if self._started.is_set():
+            raise RuntimeError("threads can only be started once")
+    
+        with _active_limbo_lock:
+            _limbo[self] = self
+        try:
+            # Start joinable thread
+>           _start_joinable_thread(self._bootstrap, handle=self._handle,
+                                   daemon=self.daemon)
+E                                  RuntimeError: can't start new thread
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError
+__________________ test_tui_renders_lightweight_chat_response __________________
+
+    def test_tui_renders_lightweight_chat_response() -> None:
+        def fake_stream(*args, **kwargs):
+            yield {
+                "type": "custom_event",
+                "event": {
+                    "type": "chat_response",
+                    "mode": "lightweight",
+                    "reason": "greeting",
+                    "response": "你好，我在。",
+                },
+            }
+    
+        async def run() -> None:
+            app = MokioClawTuiApp(initial_task="你好", stream_factory=fake_stream)
+            async with app.run_test(size=(100, 30)) as pilot:
+                await wait_for_completed_run(app, pilot)
+                assert app.run_count == 1
+                assert app.latest_workspace
+                assert not app.running
+                assert any("你好，我在。" in str(widget.content) for widget in app.query(Static))
+    
+>       asyncio.run(run())
+
+tests/test_tui.py:199: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:62: in __exit__
+    self.close()
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:72: in close
+    loop.run_until_complete(
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:613: in shutdown_default_executor
+    thread.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Thread(Thread-60 (_do_shutdown), stopped)>
+
+    def start(self):
+        """Start the thread's activity.
+    
+        It must be called at most once per thread object. It arranges for the
+        object's run() method to be invoked in a separate thread of control.
+    
+        This method will raise a RuntimeError if called more than once on the
+        same thread object.
+    
+        """
+        if not self._initialized:
+            raise RuntimeError("thread.__init__() not called")
+    
+        if self._started.is_set():
+            raise RuntimeError("threads can only be started once")
+    
+        with _active_limbo_lock:
+            _limbo[self] = self
+        try:
+            # Start joinable thread
+>           _start_joinable_thread(self._bootstrap, handle=self._handle,
+                                   daemon=self.daemon)
+E                                  RuntimeError: can't start new thread
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError
+____________ test_tui_runs_multiple_tasks_in_same_session_workspace ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_tui_runs_multiple_tasks_i0')
+
+    def test_tui_runs_multiple_tasks_in_same_session_workspace(tmp_path) -> None:
+        calls = []
+    
+        def fake_stream(*args, **kwargs):
+            calls.append((args, kwargs))
+            yield {"type": "workspace", "path": str(kwargs["session_workspace"])}
+    
+        async def run() -> None:
+            app = MokioClawTuiApp(workspace=tmp_path / "session-workspace", stream_factory=fake_stream)
+            async with app.run_test(size=(100, 30)) as pilot:
+                app.start_task("first")
+                await wait_for_completed_run(app, pilot, turn=1)
+                app.start_task("second")
+                await wait_for_completed_run(app, pilot, turn=2)
+    
+>       asyncio.run(run())
+
+tests/test_tui.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:194: in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:62: in __exit__
+    self.close()
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/runners.py:72: in close
+    loop.run_until_complete(
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/asyncio/base_events.py:613: in shutdown_default_executor
+    thread.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Thread(Thread-61 (_do_shutdown), stopped)>
+
+    def start(self):
+        """Start the thread's activity.
+    
+        It must be called at most once per thread object. It arranges for the
+        object's run() method to be invoked in a separate thread of control.
+    
+        This method will raise a RuntimeError if called more than once on the
+        same thread object.
+    
+        """
+        if not self._initialized:
+            raise RuntimeError("thread.__init__() not called")
+    
+        if self._started.is_set():
+            raise RuntimeError("threads can only be started once")
+    
+        with _active_limbo_lock:
+            _limbo[self] = self
+        try:
+            # Start joinable thread
+>           _start_joinable_thread(self._bootstrap, handle=self._handle,
+                                   daemon=self.daemon)
+E                                  RuntimeError: can't start new thread
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-aarch64-gnu/lib/python3.13/threading.py:975: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_run_cancellation.py::test_real_graph_cancel_during_router_has_one_trace_and_no_next_node[False] - AssertionError: assert '' == '部分路由文本'
+  
+  - 部分路由文本
+FAILED tests/test_subagent_tasks.py::test_read_only_subagents_run_concurrently - AssertionError: Subagent run did not reach completed
+FAILED tests/test_tools.py::test_bash_runs_command_inside_workspace - RuntimeError: can't start new thread
+FAILED tests/test_tools.py::test_bash_accepts_string_timeout - assert False is True
+FAILED tests/test_tools.py::test_bash_sets_utf8_for_python_subprocess - assert False is True
+FAILED tests/test_tools.py::test_bash_loads_workspace_env_file - RuntimeError: can't start new thread
+FAILED tests/test_tools.py::test_bash_prefers_runtime_python_on_path - assert False is True
+FAILED tests/test_tools.py::test_bash_pip_shim_uses_runtime_python - assert False is True
+FAILED tests/test_tools.py::test_bash_env_file_expands_existing_variables - assert False is True
+FAILED tests/test_tools.py::test_bash_allows_dev_null_stderr_redirect - assert False is True
+FAILED tests/test_tools.py::test_bash_writes_long_output_to_workspace_log - assert False is True
+FAILED tests/test_tools.py::test_bash_can_start_background_process - BlockingIOError: [Errno 11] Resource temporarily unavailable
+FAILED tests/test_tools.py::test_bash_inline_approval_handler_can_approve - RuntimeError: can't start new thread
+FAILED tests/test_tui.py::test_tui_renders_fake_stream_events - RuntimeError: can't start new thread
+FAILED tests/test_tui.py::test_tui_renders_lightweight_chat_response - RuntimeError: can't start new thread
+FAILED tests/test_tui.py::test_tui_runs_multiple_tasks_in_same_session_workspace - RuntimeError: can't start new thread
+16 failed, 439 passed, 2 skipped in 44.05s
+make: *** [Makefile:8: check] Error 1

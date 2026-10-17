@@ -1,0 +1,25 @@
+{
+  "command": [
+    "git",
+    "clone",
+    "--no-hardlinks",
+    "--no-local",
+    "--single-branch",
+    "--branch",
+    "master",
+    "/Users/nicedream/xm/MokioAgent",
+    "/Users/nicedream/.cache/mokioclaw/ci/goal3-20261017/linux-tui-validation/repo-event-sync"
+  ],
+  "status": "passed",
+  "exit_code": 0,
+  "log": "clone-event-sync.log",
+  "timeout_seconds": 60,
+  "timed_out": false,
+  "seconds": 0.815,
+  "output_bytes": 107,
+  "log_bytes": 107,
+  "log_truncated": false,
+  "tail": "Cloning into '/Users/nicedream/.cache/mokioclaw/ci/goal3-20261017/linux-tui-validation/repo-event-sync'...\n",
+  "output_complete": true,
+  "output_errors": []
+}

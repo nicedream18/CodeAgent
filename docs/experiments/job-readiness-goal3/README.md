@@ -1,8 +1,23 @@
 # Goal 3：Linux CI 与干净安装证据
 
-本地可评审准备与远程验收分开。用户已授权推送固定的 22 个提交至 `8ca634d`；该次 push 已执行并自动触发 CI。
-后续修复提交尚未获远程推送授权；软件包、镜像发布及真实模型调用仍未授权。
-最终状态和本轮证据见 ../../internship/STATUS.md；配置文件和本地 ARM64 结果不能代替远程 Linux 运行链接。
+本地可评审准备与远程验收分开。已授权的两次定向推送分别到 `8ca634d` 和 `ea542c0`，原运行均保留。
+第二次远程 Docker/wheel 已通过，普通检查仍待测试同步修复后的复验；后续推送尚未授权。
+软件包/镜像发布及真实模型调用均未授权。
+
+## 当前本地候选
+
+状态：**本地修复完成、远程普通检查待复验授权**。
+被测代码 `35162c0342f8600b3b7ce37d84ac55e5b0e3cee4`；检查输入摘要为
+`e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54`。
+后续仅归档文档，最终推送 SHA 由仓库外清单确定并核对同一输入摘要。
+
+- [macOS ARM64 全量](local-arm64-final/check/report.json)：455 passed、2 skipped，Ruff、31 模块 mypy、文档及 diff 通过。
+- [真实 Docker](local-arm64-final/docker/report.json)：29 passed、0 skipped，独立镜像与清理收据齐全。
+- [wheel 干净安装](local-arm64-final/wheel/report.json)：site-packages、两种 CLI 及离线资源通过。
+- [Linux ARM64 禁网全量](local-linux-full/final-offline/report.json)：455 passed、2 skipped，相同代码与检查输入摘要。
+- [故障复盘](CI_FAILURES.md)：等待完成事件、取消同步、失效 mock 及测试宿主资源边界；失败尝试原样保留。
+
+最终以 [验收索引](acceptance.json) 和 [STATUS](../../internship/STATUS.md) 为准；尚未取得当前候选的远程普通检查成功结果。
 
 ## 第二次远程运行与 TUI 测试同步
 
