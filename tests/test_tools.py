@@ -327,14 +327,21 @@ def test_bash_high_risk_command_auto_approval_executes(monkeypatch, tmp_path: Pa
 
 
 def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -> None:
+    from mokioclaw.core.execution_backend import ExecutionResult, LocalBackend
+
     requests = []
+    executions = []
 
-    class FakeCompleted:
-        returncode = 0
-        stdout = b"ok\n"
-        stderr = b""
+    def execute(self, request):
+        assert requests and requests[0].command == request.command
+        executions.append(request)
+        return ExecutionResult(True, 0, False, "ok\n", "", 0, "local")
 
-    monkeypatch.setattr("subprocess.run", lambda command, **kwargs: FakeCompleted())
+    def forbid_process(*args, **kwargs):
+        raise AssertionError("The approval unit test must not spawn an installer")
+
+    monkeypatch.setattr(LocalBackend, "run", execute)
+    monkeypatch.setattr("subprocess.Popen", forbid_process)
 
     def handler(request):
         requests.append(request)
@@ -347,6 +354,7 @@ def test_bash_inline_approval_handler_can_approve(monkeypatch, tmp_path: Path) -
     assert result["ok"] is True
     assert result["approved"] is True
     assert requests[0].command == "pip install fastapi"
+    assert len(requests) == len(executions) == 1
 
 
 def test_bash_inline_approval_handler_can_reject(tmp_path: Path) -> None:
