@@ -1,19 +1,19 @@
 # 求职交付收敛状态
 
-## Goal 3：本地修复完成、远程普通检查待复验授权
+## Goal 3：已完成
 
-- 最新被测代码：`35162c0342f8600b3b7ce37d84ac55e5b0e3cee4`，工作区干净；源码与检查输入摘要 `e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54`。
-- macOS ARM64 全量：455 passed、2 skipped；Ruff、31 个 mypy 模块、协议/评测文档及 diff 检查通过。
-- 本地真实 Docker：29 passed、0 skipped；独立镜像及 owner 清理确认。wheel 仓库外干净安装、两种 CLI 和离线资源检查通过。
-- 补充 Linux ARM64 全量：455 passed、2 skipped；依赖准备后禁网执行，UV_OFFLINE=1。它不能代替远程 x86_64 CI。
-- [首轮远程 8ca634d](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 因使用 Python 3.12.3 失败；[第二轮 ea542c0](https://github.com/nicedream18/CodeAgent/actions/runs/39027177601) Docker/wheel 通过，普通测试 454 passed、1 failed、2 skipped，失败为 TUI 固定等待时间。
-- 两轮全部报告均已下载并校验 GitHub SHA256。新增测试修复等待实际完成/token 事件，并修正审批单测过时 mock，禁止真实安装副作用；本地诊断失败均保留。
-- 产品源码、锁、Goal 2 的 384 份产物、7 份缓存、旧 wheel/标签保持原样；未请求真实模型或发布产物。
-- 新增提交尚未推送；需按具体清单授权后复验。Goal 3 尚未完整完成。
+- 远程已验收提交：`748ca5d198df5f42c4a1fc8364022dc7abddda25`；[Linux CI 运行](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552) 三作业均 success。
+- 远程普通检查：455 passed、2 skipped；Ruff、31 个 mypy 模块、协议/评测文档及 diff 通过。
+- 远程真实 Docker：29 passed、0 skipped，linux/x86_64；独立镜像及 owner 清理确认。wheel 仓库外全新环境安装、site-packages、两种 CLI 和离线资源检查通过。
+- 三份报告均下载并验证 GitHub SHA256；Python 3.13.9、uv 0.12.19，检查输入与本地被测代码一致。
+- 保留本地 macOS ARM64 的 455/2 全量、29/0 Docker 和 wheel 证据；补充禁网 Linux ARM64 全量为 455/2。
+- 两次远程失败及本地诊断失败保留。完成固定 Python 入口、TUI/取消测试同步与审批单测执行后端 mock 修复，没有改产品源码或任务评分。
+- 产品源码、锁、Goal 2 的 384 份产物、7 份缓存、旧 wheel/标签/镜像完整性复核通过；未请求真实模型或发布产物。
+- 最后状态与报告归档为本地文档提交，未增加推送范围；CI 与 wheel 证据准确对应 748ca5d。
 
-证据：[验收索引](../experiments/job-readiness-goal3/acceptance.json)、[故障复盘](../experiments/job-readiness-goal3/CI_FAILURES.md)、[设计和操作](../experiments/job-readiness-goal3/README.md)。
+证据：[验收索引](../experiments/job-readiness-goal3/acceptance.json)、[远程报告与下载收据](../experiments/job-readiness-goal3/remote/39028453552/status.json)、[故障复盘](../experiments/job-readiness-goal3/CI_FAILURES.md)。
 
-## Goal 2：18 次有限真实任务验证已完成
+## Goal 2：18 次有限真实任务验证已完成（历史记录）
 
 - 固定三任务 × B0/B1 × 三次：18/18 有终态，原顺序执行，无重跑或追加。
 - 完整交付：B0 1/9、B1 0/9；独立产物通过均 8/9。B1 未显示完成率改善。
@@ -23,7 +23,7 @@
 - 成功的 M08-v2（B0）与产物通过但运行失败的 M08-v2（B1）均从归档重建，可信 Docker 13/13 再次通过；原终态未改。
 - 唯一成功实际只改一个源文件，多源文件修改后完整交付目标仍为 0，未达成；没有追加实验凑成功。
 - `make check`：444 passed、2 skipped；Ruff、26 个严格 mypy 模块及文档/diff 检查通过；真实 `make check-docker` 29 passed（linux/aarch64）。
-- 未推送、发布、修改历史批次或冻结 B0/B1。远程 Linux CI 仍未运行。
+- Goal 2 收尾时未推送、发布或修改历史批次及冻结 B0/B1；当时远程 Linux CI 尚未运行。后续 CI 验收见上方 Goal 3。
 
 报告：[结果](../experiments/job-readiness-goal2/RESULTS.md)、[失败分析](../experiments/job-readiness-goal2/ANALYSIS.md)、[回放与复验](../experiments/job-readiness-goal2/DEMO.md)。
 后续优先收敛 verifier 与规范工具名反馈；新产品修复后的真实复测、额外 trial 或远程操作需另行授权。

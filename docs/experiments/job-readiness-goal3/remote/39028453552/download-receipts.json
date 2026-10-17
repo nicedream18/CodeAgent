@@ -1,0 +1,47 @@
+[
+  {
+    "job": "check",
+    "artifact_id": 12099242869,
+    "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12099242869",
+    "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12099242869/zip",
+    "archive_sha256": "517caf3ac00aaf90b6df006d5eefab593f7865203bf3c6a076cbcbfe9d8446e2",
+    "github_digest": "sha256:517caf3ac00aaf90b6df006d5eefab593f7865203bf3c6a076cbcbfe9d8446e2",
+    "github_digest_matches": true,
+    "bytes": 21812,
+    "created_at": "2026-10-17T11:23:57Z",
+    "expires_at": "2026-10-31T11:23:56Z",
+    "report": "check/report.json",
+    "report_sha256": "4201c60f2225c3fa35606eb45caef95d17efbbb1730ca315128d5a5bf225314e",
+    "log_truncated": false
+  },
+  {
+    "job": "wheel",
+    "artifact_id": 12099153250,
+    "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12099153250",
+    "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12099153250/zip",
+    "archive_sha256": "aa4a725b2d1c4b17a3ef68537d2f03ef13a05a651a7cdb981002842cd0167fb9",
+    "github_digest": "sha256:aa4a725b2d1c4b17a3ef68537d2f03ef13a05a651a7cdb981002842cd0167fb9",
+    "github_digest_matches": true,
+    "bytes": 48470,
+    "created_at": "2026-10-17T11:22:48Z",
+    "expires_at": "2026-10-31T11:22:48Z",
+    "report": "wheel/report.json",
+    "report_sha256": "6a8bfb38f52dedb9577bee87ae7723ce33d087e3a150046031047f345b211558",
+    "log_truncated": false
+  },
+  {
+    "job": "docker",
+    "artifact_id": 12098519630,
+    "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12098519630",
+    "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098519630/zip",
+    "archive_sha256": "9e09760f9ba244db6b7b0cff8218b82345d7c6ffc8b2fb04bb7ac3708ca3682e",
+    "github_digest": "sha256:9e09760f9ba244db6b7b0cff8218b82345d7c6ffc8b2fb04bb7ac3708ca3682e",
+    "github_digest_matches": true,
+    "bytes": 23344,
+    "created_at": "2026-10-17T11:23:50Z",
+    "expires_at": "2026-10-31T11:23:49Z",
+    "report": "docker/report.json",
+    "report_sha256": "48f3f3ba5344cef88a0c64a35ccc04f2ba0de595354326f749ce78ce10fe4fe3",
+    "log_truncated": false
+  }
+]

@@ -31,7 +31,7 @@ flowchart LR
 | 56 次正式试验及 56 次无效对照均保留 | [实际结果](docs/experiments/internship-v1/RESULTS.md) |
 | 150 秒真实模型完整交付回放，另保留失败案例 | [演示](docs/internship/demo.md) |
 | 三个 v2 任务环境、角色诊断及完成预算预留 | [Goal 1 设计、离线实验与 B0/B1](docs/experiments/job-readiness-v1/) |
-| Linux CI、真实容器及 wheel 干净安装入口；远程待验收 | [Goal 3 操作与证据边界](docs/experiments/job-readiness-goal3/) |
+| Linux CI 全量 455 项、真实 Docker 29 项及 wheel 干净安装通过（748ca5d） | [Goal 3 运行与验收证据](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552) |
 
 ## 快速运行
 

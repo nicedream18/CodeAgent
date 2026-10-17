@@ -1,23 +1,30 @@
 # Goal 3：Linux CI 与干净安装证据
 
-本地可评审准备与远程验收分开。已授权的两次定向推送分别到 `8ca634d` 和 `ea542c0`，原运行均保留。
-第二次远程 Docker/wheel 已通过，普通检查仍待测试同步修复后的复验；后续推送尚未授权。
-软件包/镜像发布及真实模型调用均未授权。
+状态：**已完成**。已取得与 commit `748ca5d198df5f42c4a1fc8364022dc7abddda25` 对应的真实远程 Linux 全通过证据。
+[最终远程运行](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552) 由批准的 push 自动触发，未重复 dispatch 或重跑旧运行。
+三份报告已下载，并逐一与 GitHub artifact SHA256 校验一致；两次原失败运行及本地诊断失败保留。
 
-## 当前本地候选
+## 最终结果
 
-状态：**本地修复完成、远程普通检查待复验授权**。
-被测代码 `35162c0342f8600b3b7ce37d84ac55e5b0e3cee4`；检查输入摘要为
-`e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54`。
-后续仅归档文档，最终推送 SHA 由仓库外清单确定并核对同一输入摘要。
+| 验证 | 实际结果 | 证据 |
+|---|---|---|
+| 远程 Linux x86_64 普通检查 | 455 passed、2 skipped；Ruff、31 模块 mypy、协议/评测文档与 diff 通过 | [报告](remote/39028453552/check/report.json) |
+| 远程真实 Docker | 29 passed、0 skipped，linux/x86_64；镜像和清理收据齐全 | [报告](remote/39028453552/docker/report.json) |
+| 远程 wheel 干净安装 | 仓库外全新环境、site-packages 导入、两种 CLI、离线资源与文件读取通过 | [报告](remote/39028453552/wheel/report.json) |
+| 本地 macOS ARM64 普通检查 | 455 passed、2 skipped，代码 35162c0 | [报告](local-arm64-final/check/report.json) |
+| 本地真实 Docker / wheel | 29 passed、0 skipped；干净 wheel 安装通过 | [Docker](local-arm64-final/docker/report.json)、[wheel](local-arm64-final/wheel/report.json) |
+| 补充 Linux ARM64 禁网全量 | 455 passed、2 skipped，UV_OFFLINE=1 | [报告](local-linux-full/final-offline/report.json) |
 
-- [macOS ARM64 全量](local-arm64-final/check/report.json)：455 passed、2 skipped，Ruff、31 模块 mypy、文档及 diff 通过。
-- [真实 Docker](local-arm64-final/docker/report.json)：29 passed、0 skipped，独立镜像与清理收据齐全。
-- [wheel 干净安装](local-arm64-final/wheel/report.json)：site-packages、两种 CLI 及离线资源通过。
-- [Linux ARM64 禁网全量](local-linux-full/final-offline/report.json)：455 passed、2 skipped，相同代码与检查输入摘要。
-- [故障复盘](CI_FAILURES.md)：等待完成事件、取消同步、失效 mock 及测试宿主资源边界；失败尝试原样保留。
+三份远程报告对应同一检查输入摘要：`e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54`，与本地被测版本一致。
+Python 3.13.9，uv 0.12.19；远程为 Ubuntu runner 的 Linux/glibc 2.39。
+本地与远程 Docker 构建输入相同，实际镜像 ID 按架构分别记录，不要求跨架构相同。
+已验收 wheel SHA256 为 `605001843b1c5e1ff3a105bf76abdbee5a17f43e1e19338d28522e1974f38359`，二进制及镜像未发布。
 
-最终以 [验收索引](acceptance.json) 和 [STATUS](../../internship/STATUS.md) 为准；尚未取得当前候选的远程普通检查成功结果。
+[验收索引](acceptance.json)、[运行与下载收据](remote/39028453552/status.json)、[下载摘要](remote/39028453552/download-receipts.json)、[故障复盘](CI_FAILURES.md)。
+模型调用为 0；旧 wheel、标签、镜像、7 份缓存及 Goal 2 的 384 项摘要均保持原样，见 [最终审计](integrity-final.json)。
+
+最终归档仅更新状态文档（含顶层 README 的状态行），没有新增远程推送授权；验收和 wheel 版本准确指向 748ca5d，不能把归档提交冒充远程被测提交。
+GitHub artifacts 需要登录，保留 14 天；本目录保存已验证的报告副本，不依赖临时安装目录继续存在。
 
 ## 第二次远程运行与 TUI 测试同步
 
@@ -30,7 +37,7 @@ Docker 和 wheel 两作业 success，check 为 failure；三份报告均已下�
 
 测试修复只调整 `tests/test_tui.py`：三处任务完成断言改为按运行轮次及 UI 完成状态有界等待，
 仍保留原断言，并额外核对 finished 状态及聊天正文。不改产品代码，不跳过测试，不重跑旧 CI 来掩盖失败。
-新的本地检查与 Linux 容器复验完成后另行记录；新增提交尚未获推送授权。
+后续本地与远程复验已经完成，见上方最终结果；本节保留当时的失败状态。
 
 ## 首次远程运行及入口修复
 
@@ -58,7 +65,7 @@ Docker 和 wheel 两作业 success，check 为 failure；三份报告均已下�
 - [真实 Docker](local-arm64-repair/docker/report.json)：29 passed、0 skipped，独立镜像及 owner 清理确认。
 - [wheel](local-arm64-repair/wheel/report.json)：仓库外干净安装、两种 CLI 和离线资源检查通过；wheel SHA 与首轮相同。
 
-状态：**本地修复完成、远程复验待授权**。原远程失败保留；修复版本尚未获得远程通过证据。
+这是该阶段的历史记录；原失败保留，最终远程结果见上方。
 
 ## 首轮本地结果（固定代码 9247f7f）
 
@@ -143,7 +150,7 @@ uv run python scripts/ci_push_manifest.py \
 它没有 push 或远程触发功能。扫描是项目凭证值和常见高置信模式检查，不等于通用 DLP 保证。
 目标 SHA、仓库/分支或远程基线改变后，必须重新核对清单。
 取得授权后再推送；push 会自动运行三作业，应复用该运行，不重复 dispatch。
-workflow_dispatch 的 GitHub 手动入口需默认分支包含配置；原批准版本已推送 main，后续修复推送仍待具体授权。
+workflow_dispatch 的 GitHub 手动入口需默认分支包含配置；三个已批准版本均已定向推送 main；任何新增推送仍需具体授权。
 
 远程通过后保存对应 commit 的 run/job/artifact 链接，并下载报告核对，不把 queued/running 当通过。
 本地 ARM64 与远程 Linux 分别归档，保留失败，不修改 Goal 1/2 原始记录。

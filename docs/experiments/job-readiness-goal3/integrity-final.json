@@ -1,0 +1,18 @@
+{
+  "recorded_at": "2026-10-17T11:27:27.465096+00:00",
+  "validated_remote_commit": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+  "checks": {
+    "source_unchanged": true,
+    "lock_unchanged": true,
+    "old_wheel_unchanged": true,
+    "goal2_384_unchanged": true,
+    "historical_7_caches_unchanged": true,
+    "old_tag_unchanged": true,
+    "historical_image_unchanged": true
+  },
+  "runtime_source_sha256": "4f72454c28444f1041dccfa199e1d24a8bd171ffe9bb5c4b47169b6bc9a29a4f",
+  "goal2_artifact_count": 384,
+  "real_model_calls": 0,
+  "authorized_pushes": 3,
+  "package_image_releases": 0
+}

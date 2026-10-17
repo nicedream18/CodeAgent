@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-17T11:28:52.046624+00:00",
+  "run": {
+    "id": 39028453552,
+    "head_sha": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552",
+    "run_attempt": 1,
+    "created_at": "2026-10-17T11:22:33Z",
+    "updated_at": "2026-10-17T11:24:00Z"
+  },
+  "jobs": [
+    {
+      "id": 117383982844,
+      "name": "check",
+      "html_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/job/117383982844",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-17T11:22:35Z",
+      "completed_at": "2026-10-17T11:23:59Z",
+      "runner_name": "GitHub Actions 1000000043",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-17T11:22:36Z",
+          "completed_at": "2026-10-17T11:22:37Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-17T11:22:37Z",
+          "completed_at": "2026-10-17T11:22:38Z"
+        },
+        {
+          "name": "Run astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-17T11:22:38Z",
+          "completed_at": "2026-10-17T11:22:41Z"
+        },
+        {
+          "name": "Run uv run --no-project --python 3.13.9 python scripts/ci_report.py --job check --output \"${RUNNER_TEMP}/mokioclaw-ci/check\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-17T11:22:41Z",
+          "completed_at": "2026-10-17T11:23:56Z"
+        },
+        {
+          "name": "Check summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-17T11:23:56Z",
+          "completed_at": "2026-10-17T11:23:56Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-17T11:23:56Z",
+          "completed_at": "2026-10-17T11:23:57Z"
+        },
+        {
+          "name": "Post Run astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-17T11:23:57Z",
+          "completed_at": "2026-10-17T11:23:57Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-17T11:23:57Z",
+          "completed_at": "2026-10-17T11:23:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-17T11:23:57Z",
+          "completed_at": "2026-10-17T11:23:57Z"
+        }
+      ]
+    },
+    {
+      "id": 117383982888,
+      "name": "docker",
+      "html_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/job/117383982888",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-17T11:22:35Z",
+      "completed_at": "2026-10-17T11:23:52Z",
+      "runner_name": "GitHub Actions 1000000042",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-17T11:22:36Z",
+          "completed_at": "2026-10-17T11:22:38Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-17T11:22:38Z",
+          "completed_at": "2026-10-17T11:22:40Z"
+        },
+        {
+          "name": "Run astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-17T11:22:40Z",
+          "completed_at": "2026-10-17T11:22:42Z"
+        },
+        {
+          "name": "Run uv run --no-project --python 3.13.9 python scripts/ci_report.py --job docker --output \"${RUNNER_TEMP}/mokioclaw-ci/docker\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-17T11:22:42Z",
+          "completed_at": "2026-10-17T11:23:49Z"
+        },
+        {
+          "name": "Docker summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-17T11:23:49Z",
+          "completed_at": "2026-10-17T11:23:49Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-17T11:23:49Z",
+          "completed_at": "2026-10-17T11:23:50Z"
+        },
+        {
+          "name": "Post Run astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-17T11:23:50Z",
+          "completed_at": "2026-10-17T11:23:50Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-17T11:23:50Z",
+          "completed_at": "2026-10-17T11:23:50Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-17T11:23:50Z",
+          "completed_at": "2026-10-17T11:23:50Z"
+        }
+      ]
+    },
+    {
+      "id": 117383982972,
+      "name": "wheel",
+      "html_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/job/117383982972",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-17T11:22:35Z",
+      "completed_at": "2026-10-17T11:22:51Z",
+      "runner_name": "GitHub Actions 1000000044",
+      "runner_group_name": "GitHub Actions",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-17T11:22:35Z",
+          "completed_at": "2026-10-17T11:22:37Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-17T11:22:37Z",
+          "completed_at": "2026-10-17T11:22:38Z"
+        },
+        {
+          "name": "Run astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-17T11:22:38Z",
+          "completed_at": "2026-10-17T11:22:40Z"
+        },
+        {
+          "name": "Run uv run --no-project --python 3.13.9 python scripts/ci_report.py --job wheel --output \"${RUNNER_TEMP}/mokioclaw-ci/wheel\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-17T11:22:40Z",
+          "completed_at": "2026-10-17T11:22:47Z"
+        },
+        {
+          "name": "Wheel summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-17T11:22:47Z",
+          "completed_at": "2026-10-17T11:22:47Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-17T11:22:47Z",
+          "completed_at": "2026-10-17T11:22:48Z"
+        },
+        {
+          "name": "Post Run astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-17T11:22:48Z",
+          "completed_at": "2026-10-17T11:22:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-17T11:22:48Z",
+          "completed_at": "2026-10-17T11:22:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-17T11:22:49Z",
+          "completed_at": "2026-10-17T11:22:49Z"
+        }
+      ]
+    }
+  ],
+  "download_receipts": [
+    {
+      "job": "check",
+      "artifact_id": 12099242869,
+      "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12099242869",
+      "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12099242869/zip",
+      "archive_sha256": "517caf3ac00aaf90b6df006d5eefab593f7865203bf3c6a076cbcbfe9d8446e2",
+      "github_digest": "sha256:517caf3ac00aaf90b6df006d5eefab593f7865203bf3c6a076cbcbfe9d8446e2",
+      "github_digest_matches": true,
+      "bytes": 21812,
+      "created_at": "2026-10-17T11:23:57Z",
+      "expires_at": "2026-10-31T11:23:56Z",
+      "report": "check/report.json",
+      "report_sha256": "4201c60f2225c3fa35606eb45caef95d17efbbb1730ca315128d5a5bf225314e",
+      "log_truncated": false
+    },
+    {
+      "job": "wheel",
+      "artifact_id": 12099153250,
+      "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12099153250",
+      "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12099153250/zip",
+      "archive_sha256": "aa4a725b2d1c4b17a3ef68537d2f03ef13a05a651a7cdb981002842cd0167fb9",
+      "github_digest": "sha256:aa4a725b2d1c4b17a3ef68537d2f03ef13a05a651a7cdb981002842cd0167fb9",
+      "github_digest_matches": true,
+      "bytes": 48470,
+      "created_at": "2026-10-17T11:22:48Z",
+      "expires_at": "2026-10-31T11:22:48Z",
+      "report": "wheel/report.json",
+      "report_sha256": "6a8bfb38f52dedb9577bee87ae7723ce33d087e3a150046031047f345b211558",
+      "log_truncated": false
+    },
+    {
+      "job": "docker",
+      "artifact_id": 12098519630,
+      "download_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12098519630",
+      "archive_download_url": "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098519630/zip",
+      "archive_sha256": "9e09760f9ba244db6b7b0cff8218b82345d7c6ffc8b2fb04bb7ac3708ca3682e",
+      "github_digest": "sha256:9e09760f9ba244db6b7b0cff8218b82345d7c6ffc8b2fb04bb7ac3708ca3682e",
+      "github_digest_matches": true,
+      "bytes": 23344,
+      "created_at": "2026-10-17T11:23:50Z",
+      "expires_at": "2026-10-31T11:23:49Z",
+      "report": "docker/report.json",
+      "report_sha256": "48f3f3ba5344cef88a0c64a35ccc04f2ba0de595354326f749ce78ce10fe4fe3",
+      "log_truncated": false
+    }
+  ],
+  "reports_verified": true,
+  "all_artifact_digests_verified": true,
+  "source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
+  "python": "3.13.9 (main, Nov 19 2025, 22:47:49) [Clang 21.1.4 ]",
+  "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "check_pytest_counts": {
+    "passed": 455,
+    "failed": 0,
+    "skipped": 2,
+    "error": 0,
+    "xfailed": 0,
+    "xpassed": 0,
+    "deselected": 0
+  },
+  "docker_pytest_counts": {
+    "passed": 29,
+    "failed": 0,
+    "skipped": 0,
+    "error": 0,
+    "xfailed": 0,
+    "xpassed": 0,
+    "deselected": 0
+  },
+  "docker_build": {
+    "dockerfile_sha256": "93092eb3b532346b99f666bd4f068c9a10e29d31a1c881de6631cb7adcf7b79d",
+    "requirements_sha256": "3f01c889a22728e62b4d10e6f6316552b936a150104d398928da4905604d2b34",
+    "tag": "mokioclaw-ci:654713722583409e",
+    "published": false,
+    "image_id": "sha256:faf88f967f62577c0b69884bf246ca84c94e04c941771f5a373a39c1979630f7"
+  },
+  "docker_platform": "linux/x86_64",
+  "docker_cleanup": {
+    "removed": [],
+    "confirmed": true
+  },
+  "wheel": {
+    "file": "mokioclaw-0.2.0-py3-none-any.whl",
+    "sha256": "605001843b1c5e1ff3a105bf76abdbee5a17f43e1e19338d28522e1974f38359",
+    "bytes": 2183874,
+    "uploaded": false
+  },
+  "installed_probe": {
+    "ok": true,
+    "installed_from": "/tmp/mokio-ci-owm7euxn/venv/lib/python3.13/site-packages/mokioclaw/__init__.py",
+    "prefix": "/tmp/mokio-ci-owm7euxn/venv",
+    "python": "3.13.9 (main, Nov 19 2025, 22:47:49) [Clang 21.1.4 ]",
+    "site_packages_verified": true,
+    "network_disabled": true,
+    "sample_tokens": 8,
+    "static_assets_verified": true,
+    "credential_environment_empty": true
+  },
+  "linux_acceptance": "passed",
+  "earlier_failed_runs_preserved": [
+    39026034469,
+    39027177601
+  ],
+  "real_model_calls": 0,
+  "releases_published": 0
+}

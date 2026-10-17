@@ -29,4 +29,5 @@
 被测代码为 35162c0342f8600b3b7ce37d84ac55e5b0e3cee4，源码与检查输入摘要为
 e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54。
 macOS ARM64 全量 455/0/2、真实 Docker 29/0/0、干净 wheel 安装通过；Linux ARM64 禁网全量 455/0/2。
-后续归档只增加文档，不改变被测输入。新增提交尚未推送，不把远程已通过的 Docker/wheel 扩大解释为整个 Goal 3 完成。
+随后获准推送 748ca5d，[第三次远程运行](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552) 三作业均通过，普通检查 455/0/2、真实 Docker 29/0/0，wheel 安装通过；三份报告已下载并验证摘要。
+最终归档更新状态与顶层 README 文案；验收始终引用实际远程被测提交 748ca5d。

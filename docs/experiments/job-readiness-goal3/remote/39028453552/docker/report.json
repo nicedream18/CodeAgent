@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "job": "docker",
+  "status": "passed",
+  "metadata": {
+    "commit": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+    "source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
+    "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+    "python": "3.13.9 (main, Nov 19 2025, 22:47:49) [Clang 21.1.4 ]",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "recorded_at": "2026-10-17T11:22:43.879231+00:00",
+    "workflow": "Offline checks",
+    "job": "docker",
+    "run_id": "39028453552",
+    "run_attempt": "1",
+    "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552",
+    "dirty": false,
+    "real_model_calls": 0,
+    "log_limit_bytes": 1048576,
+    "total_report_limit_bytes": 16777216,
+    "uv": "uv 0.12.19 (x86_64-unknown-linux-gnu)"
+  },
+  "steps": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.008,
+      "output_bytes": 38,
+      "log_bytes": 38,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (x86_64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "frozen-install",
+      "command": [
+        "uv",
+        "sync",
+        "--frozen"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "frozen-install.log",
+      "timeout_seconds": 600,
+      "timed_out": false,
+      "seconds": 0.716,
+      "output_bytes": 2740,
+      "log_bytes": 2740,
+      "log_truncated": false,
+      "tail": "Using CPython 3.13.9 interpreter at: /home/runner/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/bin/python3.13\nCreating virtual environment at: .venv\n   Building mokioclaw @ file:///home/runner/work/CodeAgent/CodeAgent\nDownloading pillow (6.8MiB)\nDownloading tiktoken (1.1MiB)\nDownloading cryptography (4.5MiB)\nDownloading pydantic-core (2.0MiB)\nDownloading ruff (9.9MiB)\nDownloading mypy (14.7MiB)\nDownloading zstandard (5.3MiB)\nDownloading openai (1.2MiB)\nDownloading pygments (1.2MiB)\nDownloading ast-serialize (1.3MiB)\n Downloaded tiktoken\n Downloaded ast-serialize\n Downloaded pygments\n Downloaded pydantic-core\n Downloaded openai\n Downloaded cryptography\n Downloaded zstandard\n Downloaded pillow\n Downloaded ruff\n Downloaded mypy\n      Built mokioclaw @ file:///home/runner/work/CodeAgent/CodeAgent\nPrepared 86 packages in 627ms\nInstalled 86 packages in 52ms\n + annotated-doc==0.0.4\n + annotated-types==0.7.0\n + anyio==4.13.0\n + ast-serialize==0.13.0\n + attrs==26.1.0\n + certifi==2026.4.22\n + cffi==2.1.1\n + charset-normalizer==3.4.7\n + click==8.3.3\n + cryptography==50.0.2\n + distro==1.9.0\n + h11==0.16.0\n + httpcore==1.0.9\n + httpcore2==2.13.1\n + httpx==0.28.1\n + httpx2==2.13.1\n + idna==3.20\n + iniconfig==2.3.0\n + jiter==0.14.0\n + jsonpatch==1.33\n + jsonpointer==3.1.1\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + langchain==1.3.0\n + langchain-core==1.4.0\n + langchain-openai==1.2.1\n + langchain-protocol==0.0.15\n + langgraph==1.2.0\n + langgraph-checkpoint==4.1.0\n + langgraph-prebuilt==1.1.0\n + langgraph-sdk==0.3.14\n + langsmith==0.8.4\n + librt==0.16.0\n + linkify-it-py==2.1.0\n + markdown-it-py==4.2.0\n + mcp==2.3.0\n + mcp-types==2.3.0\n + mdit-py-plugins==0.6.1\n + mdurl==0.1.2\n + mokioclaw==0.2.0 (from file:///home/runner/work/CodeAgent/CodeAgent)\n + mypy==2.4.0\n + mypy-extensions==1.1.0\n + openai==2.36.0\n + opentelemetry-api==1.45.1\n + orjson==3.11.9\n + ormsgpack==1.12.2\n + packaging==26.2\n + pathspec==1.1.1\n + pillow==12.2.0\n + platformdirs==4.9.6\n + pluggy==1.6.0\n + pycparser==3.11\n + pydantic==2.13.4\n + pydantic-core==2.46.4\n + pygments==2.20.0\n + pyjwt==2.15.1\n + pytest==9.0.3\n + python-dotenv==1.2.2\n + python-multipart==0.0.32\n + pyyaml==6.0.3\n + referencing==0.37.0\n + regex==2026.5.9\n + requests==2.34.1\n + requests-toolbelt==1.0.0\n + rich==15.0.0\n + rpds-py==2026.9.1\n + ruff==0.17.0\n + shellingham==1.5.4\n + sniffio==1.3.1\n + sse-starlette==3.5.0\n + starlette==1.7.0\n + tavily-python==0.7.24\n + tenacity==9.1.4\n + textual==8.2.6\n + tiktoken==0.12.0\n + tqdm==4.67.3\n + truststore==0.10.5\n + typer==0.25.1\n + typing-extensions==4.15.0\n + typing-inspection==0.4.2\n + uc-micro-py==2.0.0\n + urllib3==2.7.0\n + uuid-utils==0.15.0\n + uvicorn==0.54.0\n + xxhash==3.7.0\n + zstandard==0.25.0\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "export-execution-lock",
+      "command": [
+        "uv",
+        "export",
+        "--frozen",
+        "--no-emit-project",
+        "--no-hashes",
+        "--output-file",
+        "/tmp/mokio-ci-asp1g4km/execution.txt"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "export-execution-lock.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 0.016,
+      "output_bytes": 5124,
+      "log_bytes": 5124,
+      "log_truncated": false,
+      "tail": "ripten'\n    # via httpx2\nhttpx==0.28.1\n    # via\n    #   langgraph-sdk\n    #   langsmith\n    #   openai\n    #   tavily-python\nhttpx2==2.13.1\n    # via mcp\nhttpx2-jsfetch==1.0 ; sys_platform == 'emscripten'\n    # via httpx2\nidna==3.20\n    # via\n    #   anyio\n    #   httpx\n    #   httpx2\n    #   requests\niniconfig==2.3.0\n    # via pytest\njiter==0.14.0\n    # via openai\njsonpatch==1.33\n    # via langchain-core\njsonpointer==3.1.1\n    # via jsonpatch\njsonschema==4.26.0\n    # via mcp\njsonschema-specifications==2025.9.1\n    # via jsonschema\nlangchain==1.3.0\n    # via mokioclaw\nlangchain-core==1.4.0\n    # via\n    #   langchain\n    #   langchain-openai\n    #   langgraph\n    #   langgraph-checkpoint\n    #   langgraph-prebuilt\nlangchain-openai==1.2.1\n    # via mokioclaw\nlangchain-protocol==0.0.15\n    # via langchain-core\nlanggraph==1.2.0\n    # via\n    #   langchain\n    #   mokioclaw\nlanggraph-checkpoint==4.1.0\n    # via\n    #   langgraph\n    #   langgraph-prebuilt\nlanggraph-prebuilt==1.1.0\n    # via langgraph\nlanggraph-sdk==0.3.14\n    # via langgraph\nlangsmith==0.8.4\n    # via langchain-core\nlibrt==0.16.0 ; platform_python_implementation != 'PyPy'\n    # via mypy\nlinkify-it-py==2.1.0\n    # via markdown-it-py\nmarkdown-it-py==4.2.0\n    # via\n    #   mdit-py-plugins\n    #   rich\n    #   textual\nmcp==2.3.0\n    # via mokioclaw\nmcp-types==2.3.0\n    # via mcp\nmdit-py-plugins==0.6.1\n    # via textual\nmdurl==0.1.2\n    # via markdown-it-py\nmypy==2.4.0\nmypy-extensions==1.1.0\n    # via mypy\nopenai==2.36.0\n    # via langchain-openai\nopentelemetry-api==1.45.1\n    # via mcp\norjson==3.11.9\n    # via\n    #   langgraph-sdk\n    #   langsmith\normsgpack==1.12.2\n    # via langgraph-checkpoint\npackaging==26.2\n    # via\n    #   langchain-core\n    #   langsmith\n    #   pytest\npathspec==1.1.1\n    # via\n    #   mokioclaw\n    #   mypy\npillow==12.2.0\n    # via mokioclaw\nplatformdirs==4.9.6\n    # via textual\npluggy==1.6.0\n    # via pytest\npycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'\n    # via cffi\npydantic==2.13.4\n    # via\n    #   langchain\n    #   langchain-core\n    #   langgraph\n    #   langsmith\n    #   mcp\n    #   mcp-types\n    #   openai\npydantic-core==2.46.4\n    # via pydantic\npygments==2.20.0\n    # via\n    #   pytest\n    #   rich\n    #   textual\npyjwt==2.15.1\n    # via mcp\npytest==9.0.3\npython-dotenv==1.2.2\n    # via mokioclaw\npython-multipart==0.0.32\n    # via mcp\npywin32==312 ; sys_platform == 'win32'\n    # via mcp\npyyaml==6.0.3\n    # via\n    #   langchain-core\n    #   mokioclaw\nreferencing==0.37.0\n    # via\n    #   jsonschema\n    #   jsonschema-specifications\nregex==2026.5.9\n    # via tiktoken\nrequests==2.34.1\n    # via\n    #   langsmith\n    #   requests-toolbelt\n    #   tavily-python\n    #   tiktoken\nrequests-toolbelt==1.0.0\n    # via langsmith\nrich==15.0.0\n    # via\n    #   textual\n    #   typer\nrpds-py==2026.9.1\n    # via\n    #   jsonschema\n    #   referencing\nruff==0.17.0\nshellingham==1.5.4\n    # via typer\nsniffio==1.3.1\n    # via openai\nsse-starlette==3.5.0\n    # via mcp\nstarlette==1.7.0\n    # via\n    #   mcp\n    #   sse-starlette\ntavily-python==0.7.24\n    # via mokioclaw\ntenacity==9.1.4\n    # via langchain-core\ntextual==8.2.6\n    # via mokioclaw\ntiktoken==0.12.0\n    # via\n    #   langchain-openai\n    #   mokioclaw\n    #   tavily-python\ntqdm==4.67.3\n    # via openai\ntruststore==0.10.5 ; sys_platform != 'emscripten'\n    # via\n    #   httpcore2\n    #   httpx2\ntyper==0.25.1\n    # via mokioclaw\ntyping-extensions==4.15.0\n    # via\n    #   langchain-core\n    #   langchain-protocol\n    #   mcp\n    #   mcp-types\n    #   mypy\n    #   openai\n    #   opentelemetry-api\n    #   pydantic\n    #   pydantic-core\n    #   textual\n    #   typing-inspection\ntyping-inspection==0.4.2\n    # via\n    #   mcp\n    #   pydantic\nuc-micro-py==2.0.0\n    # via linkify-it-py\nurllib3==2.7.0\n    # via requests\nuuid-utils==0.15.0\n    # via\n    #   langchain-core\n    #   langsmith\nuvicorn==0.54.0 ; sys_platform != 'emscripten'\n    # via mcp\nxxhash==3.7.0\n    # via\n    #   langgraph\n    #   langsmith\nzstandard==0.25.0\n    # via langsmith\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "engine",
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ServerVersion}} {{.OSType}}/{{.Architecture}}"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "engine.log",
+      "timeout_seconds": 30,
+      "timed_out": false,
+      "seconds": 0.415,
+      "output_bytes": 20,
+      "log_bytes": 20,
+      "log_truncated": false,
+      "tail": "28.0.4 linux/x86_64\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "build-execution-image",
+      "command": [
+        "docker",
+        "build",
+        "--iidfile",
+        "/tmp/mokio-ci-asp1g4km/image-id",
+        "-t",
+        "mokioclaw-ci:654713722583409e",
+        "docker/execution"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "build-execution-image.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 28.983,
+      "output_bytes": 46305,
+      "log_bytes": 46305,
+      "log_truncated": false,
+      "tail": "1.7.0-py3-none-any.whl (78 kB)\n#9 5.678 Downloading tavily_python-0.7.24-py3-none-any.whl (20 kB)\n#9 5.681 Downloading textual-8.2.6-py3-none-any.whl (729 kB)\n#9 5.685    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 729.9/729.9 kB 745.2 MB/s  0:00:00\n#9 5.688 Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)\n#9 5.691 Downloading truststore-0.10.5-py3-none-any.whl (19 kB)\n#9 5.694 Downloading typer-0.25.1-py3-none-any.whl (58 kB)\n#9 5.697 Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)\n#9 5.699 Downloading uc_micro_py-2.0.0-py3-none-any.whl (6.4 kB)\n#9 5.702 Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)\n#9 5.705 Downloading xxhash-3.7.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (193 kB)\n#9 5.708 Downloading zstandard-0.25.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.5 MB)\n#9 5.719    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 595.5 MB/s  0:00:00\n#9 6.146 Installing collected packages: zstandard, xxhash, uuid-utils, urllib3, uc-micro-py, typing-extensions, truststore, tqdm, tenacity, sniffio, shellingham, ruff, rpds-py, regex, pyyaml, python-multipart, python-dotenv, pyjwt, pygments, pycparser, pluggy, platformdirs, pillow, pathspec, packaging, ormsgpack, orjson, mypy-extensions, mdurl, librt, jsonpointer, jiter, iniconfig, idna, h11, distro, click, charset-normalizer, certifi, attrs, ast-serialize, annotated-types, annotated-doc, uvicorn, typing-inspection, requests, referencing, pytest, pydantic-core, opentelemetry-api, mypy, markdown-it-py, linkify-it-py, langchain-protocol, jsonpatch, httpcore2, httpcore, cffi, anyio, tiktoken, starlette, rich, requests-toolbelt, pydantic, mdit-py-plugins, jsonschema-specifications, httpx2, httpx, cryptography, typer, textual, tavily-python, sse-starlette, openai, mcp-types, langsmith, langgraph-sdk, jsonschema, mcp, langchain-core, langgraph-checkpoint, langchain-openai, langgraph-prebuilt, langgraph, langchain\n#9 13.73 \n#9 13.74 Successfully installed annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 ast-serialize-0.13.0 attrs-26.1.0 certifi-2026.4.22 cffi-2.1.1 charset-normalizer-3.4.7 click-8.3.3 cryptography-50.0.2 distro-1.9.0 h11-0.16.0 httpcore-1.0.9 httpcore2-2.13.1 httpx-0.28.1 httpx2-2.13.1 idna-3.20 iniconfig-2.3.0 jiter-0.14.0 jsonpatch-1.33 jsonpointer-3.1.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 langchain-1.3.0 langchain-core-1.4.0 langchain-openai-1.2.1 langchain-protocol-0.0.15 langgraph-1.2.0 langgraph-checkpoint-4.1.0 langgraph-prebuilt-1.1.0 langgraph-sdk-0.3.14 langsmith-0.8.4 librt-0.16.0 linkify-it-py-2.1.0 markdown-it-py-4.2.0 mcp-2.3.0 mcp-types-2.3.0 mdit-py-plugins-0.6.1 mdurl-0.1.2 mypy-2.4.0 mypy-extensions-1.1.0 openai-2.36.0 opentelemetry-api-1.45.1 orjson-3.11.9 ormsgpack-1.12.2 packaging-26.2 pathspec-1.1.1 pillow-12.2.0 platformdirs-4.9.6 pluggy-1.6.0 pycparser-3.11 pydantic-2.13.4 pydantic-core-2.46.4 pygments-2.20.0 pyjwt-2.15.1 pytest-9.0.3 python-dotenv-1.2.2 python-multipart-0.0.32 pyyaml-6.0.3 referencing-0.37.0 regex-2026.5.9 requests-2.34.1 requests-toolbelt-1.0.0 rich-15.0.0 rpds-py-2026.9.1 ruff-0.17.0 shellingham-1.5.4 sniffio-1.3.1 sse-starlette-3.5.0 starlette-1.7.0 tavily-python-0.7.24 tenacity-9.1.4 textual-8.2.6 tiktoken-0.12.0 tqdm-4.67.3 truststore-0.10.5 typer-0.25.1 typing-extensions-4.15.0 typing-inspection-0.4.2 uc-micro-py-2.0.0 urllib3-2.7.0 uuid-utils-0.15.0 uvicorn-0.54.0 xxhash-3.7.0 zstandard-0.25.0\n#9 13.74 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.\n#9 DONE 15.7s\n\n#10 exporting to image\n#10 exporting layers\n#10 exporting layers 1.7s done\n#10 writing image sha256:faf88f967f62577c0b69884bf246ca84c94e04c941771f5a373a39c1979630f7 done\n#10 naming to docker.io/library/mokioclaw-ci:654713722583409e done\n#10 DONE 1.7s\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "real-docker-tests",
+      "command": [
+        "make",
+        "check-docker"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "real-docker-tests.log",
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "seconds": 35.095,
+      "output_bytes": 4348,
+      "log_bytes": 4348,
+      "log_truncated": false,
+      "tail": "  \"command\": {\n    \"command\": [\n      \"/home/runner/work/CodeAgent/CodeAgent/.venv/bin/python\",\n      \"-m\",\n      \"pytest\",\n      \"-q\",\n      \"tests/test_execution_backend.py\",\n      \"tests/test_internship_eval.py\"\n    ],\n    \"status\": \"passed\",\n    \"exit_code\": 0,\n    \"log\": \"pytest.log\",\n    \"timeout_seconds\": 120,\n    \"timed_out\": false,\n    \"seconds\": 34.844,\n    \"output_bytes\": 100,\n    \"log_bytes\": 100,\n    \"log_truncated\": false,\n    \"tail\": \".............................                                            [100%]\\n29 passed in 32.29s\\n\",\n    \"output_complete\": true,\n    \"output_errors\": []\n  },\n  \"pytest\": {\n    \"schema_version\": 1,\n    \"session_token\": \"c150515c728540139993e961062d6cfc\",\n    \"exit_code\": 0,\n    \"collected\": 29,\n    \"counts\": {\n      \"passed\": 29,\n      \"failed\": 0,\n      \"skipped\": 0,\n      \"error\": 0,\n      \"xfailed\": 0,\n      \"xpassed\": 0,\n      \"deselected\": 0\n    },\n    \"passed_nodeids\": [\n      \"tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[0]\",\n      \"tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[1]\",\n      \"tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[4]\",\n      \"tests/test_execution_backend.py::test_local_timeout_kills_descendants_and_output_is_bounded\",\n      \"tests/test_execution_backend.py::test_backend_rules_keep_legacy_local_and_separate_images\",\n      \"tests/test_execution_backend.py::test_docker_unavailable_never_falls_back\",\n      \"tests/test_execution_backend.py::test_docker_background_is_rejected_before_launch\",\n      \"tests/test_execution_backend.py::test_real_docker_isolation_timeout_and_paths\",\n      \"tests/test_execution_backend.py::test_missing_image_is_controlled\",\n      \"tests/test_execution_backend.py::test_runtime_explicit_backend_and_config_precedence\",\n      \"tests/test_execution_backend.py::test_once_approval_is_invalid_after_backend_change\",\n      \"tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[light]\",\n      \"tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[strict]\",\n      \"tests/test_internship_eval.py::test_schedule_has_exactly_56_unique_predeclared_trials\",\n      \"tests/test_internship_eval.py::test_eval_cli_offline_is_separate_from_real_statistics\",\n      \"tests/test_internship_eval.py::test_request_and_tool_limits_stop_before_another_operation\",\n      \"tests/test_internship_eval.py::test_empty_or_forged_test_report_cannot_claim_solved\",\n      \"tests/test_internship_eval.py::test_baseline_uses_real_shared_loop_without_router_or_verifier\",\n      \"tests/test_internship_eval.py::test_real_grader_rejects_noop_test_edits_and_fake_success\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[baseline]\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[full]\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[light]\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[auto]\",\n      \"tests/test_internship_eval.py::test_evaluation_provider_failure_is_controlled_and_does_not_leak_key\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[baseline]\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[full]\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[light]\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[auto]\",\n      \"tests/test_internship_eval.py::test_explicit_subagent_model_override_restores_parent_on_failure\"\n    ],\n    \"nodeids_truncated\": false,\n    \"seconds\": 32.314\n  },\n  \"owner\": \"ci-9aa5108ddde34290bdc028d4c71458d0\",\n  \"cleanup\": {\n    \"removed\": [],\n    \"confirmed\": true\n  }\n}\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "planned_steps": [
+    "uv-version",
+    "frozen-install",
+    "export-execution-lock",
+    "engine",
+    "build-execution-image",
+    "real-docker-tests"
+  ],
+  "checks": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.008,
+      "output_bytes": 38,
+      "log_bytes": 38,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (x86_64-unknown-linux-gnu)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "frozen-install",
+      "command": [
+        "uv",
+        "sync",
+        "--frozen"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "frozen-install.log",
+      "timeout_seconds": 600,
+      "timed_out": false,
+      "seconds": 0.716,
+      "output_bytes": 2740,
+      "log_bytes": 2740,
+      "log_truncated": false,
+      "tail": "Using CPython 3.13.9 interpreter at: /home/runner/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/bin/python3.13\nCreating virtual environment at: .venv\n   Building mokioclaw @ file:///home/runner/work/CodeAgent/CodeAgent\nDownloading pillow (6.8MiB)\nDownloading tiktoken (1.1MiB)\nDownloading cryptography (4.5MiB)\nDownloading pydantic-core (2.0MiB)\nDownloading ruff (9.9MiB)\nDownloading mypy (14.7MiB)\nDownloading zstandard (5.3MiB)\nDownloading openai (1.2MiB)\nDownloading pygments (1.2MiB)\nDownloading ast-serialize (1.3MiB)\n Downloaded tiktoken\n Downloaded ast-serialize\n Downloaded pygments\n Downloaded pydantic-core\n Downloaded openai\n Downloaded cryptography\n Downloaded zstandard\n Downloaded pillow\n Downloaded ruff\n Downloaded mypy\n      Built mokioclaw @ file:///home/runner/work/CodeAgent/CodeAgent\nPrepared 86 packages in 627ms\nInstalled 86 packages in 52ms\n + annotated-doc==0.0.4\n + annotated-types==0.7.0\n + anyio==4.13.0\n + ast-serialize==0.13.0\n + attrs==26.1.0\n + certifi==2026.4.22\n + cffi==2.1.1\n + charset-normalizer==3.4.7\n + click==8.3.3\n + cryptography==50.0.2\n + distro==1.9.0\n + h11==0.16.0\n + httpcore==1.0.9\n + httpcore2==2.13.1\n + httpx==0.28.1\n + httpx2==2.13.1\n + idna==3.20\n + iniconfig==2.3.0\n + jiter==0.14.0\n + jsonpatch==1.33\n + jsonpointer==3.1.1\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + langchain==1.3.0\n + langchain-core==1.4.0\n + langchain-openai==1.2.1\n + langchain-protocol==0.0.15\n + langgraph==1.2.0\n + langgraph-checkpoint==4.1.0\n + langgraph-prebuilt==1.1.0\n + langgraph-sdk==0.3.14\n + langsmith==0.8.4\n + librt==0.16.0\n + linkify-it-py==2.1.0\n + markdown-it-py==4.2.0\n + mcp==2.3.0\n + mcp-types==2.3.0\n + mdit-py-plugins==0.6.1\n + mdurl==0.1.2\n + mokioclaw==0.2.0 (from file:///home/runner/work/CodeAgent/CodeAgent)\n + mypy==2.4.0\n + mypy-extensions==1.1.0\n + openai==2.36.0\n + opentelemetry-api==1.45.1\n + orjson==3.11.9\n + ormsgpack==1.12.2\n + packaging==26.2\n + pathspec==1.1.1\n + pillow==12.2.0\n + platformdirs==4.9.6\n + pluggy==1.6.0\n + pycparser==3.11\n + pydantic==2.13.4\n + pydantic-core==2.46.4\n + pygments==2.20.0\n + pyjwt==2.15.1\n + pytest==9.0.3\n + python-dotenv==1.2.2\n + python-multipart==0.0.32\n + pyyaml==6.0.3\n + referencing==0.37.0\n + regex==2026.5.9\n + requests==2.34.1\n + requests-toolbelt==1.0.0\n + rich==15.0.0\n + rpds-py==2026.9.1\n + ruff==0.17.0\n + shellingham==1.5.4\n + sniffio==1.3.1\n + sse-starlette==3.5.0\n + starlette==1.7.0\n + tavily-python==0.7.24\n + tenacity==9.1.4\n + textual==8.2.6\n + tiktoken==0.12.0\n + tqdm==4.67.3\n + truststore==0.10.5\n + typer==0.25.1\n + typing-extensions==4.15.0\n + typing-inspection==0.4.2\n + uc-micro-py==2.0.0\n + urllib3==2.7.0\n + uuid-utils==0.15.0\n + uvicorn==0.54.0\n + xxhash==3.7.0\n + zstandard==0.25.0\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "export-execution-lock",
+      "command": [
+        "uv",
+        "export",
+        "--frozen",
+        "--no-emit-project",
+        "--no-hashes",
+        "--output-file",
+        "/tmp/mokio-ci-asp1g4km/execution.txt"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "export-execution-lock.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 0.016,
+      "output_bytes": 5124,
+      "log_bytes": 5124,
+      "log_truncated": false,
+      "tail": "ripten'\n    # via httpx2\nhttpx==0.28.1\n    # via\n    #   langgraph-sdk\n    #   langsmith\n    #   openai\n    #   tavily-python\nhttpx2==2.13.1\n    # via mcp\nhttpx2-jsfetch==1.0 ; sys_platform == 'emscripten'\n    # via httpx2\nidna==3.20\n    # via\n    #   anyio\n    #   httpx\n    #   httpx2\n    #   requests\niniconfig==2.3.0\n    # via pytest\njiter==0.14.0\n    # via openai\njsonpatch==1.33\n    # via langchain-core\njsonpointer==3.1.1\n    # via jsonpatch\njsonschema==4.26.0\n    # via mcp\njsonschema-specifications==2025.9.1\n    # via jsonschema\nlangchain==1.3.0\n    # via mokioclaw\nlangchain-core==1.4.0\n    # via\n    #   langchain\n    #   langchain-openai\n    #   langgraph\n    #   langgraph-checkpoint\n    #   langgraph-prebuilt\nlangchain-openai==1.2.1\n    # via mokioclaw\nlangchain-protocol==0.0.15\n    # via langchain-core\nlanggraph==1.2.0\n    # via\n    #   langchain\n    #   mokioclaw\nlanggraph-checkpoint==4.1.0\n    # via\n    #   langgraph\n    #   langgraph-prebuilt\nlanggraph-prebuilt==1.1.0\n    # via langgraph\nlanggraph-sdk==0.3.14\n    # via langgraph\nlangsmith==0.8.4\n    # via langchain-core\nlibrt==0.16.0 ; platform_python_implementation != 'PyPy'\n    # via mypy\nlinkify-it-py==2.1.0\n    # via markdown-it-py\nmarkdown-it-py==4.2.0\n    # via\n    #   mdit-py-plugins\n    #   rich\n    #   textual\nmcp==2.3.0\n    # via mokioclaw\nmcp-types==2.3.0\n    # via mcp\nmdit-py-plugins==0.6.1\n    # via textual\nmdurl==0.1.2\n    # via markdown-it-py\nmypy==2.4.0\nmypy-extensions==1.1.0\n    # via mypy\nopenai==2.36.0\n    # via langchain-openai\nopentelemetry-api==1.45.1\n    # via mcp\norjson==3.11.9\n    # via\n    #   langgraph-sdk\n    #   langsmith\normsgpack==1.12.2\n    # via langgraph-checkpoint\npackaging==26.2\n    # via\n    #   langchain-core\n    #   langsmith\n    #   pytest\npathspec==1.1.1\n    # via\n    #   mokioclaw\n    #   mypy\npillow==12.2.0\n    # via mokioclaw\nplatformdirs==4.9.6\n    # via textual\npluggy==1.6.0\n    # via pytest\npycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'\n    # via cffi\npydantic==2.13.4\n    # via\n    #   langchain\n    #   langchain-core\n    #   langgraph\n    #   langsmith\n    #   mcp\n    #   mcp-types\n    #   openai\npydantic-core==2.46.4\n    # via pydantic\npygments==2.20.0\n    # via\n    #   pytest\n    #   rich\n    #   textual\npyjwt==2.15.1\n    # via mcp\npytest==9.0.3\npython-dotenv==1.2.2\n    # via mokioclaw\npython-multipart==0.0.32\n    # via mcp\npywin32==312 ; sys_platform == 'win32'\n    # via mcp\npyyaml==6.0.3\n    # via\n    #   langchain-core\n    #   mokioclaw\nreferencing==0.37.0\n    # via\n    #   jsonschema\n    #   jsonschema-specifications\nregex==2026.5.9\n    # via tiktoken\nrequests==2.34.1\n    # via\n    #   langsmith\n    #   requests-toolbelt\n    #   tavily-python\n    #   tiktoken\nrequests-toolbelt==1.0.0\n    # via langsmith\nrich==15.0.0\n    # via\n    #   textual\n    #   typer\nrpds-py==2026.9.1\n    # via\n    #   jsonschema\n    #   referencing\nruff==0.17.0\nshellingham==1.5.4\n    # via typer\nsniffio==1.3.1\n    # via openai\nsse-starlette==3.5.0\n    # via mcp\nstarlette==1.7.0\n    # via\n    #   mcp\n    #   sse-starlette\ntavily-python==0.7.24\n    # via mokioclaw\ntenacity==9.1.4\n    # via langchain-core\ntextual==8.2.6\n    # via mokioclaw\ntiktoken==0.12.0\n    # via\n    #   langchain-openai\n    #   mokioclaw\n    #   tavily-python\ntqdm==4.67.3\n    # via openai\ntruststore==0.10.5 ; sys_platform != 'emscripten'\n    # via\n    #   httpcore2\n    #   httpx2\ntyper==0.25.1\n    # via mokioclaw\ntyping-extensions==4.15.0\n    # via\n    #   langchain-core\n    #   langchain-protocol\n    #   mcp\n    #   mcp-types\n    #   mypy\n    #   openai\n    #   opentelemetry-api\n    #   pydantic\n    #   pydantic-core\n    #   textual\n    #   typing-inspection\ntyping-inspection==0.4.2\n    # via\n    #   mcp\n    #   pydantic\nuc-micro-py==2.0.0\n    # via linkify-it-py\nurllib3==2.7.0\n    # via requests\nuuid-utils==0.15.0\n    # via\n    #   langchain-core\n    #   langsmith\nuvicorn==0.54.0 ; sys_platform != 'emscripten'\n    # via mcp\nxxhash==3.7.0\n    # via\n    #   langgraph\n    #   langsmith\nzstandard==0.25.0\n    # via langsmith\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "engine",
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ServerVersion}} {{.OSType}}/{{.Architecture}}"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "engine.log",
+      "timeout_seconds": 30,
+      "timed_out": false,
+      "seconds": 0.415,
+      "output_bytes": 20,
+      "log_bytes": 20,
+      "log_truncated": false,
+      "tail": "28.0.4 linux/x86_64\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "build-execution-image",
+      "command": [
+        "docker",
+        "build",
+        "--iidfile",
+        "/tmp/mokio-ci-asp1g4km/image-id",
+        "-t",
+        "mokioclaw-ci:654713722583409e",
+        "docker/execution"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "build-execution-image.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 28.983,
+      "output_bytes": 46305,
+      "log_bytes": 46305,
+      "log_truncated": false,
+      "tail": "1.7.0-py3-none-any.whl (78 kB)\n#9 5.678 Downloading tavily_python-0.7.24-py3-none-any.whl (20 kB)\n#9 5.681 Downloading textual-8.2.6-py3-none-any.whl (729 kB)\n#9 5.685    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 729.9/729.9 kB 745.2 MB/s  0:00:00\n#9 5.688 Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)\n#9 5.691 Downloading truststore-0.10.5-py3-none-any.whl (19 kB)\n#9 5.694 Downloading typer-0.25.1-py3-none-any.whl (58 kB)\n#9 5.697 Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)\n#9 5.699 Downloading uc_micro_py-2.0.0-py3-none-any.whl (6.4 kB)\n#9 5.702 Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)\n#9 5.705 Downloading xxhash-3.7.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (193 kB)\n#9 5.708 Downloading zstandard-0.25.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.5 MB)\n#9 5.719    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 595.5 MB/s  0:00:00\n#9 6.146 Installing collected packages: zstandard, xxhash, uuid-utils, urllib3, uc-micro-py, typing-extensions, truststore, tqdm, tenacity, sniffio, shellingham, ruff, rpds-py, regex, pyyaml, python-multipart, python-dotenv, pyjwt, pygments, pycparser, pluggy, platformdirs, pillow, pathspec, packaging, ormsgpack, orjson, mypy-extensions, mdurl, librt, jsonpointer, jiter, iniconfig, idna, h11, distro, click, charset-normalizer, certifi, attrs, ast-serialize, annotated-types, annotated-doc, uvicorn, typing-inspection, requests, referencing, pytest, pydantic-core, opentelemetry-api, mypy, markdown-it-py, linkify-it-py, langchain-protocol, jsonpatch, httpcore2, httpcore, cffi, anyio, tiktoken, starlette, rich, requests-toolbelt, pydantic, mdit-py-plugins, jsonschema-specifications, httpx2, httpx, cryptography, typer, textual, tavily-python, sse-starlette, openai, mcp-types, langsmith, langgraph-sdk, jsonschema, mcp, langchain-core, langgraph-checkpoint, langchain-openai, langgraph-prebuilt, langgraph, langchain\n#9 13.73 \n#9 13.74 Successfully installed annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 ast-serialize-0.13.0 attrs-26.1.0 certifi-2026.4.22 cffi-2.1.1 charset-normalizer-3.4.7 click-8.3.3 cryptography-50.0.2 distro-1.9.0 h11-0.16.0 httpcore-1.0.9 httpcore2-2.13.1 httpx-0.28.1 httpx2-2.13.1 idna-3.20 iniconfig-2.3.0 jiter-0.14.0 jsonpatch-1.33 jsonpointer-3.1.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 langchain-1.3.0 langchain-core-1.4.0 langchain-openai-1.2.1 langchain-protocol-0.0.15 langgraph-1.2.0 langgraph-checkpoint-4.1.0 langgraph-prebuilt-1.1.0 langgraph-sdk-0.3.14 langsmith-0.8.4 librt-0.16.0 linkify-it-py-2.1.0 markdown-it-py-4.2.0 mcp-2.3.0 mcp-types-2.3.0 mdit-py-plugins-0.6.1 mdurl-0.1.2 mypy-2.4.0 mypy-extensions-1.1.0 openai-2.36.0 opentelemetry-api-1.45.1 orjson-3.11.9 ormsgpack-1.12.2 packaging-26.2 pathspec-1.1.1 pillow-12.2.0 platformdirs-4.9.6 pluggy-1.6.0 pycparser-3.11 pydantic-2.13.4 pydantic-core-2.46.4 pygments-2.20.0 pyjwt-2.15.1 pytest-9.0.3 python-dotenv-1.2.2 python-multipart-0.0.32 pyyaml-6.0.3 referencing-0.37.0 regex-2026.5.9 requests-2.34.1 requests-toolbelt-1.0.0 rich-15.0.0 rpds-py-2026.9.1 ruff-0.17.0 shellingham-1.5.4 sniffio-1.3.1 sse-starlette-3.5.0 starlette-1.7.0 tavily-python-0.7.24 tenacity-9.1.4 textual-8.2.6 tiktoken-0.12.0 tqdm-4.67.3 truststore-0.10.5 typer-0.25.1 typing-extensions-4.15.0 typing-inspection-0.4.2 uc-micro-py-2.0.0 urllib3-2.7.0 uuid-utils-0.15.0 uvicorn-0.54.0 xxhash-3.7.0 zstandard-0.25.0\n#9 13.74 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.\n#9 DONE 15.7s\n\n#10 exporting to image\n#10 exporting layers\n#10 exporting layers 1.7s done\n#10 writing image sha256:faf88f967f62577c0b69884bf246ca84c94e04c941771f5a373a39c1979630f7 done\n#10 naming to docker.io/library/mokioclaw-ci:654713722583409e done\n#10 DONE 1.7s\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "real-docker-tests",
+      "command": [
+        "make",
+        "check-docker"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "real-docker-tests.log",
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "seconds": 35.095,
+      "output_bytes": 4348,
+      "log_bytes": 4348,
+      "log_truncated": false,
+      "tail": "  \"command\": {\n    \"command\": [\n      \"/home/runner/work/CodeAgent/CodeAgent/.venv/bin/python\",\n      \"-m\",\n      \"pytest\",\n      \"-q\",\n      \"tests/test_execution_backend.py\",\n      \"tests/test_internship_eval.py\"\n    ],\n    \"status\": \"passed\",\n    \"exit_code\": 0,\n    \"log\": \"pytest.log\",\n    \"timeout_seconds\": 120,\n    \"timed_out\": false,\n    \"seconds\": 34.844,\n    \"output_bytes\": 100,\n    \"log_bytes\": 100,\n    \"log_truncated\": false,\n    \"tail\": \".............................                                            [100%]\\n29 passed in 32.29s\\n\",\n    \"output_complete\": true,\n    \"output_errors\": []\n  },\n  \"pytest\": {\n    \"schema_version\": 1,\n    \"session_token\": \"c150515c728540139993e961062d6cfc\",\n    \"exit_code\": 0,\n    \"collected\": 29,\n    \"counts\": {\n      \"passed\": 29,\n      \"failed\": 0,\n      \"skipped\": 0,\n      \"error\": 0,\n      \"xfailed\": 0,\n      \"xpassed\": 0,\n      \"deselected\": 0\n    },\n    \"passed_nodeids\": [\n      \"tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[0]\",\n      \"tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[1]\",\n      \"tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[4]\",\n      \"tests/test_execution_backend.py::test_local_timeout_kills_descendants_and_output_is_bounded\",\n      \"tests/test_execution_backend.py::test_backend_rules_keep_legacy_local_and_separate_images\",\n      \"tests/test_execution_backend.py::test_docker_unavailable_never_falls_back\",\n      \"tests/test_execution_backend.py::test_docker_background_is_rejected_before_launch\",\n      \"tests/test_execution_backend.py::test_real_docker_isolation_timeout_and_paths\",\n      \"tests/test_execution_backend.py::test_missing_image_is_controlled\",\n      \"tests/test_execution_backend.py::test_runtime_explicit_backend_and_config_precedence\",\n      \"tests/test_execution_backend.py::test_once_approval_is_invalid_after_backend_change\",\n      \"tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[light]\",\n      \"tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[strict]\",\n      \"tests/test_internship_eval.py::test_schedule_has_exactly_56_unique_predeclared_trials\",\n      \"tests/test_internship_eval.py::test_eval_cli_offline_is_separate_from_real_statistics\",\n      \"tests/test_internship_eval.py::test_request_and_tool_limits_stop_before_another_operation\",\n      \"tests/test_internship_eval.py::test_empty_or_forged_test_report_cannot_claim_solved\",\n      \"tests/test_internship_eval.py::test_baseline_uses_real_shared_loop_without_router_or_verifier\",\n      \"tests/test_internship_eval.py::test_real_grader_rejects_noop_test_edits_and_fake_success\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[baseline]\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[full]\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[light]\",\n      \"tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[auto]\",\n      \"tests/test_internship_eval.py::test_evaluation_provider_failure_is_controlled_and_does_not_leak_key\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[baseline]\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[full]\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[light]\",\n      \"tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[auto]\",\n      \"tests/test_internship_eval.py::test_explicit_subagent_model_override_restores_parent_on_failure\"\n    ],\n    \"nodeids_truncated\": false,\n    \"seconds\": 32.314\n  },\n  \"owner\": \"ci-9aa5108ddde34290bdc028d4c71458d0\",\n  \"cleanup\": {\n    \"removed\": [],\n    \"confirmed\": true\n  }\n}\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "docker_build": {
+    "dockerfile_sha256": "93092eb3b532346b99f666bd4f068c9a10e29d31a1c881de6631cb7adcf7b79d",
+    "requirements_sha256": "3f01c889a22728e62b4d10e6f6316552b936a150104d398928da4905604d2b34",
+    "tag": "mokioclaw-ci:654713722583409e",
+    "published": false,
+    "image_id": "sha256:faf88f967f62577c0b69884bf246ca84c94e04c941771f5a373a39c1979630f7"
+  },
+  "docker": {
+    "ok": true,
+    "backend": "docker",
+    "image_digest": "sha256:faf88f967f62577c0b69884bf246ca84c94e04c941771f5a373a39c1979630f7",
+    "platform": "linux/x86_64",
+    "checked_at": "2026-10-17T11:23:14.307486+00:00",
+    "command": {
+      "command": [
+        "/home/runner/work/CodeAgent/CodeAgent/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_execution_backend.py",
+        "tests/test_internship_eval.py"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "pytest.log",
+      "timeout_seconds": 120,
+      "timed_out": false,
+      "seconds": 34.844,
+      "output_bytes": 100,
+      "log_bytes": 100,
+      "log_truncated": false,
+      "tail": ".............................                                            [100%]\n29 passed in 32.29s\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    "pytest": {
+      "schema_version": 1,
+      "session_token": "c150515c728540139993e961062d6cfc",
+      "exit_code": 0,
+      "collected": 29,
+      "counts": {
+        "passed": 29,
+        "failed": 0,
+        "skipped": 0,
+        "error": 0,
+        "xfailed": 0,
+        "xpassed": 0,
+        "deselected": 0
+      },
+      "passed_nodeids": [
+        "tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[0]",
+        "tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[1]",
+        "tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[4]",
+        "tests/test_execution_backend.py::test_local_timeout_kills_descendants_and_output_is_bounded",
+        "tests/test_execution_backend.py::test_backend_rules_keep_legacy_local_and_separate_images",
+        "tests/test_execution_backend.py::test_docker_unavailable_never_falls_back",
+        "tests/test_execution_backend.py::test_docker_background_is_rejected_before_launch",
+        "tests/test_execution_backend.py::test_real_docker_isolation_timeout_and_paths",
+        "tests/test_execution_backend.py::test_missing_image_is_controlled",
+        "tests/test_execution_backend.py::test_runtime_explicit_backend_and_config_precedence",
+        "tests/test_execution_backend.py::test_once_approval_is_invalid_after_backend_change",
+        "tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[light]",
+        "tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[strict]",
+        "tests/test_internship_eval.py::test_schedule_has_exactly_56_unique_predeclared_trials",
+        "tests/test_internship_eval.py::test_eval_cli_offline_is_separate_from_real_statistics",
+        "tests/test_internship_eval.py::test_request_and_tool_limits_stop_before_another_operation",
+        "tests/test_internship_eval.py::test_empty_or_forged_test_report_cannot_claim_solved",
+        "tests/test_internship_eval.py::test_baseline_uses_real_shared_loop_without_router_or_verifier",
+        "tests/test_internship_eval.py::test_real_grader_rejects_noop_test_edits_and_fake_success",
+        "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[baseline]",
+        "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[full]",
+        "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[light]",
+        "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[auto]",
+        "tests/test_internship_eval.py::test_evaluation_provider_failure_is_controlled_and_does_not_leak_key",
+        "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[baseline]",
+        "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[full]",
+        "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[light]",
+        "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[auto]",
+        "tests/test_internship_eval.py::test_explicit_subagent_model_override_restores_parent_on_failure"
+      ],
+      "nodeids_truncated": false,
+      "seconds": 32.314
+    },
+    "owner": "ci-9aa5108ddde34290bdc028d4c71458d0",
+    "cleanup": {
+      "removed": [],
+      "confirmed": true
+    }
+  }
+}

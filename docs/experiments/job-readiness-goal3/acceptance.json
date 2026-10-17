@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-17T11:19:59.983048+00:00",
+  "recorded_at": "2026-10-17T11:28:52.047496+00:00",
   "goal": "Goal 3",
-  "status": "本地修复完成、远程普通检查待复验授权",
+  "status": "已完成",
   "local_preparation": "passed",
   "remote_execution_authorized": true,
-  "remote_verified": false,
-  "full_goal_complete": false,
-  "remote_commit": "ea542c06dac27e9f7b1d7aefdfdc9ac413e5ec75",
-  "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601",
+  "remote_verified": true,
+  "full_goal_complete": true,
+  "remote_commit": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+  "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552",
   "job_urls": {
-    "docker": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/job/117380358953",
-    "wheel": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/job/117380359054",
-    "check": "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/job/117380359152"
+    "check": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/job/117383982844",
+    "docker": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/job/117383982888",
+    "wheel": "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/job/117383982972"
   },
   "artifact_urls": [
-    "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12099280184",
-    "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12098572964",
-    "https://github.com/nicedream18/CodeAgent/actions/runs/39027177601/artifacts/12098469929"
+    "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12099242869",
+    "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12099153250",
+    "https://github.com/nicedream18/CodeAgent/actions/runs/39028453552/artifacts/12098519630"
   ],
   "tested_code_commit": "35162c0342f8600b3b7ce37d84ac55e5b0e3cee4",
   "source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
-  "archive_commit_note": "Final delivery commit adds only Goal 3 evidence and status documentation. Compare source_and_checks_sha256 rather than pretending these local reports ran at the later archive commit.",
+  "archive_commit_note": "Local final archive updates README status text and evidence docs. Product code, tests, workflow and dependencies match validated remote commit 748ca5d. README is wheel metadata; the verified wheel hash refers exactly to that remote commit, not an unbuilt documentation archive.",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
   "uv": "uv 0.12.19 (bea138450 2026-09-24 aarch64-apple-darwin)",
@@ -80,7 +80,7 @@
       "status": "passed",
       "goal2_artifacts": 384,
       "historical_cache_manifests": 7,
-      "evidence": "integrity-audit.json"
+      "evidence": "integrity-final.json"
     },
     "offline_linux_full": {
       "status": "passed",
@@ -91,6 +91,31 @@
       "test_host_pid_limit": 1024,
       "product_command_pid_limit": 128,
       "evidence": "local-linux-full/final-offline/report.json"
+    },
+    "remote_linux": {
+      "status": "passed",
+      "commit": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+      "check_counts": {
+        "passed": 455,
+        "failed": 0,
+        "skipped": 2,
+        "error": 0,
+        "xfailed": 0,
+        "xpassed": 0,
+        "deselected": 0
+      },
+      "docker_counts": {
+        "passed": 29,
+        "failed": 0,
+        "skipped": 0,
+        "error": 0,
+        "xfailed": 0,
+        "xpassed": 0,
+        "deselected": 0
+      },
+      "wheel_clean_install": true,
+      "reports_downloaded_and_digest_verified": true,
+      "evidence": "remote/39028453552/status.json"
     }
   },
   "reports": {
@@ -101,37 +126,42 @@
     "image_published": false
   },
   "real_model_calls": 0,
-  "remote_writes": 2,
-  "remaining": [
-    "Approve the exact additional test repair and evidence commit range.",
-    "Push the approved candidate and reuse its automatic workflow; retain both earlier failed runs.",
-    "Verify all three Linux jobs and downloaded artifacts at the new approved commit."
-  ],
+  "remote_writes": 3,
+  "remaining": [],
   "limits": [
-    "Local ARM64 evidence does not prove remote Linux success.",
-    "No real model calls or repeated real trials.",
-    "Docker and dependency preparation use network; actual execution restrictions are unchanged."
+    "GitHub artifacts require sign-in and are retained for 14 days; verified extracted copies and hashes are archived locally.",
+    "Preparation may use network; actual Docker command restrictions are unchanged, and no real model calls were made.",
+    "The final status/evidence documentation commit is local only; CI and wheel provenance refer exactly to validated remote commit 748ca5d."
   ],
   "remote_result": {
-    "conclusion": "failure",
+    "conclusion": "success",
     "jobs": {
+      "check": "success",
       "docker": "success",
-      "wheel": "success",
-      "check": "failure"
+      "wheel": "success"
     },
     "reports_downloaded": true,
     "artifact_sha256_verified": true,
     "python": "3.13.9",
     "check_pytest_counts": {
-      "passed": 454,
-      "failed": 1,
+      "passed": 455,
+      "failed": 0,
       "skipped": 2,
       "error": 0,
       "xfailed": 0,
       "xpassed": 0,
       "deselected": 0
     },
-    "evidence": "remote/39027177601/status.json"
+    "docker_pytest_counts": {
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0,
+      "error": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "deselected": 0
+    },
+    "evidence": "remote/39028453552/status.json"
   },
   "local_repair": {
     "state": "passed",
@@ -143,11 +173,42 @@
       "Approval unit test mocks LocalBackend and forbids actual process creation"
     ],
     "product_source_changed": false,
-    "new_push_authorized": false,
+    "new_push_authorized": true,
     "evidence": [
       "local-arm64-final/",
       "local-linux-full/final-offline/",
       "CI_FAILURES.md"
-    ]
-  }
+    ],
+    "approved_remote_head": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+    "remote_verification": "passed"
+  },
+  "requirements": {
+    "corresponding_remote_commit_and_run": "passed",
+    "ordinary_linux_check": "passed",
+    "real_linux_docker_check": "passed",
+    "clean_wheel_install_and_cli": "passed",
+    "python_platform_image_test_provenance": "passed",
+    "downloadable_bounded_sanitized_reports": "passed",
+    "no_real_model_calls": "passed",
+    "local_arm64_and_remote_linux_evidence": "passed",
+    "status_and_design_updated": "passed",
+    "historical_frozen_artifacts_preserved": "passed"
+  },
+  "failed_remote_runs_preserved": [
+    {
+      "run_id": 39026034469,
+      "commit": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
+      "status": "failure",
+      "evidence": "remote/39026034469/status.json"
+    },
+    {
+      "run_id": 39027177601,
+      "commit": "ea542c06dac27e9f7b1d7aefdfdc9ac413e5ec75",
+      "status": "failure",
+      "evidence": "remote/39027177601/status.json"
+    }
+  ],
+  "validated_remote_source_and_checks_sha256": "e2f8298b151a2c93cc2468a35486d0a1e163bf0468517f0ade1679f10d894d54",
+  "local_archive_source_and_checks_sha256": "8737636f73ed1aee5c891ec85c4aab57e91f2832b04e6ab54aed49c0b0869d1a",
+  "documentation_only_after_validation": true
 }
