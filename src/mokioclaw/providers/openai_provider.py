@@ -27,6 +27,11 @@ class ConfiguredChatOpenAI(ChatOpenAI):
     output_parameter: str = "max_tokens"
     mokio_profile: dict = Field(default_factory=dict)
 
+    def estimate_context_tokens(self, messages, tools):
+        from mokioclaw.providers.token_estimate import compatible_estimate
+
+        return compatible_estimate(messages, tools)
+
     def _get_request_payload(self, input_, *, stop=None, **kwargs):
         payload = super()._get_request_payload(input_, stop=stop, **kwargs)
         other = "max_completion_tokens" if self.output_parameter == "max_tokens" else "max_tokens"

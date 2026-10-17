@@ -862,6 +862,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "tavily-python" },
     { name = "textual" },
+    { name = "tiktoken" },
     { name = "typer" },
 ]
 
@@ -884,6 +885,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "tavily-python", specifier = ">=0.7.24" },
     { name = "textual", specifier = ">=8.2.4" },
+    { name = "tiktoken", specifier = ">=0.12.0" },
     { name = "typer", specifier = ">=0.16.0" },
 ]
 

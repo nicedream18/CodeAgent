@@ -31,6 +31,9 @@ FACT_FIELDS = (
     "last_error",
     "context_next_node",
     "attempts",
+    "repo_explored",
+    "repo_context",
+    "code_agent_summary",
 )
 
 
@@ -206,6 +209,12 @@ def compact_messages(
         facts_path = Path(".mokioclaw") / "context" / scope / f"facts-{uuid4().hex}.json"
         _atomic_json(runtime.workspace / facts_path, facts)
     prompt_facts = dict(facts)
+    for key in ("repo_context", "code_agent_summary"):
+        if len(str(prompt_facts.get(key, ""))) > 1600:
+            prompt_facts[key] = {
+                "summary": str(prompt_facts[key])[:1600],
+                "full_facts_path": str(facts_path),
+            }
     for key in ("sources", "background_tasks", "applied_subagent_results"):
         if len(encoded(prompt_facts.get(key, []))) > 4000:
             prompt_facts[key] = {
@@ -239,7 +248,11 @@ def compact_messages(
             "summary": observations["summary"][:900],
             "degraded": observations.get("degraded", False),
         }
-        replacement = protected + [AIMessage(content=encoded(payload))]
+        # Prefer the last complete observation over reaching a soft target. A
+        # head/tail history summary can omit exactly the code just requested.
+        replacement = protected + [AIMessage(content=encoded(payload))] + recent
+        if snapshot(model, replacement, budget).input_tokens > budget.input_limit:
+            replacement = protected + [AIMessage(content=encoded(payload))]
     after = snapshot(model, replacement, budget)
     if after.input_tokens > budget.input_limit:
         raise ContextBudgetError(

@@ -86,16 +86,27 @@ class BudgetSnapshot:
 def estimate_messages(
     model: Any, messages: list[Any], tools: list[Any] | None = None
 ) -> tuple[int, str]:
-    """Count the actual messages and schemas; unknown models use UTF-8 bytes.
+    """Count messages and schemas using an adapter or a conservative fallback.
 
     Counting is always labelled an estimate: providers add transport-specific
-    wrappers. The byte fallback deliberately overestimates non-ASCII text.
+    wrappers. Compatible adapters use a bundled, labelled tokenizer estimate;
+    unsupported custom models retain the conservative UTF-8 byte fallback.
     """
     schemas = tools if tools is not None else getattr(model, "kwargs", {}).get("tools", [])
+    adapter = getattr(model, "estimate_context_tokens", None)
+    if not callable(adapter):
+        adapter = getattr(getattr(model, "bound", None), "estimate_context_tokens", None)
+    if callable(adapter):
+        try:
+            count, method = adapter(messages, schemas)
+            if int(count) >= 0:
+                return int(count), str(method)
+        except (ValueError, OSError, TypeError):
+            pass  # Retain the conservative fallback if the local adapter fails.
     schema_text = json.dumps(schemas, ensure_ascii=False, default=str)
     schema_count = len(schema_text.encode("utf-8")) if schemas else 0
-    counter = getattr(model, "get_num_tokens_from_messages", None)
-    if not callable(counter):
+    counter = None if callable(adapter) else getattr(model, "get_num_tokens_from_messages", None)
+    if not callable(counter) and not callable(adapter):
         counter = getattr(getattr(model, "bound", None), "get_num_tokens_from_messages", None)
     if callable(counter):
         try:

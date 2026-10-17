@@ -33,6 +33,7 @@ MAX_TEXT_CHARS = {
     "session_context": 1800,
     "notepad": 1800,
     "history_summary": 2200,
+    "repo_context": 2400,
 }
 
 
@@ -74,7 +75,7 @@ def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[
         "acceptance_criteria": state.get("acceptance_criteria", []),
         "verification_commands": state.get("verification_commands", []),
         "latest_user_corrections": state.get("latest_user_corrections", []),
-        "repo_context": state.get("repo_context", ""),
+        "repo_context": _repo_projection(runtime, state.get("repo_context", "")),
         "research_notes": _short_text(
             state.get("research_notes", ""), MAX_TEXT_CHARS["research_notes"]
         ),
@@ -111,6 +112,20 @@ def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[
         "working_memory": working_memory,
         "history_summary_store": history_summary_store,
     }
+
+
+def _repo_projection(runtime, value):
+    text = str(value)
+    if len(text) <= MAX_TEXT_CHARS["repo_context"]:
+        return text
+    import hashlib
+
+    from mokioclaw.core.context_compaction import _atomic_json
+
+    digest = hashlib.sha256(text.encode()).hexdigest()[:24]
+    reference = f".mokioclaw/memory/repo-{digest}.json"
+    _atomic_json(runtime.workspace / reference, {"repo_context": text})
+    return _short_text(text, MAX_TEXT_CHARS["repo_context"]) + "\nFull repository evidence: " + reference
 
 
 def format_layered_memory_for_prompt(memory: dict[str, Any]) -> str:
