@@ -1,0 +1,12 @@
+{
+  "suite": "job-readiness-v1",
+  "task_sha256": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42",
+  "visible_command": "PYTHONPATH=src:. python -m pytest -q tests/test_visible_basics.py",
+  "visible_tests_sha256": "33391922b1c2a2fc4bf61d9cdde3273bacf1bfe0a597f0a34d28f8361dce8dbe",
+  "fixtures": [
+    "examples/mcp/echo_server.py"
+  ],
+  "visible_scope": "Three standalone baseline checks; original full suite is not exposed.",
+  "excluded_visible_tests": "Host-shim assumptions and unrelated integration suites are not baseline checks for this Docker slice. Trusted scoring selections are frozen separately.",
+  "hidden_material": "reference.patch, tests.patch and trusted-tests remain evaluator-only"
+}

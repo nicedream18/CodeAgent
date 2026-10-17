@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="0.553" timestamp="2026-10-17T06:47:08.739293+00:00" hostname="14bbe4dddfb9"><testcase classname="tests.test_eval_since" name="test_since_filters_utc_boundary_and_invalid_records" time="0.038"><failure message="AssertionError: Usage: root trace [OPTIONS]&#10;  Try 'root trace --help' for help.&#10;  ╭─ Error ──────────────────────────────────────────────────────────────────────╮&#10;  │ No such option: --since                                                      │&#10;  ╰──────────────────────────────────────────────────────────────────────────────╯&#10;  &#10;assert 2 == 0&#10; +  where 2 = &lt;Result SystemExit(2)&gt;.exit_code">tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_since_filters_utc_boundar0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0xffff81ea4510&gt;
+
+    def test_since_filters_utc_boundary_and_invalid_records(tmp_path, monkeypatch):
+        monkeypatch.setenv("MOKIO_DAEMON_DIR", str(tmp_path / "daemon"))
+        root = tmp_path / ".mokioclaw/traces/test"
+        root.mkdir(parents=True)
+        times = ["2025-01-01T00:00:00Z", "2025-01-02T08:00:00+08:00", "2025-01-03T00:00:00Z", None, "broken"]
+        (root / "events.jsonl").write_text("".join(json.dumps({"timestamp": t, "type": "test", "run_id": f"id-{i}"}) + "\n" for i,t in enumerate(times)))
+        output = CliRunner().invoke(app, ["trace", "--workspace", str(tmp_path), "--since", "2025-01-02T00:00:00Z", "--raw"])
+&gt;       assert output.exit_code == 0, output.output
+E       AssertionError: Usage: root trace [OPTIONS]
+E         Try 'root trace --help' for help.
+E         ╭─ Error ──────────────────────────────────────────────────────────────────────╮
+E         │ No such option: --since                                                      │
+E         ╰──────────────────────────────────────────────────────────────────────────────╯
+E         
+E       assert 2 == 0
+E        +  where 2 = &lt;Result SystemExit(2)&gt;.exit_code
+
+tests/test_eval_since.py:16: AssertionError</failure></testcase><testcase classname="tests.test_eval_since" name="test_since_rejects_invalid_or_naive[invalid]" time="0.005" /><testcase classname="tests.test_eval_since" name="test_since_rejects_invalid_or_naive[2025-01-01]" time="0.005" /><testcase classname="tests.test_eval_since" name="test_since_rejects_invalid_or_naive[2025-01-01T00:00:00]" time="0.004" /></testsuite></testsuites>

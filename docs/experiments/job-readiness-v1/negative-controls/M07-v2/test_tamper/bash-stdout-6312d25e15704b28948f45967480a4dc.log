@@ -1,0 +1,22 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___________________ test_literal_search_backends_and_schema ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_literal_search_backends_a0')
+
+    def test_literal_search_backends_and_schema(tmp_path):
+        (tmp_path / "中文.txt").write_text("Foo.bar[0]\nfooXbar0\nfoo.bar[0]\n")
+        runtime = RuntimeState(workspace=tmp_path)
+        results = []
+        for backend in ("python", "rg"):
+            runtime.settings = {"search": {"backend": backend}}
+>           output = grep(runtime, "foo.bar[0]", ignore_case=True, fixed_strings=True)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: grep() got an unexpected keyword argument 'fixed_strings'
+
+tests/test_eval_literal.py:12: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_eval_literal.py::test_literal_search_backends_and_schema - ...
+1 failed, 1 passed in 0.35s
+..                                                                       [100%]
+2 passed in 0.45s

@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-17T06:36:58.175973+00:00",
+  "head": "883e5e459d894f3e970d06aa6fc226a8c78a460b",
+  "dirty_files_before_work": [],
+  "source_sha256": "ef4fa4450ca5245dd2548bc4e5c309868e271550342ceb985488024ba2bb0660",
+  "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+  "tags": [
+    "f8b1c3d7aa82a5fee01b143118d1418fe487e983 refs/tags/v0.2.0-rc.1"
+  ],
+  "original_wheel_sha256": "937f67db6956aeafc9920f3d7f075c2918c397fe5506ffbc1f2728cbd5594c15",
+  "historical_cache_manifests": {
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-d01-v1/manifest.json": "093e4e83e478ae097f8ed111066297d3578859c65157d8809c4ceb6b6f0542c5",
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-v1/manifest.json": "b15ceac3b4c3242e7bdae0e0bff0eb14487a526f5e2b5bc0ad0e82a2239f92b3",
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-m02-v2/manifest.json": "a7352f10999ca7559e59a56730707bd7b427eb44889df2acef41388857974fd5",
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-m02-v3/manifest.json": "159d4708c4166f325153f758b9288b81eb8ebc6003e94af9159ce2ae400a36ae",
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-m02-v4/manifest.json": "ba3b52a2808b178ba615a9034009b1cbcf24504a5d530c56c018f6546f842dc3",
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/manifest.json": "edbba211eb6392f4d452e441ca438ce983ccffbc35a2cd4bcd445b40fe03a39d",
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/manifest.json": "c34f1dd5ecfd2e760590db566095db044814e88a6ccd30f477e646fb50fe00d6"
+  },
+  "real_model_calls_authorized": false,
+  "push_authorized": false
+}

@@ -10,13 +10,14 @@ from pathlib import Path
 
 from mokioclaw.evaluation.completion_demo import prepare_demo_task
 from mokioclaw.evaluation.grader import grade_candidate
+from mokioclaw.evaluation.job_tasks import TASK_IDS, job_cache_root, prepare_job_task
 from mokioclaw.evaluation.models import EvalTask
 from mokioclaw.evaluation.prepare import cache_root, copy_source, file_hashes, prepare_task
 
 parser = argparse.ArgumentParser()
 parser.add_argument("trial_id")
 parser.add_argument("--archive", type=Path, default=Path("docs/experiments/internship-v1/main"))
-parser.add_argument("--cache", type=Path, default=cache_root())
+parser.add_argument("--cache", type=Path)
 parser.add_argument("--output", type=Path)
 args = parser.parse_args()
 if not re.fullmatch(r"[A-Za-z0-9_-]+", args.trial_id):
@@ -24,13 +25,20 @@ if not re.fullmatch(r"[A-Za-z0-9_-]+", args.trial_id):
 source = args.archive / "trials" / args.trial_id
 record = json.loads((source / "result.json").read_text())
 task_id = record["config"]["task_id"]
-task = (
-    prepare_demo_task(args.cache)
-    if task_id == "D01"
-    else prepare_task(task_id, args.cache, Path.cwd())
-)
+args.cache = args.cache or (job_cache_root() if task_id in TASK_IDS else cache_root())
+if task_id in TASK_IDS:
+    task = prepare_job_task(task_id, args.cache, Path.cwd())
+else:
+    task = (
+        prepare_demo_task(args.cache)
+        if task_id == "D01"
+        else prepare_task(task_id, args.cache, Path.cwd())
+    )
+archived_task = args.archive.parent / "tasks" / f"{task_id}.json"
+if task_id in TASK_IDS:
+    archived_task = args.archive.parent / "tasks" / task_id / "task.json"
 original_task = EvalTask.model_validate_json(
-    (args.archive.parent / "tasks" / f"{task_id}.json").read_text()
+    archived_task.read_text()
 )
 if (task.source_sha256, task.dependency_sha256, task.target_tests, task.regression_tests) != (
     original_task.source_sha256,

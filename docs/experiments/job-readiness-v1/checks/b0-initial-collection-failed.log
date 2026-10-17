@@ -1,0 +1,183 @@
+uv sync --frozen
+Uninstalled 2 packages in 70ms
+ - fastapi==0.143.3
+ - pip==25.2
+uv run ruff check src tests scripts examples
+All checks passed!
+uv run mypy
+Success: no issues found in 23 source files
+uv run python scripts/gen_protocol_doc.py --check
+uv run python scripts/gen_eval_doc.py --check
+uv run pytest -q
+
+==================================== ERRORS ====================================
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_agent_extensions.py _
+import file mismatch:
+imported module 'test_agent_extensions' has this __file__ attribute:
+  /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_agent_extensions.py
+which is not the same as the test file we want to collect:
+  /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_agent_extensions.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_approval_memory.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_approval_memory.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_approval_memory.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_checkpoint.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_checkpoint.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_checkpoint.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_cli_smoke.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_cli_smoke.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_cli_smoke.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_context_governance.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_context_governance.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_context_governance.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_daemon.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_daemon.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_daemon.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_literal.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_literal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_literal.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_since.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_since.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_since.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_terminal.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_terminal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_terminal.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_formatter.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_formatter.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_formatter.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_generation_reliability.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_generation_reliability.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_generation_reliability.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_graph.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_graph.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_graph.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_mcp_streaming.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_mcp_streaming.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_mcp_streaming.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_integration.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_integration.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_workflows.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_workflows.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_workflows.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_project_optimization.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_project_optimization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_project_optimization.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_protocol_contracts.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_protocol_contracts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_protocol_contracts.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_reliability_extensions.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_reliability_extensions.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_reliability_extensions.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_run_cancellation.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_run_cancellation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_run_cancellation.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_runtime.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_runtime.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_runtime.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_session.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_session.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_session.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_subagent_tasks.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_subagent_tasks.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_subagent_tasks.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tool_registry_policy.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tool_registry_policy.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tool_registry_policy.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tools.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tools.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tools.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_trace.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_trace.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_trace.py
+_ ERROR collecting docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tui.py _
+ImportError while importing test module '/Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tui.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+ImportError: /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tui.py
+_______________ ERROR collecting tests/test_agent_extensions.py ________________
+import file mismatch:
+imported module 'test_agent_extensions' has this __file__ attribute:
+  /Users/nicedream/xm/MokioAgent/docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_agent_extensions.py
+which is not the same as the test file we want to collect:
+  /Users/nicedream/xm/MokioAgent/tests/test_agent_extensions.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
+=========================== short test summary info ============================
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_agent_extensions.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_approval_memory.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_checkpoint.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_cli_smoke.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_context_governance.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_daemon.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_literal.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_since.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_eval_terminal.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_formatter.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_generation_reliability.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_graph.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_mcp_streaming.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_integration.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_optimization_workflows.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_project_optimization.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_protocol_contracts.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_reliability_extensions.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_run_cancellation.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_runtime.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_session.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_subagent_tasks.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tool_registry_policy.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tools.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_trace.py
+ERROR docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success/mokio-grade-v8tmxdt7/workspace/tests/test_tui.py
+ERROR tests/test_agent_extensions.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 27 errors during collection !!!!!!!!!!!!!!!!!!!
+27 errors in 1.07s
+make: *** [check] Error 2

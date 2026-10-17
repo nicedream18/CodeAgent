@@ -1,0 +1,104 @@
+{
+  "M02-v2": {
+    "fake_success": {
+      "schema_version": 1,
+      "valid": true,
+      "solved": false,
+      "target_passed": 0,
+      "target_failed": 2,
+      "regression_failed": 0,
+      "tests_run": 6,
+      "out_of_scope": [],
+      "tampered_tests": [],
+      "infrastructure_error": null,
+      "seconds": 2.225,
+      "report": "docs/experiments/job-readiness-v1/negative-controls/M02-v2/fake_success"
+    },
+    "test_tamper": {
+      "schema_version": 1,
+      "valid": true,
+      "solved": false,
+      "target_passed": 0,
+      "target_failed": 2,
+      "regression_failed": 0,
+      "tests_run": 6,
+      "out_of_scope": [
+        "tests/test_visible_basics.py"
+      ],
+      "tampered_tests": [
+        "tests/test_visible_basics.py"
+      ],
+      "infrastructure_error": null,
+      "seconds": 2.306,
+      "report": "docs/experiments/job-readiness-v1/negative-controls/M02-v2/test_tamper"
+    }
+  },
+  "M07-v2": {
+    "fake_success": {
+      "schema_version": 1,
+      "valid": true,
+      "solved": false,
+      "target_passed": 1,
+      "target_failed": 1,
+      "regression_failed": 0,
+      "tests_run": 4,
+      "out_of_scope": [],
+      "tampered_tests": [],
+      "infrastructure_error": null,
+      "seconds": 2.623,
+      "report": "docs/experiments/job-readiness-v1/negative-controls/M07-v2/fake_success"
+    },
+    "test_tamper": {
+      "schema_version": 1,
+      "valid": true,
+      "solved": false,
+      "target_passed": 1,
+      "target_failed": 1,
+      "regression_failed": 0,
+      "tests_run": 4,
+      "out_of_scope": [
+        "tests/test_visible_basics.py"
+      ],
+      "tampered_tests": [
+        "tests/test_visible_basics.py"
+      ],
+      "infrastructure_error": null,
+      "seconds": 2.582,
+      "report": "docs/experiments/job-readiness-v1/negative-controls/M07-v2/test_tamper"
+    }
+  },
+  "M08-v2": {
+    "fake_success": {
+      "schema_version": 1,
+      "valid": true,
+      "solved": false,
+      "target_passed": 3,
+      "target_failed": 1,
+      "regression_failed": 0,
+      "tests_run": 13,
+      "out_of_scope": [],
+      "tampered_tests": [],
+      "infrastructure_error": null,
+      "seconds": 2.932,
+      "report": "docs/experiments/job-readiness-v1/negative-controls/M08-v2/fake_success"
+    },
+    "test_tamper": {
+      "schema_version": 1,
+      "valid": true,
+      "solved": false,
+      "target_passed": 3,
+      "target_failed": 1,
+      "regression_failed": 0,
+      "tests_run": 13,
+      "out_of_scope": [
+        "tests/test_visible_basics.py"
+      ],
+      "tampered_tests": [
+        "tests/test_visible_basics.py"
+      ],
+      "infrastructure_error": null,
+      "seconds": 2.969,
+      "report": "docs/experiments/job-readiness-v1/negative-controls/M08-v2/test_tamper"
+    }
+  }
+}

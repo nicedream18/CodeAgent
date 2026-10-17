@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F...                                                                     [100%]\n=================================== FAILURES ===================================\n_____________ test_since_filters_utc_boundary_and_invalid_records ______________\n\ntmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_since_filters_utc_boundar0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff965dc510>\n\n    def test_since_filters_utc_boundary_and_invalid_records(tmp_path, monkeypatch):\n        monkeypatch.setenv(\"MOKIO_DAEMON_DIR\", str(tmp_path / \"daemon\"))\n        root = tmp_path / \".mokioclaw/traces/test\"\n        root.mkdir(parents=True)\n        times = [\"2025-01-01T00:00:00Z\", \"2025-01-02T08:00:00+08:00\", \"2025-01-03T00:00:00Z\", None, \"broken\"]\n        (root / \"events.jsonl\").write_text(\"\".join(json.dumps({\"timestamp\": t, \"type\": \"test\", \"run_id\": f\"id-{i}\"}) + \"\\n\" for i,t in enumerate(times)))\n        output = CliRunner().invoke(app, [\"trace\", \"--workspace\", str(tmp_path), \"--since\", \"2025-01-02T00:00:00Z\", \"--raw\"])\n>       assert output.exit_code == 0, output.output\nE       AssertionError: Usage: root trace [OPTIONS]\nE         Try 'root trace --help' for help.\nE         \u256d\u2500 Error \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\nE         \u2502 No such option: --since                                                      \u2502\nE         \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\nE         \nE       assert 2 == 0\nE        +  where 2 = <Result SystemExit(2)>.exit_code\n\ntests/test_eval_since.py:16: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_eval_since.py::test_since_filters_utc_boundary_and_invalid_records\n1 failed, 3 passed in 0.54s\n.........                                                                [100%]\n9 passed in 0.64s\n",
+  "stderr": "",
+  "duration_ms": 2835,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-b8c70da76038444c926e6c0ea880edfe.log",
+    "stdout_output_bytes": 2192,
+    "stdout_retained_bytes": 2192,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-3a5d6dd0d4274a2b82365a3d987afe4e.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "3f08c149bbdcefc1f2c173bc0c0784e71e6397dfa27fb36e6b00dcf79ba3f97a",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-b8c70da76038444c926e6c0ea880edfe.log",
+  "stdout_output_bytes": 2192,
+  "stdout_retained_bytes": 2192,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-3a5d6dd0d4274a2b82365a3d987afe4e.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "3f08c149bbdcefc1f2c173bc0c0784e71e6397dfa27fb36e6b00dcf79ba3f97a",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

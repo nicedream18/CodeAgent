@@ -70,7 +70,9 @@ def grade_candidate(
         or Path(p).name in {"pytest.ini", "conftest.py", "pyproject.toml", "setup.cfg", "tox.ini"}
     ]
     try:
-        with TemporaryDirectory(prefix="mokio-grade-", dir=report_root) as temp:
+        # A report directory can be inside the source checkout. Keep executable
+        # staging elsewhere so concurrent pytest discovery cannot collect it.
+        with TemporaryDirectory(prefix="mokio-grade-") as temp:
             staging = Path(temp) / "workspace"
             copy_source(base, staging)
             for name in changes:

@@ -1,0 +1,30 @@
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+_____________ test_since_filters_utc_boundary_and_invalid_records ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_since_filters_utc_boundar0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff87798510>
+
+    def test_since_filters_utc_boundary_and_invalid_records(tmp_path, monkeypatch):
+        monkeypatch.setenv("MOKIO_DAEMON_DIR", str(tmp_path / "daemon"))
+        root = tmp_path / ".mokioclaw/traces/test"
+        root.mkdir(parents=True)
+        times = ["2025-01-01T00:00:00Z", "2025-01-02T08:00:00+08:00", "2025-01-03T00:00:00Z", None, "broken"]
+        (root / "events.jsonl").write_text("".join(json.dumps({"timestamp": t, "type": "test", "run_id": f"id-{i}"}) + "\n" for i,t in enumerate(times)))
+        output = CliRunner().invoke(app, ["trace", "--workspace", str(tmp_path), "--since", "2025-01-02T00:00:00Z", "--raw"])
+>       assert output.exit_code == 0, output.output
+E       AssertionError: Usage: root trace [OPTIONS]
+E         Try 'root trace --help' for help.
+E         ╭─ Error ──────────────────────────────────────────────────────────────────────╮
+E         │ No such option: --since                                                      │
+E         ╰──────────────────────────────────────────────────────────────────────────────╯
+E         
+E       assert 2 == 0
+E        +  where 2 = <Result SystemExit(2)>.exit_code
+
+tests/test_eval_since.py:16: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_eval_since.py::test_since_filters_utc_boundary_and_invalid_records
+1 failed, 3 passed in 0.51s
+.........                                                                [100%]
+9 passed in 0.68s

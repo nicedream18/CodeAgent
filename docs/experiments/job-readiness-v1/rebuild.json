@@ -1,0 +1,17 @@
+{
+  "M02-v2": {
+    "same_task_contract": true,
+    "source_sha256": "fb2df68ac514908680e651a6fba489c38b06ce7bcfbbde2d9c6acbf58a13f0db",
+    "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547"
+  },
+  "M07-v2": {
+    "same_task_contract": true,
+    "source_sha256": "bc5cca0ccbcaceed2fd64b9deec59587636fcceaadb11cebf6ba8192e5732f80",
+    "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547"
+  },
+  "M08-v2": {
+    "same_task_contract": true,
+    "source_sha256": "8e0f48ebf9a82650993181e473d383aec580f195af4bf6f40d415a92d3ad89f7",
+    "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547"
+  }
+}

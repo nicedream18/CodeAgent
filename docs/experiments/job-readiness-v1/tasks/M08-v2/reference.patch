@@ -1,0 +1,51 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,6 +439,7 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = None,
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+@@ -446,10 +447,17 @@
+     from mokioclaw.core.daemon_client import daemon_state_dir
+     from mokioclaw.core.transport_trace import TraceReader
+ 
++    from mokioclaw.core.transport_trace import parse_since, record_since
++    try:
++        since_time = parse_since(since) if since is not None else None
++    except ValueError as exc:
++        raise typer.BadParameter(str(exc), param_hint='--since') from exc
+     reader = TraceReader()
+     try:
+         while True:
+             for _path, record in reader.read(workspace, daemon_root=daemon_state_dir()):
++                if since_time is not None and not record_since(record, since_time):
++                    continue
+                 payload = record.get("payload", {})
+                 if run_id and (record.get("run_id") or payload.get("run_id")) != run_id:
+                     continue
+--- a/src/mokioclaw/core/transport_trace.py
++++ b/src/mokioclaw/core/transport_trace.py
+@@ -151,3 +151,20 @@
+                 self.offsets[str(path)] = (info.st_ino, offset)
+             except OSError:
+                 continue
++
++
++def parse_since(value: str) -> datetime:
++    try:
++        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
++    except ValueError as exc:
++        raise ValueError("--since requires an ISO8601 timestamp with timezone") from exc
++    if parsed.tzinfo is None:
++        raise ValueError("--since requires a timezone")
++    return parsed.astimezone(UTC)
++
++
++def record_since(record: dict[str, Any], since: datetime) -> bool:
++    try:
++        return parse_since(str(record.get("timestamp", ""))) >= since
++    except ValueError:
++        return False
