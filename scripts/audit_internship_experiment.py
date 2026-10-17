@@ -4,11 +4,28 @@ from __future__ import annotations
 
 import argparse
 import json
+import tarfile
 from collections import Counter
 from pathlib import Path
 
 from mokioclaw.evaluation.models import EvalTrialResult
 from mokioclaw.evaluation.prepare import cache_root
+
+
+def trace_lines(trial: Path, member: str) -> list[str]:
+    path = trial / member
+    if path.is_file():
+        with path.open("rb") as handle:
+            payload = handle.read(16 * 1024 * 1024 + 1)
+    else:
+        with tarfile.open(trial / "trace.tar.gz") as archive:
+            handle = archive.extractfile(member)
+            if handle is None:
+                raise ValueError("Missing trace member: " + member)
+            payload = handle.read(16 * 1024 * 1024 + 1)
+    if len(payload) > 16 * 1024 * 1024:
+        raise ValueError("Trace input exceeds the bounded audit limit")
+    return payload.decode().splitlines()
 
 
 def audit(root: Path) -> dict:
@@ -38,16 +55,24 @@ def audit(root: Path) -> dict:
         else:
             completed += 1
         starts, ends, calls = Counter(), Counter(), Counter()
-        events_path = path.parent / "events.jsonl"
         delivered = Counter()
-        for line in events_path.read_text().splitlines() if events_path.exists() else []:
+        for line in trace_lines(path.parent, "events.jsonl"):
             event = json.loads(line).get("event", {})
             if isinstance(event, dict) and event.get("type") == "llm_request":
                 delivered[event.get("stream_id")] += 1
-        trace_paths = list((path.parent / "workspace/.mokioclaw/traces").glob("*/events.jsonl"))
-        if len(trace_paths) != 1:
+        trace_names = [
+            p.relative_to(path.parent).as_posix()
+            for p in (path.parent / "workspace/.mokioclaw/traces").glob("*/events.jsonl")
+        ]
+        if not trace_names and (path.parent / "trace.tar.gz").exists():
+            with tarfile.open(path.parent / "trace.tar.gz") as archive:
+                trace_names = [
+                    m.name for m in archive if m.isfile()
+                    and m.name.startswith(".mokioclaw/traces/") and m.name.endswith("/events.jsonl")
+                ]
+        if len(trace_names) != 1:
             issues.append(f"{name}: expected a single canonical run trace")
-        for line in trace_paths[0].read_text().splitlines() if len(trace_paths) == 1 else []:
+        for line in trace_lines(path.parent, trace_names[0]) if len(trace_names) == 1 else []:
             event = json.loads(line).get("payload", {}).get("payload", {})
             if not isinstance(event, dict):
                 continue
@@ -92,7 +117,8 @@ def audit(root: Path) -> dict:
         issues.append(f"Only {completed}/{len(expected)} terminal trials")
     return {
         "schema_version": 1,
-        "experiment_id": root.name,
+        "experiment_id": json.loads((root / "archive-info.json").read_text())["experiment_id"]
+        if (root / "archive-info.json").exists() else root.name,
         "frozen_revision": manifest["harness_revision"],
         "scheduled": len(expected),
         "terminal": completed,
@@ -112,6 +138,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("experiment_id")
     parser.add_argument("--cache", type=Path, default=cache_root())
+    parser.add_argument("--archive", type=Path, help="Audit the shipped archive without a model cache")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if not args.experiment_id or any(
@@ -119,7 +146,9 @@ if __name__ == "__main__":
         for c in args.experiment_id
     ):
         raise SystemExit("Invalid experiment ID")
-    record = audit(args.cache / "experiments" / args.experiment_id)
+    record = audit(args.archive or args.cache / "experiments" / args.experiment_id)
+    if record["experiment_id"] != args.experiment_id:
+        raise SystemExit("Archive experiment ID does not match the requested experiment")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({k: v for k, v in record.items() if k != "trials"}, ensure_ascii=False))

@@ -31,7 +31,18 @@
     "evidence": "docker-arm64-2026-10-17.json"
   },
   "clean_checkout": {
-    "status": "pending_final_documentation_commit"
+    "source_revision": "d8344fe3b1d677ccf62c91f153a0cb625a82dcb5",
+    "checkout": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-final-clean-jdv1vija/repo",
+    "isolated_home": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-final-clean-jdv1vija/home",
+    "personal_env_copied": false,
+    "credentials_provided": false,
+    "make_check": "passed",
+    "seconds": 59.919,
+    "offline_demo": "passed",
+    "wheel_build": "passed",
+    "wheel_sha256": "937f67db6956aeafc9920f3d7f075c2918c397fe5506ffbc1f2728cbd5594c15",
+    "wheel_byte_identical": true,
+    "log": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-final-clean-jdv1vija/check.log"
   },
   "remote_ci": "configured, not triggered (no push)",
   "real_experiments": {
@@ -40,5 +51,9 @@
     "corrected": 56,
     "complete_deliveries": 0,
     "independent_artifact_passes": 8
-  }
+  },
+  "recorded_at": "2026-10-17T04:07:30.283512+00:00",
+  "shipped_archive_audit_matches_original_cache": true,
+  "demo_playback_seconds": 150,
+  "no_execution_containers_remaining": true
 }

@@ -43,6 +43,13 @@
 后续核对显式采用 canonical trace，同时将事件展示缺陷单列为未通过，未把“配置有效”写成“所有验收通过”。
 [核对结果](corrected/audit.json) · [初始严格事件核对失败](corrected/audit.initial-strict.json) · [有效性说明](corrected/validity.json)。
 
+从仓库归档重新核对，无需原模型缓存，也不会发起请求：
+
+```sh
+uv run python scripts/audit_internship_experiment.py internship-v1-20261017 \
+  --archive docs/experiments/internship-v1/corrected --output /tmp/mokio-audit.json
+```
+
 事件缺陷已在实验结束后修复：升级图逐步转发 custom 事件，子 Agent 保留原始结束事件的 trace 身份；离线回归覆盖正常完成及生成后异常。
 正式结果仍属于原冻结 1e6d1cc，不声称已经在新代码上再次运行真实矩阵。
 
