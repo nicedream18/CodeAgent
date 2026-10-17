@@ -136,6 +136,8 @@ def default_subagents() -> dict[str, SubagentDefinition]:
             ),
             10,
             context_fields=(
+                "repo_context",
+                "repo_explored",
                 "research_notes",
                 "sources",
                 "todos",

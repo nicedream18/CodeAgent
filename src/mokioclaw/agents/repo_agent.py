@@ -119,7 +119,22 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
     payload.setdefault("summary", raw)
     payload["evidence"] = evidence
     payload["state_updates"] = {
-        "repo_context": payload["summary"],
+        "repo_context": json.dumps(
+            {
+                key: payload[key]
+                for key in (
+                    "entry_points",
+                    "suggested_changes",
+                    "tests",
+                    "summary",
+                    "call_chains",
+                    "conventions",
+                    "unresolved",
+                )
+                if key in payload
+            },
+            ensure_ascii=False,
+        ),
         "repo_explored": True,
     }
     return payload

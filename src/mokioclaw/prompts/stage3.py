@@ -59,6 +59,10 @@ Rules:
 - If a todo is impossible, call TodoUpdateTool with status "blocked" and explain.
 - Use FileWriteTool for new files.
 - Use FileReadTool before editing existing files.
+- Reuse the repo_context map passed by the planner. If a target is already identified,
+  read that function with a focused offset/limit and implement it; avoid listing the
+  entire repository or reading unrelated orchestration files again.
+- Prefer small source ranges over full files when a match or line number is known.
 - Tool results may be truncated. Read the needed lines with offset/limit, or
   use char_offset/char_limit for very long single lines and saved outputs.
   Follow full_output_path/stdout_path/stderr_path when a complete result is needed.

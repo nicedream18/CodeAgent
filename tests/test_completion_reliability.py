@@ -221,3 +221,55 @@ def test_finalization_discards_unexpected_writes_and_preserves_protocol(tmp_path
     assert not (tmp_path / "late.txt").exists()
     message_groups(messages)
     assert events[-1]["result"]["status"] == "not_executed"
+
+
+def test_code_handoff_receives_repository_map_and_current_budget(tmp_path, monkeypatch):
+    from mokioclaw.agents import code_agent
+    from mokioclaw.agents.registry import run_subagent
+
+    (tmp_path / "module.py").write_text("value = 1\n")
+    captured = []
+
+    class Model:
+        def bind_tools(self, tools):
+            return self
+
+        def invoke(self, messages):
+            captured.append(list(messages))
+            if len(captured) == 1:
+                return AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "FileReadTool",
+                            "id": "target-read",
+                            "args": {"file_path": "module.py"},
+                        }
+                    ],
+                )
+            return AIMessage(content="Observed module.py; no modification requested.")
+
+    monkeypatch.setattr(code_agent, "create_model", Model)
+    runtime = RuntimeState(workspace=tmp_path)
+    result = run_subagent(
+        {
+            "runtime": runtime,
+            "task": "inspect",
+            "repo_explored": True,
+            "repo_context": "Existing implementation: module.py:1",
+        },
+        "codeAgent",
+        "inspect",
+    )
+    assert result["ok"] and len(captured) == 2
+    for request in captured:
+        humans = "\n".join(str(m.content) for m in request if isinstance(m, HumanMessage))
+        assert "module.py:1" in humans and '"repo_explored": true' in humans
+        notes = [
+            m.content
+            for m in request
+            if isinstance(m, SystemMessage) and str(m.content).startswith("MOKIO EXECUTION BUDGET")
+        ]
+        assert len(notes) == 1
+    assert "remaining: 10 of 10" in captured[0][1].content
+    assert "remaining: 9 of 10" in captured[1][1].content

@@ -12,7 +12,7 @@ from collections.abc import Callable, Iterator
 from contextlib import AbstractContextManager
 from typing import Any
 
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
 from mokioclaw.core.run_inbox import tool_call_batch
 
@@ -33,6 +33,39 @@ class ToolConversation:
         self.produced = produced
 
     def request(self, runnable: Any) -> Any:
+        runtime = self.state.get("runtime") if self.state else None
+        if runtime is not None:
+            marker = "MOKIO EXECUTION BUDGET\n"
+            facts = []
+            active = runtime.active_subagent_budget
+            if active is not None:
+                facts.append(
+                    f"Role tool calls remaining: {max(0, active.limit - active.used)} of {active.limit}."
+                )
+            if runtime.run_request_limit:
+                facts.append(
+                    f"Run model requests remaining: {max(0, runtime.run_request_limit - runtime.model_metrics.get('requests', 0))}."
+                )
+            if runtime.run_token_limit:
+                facts.append(
+                    f"Run token headroom before the next reservation: {max(0, runtime.run_token_limit - runtime.model_metrics.get('total_tokens', 0))} (estimated when usage is missing)."
+                )
+            self.messages[:] = [
+                m
+                for m in self.messages
+                if not (isinstance(m, SystemMessage) and str(m.content).startswith(marker))
+            ]
+            if facts:
+                self.messages.insert(
+                    1,
+                    SystemMessage(
+                        content=marker
+                        + "\n".join(facts)
+                        + "\nUse existing repository evidence. Read focused source ranges, implement the requested change, "
+                        "then run relevant checks and report. Each TODO/read/search/check consumes a tool call. "
+                        "Avoid broad discovery after the target is known; preserve budget for verification and the final report."
+                    ),
+                )
         response = self.invoke(
             runnable, self.messages, writer=self.writer, node=self.node, state=self.state
         )
