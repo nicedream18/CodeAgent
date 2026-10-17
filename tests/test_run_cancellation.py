@@ -59,6 +59,7 @@ def test_real_graph_cancel_during_router_has_one_trace_and_no_next_node(
     from mokioclaw.graph import nodes
 
     entered, closed = threading.Event(), threading.Event()
+    token_received = threading.Event()
     control = RunControl()
 
     class SlowModel:
@@ -80,13 +81,20 @@ def test_real_graph_cancel_during_router_has_one_trace_and_no_next_node(
         try:
             stream = agent.stream_session_events if session else agent.stream_agent_events
             options = {"session_workspace" if session else "workspace": tmp_path}
-            received.extend(stream("任务", run_control=control, approval_mode="deny", **options))
+            for event in stream("任务", run_control=control, approval_mode="deny", **options):
+                received.append(event)
+                payload = event.get("event", {})
+                if payload.get("type") == "llm_token" and payload.get("text") == "部分路由文本":
+                    token_received.set()
         except BaseException as exc:  # noqa: BLE001 — capture thread control signals for assertions
             failures.append(exc)
 
     worker = threading.Thread(target=consume)
     worker.start()
     assert entered.wait(3)
+    # The producer resuming after yield doesn't guarantee the execution thread
+    # has consumed that token. Cancel after the actual streamed event instead.
+    assert token_received.wait(3)
     control.cancel()
     worker.join(3)
     assert not worker.is_alive() and not failures
