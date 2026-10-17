@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "old_cache_manifests_unchanged": true,
+    "old_wheel_unchanged": true,
+    "old_tag_objects_unchanged": true,
+    "historical_git_evidence_unchanged": true,
+    "tracked_runtime_unchanged": true,
+    "configured_credential_absent_from_new_artifacts": true,
+    "no_batch_containers_remaining": true,
+    "no_push_or_publication_performed": true
+  },
+  "credential_hits": [],
+  "old_manifest_count": 7,
+  "batch_containers_remaining": [],
+  "scope": "Local state and credential-value scan; not a general secret scanner or proof of remote CI."
+}

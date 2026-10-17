@@ -1,0 +1,18 @@
+[
+  {
+    "role": "codeAgent",
+    "stream_id": "fcb466825efa402389667211b5f36986",
+    "reference": ".mokioclaw/diagnostics/model-stream-a1c13870c91041a6a2437bcc8183dd40.log",
+    "retained_full_file_available": true,
+    "output_truncated": false,
+    "finish_reason": "completed"
+  },
+  {
+    "role": "verifier",
+    "stream_id": "545885638baa4202aeed3c81f378ec47",
+    "reference": ".mokioclaw/diagnostics/model-stream-d7edc09786974ba2b4bc510e5b8f0fb6.log",
+    "retained_full_file_available": true,
+    "output_truncated": false,
+    "finish_reason": "tool_calls"
+  }
+]

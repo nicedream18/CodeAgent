@@ -1,0 +1,10 @@
+uv run python scripts/check_docker.py
+{
+  "ok": true,
+  "backend": "docker",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "platform": "linux/aarch64",
+  "checked_at": "2026-10-17T09:13:26.931936+00:00",
+  "pytest": ".............................                                            [100%]\n29 passed in 18.38s\n",
+  "stderr": ""
+}

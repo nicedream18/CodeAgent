@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-17T09:16:28.492862+00:00",
+  "goal": "Goal 2",
+  "engineering_acceptance": "passed",
+  "requirements": {
+    "fixed_versions_tasks_order_and_worker_imports": {
+      "status": "proved",
+      "evidence": [
+        "../job-readiness-v1/goal2-input.json",
+        "offline-preflight.json",
+        "latest-preflight.json",
+        "provenance-audit.json",
+        "b0/manifest.json",
+        "b1/manifest.json",
+        "b*/trials/*/dispatch.json",
+        "b*/trials/*/worker-import-contract.json"
+      ]
+    },
+    "offline_models_scheduling_receipts_resumption": {
+      "status": "proved",
+      "evidence": [
+        "offline-preflight.json",
+        "checks/driver-pytest-final.log",
+        "../../../tests/test_goal2_driver.py",
+        "../../../tests/test_goal2_report.py"
+      ]
+    },
+    "exactly_18_terminal_trials_no_reruns": {
+      "status": "proved",
+      "scheduled": 18,
+      "terminal": 18,
+      "first_15_receipts_preserved": true,
+      "evidence": [
+        "coordinator.log",
+        "provenance-audit.json",
+        "infrastructure-incident-15.json",
+        "b*/trials/*/result.json"
+      ]
+    },
+    "model_budget_permissions_and_event_audit": {
+      "status": "proved_at_frozen_runtime_and_canonical_event_boundary",
+      "requests": 427,
+      "max_sdk_retries": 0,
+      "evidence": [
+        "b0/audit.json",
+        "b1/audit.json",
+        "comparison.json",
+        "b*/trials/*/spec.json"
+      ],
+      "limits": [
+        "Not an independent HTTP capture; inferred transport parameters also rely on frozen provider/worker code."
+      ]
+    },
+    "independent_grading_and_all_failures_preserved": {
+      "status": "proved",
+      "grades_valid": 18,
+      "complete_deliveries": 1,
+      "partial_artifact_passes": 15,
+      "scope_failures": 2,
+      "budget_stops": 16,
+      "infrastructure_failures": 1,
+      "evidence": [
+        "comparison.json",
+        "b*/trials/*/grade/",
+        "ANALYSIS.md"
+      ]
+    },
+    "raw_patches_traces_and_immutability": {
+      "status": "proved",
+      "archive_index_hashes_verified": true,
+      "evidence": [
+        "b0/index.json",
+        "b1/index.json",
+        "b*/trials/*/changed-files.tar.gz",
+        "b*/trials/*/trace.tar.gz",
+        "integrity-audit.json"
+      ]
+    },
+    "comparison_role_usage_and_three_repeat_distributions": {
+      "status": "proved",
+      "evidence": [
+        "RESULTS.md",
+        "comparison.json",
+        "ANALYSIS.md",
+        "b*/trials/*/role-overhead.json"
+      ],
+      "limits": [
+        "Cache creation unknown; one failed request uses estimates; no fee or broad generalization claim."
+      ]
+    },
+    "success_and_failure_reconstruction_and_replays": {
+      "status": "proved",
+      "independent_tests_each": 13,
+      "new_model_calls": 0,
+      "evidence": [
+        "regrades/",
+        "cases/",
+        "success-demo.cast",
+        "failure-demo.cast",
+        "DEMO.md",
+        "checks/success-replay.log",
+        "checks/failure-replay.log"
+      ],
+      "limits": [
+        "Final report is the original bounded checkpoint snapshot, not invented full text. Actual role responses saved separately."
+      ]
+    },
+    "quality_checks": {
+      "status": "proved",
+      "pytest_passed": 444,
+      "pytest_skipped": 2,
+      "strict_mypy_modules": 26,
+      "real_docker_passed": 29,
+      "docker_platform": "linux/aarch64",
+      "evidence": [
+        "checks/make-check-final.log",
+        "checks/make-check-docker.log"
+      ]
+    },
+    "history_security_and_authorized_scope": {
+      "status": "proved",
+      "evidence": [
+        "authorization.json",
+        "integrity-audit.json",
+        "../job-readiness-v1/goal2-input.json"
+      ],
+      "pushes": 0,
+      "publications": 0,
+      "frozen_product_changes": 0
+    },
+    "documentation_and_learning_handoff": {
+      "status": "proved",
+      "evidence": [
+        "README.md",
+        "ANALYSIS.md",
+        "DEMO.md",
+        "../../internship/STATUS.md"
+      ]
+    }
+  },
+  "effectiveness": {
+    "completion_rate_improvement": "not_demonstrated",
+    "B0_complete": 1,
+    "B1_complete": 0,
+    "denominator_each": 9,
+    "multiple_source_file_complete_deliveries": 0,
+    "effect_target": "not_achieved"
+  },
+  "remaining_authorization": [
+    "Further model trials or new matrix",
+    "Remote push/publication",
+    "Remote Linux CI actions"
+  ],
+  "known_limitations": [
+    "Frozen worker only saves bounded final output snapshots",
+    "Exact cause of transient streaming APIConnectionError remains unconfirmed",
+    "Local ARM64 container checks do not constitute remote Linux CI"
+  ],
+  "execution_drivers": {
+    "coordinator_commit": "973176a",
+    "coordinator_sha256": "fa489e3f8b08cf13300715e3e464c322369b3a6036c42f9adfac94ab87c52e21",
+    "report_sha256": "2f92b0d2de92f827b5c6def0568a49ac159f44499a985c6e3ba3c46326a6ebf9",
+    "coordinator_unchanged_during_all_trials": true
+  }
+}

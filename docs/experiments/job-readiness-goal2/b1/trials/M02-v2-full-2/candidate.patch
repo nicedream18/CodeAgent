@@ -1,0 +1,14 @@
+--- a/src/mokioclaw/providers/generation.py
++++ b/src/mokioclaw/providers/generation.py
+@@ -65,7 +65,10 @@
+ 
+ def validate_generation(message: Any) -> GenerationOutcome:
+     result = outcome(message)
+-    if False:
++    if result.reason == "output_limit":
++        # Truncated output invalidates every declared call in this response,
++        # including ones whose arguments happen to look complete: the model was
++        # cut off mid-generation, so no call from this response may execute.
+         raise ModelGenerationStopped("model_output_truncated", message)
+     if result.reason in {"blocked", "unknown"}:
+         raise ModelGenerationStopped(

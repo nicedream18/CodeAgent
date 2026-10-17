@@ -1,0 +1,85 @@
+--- a/src/mokioclaw/providers/generation.py
++++ b/src/mokioclaw/providers/generation.py
+@@ -14,12 +14,25 @@
+ 
+ 
+ class ModelGenerationStopped(RuntimeError):
+-    def __init__(self, reason: str, message: Any = None):
++    def __init__(
++        self,
++        reason: str,
++        message: Any = None,
++        *,
++        declared: list[dict[str, Any]] | None = None,
++        raw_reason: str | None = None,
++    ):
+         super().__init__(reason)
+         self.reason = reason
+         self.message = message
+         self.stream_id = ""
+         self.state: dict[str, Any] = {}
++        # Every call declared by the rejected response (complete-looking ones
++        # included). These are never executed; they only get not_executed results.
++        self.declared: list[dict[str, Any]] = (
++            list(declared) if declared is not None else declared_calls(message)
++        )
++        self.raw_reason = raw_reason
+ 
+ 
+ @dataclass(frozen=True)
+@@ -45,28 +58,41 @@
+ 
+ 
+ def declared_calls(message: Any) -> list[dict[str, Any]]:
++    """Enumerate every call the response declared, complete-looking or not.
++
++    Argument values are intentionally NOT carried over: a truncated response's
++    arguments may be SDK-completed or partially parsed and must never be used.
++    """
++    if message is None:
++        return []
+     calls: dict[str, dict[str, Any]] = {}
+     for item in [*getattr(message, "tool_calls", []), *getattr(message, "invalid_tool_calls", [])]:
+-        key = str(item.get("id") or len(calls))
+-        calls[key] = {
+-            "id": key,
+-            "name": item.get("name") or "unknown_tool",
+-            "args": item.get("args", {}),
+-        }
++        if not isinstance(item, dict):
++            continue
++        key = str(item.get("id") or f"call_{len(calls)}")
++        calls[key] = {"id": key, "name": item.get("name") or "unknown_tool", "args": {}}
+     for item in getattr(message, "tool_call_chunks", []):
+-        key = str(item.get("id") or item.get("index", len(calls)))
+-        calls[key] = {
+-            "id": key,
+-            "name": item.get("name") or "unknown_tool",
+-            "args": item.get("args", ""),
+-        }
++        if not isinstance(item, dict):
++            continue
++        key = str(item.get("id") or item.get("index", f"call_{len(calls)}"))
++        if key in calls:
++            continue
++        calls[key] = {"id": key, "name": item.get("name") or "unknown_tool", "args": {}}
+     return list(calls.values())
+ 
+ 
+ def validate_generation(message: Any) -> GenerationOutcome:
+     result = outcome(message)
+-    if False:
+-        raise ModelGenerationStopped("model_output_truncated", message)
++    if result.reason == "output_limit":
++        # Truncation invalidates EVERY declared call of this response, including
++        # ones that look complete: the SDK may have completed partial JSON.
++        # This check must precede any JSON-validity / tool-call-shape check.
++        raise ModelGenerationStopped(
++            "model_output_truncated",
++            message,
++            declared=declared_calls(message),
++            raw_reason=result.raw_reason,
++        )
+     if result.reason in {"blocked", "unknown"}:
+         raise ModelGenerationStopped(
+             "model_content_blocked"

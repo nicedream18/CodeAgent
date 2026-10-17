@@ -1,0 +1,20 @@
+uv sync --frozen
+Uninstalled 2 packages in 62ms
+ - fastapi==0.143.3
+ - pip==25.2
+uv run ruff check src tests scripts examples
+All checks passed!
+uv run mypy
+Success: no issues found in 26 source files
+uv run python scripts/gen_protocol_doc.py --check
+uv run python scripts/gen_eval_doc.py --check
+uv run pytest -q
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+....s................................................................... [ 48%]
+...s.................................................................... [ 64%]
+........................................................................ [ 80%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+444 passed, 2 skipped in 41.21s
+git diff --check

@@ -1,0 +1,30 @@
+{
+  "config": {
+    "schema_version": 1,
+    "task_id": "M07-v2",
+    "architecture": "full",
+    "repeat": 1,
+    "seed": 20261017,
+    "temperature": 0.0,
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "token_limit": 200000,
+    "request_limit": 40,
+    "tool_limit": 80,
+    "generation_seconds": 900,
+    "bash_seconds": 60,
+    "grading_seconds": 120,
+    "model": "deepseek-chat",
+    "model_config_sha256": "8f1ac6f257a41f94c653d5e9129e0b0347621aae56249dc7cedb8e85696d8e17",
+    "harness_revision": "ee5f073a7640c15c1d693c7e93bc067e9eb8da51",
+    "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61"
+  },
+  "workspace": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/experiments/job-readiness-goal2-20261017-b1/trials/M07-v2-full-1/workspace",
+  "owner": "job-readiness-goal2-20261017-b1-M07-v2-full-1",
+  "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "为 grep(state, pattern, path='.', glob=None, head_limit=50, ignore_case=False, fixed_strings=False) 增加可选字面量搜索，GrepTool 暴露 fixed_strings: bool=False。开启时点、括号、方括号等按字面量匹配，兼容 ignore_case、中文路径、忽略规则、结果上限。rg 与 Python 后端的 matches 内容和顺序保持一致，旧正则默认行为不变。\n\n本工作区是固定工程任务切片，不是原仓库的完整测试环境。可见基础检查命令：PYTHONPATH=src:. python -m pytest -q tests/test_visible_basics.py。该检查验证基础读写/搜索、CLI 帮助和本地 stdio fixture；目标边界请自行验证。隐藏目标及固定回归由外部评分器在全新离线容器重建。只修改 src/mokioclaw 下实现，保留测试和示例 fixture。\n允许修改范围：src/mokioclaw/**",
+  "events": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/experiments/job-readiness-goal2-20261017-b1/trials/M07-v2-full-1/events.jsonl",
+  "output": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/experiments/job-readiness-goal2-20261017-b1/trials/M07-v2-full-1/worker.json",
+  "parent_pid": 86287,
+  "worker_token": "2dce21e916fd4b67b77516a589d25243"
+}

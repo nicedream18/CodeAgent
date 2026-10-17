@@ -1,4 +1,21 @@
-# 求职收敛 Goal 1 状态
+# 求职交付收敛状态
+
+## Goal 2：18 次有限真实任务验证已完成
+
+- 固定三任务 × B0/B1 × 三次：18/18 有终态，原顺序执行，无重跑或追加。
+- 完整交付：B0 1/9、B1 0/9；独立产物通过均 8/9。B1 未显示完成率改善。
+- 16 次 token 停止、1 次正常完成、1 次模型连接基础设施失败，全部保留在分母内。
+- 427 次请求、486 次实际工具；token 合计 3,350,157，其中一个请求为估算；缓存创建量未知，不报告费用。
+- 两版源码、提示词、锁、任务、实际导入路径、请求配置、事件和恢复前 15 份收据均已审计。
+- 成功的 M08-v2（B0）与产物通过但运行失败的 M08-v2（B1）均从归档重建，可信 Docker 13/13 再次通过；原终态未改。
+- 唯一成功实际只改一个源文件，多源文件修改后完整交付目标仍为 0，未达成；没有追加实验凑成功。
+- `make check`：444 passed、2 skipped；Ruff、26 个严格 mypy 模块及文档/diff 检查通过；真实 `make check-docker` 29 passed（linux/aarch64）。
+- 未推送、发布、修改历史批次或冻结 B0/B1。远程 Linux CI 仍未运行。
+
+报告：[结果](../experiments/job-readiness-goal2/RESULTS.md)、[失败分析](../experiments/job-readiness-goal2/ANALYSIS.md)、[回放与复验](../experiments/job-readiness-goal2/DEMO.md)。
+后续优先收敛 verifier 与规范工具名反馈；新产品修复后的真实复测、额外 trial 或远程操作需另行授权。
+
+## Goal 1：已完成（历史记录）
 
 - Goal 1 工程交付：已完成，逐项证据见 ../experiments/job-readiness-v1/acceptance.json。
 - B0：`cad8a153584aa5f860982dee33719dc2664730db`，任务环境及角色诊断基线。
@@ -7,7 +24,7 @@
 - 检查：make check 437 passed / 2 skipped；mypy 24 个严格模块；真实 make check-docker 29 passed。
 - 模型调用：本 Goal 为 0；固定模型比较仅验证控制流，不计真实能力。
 - 历史实验、缓存 manifest、标签、旧 wheel：摘要复核保持原样。
-- 下一阶段：goal2-input.json 固定 18 条待授权计划，目前没有启动。
+- 当时的下一阶段输入：goal2-input.json 固定 18 条待授权计划，保留原始未授权文件；本次授权和完成记录另存 Goal 2。
 - 远程推送/发布：本 Goal 未执行。
 
 ## 关键结果和限制

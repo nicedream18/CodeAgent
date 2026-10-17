@@ -1,0 +1,110 @@
+{
+  "status": "failed",
+  "stop_reason": "provider_APIConnectionError",
+  "error": null,
+  "model_metrics": {
+    "requests": 17,
+    "roles": {
+      "intent_router": {
+        "estimated": false,
+        "input_tokens": 539,
+        "output_tokens": 73,
+        "total_tokens": 612,
+        "duration_ms": 1341.902,
+        "cache_read_tokens": 384,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "repoAgent": {
+        "estimated": false,
+        "input_tokens": 37539,
+        "output_tokens": 2214,
+        "total_tokens": 39753,
+        "duration_ms": 12509.035,
+        "cache_read_tokens": 10368,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 5
+      },
+      "planner": {
+        "estimated": true,
+        "input_tokens": 15800,
+        "output_tokens": 1217,
+        "total_tokens": 17017,
+        "duration_ms": 11260.89,
+        "cache_read_tokens": 1792,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 3
+      },
+      "codeAgent": {
+        "estimated": false,
+        "input_tokens": 78666,
+        "output_tokens": 2831,
+        "total_tokens": 81497,
+        "duration_ms": 16927.375,
+        "cache_read_tokens": 10240,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 8
+      }
+    },
+    "estimated": true,
+    "input_tokens": 132544,
+    "output_tokens": 6335,
+    "total_tokens": 138879,
+    "duration_ms": 42039.202000000005,
+    "cache_read_tokens": 22784,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 20,
+  "actual_path": [
+    "intent_router",
+    "{'type': 'workflow_selected', 'mode': 'full', 'reason': 'explicit configuration or conservative router hint', 'event_id': 'fff7c238bc384b9aa4c0e24d632b6ee9', 'run_id': 'job-readiness-goal2-20261017-b0-M02-v2-full-3', 'context_version': 0}"
+  ],
+  "stream_ids": [
+    "25e209f1edf14135bf3ca2c83e8d2ddb",
+    "c04127fa09ce4db49d16cb1fcb2e1e47",
+    "65cbc5ca2a6c48d0a26244079f19672c",
+    "51a4b47fd5894c43bee8b8e1883c78e4",
+    "c655dd9414fe40a882e5865532c688c1",
+    "f1eb016cf5fb48c19cb1d87ca5c2e081",
+    "ea9a54c09274461da2b7b16729d808bf",
+    "32aeb0114bba4d218b18c1ce1daa73d6",
+    "50e4f7abddf241ebbb657067d7800135",
+    "1d4971b0b3724e3fbe4e659a68ae498d",
+    "ce7a129251734ebca1084b74df1814c4",
+    "cef944d2a35b419480cedcad7c07dc45",
+    "7243933ed1dd4b818240d164f2e8618c",
+    "c0e6a8aac8e947b98af0b39c248c6748",
+    "045827c308b846d7b68c325c8f60bedd",
+    "17140021bb764345ab41e239cd8b7530",
+    "5b655f5cbce4400bb464d286972a6eae"
+  ],
+  "tool_call_ids": [
+    "call_00_2cQzYqKWMjmFBEX6DuZO2929",
+    "call_01_yl7xW3TPkzA8V5hjEqnn4891",
+    "call_00_sEzOEhjVXARvsKuPtu228942",
+    "call_01_5ogpCCJBnZeaiNfeoKDq8489",
+    "call_00_94SKIvh2bXOia8hK1ogB9728",
+    "call_01_IrDgHapoLkhPonOwL3Vh4751",
+    "call_00_tNrhablFW3QXjNEjKUH44424",
+    "call_01_1YpXNKwUN4IhV9pKhM8e1625",
+    "call_00_5WsspwcEwxbfVCXZ8Fxi2085",
+    "call_00_KA1MIZ9qzCHQPBHgu08B1647",
+    "call_00_zmTlCHiyU7ZCIWIeJmB53818",
+    "call_01_Kv0EmC57NGyKWsGn97cQ6624",
+    "call_00_XcTDH0GUMpH2yQYpecnW9450",
+    "call_00_j71f3cCsreHjKqQUc7WX4739",
+    "call_00_8HLBPZIAFSHzM99wz0RW6646",
+    "call_00_tDS04jDTToysRejkVPzR3764",
+    "call_00_406LicbYR2zkvCXnv1QB0254",
+    "call_00_nFUTov0TDuwERmrarcCO8070",
+    "call_01_hWZNCFTax1KLmItcFgzv8944",
+    "call_02_GlikSjisoj5AUED06oPW3069"
+  ],
+  "model_claim": null,
+  "run_id": "job-readiness-goal2-20261017-b0-M02-v2-full-3"
+}

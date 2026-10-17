@@ -1,0 +1,14 @@
+{
+  "TODO.md": {
+    "before": null,
+    "after": "6c6338a5b7ae55cd4b40a758f52730c12b50c4f1f8d880a574d72e73b2d585c8"
+  },
+  "src/mokioclaw/providers/generation.py": {
+    "before": "6b455f09d053b6fe22377643ac7156c6598b0ec42ff3e9fd01e9b78f15088874",
+    "after": "7d4694231087842c0a75399cdf8cc9c774f05d06fe1765ac16b501e2197072a4"
+  },
+  "src/mokioclaw/providers/openai_provider.py": {
+    "before": "c39162757ba6b3ea7c6acdb4c48c24a7ea66ca130c9188590ac2bb208d35136a",
+    "after": "7f85ad2d7db9e43885be2643bf222210cb5b6827051dcf4c444a302acda81b3a"
+  }
+}

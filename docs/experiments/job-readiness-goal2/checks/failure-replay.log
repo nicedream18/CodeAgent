@@ -1,0 +1,153 @@
+[2J[HMokioAgent | 产物通过、运行失败：诊断回放
+M08-v2-full-1
+这是已归档记录的回放，不是一次新的实时模型运行。
+
+[2J[H需求与来源
+为 mokioclaw trace 增加 --since ISO8601 时间过滤，要求带 Z 或 UTC 偏移、包含边界时刻并按 UTC 比较。不合法或没有时区的参数返回 CLI 用法错误，不能启动任何运行。旧记录无时间戳或时间戳无效时，在有 --since 条件下跳过；无该参数时仍保持原输出。--follow 与其他筛选可组合。
+
+本工作区是固定工程任务切片，不是原仓库的完整测试环境。可见基础检查命令：PYTHONPATH=src:. python -m pytest -q tests/test_visible_basics.py。该检查验证基础读写/搜索、CLI 帮助和本地 stdio fixture；目标边界请自行验证。隐藏目标及固定回归由外部评分器在全新离线容器重建。只修改 src/mokioclaw 下实现，保留测试和示例 fixture。
+base: 6e88c21c294fe041a821a21e0abad9dc095b9364
+[2J[H仓库证据（checkpoint 摘要）
+TODO.md
+src/mokioclaw/cli/app.py
+src/mokioclaw/core/transport_trace.py
+完整模型请求、读取与调用证据保存在同一 trial 的 trace.tar.gz。
+[2J[H实际候选 diff
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,12 +439,27 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = typer.Option(
++        None,
++        "--since",
++        help="Only show records at or after this ISO8601 time (UTC 'Z' or offset required).",
++    ),
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+-    from mokioclaw.core.transport_trace import TraceReader
++    from mokioclaw.core.transport_trace import TraceReader, parse_since, record_at_or_after
++
++    since_at = None
++    if since is not None:
++        try:
++            since_at = parse_since(since)
++        except ValueError as exc:
++            raise typer.BadParameter(
++                f"{exc}; expected ISO8601 with 'Z' or a UTC offset, e.g. 2024-01-01T00:00:00Z",
++                param_hint="--since",
++            ) from exc
+ 
+     reader = TraceReader()
+     try:
+@@ -456,6 +471,8 @@
+                 if layer and record.get("layer", "event") != layer:
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
++                    continue
++                if since_at is not None and not record_at_or_after(record, since_at):
+                     continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+--- a/src/mokioclaw/core/transport_trace.py
++++ b/src/mokioclaw/core/transport_trace.py
+@@ -3,6 +3,7 @@
+ from __future__ import annotations
+ 
+ import json
++import re
+ import threading
+ from collections.abc import Iterator
+ from datetime import UTC, datetime
+@@ -111,6 +112,61 @@
+                     continue
+ 
+ 
++_TZ_SUFFIX = re.compile(r"(?:[Zz]|[+-]\d{2}:?\d{2})$")
++
++
++def parse_since(value: str) -> datetime:
++    """Parse a ``--since`` ISO8601 value into an aware UTC datetime.
++
++    A timezone designator (``Z`` or a ``+HH:MM``/``-HH:MM`` offset) is required;
++    naive values are rejected so the comparison is unambiguous. Raises
++    ``ValueError`` for anything unparsable or timezone-less.
++    """
++    text = (value or "").strip()
++    if not text:
++        raise ValueError("empty timestamp")
++    if not _TZ_SUFFIX.search(text):
++        raise ValueError("timestamp must include a timezone (Z or UTC offset)")
++    normalized = text[:-1] + "+00:00" if text[-1] in "Zz" else text
++    try:
++        parsed = datetime.fromisoformat(normalized)
++    except ValueError as exc:
++        raise ValueError(f"invalid ISO8601 timestamp: {value!r}") from exc
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError("timestamp must include a timezone (Z or UTC offset)")
++    return parsed.astimezone(UTC)
++
++
++def parse_record_timestamp(value: Any) -> datetime | None:
++    """Return a record timestamp as aware UTC, or ``None`` when missing/invalid.
++
++    Records are written with ``datetime.now(UTC).isoformat()`` (``+00:00``
++    suffix). Legacy records may lack a timestamp or carry a naive value; a naive
++    value is interpreted as UTC rather than dropped.
++    """
++    if not isinstance(value, str):
++        return None
++    text = value.strip()
++    if not text:
++        return None
++    normalized = text[:-1] + "+00:00" if text[-1] in "Zz" else text
++    try:
++        parsed = datetime.fromisoformat(normalized)
++    except ValueError:
++        return None
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        return parsed.replace(tzinfo=UTC)
++    return parsed.astimezone(UTC)
++
++
++def record_at_or_after(record: dict[str, Any], since: datetime) -> bool:
++    """True when ``record`` has a valid timestamp at or after ``since`` (UTC)."""
++    stamp = parse_record_timestamp(record.get("timestamp"))
++    if stamp is None:
++        return False
++    return stamp >= since
++
++
+ class TraceReader:
+     """Incremental reader with one cursor per file, never one key per event."""
+ 
+
+[2J[H独立容器验收（可信测试重建）
+{
+  "valid": true,
+  "solved": true,
+  "target_passed": 4,
+  "target_failed": 0,
+  "regression_failed": 0,
+  "tests_run": 13
+}
+[2J[H原运行状态与用量
+{
+  "run_status": "failed",
+  "task_solved": false,
+  "stop_reason": "token_budget_exhausted",
+  "requests": 25,
+  "run_id": "job-readiness-goal2-20261017-b1-M08-v2-full-1"
+}
+[2J[H结论边界
+仅部分产物通过测试。原运行没有正常完成，主口径仍为未解决。
+不能把这段回放当作端到端成功演示。
+MokioAgent incremental requirement; v2 fixture and visible-scope repair
+单例演示不替换原架构对照成绩。
+原始失败、基础设施问题和所有预定试验均保留。
+[2J[H回放结束。复现已有产物不会再次请求模型。
+

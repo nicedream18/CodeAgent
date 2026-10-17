@@ -1,0 +1,30 @@
+--- a/src/mokioclaw/providers/generation.py
++++ b/src/mokioclaw/providers/generation.py
+@@ -65,7 +65,9 @@
+ 
+ def validate_generation(message: Any) -> GenerationOutcome:
+     result = outcome(message)
+-    if False:
++    if result.reason == "output_limit":
++        # A truncated response is never executable: every declared call is discarded,
++        # even ones that look complete, because the raw JSON may be cut off.
+         raise ModelGenerationStopped("model_output_truncated", message)
+     if result.reason in {"blocked", "unknown"}:
+         raise ModelGenerationStopped(
+--- a/src/mokioclaw/providers/openai_provider.py
++++ b/src/mokioclaw/providers/openai_provider.py
+@@ -97,8 +97,14 @@
+                 generation_attempt=attempt,
+             )
+         except ModelGenerationStopped as exc:
++            # Exactly one re-decision is allowed; a second truncation stops safely.
+             if exc.reason != "model_output_truncated" or attempt:
+                 raise
++            runtime = (state or {}).get("runtime")
++            check_run(runtime)
++            from mokioclaw.core.run_inbox import check_redirect
++
++            check_redirect(runtime)
+             calls = declared_calls(exc.message)
+             messages.append(
+                 AIMessage(

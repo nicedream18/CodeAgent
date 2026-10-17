@@ -193,6 +193,9 @@ def summarize(rows: list[dict[str, Any]], denominator: int) -> dict[str, Any]:
         "requests_without_usage": missing_usage,
         "distributions": {key: distribution([r[key] for r in rows]) for key in (
             "requests", "tools", "generation_seconds", "grading_seconds")},
+        "usage_distributions": {key: distribution([m[key] for m in metrics if m.get(key) is not None])
+                                for key in ("input_tokens", "output_tokens", "total_tokens",
+                                            "cache_read_tokens", "cache_creation_tokens")},
         "complete_delivery_seconds": distribution([r["generation_seconds"] for r in rows
                                                     if r["task_solved"]]),
         "non_delivery_seconds": distribution([r["generation_seconds"] for r in rows
@@ -245,6 +248,18 @@ def markdown(value: dict[str, Any]) -> str:
                      f"{row['execution_status']} | {row['independent_artifact_passed']} | "
                      f"{row['task_solved']} | {row['requests']} | "
                      f"{row['model_metrics'].get('total_tokens')} | {row['stop_reason'] or '—'} |")
+    lines += ["", "| 任务 | 版本 | 完整交付 | 请求 min / median / max | token min / median / max | 生成秒 min / median / max |",
+              "|---|---|---|---|---|---|"]
+    for task, versions in value["tasks"].items():
+        for version, stats in versions.items():
+            def span(data: dict[str, Any]) -> str:
+                return " / ".join(str(data[k]) for k in ("min", "median", "max"))
+
+            lines.append(f"| {task} | {version} | {stats['complete_deliveries']}/3 | "
+                         f"{span(stats['distributions']['requests'])} | "
+                         f"{span(stats['usage_distributions']['total_tokens'])} | "
+                         f"{span(stats['distributions']['generation_seconds'])} |")
+    lines += ["", "上表 token 为供应商返回或已明确标记的估算；失败连接的未知实际计费量不能由这些值反推。"]
     lines += ["", "每任务三次的 min/median/max、成功与失败耗时、角色开销、缓存未知量及验收明细见 comparison.json。",
               "显式模型自评按最终汇报标记解析；未出现时记未知。内部 verifier 与外部测试分别记录。",
               "预算停止保留文件产物，不能等同于完整交付。成功率提升不是本批完成的必要条件。", "",

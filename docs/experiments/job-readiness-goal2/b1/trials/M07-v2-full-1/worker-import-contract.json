@@ -1,0 +1,10 @@
+{
+  "executable": "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+  "modules": {
+    "mokioclaw.evaluation.worker": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/evaluation/worker.py",
+    "mokioclaw.evaluation.runner": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/evaluation/runner.py",
+    "mokioclaw.core.agent": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/core/agent.py",
+    "mokioclaw.agents.code_agent": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/agents/code_agent.py",
+    "mokioclaw.providers.openai_provider": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/providers/openai_provider.py"
+  }
+}

@@ -1,0 +1,46 @@
+START 1/18 B1 M02-v2-full-3
+{"index": 1, "version": "B1", "trial_id": "M02-v2-full-3", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 22, "stop_reason": "token_budget_exhausted"}
+START 2/18 B1 M08-v2-full-2
+{"index": 2, "version": "B1", "trial_id": "M08-v2-full-2", "status": "failed", "task_solved": false, "artifact_passed": false, "requests": 22, "stop_reason": "token_budget_exhausted"}
+START 3/18 B1 M08-v2-full-1
+{"index": 3, "version": "B1", "trial_id": "M08-v2-full-1", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 25, "stop_reason": "token_budget_exhausted"}
+START 4/18 B0 M08-v2-full-1
+{"index": 4, "version": "B0", "trial_id": "M08-v2-full-1", "status": "finished", "task_solved": true, "artifact_passed": true, "requests": 24, "stop_reason": null}
+START 5/18 B0 M07-v2-full-1
+{"index": 5, "version": "B0", "trial_id": "M07-v2-full-1", "status": "failed", "task_solved": false, "artifact_passed": false, "requests": 25, "stop_reason": "token_budget_exhausted"}
+START 6/18 B1 M07-v2-full-1
+{"index": 6, "version": "B1", "trial_id": "M07-v2-full-1", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 27, "stop_reason": "token_budget_exhausted"}
+START 7/18 B0 M07-v2-full-2
+{"index": 7, "version": "B0", "trial_id": "M07-v2-full-2", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 23, "stop_reason": "token_budget_exhausted"}
+START 8/18 B0 M07-v2-full-3
+{"index": 8, "version": "B0", "trial_id": "M07-v2-full-3", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 25, "stop_reason": "token_budget_exhausted"}
+START 9/18 B1 M02-v2-full-1
+{"index": 9, "version": "B1", "trial_id": "M02-v2-full-1", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 23, "stop_reason": "token_budget_exhausted"}
+START 10/18 B1 M07-v2-full-2
+{"index": 10, "version": "B1", "trial_id": "M07-v2-full-2", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 27, "stop_reason": "token_budget_exhausted"}
+START 11/18 B1 M08-v2-full-3
+{"index": 11, "version": "B1", "trial_id": "M08-v2-full-3", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 22, "stop_reason": "token_budget_exhausted"}
+START 12/18 B0 M08-v2-full-2
+{"index": 12, "version": "B0", "trial_id": "M08-v2-full-2", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 23, "stop_reason": "token_budget_exhausted"}
+START 13/18 B0 M02-v2-full-2
+{"index": 13, "version": "B0", "trial_id": "M02-v2-full-2", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 22, "stop_reason": "token_budget_exhausted"}
+START 14/18 B1 M02-v2-full-2
+{"index": 14, "version": "B1", "trial_id": "M02-v2-full-2", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 24, "stop_reason": "token_budget_exhausted"}
+START 15/18 B0 M02-v2-full-3
+{"index": 15, "version": "B0", "trial_id": "M02-v2-full-3", "status": "infrastructure_failed", "task_solved": false, "artifact_passed": true, "requests": 17, "stop_reason": "provider_APIConnectionError"}
+Traceback (most recent call last):
+  File "/Users/nicedream/xm/MokioAgent/scripts/job_readiness_trials.py", line 294, in <module>
+    main()
+    ~~~~^^
+  File "/Users/nicedream/xm/MokioAgent/scripts/job_readiness_trials.py", line 287, in main
+    run_matrix(args.cache, args.batch, plan)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nicedream/xm/MokioAgent/scripts/job_readiness_trials.py", line 261, in run_matrix
+    raise RuntimeError("Infrastructure failure: inspect before resuming unstarted trials")
+RuntimeError: Infrastructure failure: inspect before resuming unstarted trials
+START 16/18 B1 M07-v2-full-3
+{"index": 16, "version": "B1", "trial_id": "M07-v2-full-3", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 27, "stop_reason": "token_budget_exhausted"}
+START 17/18 B0 M02-v2-full-1
+{"index": 17, "version": "B0", "trial_id": "M02-v2-full-1", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 25, "stop_reason": "token_budget_exhausted"}
+START 18/18 B0 M08-v2-full-3
+{"index": 18, "version": "B0", "trial_id": "M08-v2-full-3", "status": "failed", "task_solved": false, "artifact_passed": true, "requests": 24, "stop_reason": "token_budget_exhausted"}

@@ -1,0 +1,75 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -431,6 +431,44 @@
+     )
+ 
+ 
++def _parse_iso8601_utc(value: str) -> "datetime":
++    """Parse an ISO8601 string that must carry a timezone; return it in UTC."""
++    from datetime import UTC, datetime
++
++    text = value.strip()
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError as exc:
++        raise ValueError(f"invalid ISO8601 timestamp: {value!r}") from exc
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError(f"timestamp must include a timezone: {value!r}")
++    return parsed.astimezone(UTC)
++
++
++def _parse_since(value: str) -> "datetime":
++    """Parse the ``--since`` option, raising ``typer.BadParameter`` when invalid."""
++    try:
++        return _parse_iso8601_utc(value)
++    except ValueError as exc:
++        raise typer.BadParameter(
++            f"--since must be an ISO8601 timestamp with a timezone (e.g. 2024-01-01T00:00:00Z): {exc}"
++        ) from exc
++
++
++def _record_at_or_after(record: dict, since_utc: "datetime") -> bool:
++    """Return True when the record timestamp is valid and >= ``since_utc`` (UTC)."""
++    timestamp = record.get("timestamp")
++    if not isinstance(timestamp, str):
++        return False
++    try:
++        record_utc = _parse_iso8601_utc(timestamp)
++    except ValueError:
++        return False
++    return record_utc >= since_utc
++
++
+ @app.command("trace")
+ def trace_command(
+     workspace: Path | None = None,
+@@ -439,9 +477,18 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: Annotated[
++        str | None,
++        typer.Option(
++            "--since",
++            help="Only show records at or after this ISO8601 timestamp (timezone required, e.g. 2024-01-01T00:00:00Z).",
++        ),
++    ] = None,
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
++
++    since_utc = _parse_since(since) if since is not None else None
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+     from mokioclaw.core.transport_trace import TraceReader
+@@ -456,6 +503,8 @@
+                 if layer and record.get("layer", "event") != layer:
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
++                    continue
++                if since_utc is not None and not _record_at_or_after(record, since_utc):
+                     continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))

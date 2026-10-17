@@ -1,0 +1,97 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -2,6 +2,7 @@
+ 
+ import json
+ import sys
++from datetime import UTC, datetime
+ from pathlib import Path
+ from typing import Annotated, Literal
+ 
+@@ -431,6 +432,50 @@
+     )
+ 
+ 
++def _parse_iso8601_utc(value: str, *, require_timezone: bool) -> datetime | None:
++    """Parse an ISO8601 string into an aware UTC datetime.
++
++    Returns ``None`` when the value cannot be parsed. When ``require_timezone``
++    is true, values without a timezone designator (``Z``/``z`` or a ``+HH:MM``
++    style offset) are rejected as well.
++    """
++    text = value.strip()
++    if not text:
++        return None
++    if text[-1] in {"Z", "z"}:
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError:
++        return None
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        if require_timezone:
++            return None
++        return parsed.replace(tzinfo=UTC)
++    return parsed.astimezone(UTC)
++
++
++def _parse_since_option(value: str | None) -> datetime | None:
++    """Validate the ``--since`` CLI value, raising a usage error when invalid."""
++    if value is None:
++        return None
++    parsed = _parse_iso8601_utc(value, require_timezone=True)
++    if parsed is None:
++        raise typer.BadParameter(
++            f"Invalid --since value {value!r}: expected an ISO8601 timestamp with a "
++            "timezone, e.g. 2024-01-01T00:00:00Z or 2024-01-01T00:00:00+02:00."
++        )
++    return parsed
++
++
++def _record_timestamp_utc(record: dict) -> datetime | None:
++    """Return the record's timestamp as an aware UTC datetime, or ``None``."""
++    raw = record.get("timestamp")
++    if not isinstance(raw, str):
++        return None
++    return _parse_iso8601_utc(raw, require_timezone=False)
++
++
+ @app.command("trace")
+ def trace_command(
+     workspace: Path | None = None,
+@@ -439,12 +484,24 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: Annotated[
++        str | None,
++        typer.Option(
++            "--since",
++            help=(
++                "Only show records at or after this ISO8601 UTC timestamp "
++                "(e.g. 2024-01-01T00:00:00Z or 2024-01-01T00:00:00+02:00)."
++            ),
++        ),
++    ] = None,
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+     from mokioclaw.core.transport_trace import TraceReader
++
++    since_utc = _parse_since_option(since)
+ 
+     reader = TraceReader()
+     try:
+@@ -457,6 +514,10 @@
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
+                     continue
++                if since_utc is not None:
++                    record_ts = _record_timestamp_utc(record)
++                    if record_ts is None or record_ts < since_utc:
++                        continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+                 else:

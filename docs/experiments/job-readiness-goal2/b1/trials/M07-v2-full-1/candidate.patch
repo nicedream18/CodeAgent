@@ -1,0 +1,56 @@
+--- a/src/mokioclaw/tools/grep_tool.py
++++ b/src/mokioclaw/tools/grep_tool.py
+@@ -115,13 +115,22 @@
+     }
+ 
+ 
+-def grep(state, pattern, path=".", glob=None, head_limit=50, ignore_case=False):
++def grep(
++    state,
++    pattern,
++    path=".",
++    glob=None,
++    head_limit=50,
++    ignore_case=False,
++    fixed_strings=False,
++):
+     started = time.monotonic()
+     try:
+         limit = int(head_limit)
+         if not pattern or limit <= 0:
+             raise ValueError("pattern and positive head_limit are required")
+-        regex = re.compile(pattern, re.IGNORECASE if ignore_case else 0)
++        flags = re.IGNORECASE if ignore_case else 0
++        regex = re.compile(re.escape(pattern) if fixed_strings else pattern, flags)
+         root = resolve_workspace_path(state, path)
+         if not root.exists():
+             raise ValueError(f"path does not exist: {path}")
+@@ -160,6 +169,8 @@
+                     ]
+                     if ignore_case:
+                         command.append("-i")
++                    if fixed_strings:
++                        command.append("--fixed-strings")
+                     command += ["-e", pattern, "--", *map(str, batch)]
+                     stream = control.iter_async(lambda command=command: _rg_lines(command))
+                     try:
+--- a/src/mokioclaw/tools/registry.py
++++ b/src/mokioclaw/tools/registry.py
+@@ -63,10 +63,13 @@
+ def _grep(state: RuntimeState) -> StructuredTool:
+     return StructuredTool.from_function(
+         name="GrepTool",
+-        func=lambda pattern, path=".", glob=None, head_limit=50, ignore_case=False: grep(
+-            state, pattern, path, glob, head_limit, ignore_case
+-        ),
+-        description="Search workspace text files by regex pattern and return matching lines.",
++        func=lambda pattern, path=".", glob=None, head_limit=50, ignore_case=False, fixed_strings=False: grep(
++            state, pattern, path, glob, head_limit, ignore_case, fixed_strings
++        ),
++        description=(
++            "Search workspace text files by regex pattern and return matching lines. "
++            "Set fixed_strings=True to match the pattern literally instead of as a regex."
++        ),
+     )
+ 
+ 

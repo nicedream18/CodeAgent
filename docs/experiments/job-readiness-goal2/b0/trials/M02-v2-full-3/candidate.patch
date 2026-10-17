@@ -1,0 +1,47 @@
+--- a/src/mokioclaw/providers/generation.py
++++ b/src/mokioclaw/providers/generation.py
+@@ -65,7 +65,10 @@
+ 
+ def validate_generation(message: Any) -> GenerationOutcome:
+     result = outcome(message)
+-    if False:
++    if result.reason == "output_limit":
++        # Truncated output invalidates EVERY declared call on this response, even
++        # ones that look complete: their arguments may be SDK-completed fragments
++        # of a half-written JSON payload and must never be executed.
+         raise ModelGenerationStopped("model_output_truncated", message)
+     if result.reason in {"blocked", "unknown"}:
+         raise ModelGenerationStopped(
+--- a/src/mokioclaw/providers/openai_provider.py
++++ b/src/mokioclaw/providers/openai_provider.py
+@@ -85,6 +85,7 @@
+ 
+     from mokioclaw.providers.generation import ModelGenerationStopped, declared_calls
+ 
++    runtime = (state or {}).get("runtime")
+     for attempt in range(2):
+         try:
+             return _invoke_once(
+@@ -97,12 +98,21 @@
+                 generation_attempt=attempt,
+             )
+         except ModelGenerationStopped as exc:
++            # Only a truncation is retryable, and only once: a second truncation
++            # stops safely instead of looping or executing anything.
+             if exc.reason != "model_output_truncated" or attempt:
+                 raise
++            # Cancellation/correction must win over the retry.
++            check_run(runtime)
++            from mokioclaw.core.run_inbox import check_redirect
++
++            check_redirect(runtime)
+             calls = declared_calls(exc.message)
++            # Synthetic AIMessage carries EMPTY args: never the SDK-completed or
++            # partial JSON values of the truncated response.
+             messages.append(
+                 AIMessage(
+-                    content=_text_content(exc.message.content),
++                    content=_text_content(getattr(exc.message, "content", "")),
+                     tool_calls=[{"id": c["id"], "name": c["name"], "args": {}} for c in calls],
+                 )
+             )

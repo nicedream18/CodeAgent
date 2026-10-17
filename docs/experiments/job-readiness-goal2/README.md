@@ -19,6 +19,18 @@ uv run python scripts/job_readiness_trials.py --real-model     # 本 Goal 已授
 ```
 
 缓存位于 ~/.cache/mokioclaw/eval/job-readiness-v1；其中 checkouts/B0、B1 为冻结 Git checkout。
+从已包含两版 Git 历史的新本地 checkout 恢复调度环境时，可先准备任务，再建立两个独立 checkout：
+
+```sh
+uv run python scripts/prepare_job_readiness.py
+mkdir -p "$HOME/.cache/mokioclaw/eval/job-readiness-v1/checkouts"
+git clone --shared --no-checkout "$PWD" "$HOME/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0"
+git -C "$HOME/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0" checkout --detach cad8a153584aa5f860982dee33719dc2664730db
+git clone --shared --no-checkout "$PWD" "$HOME/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1"
+git -C "$HOME/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1" checkout --detach ee5f073a7640c15c1d693c7e93bc067e9eb8da51
+```
+
+这些命令不请求模型；已有目录时不要覆盖，直接校验现有内容。新的真实复测仍须另行授权。
 调度器在独立批次写入 dispatch.json 后，以子进程执行原 run_trial；它在首个请求前写 result.json。
 若已有 dispatch 或 running 收据，先展示真实进程命令并停止调度，不推断进程死亡，不复用名额。
 基础设施故障会停止启动后续 trial，需核实并记录修复，之后只继续未启动项。
@@ -40,4 +52,23 @@ tests/test_goal2_driver.py 覆盖固定 18 条顺序、两版选择、预算、�
 200K 预算依赖估算预留与 usage 回填，不是精确费用上限。
 本地真实 ARM64 容器检查不能证明远程 Linux CI 已运行。
 
-本文件随本批真实观测追加报告链接，不预填成功率。
+## 实际交付
+
+18/18 终态：B0 完整交付 1/9、B1 0/9，独立产物通过均为 8/9。
+427 次请求配置与事件关联审计通过；包含一次保留的连接失败，没有重跑。
+本批未显示完整交付改善。唯一成功修改一个源文件，多源文件修改后完整交付仍未达成。
+
+- [逐次结果与三次重复分布](RESULTS.md)，完整结构化数据见 comparison.json。
+- [角色开销、停止位置、失败原因与后续建议](ANALYSIS.md)。
+- [成功和失败的实际归档回放、重建复验方式](DEMO.md)。
+- provenance-audit.json 记录实际导入和顺序；b0/audit.json、b1/audit.json 记录请求与事件审计。
+- regrades 保存两个既有产物的独立容器复验，未调用模型、未覆盖首次评分。
+- checks 保存最终统一检查及真实 Docker 检查日志。
+
+复现统计不请求模型：
+
+```sh
+uv run python scripts/report_job_readiness.py --root docs/experiments/job-readiness-goal2
+```
+
+重新启动真实 trial 或扩大矩阵不在本批完成后的授权范围内；额外复测需另行授权。

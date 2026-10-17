@@ -1,0 +1,112 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,12 +439,27 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = typer.Option(
++        None,
++        "--since",
++        help="Only show records at or after this ISO8601 time (UTC 'Z' or offset required).",
++    ),
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+-    from mokioclaw.core.transport_trace import TraceReader
++    from mokioclaw.core.transport_trace import TraceReader, parse_since, record_at_or_after
++
++    since_at = None
++    if since is not None:
++        try:
++            since_at = parse_since(since)
++        except ValueError as exc:
++            raise typer.BadParameter(
++                f"{exc}; expected ISO8601 with 'Z' or a UTC offset, e.g. 2024-01-01T00:00:00Z",
++                param_hint="--since",
++            ) from exc
+ 
+     reader = TraceReader()
+     try:
+@@ -456,6 +471,8 @@
+                 if layer and record.get("layer", "event") != layer:
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
++                    continue
++                if since_at is not None and not record_at_or_after(record, since_at):
+                     continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+--- a/src/mokioclaw/core/transport_trace.py
++++ b/src/mokioclaw/core/transport_trace.py
+@@ -3,6 +3,7 @@
+ from __future__ import annotations
+ 
+ import json
++import re
+ import threading
+ from collections.abc import Iterator
+ from datetime import UTC, datetime
+@@ -111,6 +112,61 @@
+                     continue
+ 
+ 
++_TZ_SUFFIX = re.compile(r"(?:[Zz]|[+-]\d{2}:?\d{2})$")
++
++
++def parse_since(value: str) -> datetime:
++    """Parse a ``--since`` ISO8601 value into an aware UTC datetime.
++
++    A timezone designator (``Z`` or a ``+HH:MM``/``-HH:MM`` offset) is required;
++    naive values are rejected so the comparison is unambiguous. Raises
++    ``ValueError`` for anything unparsable or timezone-less.
++    """
++    text = (value or "").strip()
++    if not text:
++        raise ValueError("empty timestamp")
++    if not _TZ_SUFFIX.search(text):
++        raise ValueError("timestamp must include a timezone (Z or UTC offset)")
++    normalized = text[:-1] + "+00:00" if text[-1] in "Zz" else text
++    try:
++        parsed = datetime.fromisoformat(normalized)
++    except ValueError as exc:
++        raise ValueError(f"invalid ISO8601 timestamp: {value!r}") from exc
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError("timestamp must include a timezone (Z or UTC offset)")
++    return parsed.astimezone(UTC)
++
++
++def parse_record_timestamp(value: Any) -> datetime | None:
++    """Return a record timestamp as aware UTC, or ``None`` when missing/invalid.
++
++    Records are written with ``datetime.now(UTC).isoformat()`` (``+00:00``
++    suffix). Legacy records may lack a timestamp or carry a naive value; a naive
++    value is interpreted as UTC rather than dropped.
++    """
++    if not isinstance(value, str):
++        return None
++    text = value.strip()
++    if not text:
++        return None
++    normalized = text[:-1] + "+00:00" if text[-1] in "Zz" else text
++    try:
++        parsed = datetime.fromisoformat(normalized)
++    except ValueError:
++        return None
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        return parsed.replace(tzinfo=UTC)
++    return parsed.astimezone(UTC)
++
++
++def record_at_or_after(record: dict[str, Any], since: datetime) -> bool:
++    """True when ``record`` has a valid timestamp at or after ``since`` (UTC)."""
++    stamp = parse_record_timestamp(record.get("timestamp"))
++    if stamp is None:
++        return False
++    return stamp >= since
++
++
+ class TraceReader:
+     """Incremental reader with one cursor per file, never one key per event."""
+ 

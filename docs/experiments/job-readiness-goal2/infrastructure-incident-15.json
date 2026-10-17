@@ -1,0 +1,31 @@
+{
+  "recorded_at": "2026-10-17T09:04:18.450913+00:00",
+  "kind": "unauthenticated_non_generation_transport_probe",
+  "model_calls": 0,
+  "worker_pid": 98938,
+  "worker_command_present": false,
+  "provider_error": "provider_APIConnectionError",
+  "original_receipt_preserved": true,
+  "http_status": 401,
+  "transport_reachable": true,
+  "server": "api.deepseek.com",
+  "response_body_saved": false,
+  "decision": "Endpoint returned HTTP 401 to a credential-free GET /models; TLS/HTTP transport is reachable now. Docker healthy, old worker absent, no evaluation containers remain. Exact streaming disconnect cause unconfirmed. Resume only scheduled unstarted trials 16-18; never rerun trial 15.",
+  "preserved_receipt_sha256": {
+    "job-readiness-goal2-20261017-b0/trials/M02-v2-full-2/result.json": "746dfe62869d8a0c91cc1d3024e21f7576951ddb8546f3cc97d5fbc2268e9c81",
+    "job-readiness-goal2-20261017-b0/trials/M02-v2-full-3/result.json": "ccdae9e98cc581020d44c9099a7a8aea01019d5f1bc153d94a66b608e6b637d9",
+    "job-readiness-goal2-20261017-b0/trials/M07-v2-full-1/result.json": "e81bc68abe26cd7fcb2cde348bf6ab6db45128105a00ed0d399ba2837833e9ab",
+    "job-readiness-goal2-20261017-b0/trials/M08-v2-full-2/result.json": "64e2ca6644c55b6b1dbbe3cbfa1d0d3d776c07a628f7c5ed80c427e48d32268d",
+    "job-readiness-goal2-20261017-b0/trials/M07-v2-full-2/result.json": "f620ece2573ed24b829cf0ac534d29c30ccc6f7dae6d84346178e261d607cd68",
+    "job-readiness-goal2-20261017-b0/trials/M08-v2-full-1/result.json": "a2a58a450237505e1e8c9c470d65a58da7557d26e371aa7eaa8af0a01f9c61a7",
+    "job-readiness-goal2-20261017-b0/trials/M07-v2-full-3/result.json": "ba3d30355d69e33d337e89df06ee94eb4fb40c9164298cec7b135fc6d3fed954",
+    "job-readiness-goal2-20261017-b1/trials/M02-v2-full-2/result.json": "5367a629051edb0c773437292f738f2ae8f822c55ea159449c0faf06ec70ad2e",
+    "job-readiness-goal2-20261017-b1/trials/M02-v2-full-3/result.json": "7d6fb1b38203f8ad4fb248bd1ddb0aeb0121aecfad058b99074d1314cf678a5b",
+    "job-readiness-goal2-20261017-b1/trials/M07-v2-full-1/result.json": "43cc2880b60cafc72f0e38dd2263e94b011fff88eb07d10e718fa17905a71c8f",
+    "job-readiness-goal2-20261017-b1/trials/M08-v2-full-3/result.json": "665e17b1e544b8edd19108b5dcbd07659387b173d390ffb010b8d001f2960081",
+    "job-readiness-goal2-20261017-b1/trials/M08-v2-full-2/result.json": "378c4c8fefba1af08921255bfd9796c48388df9e2e35ddcb2aa8cf7c435aa046",
+    "job-readiness-goal2-20261017-b1/trials/M02-v2-full-1/result.json": "f6f206324716980b50dbd6434168544c9293c2c7a20f440ff9b6e6df6c91ee5f",
+    "job-readiness-goal2-20261017-b1/trials/M07-v2-full-2/result.json": "c71915f81fa68ed1f616166a9dd9bcb8f9fa9c7c77040617ea221d61894a43fa",
+    "job-readiness-goal2-20261017-b1/trials/M08-v2-full-1/result.json": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+  }
+}

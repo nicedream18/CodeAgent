@@ -1,0 +1,42 @@
+{
+  "experiment_id": "job-readiness-goal2-20261017-b0",
+  "config": {
+    "schema_version": 1,
+    "task_id": "M07-v2",
+    "architecture": "full",
+    "repeat": 2,
+    "seed": 20261017,
+    "temperature": 0,
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "token_limit": 200000,
+    "request_limit": 40,
+    "tool_limit": 80,
+    "generation_seconds": 900,
+    "bash_seconds": 60,
+    "grading_seconds": 120,
+    "model": "deepseek-chat",
+    "model_config_sha256": "8f1ac6f257a41f94c653d5e9129e0b0347621aae56249dc7cedb8e85696d8e17",
+    "harness_revision": "cad8a153584aa5f860982dee33719dc2664730db",
+    "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61"
+  },
+  "checkout": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0",
+  "cache": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1",
+  "schedule_index": 7,
+  "version_contract": {
+    "label": "B0",
+    "revision": "cad8a153584aa5f860982dee33719dc2664730db",
+    "source_sha256": "345c81e3e56637b6a068b1548790fc1a48a918baf25035055364dbe03404b00b",
+    "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61",
+    "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+    "task_hashes": {
+      "M08-v2": "7a323d287662bfd0c910c3180427a1023dfc65c4e4df5a357cc8c611ca62e073",
+      "M02-v2": "038df6fa46e86ca9ea541609e26df312f1cab7a269e310931aecf4be1b6e89f2",
+      "M07-v2": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42"
+    },
+    "model_calls": 0,
+    "optimization": "none; repaired task environment and read-only diagnostics only"
+  },
+  "nonce": "b8c6bf6730e84dc98082936be72824a8",
+  "claimed_at": "2026-10-17T07:27:22.211182+00:00"
+}

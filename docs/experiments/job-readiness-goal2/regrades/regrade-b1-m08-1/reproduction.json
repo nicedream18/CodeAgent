@@ -1,0 +1,24 @@
+{
+  "real_model": false,
+  "kind": "independent_regrade",
+  "original_run_status": "failed",
+  "original_task_solved": false,
+  "original_artifact_passed": true,
+  "regrade": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": true,
+    "target_passed": 4,
+    "target_failed": 0,
+    "regression_failed": 0,
+    "tests_run": 13,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 2.753,
+    "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/batches/job-readiness-goal2-20261017/regrade-b1-m08-1/regrade"
+  },
+  "same_test_outcome": true,
+  "image_changed": false,
+  "output": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/batches/job-readiness-goal2-20261017/regrade-b1-m08-1"
+}

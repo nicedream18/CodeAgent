@@ -51,6 +51,8 @@ def test_partial_pass_unknown_claim_and_cache_are_not_success_or_zero(tmp_path):
     assert summary["usage"]["total_tokens"]["known_sum"] == 12
     assert summary["usage"]["cache_creation_tokens"]["known_sum"] is None
     assert summary["usage"]["cache_read_tokens"]["known_sum"] == 4
+    assert summary["usage_distributions"]["total_tokens"]["median"] == 12
+    assert summary["usage_distributions"]["cache_creation_tokens"]["n"] == 0
     assert summary["requests_without_usage"] == 0
     assert summary["complete_delivery_seconds"]["n"] == 0
     assert summary["non_delivery_seconds"]["n"] == 1

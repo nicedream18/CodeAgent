@@ -1,0 +1,132 @@
+[2J[HMokioAgent | 完整交付
+M08-v2-full-1
+这是已归档记录的回放，不是一次新的实时模型运行。
+
+[2J[H需求与来源
+为 mokioclaw trace 增加 --since ISO8601 时间过滤，要求带 Z 或 UTC 偏移、包含边界时刻并按 UTC 比较。不合法或没有时区的参数返回 CLI 用法错误，不能启动任何运行。旧记录无时间戳或时间戳无效时，在有 --since 条件下跳过；无该参数时仍保持原输出。--follow 与其他筛选可组合。
+
+本工作区是固定工程任务切片，不是原仓库的完整测试环境。可见基础检查命令：PYTHONPATH=src:. python -m pytest -q tests/test_visible_basics.py。该检查验证基础读写/搜索、CLI 帮助和本地 stdio fixture；目标边界请自行验证。隐藏目标及固定回归由外部评分器在全新离线容器重建。只修改 src/mokioclaw 下实现，保留测试和示例 fixture。
+base: 6e88c21c294fe041a821a21e0abad9dc095b9364
+[2J[H仓库证据（checkpoint 摘要）
+{"entry_points": ["src/mokioclaw/cli/app.py:434 `@app.command(\"trace\")` / `def trace_command(workspace, run_id, layer, direction, follow, raw)` — the CLI entry point to extend with `--since`.", "src/mokioclaw/cli/app.py:57 `app = typer.Typer(cls=MokioClawGroup, ...)` — root Typer app; `MokioClawGroup.parse_args` (lines 28-54) routes subcommand names to Typer.", "src/mokioclaw/core/transport_trace.py:114 `class TraceReader.read(workspace, *, daemon_root)` — incremental record iterator yielding `(path, dict)`.", "src/mokioclaw/core/transport_trace.py:95 `iter_trace_records(...)` — non-incremental variant (not used by the CLI)."], "suggested_changes": ["src/mokioclaw/cli/app.py:435-442 — add a `since: str | None = None` parameter (optionally `Annotated[str | None, typer.Option(\"--since\", help=...)]`) to `trace_command`.", "src/mokioclaw/cli/app.py:444-449 — before constructing `TraceReader`, parse `since` with `datetime.fromisoformat` (handle trailing `Z` by replacing with `+00:00`), require `tzinfo is not None`, and raise `typer.BadParameter(...)` on invalid/missing-timezone input so no reader/run starts.", "src/mokioclaw/cli/app.py:452-459 — add a filter after existing filters: when `since` is set, parse `record.get(\"timestamp\")`; skip records with missing/invalid timestamps or timestamps earlier than the boundary; compare in UTC (`astimezone(UTC)`), inclusive (`>=`). When `since` is None, leave behavior unchanged.", "Optionally add a small helper (e.g. `_parse_since` / `_record_at_or_after`) in app.py or a new module under src/mokioclaw/ for testability; keep changes within src/mokioclaw/**."], "tests": ["tests/test_visible_basics.py — visible basics (basic read/write/search, CLI help, local stdio fixture); grep found no `trace`/`since`/`fromisoformat` references, so trace filtering is not covered by visible tests.", "Verification command: `PYTHONPATH=src:. python -m pytest -q tests/test_visible_basics.py`.", "Hidden tests (external) are expected to cover: `--since` with `Z` and `+HH:MM` offsets, inclusive boundary, UTC comparison across offsets, invalid/no-timezone -> usage error (exit 2) with no run started, skipping missing/invalid timestamps only when 
+完整模型请求、读取与调用证据保存在同一 trial 的 trace.tar.gz。
+[2J[H实际候选 diff
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -431,6 +431,44 @@
+     )
+ 
+ 
++def _parse_iso8601_utc(value: str) -> "datetime":
++    """Parse an ISO8601 string that must carry a timezone; return it in UTC."""
++    from datetime import UTC, datetime
++
++    text = value.strip()
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError as exc:
++        raise ValueError(f"invalid ISO8601 timestamp: {value!r}") from exc
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError(f"timestamp must include a timezone: {value!r}")
++    return parsed.astimezone(UTC)
++
++
++def _parse_since(value: str) -> "datetime":
++    """Parse the ``--since`` option, raising ``typer.BadParameter`` when invalid."""
++    try:
++        return _parse_iso8601_utc(value)
++    except ValueError as exc:
++        raise typer.BadParameter(
++            f"--since must be an ISO8601 timestamp with a timezone (e.g. 2024-01-01T00:00:00Z): {exc}"
++        ) from exc
++
++
++def _record_at_or_after(record: dict, since_utc: "datetime") -> bool:
++    """Return True when the record timestamp is valid and >= ``since_utc`` (UTC)."""
++    timestamp = record.get("timestamp")
++    if not isinstance(timestamp, str):
++        return False
++    try:
++        record_utc = _parse_iso8601_utc(timestamp)
++    except ValueError:
++        return False
++    return record_utc >= since_utc
++
++
+ @app.command("trace")
+ def trace_command(
+     workspace: Path | None = None,
+@@ -439,9 +477,18 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: Annotated[
++        str | None,
++        typer.Option(
++            "--since",
++            help="Only show records at or after this ISO8601 timestamp (timezone required, e.g. 2024-01-01T00:00:00Z).",
++        ),
++    ] = None,
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
++
++    since_utc = _parse_since(since) if since is not None else None
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+     from mokioclaw.core.transport_trace import TraceReader
+@@ -456,6 +503,8 @@
+                 if layer and record.get("layer", "event") != layer:
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
++                    continue
++                if since_utc is not None and not _record_at_or_after(record, since_utc):
+                     continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+
+[2J[H独立容器验收（可信测试重建）
+{
+  "valid": true,
+  "solved": true,
+  "target_passed": 4,
+  "target_failed": 0,
+  "regression_failed": 0,
+  "tests_run": 13
+}
+[2J[H原运行状态与用量
+{
+  "run_status": "finished",
+  "task_solved": true,
+  "stop_reason": null,
+  "requests": 24,
+  "run_id": "job-readiness-goal2-20261017-b0-M08-v2-full-1"
+}
+[2J[H实际最终汇报（checkpoint 有界摘要）
+LangGraph MultiAgent workflow finished: PASSED
+
+Plan: Implemented --since in src/mokioclaw/cli/app.py with strict tz-aware parsing, UTC-inclusive filtering, and pre-run validation; visible tests pass and manual CLI checks confirm exit code 2 for invalid input.
+
+Todos:
+- [completed] Add --since ISO8601 (tz-aware, inclusive, UTC compare) filter to trace command in src/mokioclaw/cli/app.py; invalid/no-tz -> typer.BadParameter before any run; skip missing/invalid timestamps only when --since set; keep --follow composable.
+- [completed] Run visible tests plus a targeted manual check of --since parsing/filtering.
+
+Research sources:
+(none)
+
+Verifier:
+`--since` is implemented in src/mokioclaw/cli/app.py with strict tz-aware ISO8601 parsing (Z and +HH:MM), inclusive UTC comparison, pre-run validation raising typer.BadParameter (exit 2, no reader/run started), skipping missing/invalid timestamps only when --since is set, and composability with --follow/--raw/--run-id. Visible tests pass and targeted manual checks confirm all boundary behaviors.
+
+Checks:
+- visible tests: PASS - PYTHONPATH=src:. python -m pytest -q tests/test_visible_basics.py -> 3 passed
+- scope of changes: PASS - Only src/mokioclaw/cli/app.py modified (helpers at lines 434-469, option at 480-486, validation at 491, filter at 507); tests/ untouched (only test_visible_basics.py present, no 'since' references).
+- parsing accepts Z and UTC offsets: PASS - _parse_since('2024-01-01T00:00:00Z') and _parse_since('2024-01-01T02
+[2J[H结论边界
+这是一份正常完成且独立验收通过的候选。
+MokioAgent incremental requirement; v2 fixture and visible-scope repair
+单例演示不替换原架构对照成绩。
+原始失败、基础设施问题和所有预定试验均保留。
+[2J[H回放结束。复现已有产物不会再次请求模型。
+

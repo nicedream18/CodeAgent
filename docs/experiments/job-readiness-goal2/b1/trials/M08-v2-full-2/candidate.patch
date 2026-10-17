@@ -1,0 +1,164 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,12 +439,29 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = typer.Option(
++        None,
++        "--since",
++        help=(
++            "Only show records at or after this ISO-8601 time (inclusive). "
++            "Requires 'Z' or a UTC offset (e.g. 2024-01-01T00:00:00Z, "
++            "2024-01-01T08:00:00+08:00); compared in UTC."
++        ),
++    ),
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
++    from mokioclaw.cli.trace_filter import parse_since, record_at_or_after
+     from mokioclaw.core.daemon_client import daemon_state_dir
+     from mokioclaw.core.transport_trace import TraceReader
++
++    since_at = None
++    if since is not None:
++        try:
++            since_at = parse_since(since)
++        except ValueError as exc:
++            raise typer.BadParameter(str(exc), param_hint="--since") from exc
+ 
+     reader = TraceReader()
+     try:
+@@ -456,6 +473,8 @@
+                 if layer and record.get("layer", "event") != layer:
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
++                    continue
++                if since_at is not None and not record_at_or_after(record, since_at):
+                     continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+--- a/src/mokioclaw/cli/trace_filter.py
++++ b/src/mokioclaw/cli/trace_filter.py
+@@ -0,0 +1,64 @@
++"""Time filtering helpers for ``mokioclaw trace --since``.
++
++The ``--since`` boundary must be an ISO-8601 datetime that carries an explicit
++timezone (``Z`` or a UTC offset). Naive datetimes are rejected because they are
++ambiguous. All comparisons happen in UTC and the boundary is inclusive.
++"""
++
++from __future__ import annotations
++
++from datetime import UTC, datetime
++from typing import Any
++
++__all__ = ["parse_since", "record_at_or_after", "parse_record_timestamp"]
++
++
++def _normalize(value: str) -> str:
++    text = value.strip()
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    return text
++
++
++def parse_since(value: str) -> datetime:
++    """Parse an ISO-8601 ``--since`` value into an aware UTC datetime.
++
++    Raises ``ValueError`` for unparsable values or values without a timezone.
++    """
++    if not isinstance(value, str) or not value.strip():
++        raise ValueError("--since requires an ISO-8601 datetime with a timezone")
++    try:
++        parsed = datetime.fromisoformat(_normalize(value))
++    except ValueError as exc:
++        raise ValueError(
++            f"invalid --since value {value!r}: expected ISO-8601 with 'Z' or a UTC offset"
++        ) from exc
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError(
++            f"invalid --since value {value!r}: timezone is required ('Z' or a UTC offset)"
++        )
++    return parsed.astimezone(UTC)
++
++
++def parse_record_timestamp(record: Any) -> datetime | None:
++    """Return the record timestamp as an aware UTC datetime, or ``None``."""
++    if not isinstance(record, dict):
++        return None
++    raw = record.get("timestamp")
++    if not isinstance(raw, str) or not raw.strip():
++        return None
++    try:
++        parsed = datetime.fromisoformat(_normalize(raw))
++    except ValueError:
++        return None
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        return None
++    return parsed.astimezone(UTC)
++
++
++def record_at_or_after(record: Any, since: datetime) -> bool:
++    """True when the record timestamp is at or after ``since`` (inclusive, UTC)."""
++    stamp = parse_record_timestamp(record)
++    if stamp is None:
++        return False
++    return stamp >= since
+--- a/tmp_check_since.py
++++ b/tmp_check_since.py
+@@ -0,0 +1,53 @@
++import json
++import tempfile
++from pathlib import Path
++
++from typer.testing import CliRunner
++
++from mokioclaw.cli.app import app
++
++runner = CliRunner()
++ws = Path(tempfile.mkdtemp())
++d = ws / ".mokioclaw" / "traces" / "r1"
++d.mkdir(parents=True)
++recs = [
++    {"timestamp": "2023-12-31T23:59:59+00:00", "layer": "event", "direction": "CORE", "type": "before", "run_id": "r1"},
++    {"timestamp": "2024-01-01T00:00:00+00:00", "layer": "event", "direction": "CORE", "type": "boundary", "run_id": "r1"},
++    {"timestamp": "2024-01-01T08:00:00+08:00", "layer": "event", "direction": "CORE", "type": "offset_equal", "run_id": "r1"},
++    {"timestamp": "2024-01-01T00:00:01+00:00", "layer": "event", "direction": "CORE", "type": "after", "run_id": "r1"},
++    {"layer": "event", "direction": "CORE", "type": "no_ts", "run_id": "r1"},
++    {"timestamp": "not-a-time", "layer": "event", "direction": "CORE", "type": "bad_ts", "run_id": "r1"},
++    {"timestamp": "2024-01-01T00:00:00", "layer": "event", "direction": "CORE", "type": "naive_ts", "run_id": "r1"},
++]
++(d / "events.jsonl").write_text("\n".join(json.dumps(r) for r in recs) + "\n")
++
++
++def types(res):
++    return [json.loads(line)["type"] for line in res.stdout.splitlines() if line.strip()]
++
++
++def usage(res):
++    return "Usage" in res.output or "Invalid value" in res.output
++
++
++base = ["trace", "--workspace", str(ws), "--raw"]
++r = runner.invoke(app, base)
++print("no-since:", r.exit_code, types(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T00:00:00Z"])
++print("Z:", r.exit_code, types(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T08:00:00+08:00"])
++print("offset:", r.exit_code, types(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T00:00:01Z"])
++print("after-only:", r.exit_code, types(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T00:00:00+0000"])
++print("+0000:", r.exit_code, types(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T00:00:00"])
++print("naive:", r.exit_code, usage(r))
++r = runner.invoke(app, base + ["--since", "garbage"])
++print("invalid:", r.exit_code, usage(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T00:00:00Z", "--run-id", "r1", "--layer", "event", "--direction", "CORE"])
++print("combo:", r.exit_code, types(r))
++r = runner.invoke(app, base + ["--since", "2024-01-01T00:00:00Z", "--run-id", "nope"])
++print("combo-empty:", r.exit_code, types(r))
++r = runner.invoke(app, ["trace", "--help"])
++print("help:", r.exit_code, "--since" in r.output)

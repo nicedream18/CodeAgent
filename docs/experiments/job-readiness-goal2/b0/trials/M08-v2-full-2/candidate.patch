@@ -1,0 +1,82 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,12 +439,36 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = typer.Option(
++        None,
++        "--since",
++        help="Only show records at or after this ISO8601 instant (e.g. 2024-01-01T00:00:00Z).",
++    ),
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
++    from datetime import datetime, timezone
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+-    from mokioclaw.core.transport_trace import TraceReader
++    from mokioclaw.core.transport_trace import TraceReader, parse_timestamp
++
++    since_utc: datetime | None = None
++    if since is not None:
++        text = since.strip()
++        if text.endswith(("Z", "z")):
++            text = text[:-1] + "+00:00"
++        try:
++            parsed_since = datetime.fromisoformat(text)
++        except ValueError:
++            raise typer.BadParameter(
++                f"Invalid ISO8601 timestamp: {since!r}", param_hint="'--since'"
++            ) from None
++        if parsed_since.tzinfo is None or parsed_since.utcoffset() is None:
++            raise typer.BadParameter(
++                f"Timestamp must include a timezone (Z or UTC offset): {since!r}",
++                param_hint="'--since'",
++            )
++        since_utc = parsed_since.astimezone(timezone.utc)
+ 
+     reader = TraceReader()
+     try:
+@@ -457,6 +481,10 @@
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
+                     continue
++                if since_utc is not None:
++                    record_time = parse_timestamp(record.get("timestamp"))
++                    if record_time is None or record_time < since_utc:
++                        continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+                 else:
+--- a/src/mokioclaw/core/transport_trace.py
++++ b/src/mokioclaw/core/transport_trace.py
+@@ -92,6 +92,28 @@
+         pass  # Observability cannot change the RPC outcome.
+ 
+ 
++def parse_timestamp(value: Any) -> datetime | None:
++    """Parse an ISO8601 timestamp into an aware UTC datetime, or ``None``.
++
++    Accepts a trailing ``Z`` and explicit UTC offsets. Naive values are treated
++    as UTC because trace records are written with ``datetime.now(UTC)``.
++    """
++    if not isinstance(value, str):
++        return None
++    text = value.strip()
++    if not text:
++        return None
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError:
++        return None
++    if parsed.tzinfo is None:
++        return parsed.replace(tzinfo=UTC)
++    return parsed.astimezone(UTC)
++
++
+ def iter_trace_records(
+     workspace: Path | None = None, *, daemon_root: Path | None = None
+ ) -> Iterator[tuple[Path, dict[str, Any]]]:
