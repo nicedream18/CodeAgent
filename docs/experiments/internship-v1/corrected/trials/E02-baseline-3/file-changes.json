@@ -1,0 +1,10 @@
+{
+  "HISTORY_SUMMARY.md": {
+    "before": null,
+    "after": "31c95f44bdb34e8e6ad4c79e6f4dfa386293d91fbf3bd6ac5ab2e94564c28c23"
+  },
+  "src/flask/config.py": {
+    "before": "51ba3f8eecd262c00aa83daf0f7be6ea68ec3e8dc43890dd484cd8abc94a4c92",
+    "after": "584fd038985cd82c1ab2e6e7d9934cbbf99d0b9e25086ef15177567a3040188e"
+  }
+}

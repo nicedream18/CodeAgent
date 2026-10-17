@@ -1,0 +1,14 @@
+{
+  "HISTORY_SUMMARY.md": {
+    "before": null,
+    "after": "6ededceadf62bf009e382962d8e579e2901a7b20e7b94c5ab027c5965d6d6c9a"
+  },
+  "TODO.md": {
+    "before": null,
+    "after": "2edd8801539486b2fe7464dcdab4dffbef030887cd1f3d0881fded97b9f9cc53"
+  },
+  "src/flask/config.py": {
+    "before": "51ba3f8eecd262c00aa83daf0f7be6ea68ec3e8dc43890dd484cd8abc94a4c92",
+    "after": "aad6188092afdb2f897b7882d0dd91d662084f05248d41efe0533c45df01c8f2"
+  }
+}

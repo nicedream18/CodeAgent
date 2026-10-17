@@ -1,0 +1,44 @@
+{
+  "source_revision": "326cd9b0cf9f78eeca3392804b16a78e7e674ae3",
+  "wheel": "/Users/nicedream/xm/MokioAgent/dist/mokioclaw-0.2.0-py3-none-any.whl",
+  "sha256": "937f67db6956aeafc9920f3d7f075c2918c397fe5506ffbc1f2728cbd5594c15",
+  "bytes": 1387962,
+  "isolated_home": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-release-final-pxh1ncw1/home",
+  "first_uncached_offline_attempt": "failed: required wheel downloads absent; retained /tmp log",
+  "preparation_network_used": true,
+  "frozen_dependencies_offline_after_preparation": true,
+  "wheel_installed_in_fresh_venv": true,
+  "cli_help": "passed",
+  "doctor_local": "passed",
+  "eval_list_tasks": 12,
+  "installed_wheel_offline_demo": "passed",
+  "credentials_required": false,
+  "log": "/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-release-final-pxh1ncw1/install.log",
+  "schema_version": 1,
+  "full_checks": {
+    "pytest_passed": 403,
+    "explicit_docker_skips": 2,
+    "seconds": 40.64,
+    "ruff": "passed",
+    "strict_mypy_files": 19,
+    "protocol_and_eval_docs": "passed",
+    "diff_check": "passed"
+  },
+  "docker": {
+    "platform": "linux/aarch64",
+    "tests_passed": 29,
+    "seconds": 19.01,
+    "evidence": "docker-arm64-2026-10-17.json"
+  },
+  "clean_checkout": {
+    "status": "pending_final_documentation_commit"
+  },
+  "remote_ci": "configured, not triggered (no push)",
+  "real_experiments": {
+    "original": 56,
+    "original_comparison_valid": false,
+    "corrected": 56,
+    "complete_deliveries": 0,
+    "independent_artifact_passes": 8
+  }
+}

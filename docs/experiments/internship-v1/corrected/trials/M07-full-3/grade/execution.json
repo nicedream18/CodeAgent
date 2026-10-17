@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F.                                                                       [100%]\n=================================== FAILURES ===================================\n___________________ test_literal_search_backends_and_schema ____________________\n\ntmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_literal_search_backends_a0')\n\n    def test_literal_search_backends_and_schema(tmp_path):\n        (tmp_path / \"\u4e2d\u6587.txt\").write_text(\"Foo.bar[0]\\nfooXbar0\\nfoo.bar[0]\\n\")\n        runtime = RuntimeState(workspace=tmp_path)\n        results = []\n        for backend in (\"python\", \"rg\"):\n            runtime.settings = {\"search\": {\"backend\": backend}}\n>           output = grep(runtime, \"foo.bar[0]\", ignore_case=True, fixed_strings=True)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           TypeError: grep() got an unexpected keyword argument 'fixed_strings'\n\ntests/test_eval_literal.py:12: TypeError\n=========================== short test summary info ============================\nFAILED tests/test_eval_literal.py::test_literal_search_backends_and_schema - ...\n1 failed, 1 passed in 0.28s\n..                                                                       [100%]\n2 passed in 0.40s\n",
+  "stderr": "",
+  "duration_ms": 2110,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-2fbe027cc12f40fa968ac7fce9cca602.log",
+    "stdout_output_bytes": 1236,
+    "stdout_retained_bytes": 1236,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-825e27a50f3b4350b679a5a56434f3d8.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "046f6fddbd95295d10c48c177b6314b1e574f847a692bc27a47b9a389603e546",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-2fbe027cc12f40fa968ac7fce9cca602.log",
+  "stdout_output_bytes": 1236,
+  "stdout_retained_bytes": 1236,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-825e27a50f3b4350b679a5a56434f3d8.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "046f6fddbd95295d10c48c177b6314b1e574f847a692bc27a47b9a389603e546",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

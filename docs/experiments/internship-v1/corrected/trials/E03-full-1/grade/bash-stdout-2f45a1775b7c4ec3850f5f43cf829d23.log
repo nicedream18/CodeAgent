@@ -1,0 +1,44 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________________________ TestRoutes.test_subdomain ___________________________
+
+self = <test_cli.TestRoutes object at 0xffff8fbb4c50>
+runner = <click.testing.CliRunner object at 0xffff8fbb7c50>
+
+    def test_subdomain(self, runner):
+        app = Flask(__name__, static_folder=None)
+        app.add_url_rule("/a", subdomain="a", endpoint="a")
+        app.add_url_rule("/b", subdomain="b", endpoint="b")
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+        assert result.exit_code == 0
+>       assert "Subdomain" in result.output
+E       AssertionError: assert 'Subdomain' in 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n'
+E        +  where 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n' = <Result okay>.output
+
+tests/test_cli.py:495: AssertionError
+_____________________________ TestRoutes.test_host _____________________________
+
+self = <test_cli.TestRoutes object at 0xffff8fbb6890>
+runner = <click.testing.CliRunner object at 0xffff8fbe2910>
+
+    def test_host(self, runner):
+        app = Flask(__name__, static_folder=None, host_matching=True)
+        app.add_url_rule("/a", host="a", endpoint="a")
+        app.add_url_rule("/b", host="b", endpoint="b")
+        cli = FlaskGroup(create_app=lambda: app)
+        result = runner.invoke(cli, ["routes"])
+        assert result.exit_code == 0
+>       assert "Host" in result.output
+E       AssertionError: assert 'Host' in 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n'
+E        +  where 'Endpoint  Methods  Rule\n--------  -------  ----\na         GET      /a\nb         GET      /b\n' = <Result okay>.output
+
+tests/test_cli.py:504: AssertionError
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E03-full-1/grade/mokio-grade-6c7h50x_/workspace/.target.xml -
+=========================== short test summary info ============================
+FAILED tests/test_cli.py::TestRoutes::test_subdomain - AssertionError: assert...
+FAILED tests/test_cli.py::TestRoutes::test_host - AssertionError: assert 'Hos...
+2 failed in 0.04s
+....                                                                     [100%]
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E03-full-1/grade/mokio-grade-6c7h50x_/workspace/.regression.xml -
+4 passed, 2 deselected in 0.03s

@@ -1,0 +1,14 @@
+{
+  "HISTORY_SUMMARY.md": {
+    "before": null,
+    "after": "685c1cdae76966ddf3f0bb34e6486f7b52c3fe59305cbf212281af3e7df200d3"
+  },
+  "TODO.md": {
+    "before": null,
+    "after": "7c7fccff9e61d08a5f1e48b6b3cd6b1399e4f2e5fbca608cb6682a75256d29ce"
+  },
+  "src/flask/blueprints.py": {
+    "before": "4491da7637d5d262c95fb1992fccf5d8236a9608b8934e6f607821098436569c",
+    "after": "005b011b321acf95fb254217b8a6a8f373d1f2e0780506f09cbbbd49cd251d5a"
+  }
+}

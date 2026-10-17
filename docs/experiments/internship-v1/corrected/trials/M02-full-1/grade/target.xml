@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.266" timestamp="2026-10-16T17:14:24.213685+00:00" hostname="c526c9fb78e9"><testcase classname="tests.test_generation_reliability" name="test_truncated_batch_is_closed_and_replanned_once" time="0.010"><failure message="mokioclaw.providers.generation.ModelGenerationStopped: model_tool_arguments_invalid">message = AIMessageChunk(content='part', additional_kwargs={}, response_metadata={'finish_reason': 'length'}, tool_calls=[{'name...name': 'FileWriteTool', 'args': '{"file_path":"b","content":"part', 'id': 'b', 'index': 1, 'type': 'tool_call_chunk'}])
+
+    def validate_generation(message: Any) -&gt; GenerationOutcome:
+        result = outcome(message)
+        if False:
+            raise ModelGenerationStopped("model_output_truncated", message)
+        if result.reason in {"blocked", "unknown"}:
+            raise ModelGenerationStopped(
+                "model_content_blocked"
+                if result.reason == "blocked"
+                else "model_finish_reason_unknown",
+                message,
+            )
+        try:
+            for call in getattr(message, "tool_call_chunks", []):
+                if not isinstance(
+&gt;                   json.loads(call.get("args", ""), parse_constant=_invalid_constant), dict
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ):
+
+src/mokioclaw/providers/generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/json/__init__.py:365: in loads
+    return cls(**kw).decode(s)
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0xffff9cb7d370&gt;
+s = '{"file_path":"b","content":"part', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+&gt;           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           json.decoder.JSONDecodeError: Unterminated string starting at: line 1 column 28 (char 27)
+
+/usr/local/lib/python3.13/json/decoder.py:361: JSONDecodeError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_truncated_batch_is_closed0')
+
+    def test_truncated_batch_is_closed_and_replanned_once(tmp_path):
+        model = Model([cut(), AIMessage(content="complete")])
+        events = []
+        runtime = RuntimeState(workspace=tmp_path)
+&gt;       result = invoke_streaming(
+            model, [HumanMessage(content="task")], writer=events.append, state={"runtime": runtime}
+        )
+
+tests/test_generation_reliability.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/providers/openai_provider.py:90: in invoke_streaming
+    return _invoke_once(
+src/mokioclaw/providers/openai_provider.py:274: in _invoke_once
+    completion = validate_generation(assembled)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+message = AIMessageChunk(content='part', additional_kwargs={}, response_metadata={'finish_reason': 'length'}, tool_calls=[{'name...name': 'FileWriteTool', 'args': '{"file_path":"b","content":"part', 'id': 'b', 'index': 1, 'type': 'tool_call_chunk'}])
+
+    def validate_generation(message: Any) -&gt; GenerationOutcome:
+        result = outcome(message)
+        if False:
+            raise ModelGenerationStopped("model_output_truncated", message)
+        if result.reason in {"blocked", "unknown"}:
+            raise ModelGenerationStopped(
+                "model_content_blocked"
+                if result.reason == "blocked"
+                else "model_finish_reason_unknown",
+                message,
+            )
+        try:
+            for call in getattr(message, "tool_call_chunks", []):
+                if not isinstance(
+                    json.loads(call.get("args", ""), parse_constant=_invalid_constant), dict
+                ):
+                    raise ValueError("tool arguments must be an object")
+            for call in getattr(message, "additional_kwargs", {}).get("tool_calls", []):
+                if not isinstance(
+                    json.loads(call["function"]["arguments"], parse_constant=_invalid_constant), dict
+                ):
+                    raise ValueError("tool arguments must be an object")
+            if getattr(message, "invalid_tool_calls", []):
+                raise ValueError("invalid tool calls")
+        except (ValueError, TypeError, KeyError) as exc:
+&gt;           raise ModelGenerationStopped("model_tool_arguments_invalid", message) from exc
+E           mokioclaw.providers.generation.ModelGenerationStopped: model_tool_arguments_invalid
+
+src/mokioclaw/providers/generation.py:91: ModelGenerationStopped</failure></testcase><testcase classname="tests.test_generation_reliability" name="test_second_truncation_stops_without_third_request" time="0.000"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'model_output_truncated'&#10;  Actual message: 'model_tool_arguments_invalid'">message = AIMessageChunk(content='part', additional_kwargs={}, response_metadata={'finish_reason': 'length'}, tool_calls=[{'name...name': 'FileWriteTool', 'args': '{"file_path":"b","content":"part', 'id': 'b', 'index': 1, 'type': 'tool_call_chunk'}])
+
+    def validate_generation(message: Any) -&gt; GenerationOutcome:
+        result = outcome(message)
+        if False:
+            raise ModelGenerationStopped("model_output_truncated", message)
+        if result.reason in {"blocked", "unknown"}:
+            raise ModelGenerationStopped(
+                "model_content_blocked"
+                if result.reason == "blocked"
+                else "model_finish_reason_unknown",
+                message,
+            )
+        try:
+            for call in getattr(message, "tool_call_chunks", []):
+                if not isinstance(
+&gt;                   json.loads(call.get("args", ""), parse_constant=_invalid_constant), dict
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ):
+
+src/mokioclaw/providers/generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/json/__init__.py:365: in loads
+    return cls(**kw).decode(s)
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0xffff99d643d0&gt;
+s = '{"file_path":"b","content":"part', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+&gt;           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           json.decoder.JSONDecodeError: Unterminated string starting at: line 1 column 28 (char 27)
+
+/usr/local/lib/python3.13/json/decoder.py:361: JSONDecodeError
+
+The above exception was the direct cause of the following exception:
+
+    def test_second_truncation_stops_without_third_request():
+        model = Model([cut(), cut()])
+        with pytest.raises(ModelGenerationStopped, match="model_output_truncated"):
+&gt;           invoke_streaming(model, [])
+
+tests/test_generation_reliability.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/providers/openai_provider.py:90: in invoke_streaming
+    return _invoke_once(
+src/mokioclaw/providers/openai_provider.py:274: in _invoke_once
+    completion = validate_generation(assembled)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+message = AIMessageChunk(content='part', additional_kwargs={}, response_metadata={'finish_reason': 'length'}, tool_calls=[{'name...name': 'FileWriteTool', 'args': '{"file_path":"b","content":"part', 'id': 'b', 'index': 1, 'type': 'tool_call_chunk'}])
+
+    def validate_generation(message: Any) -&gt; GenerationOutcome:
+        result = outcome(message)
+        if False:
+            raise ModelGenerationStopped("model_output_truncated", message)
+        if result.reason in {"blocked", "unknown"}:
+            raise ModelGenerationStopped(
+                "model_content_blocked"
+                if result.reason == "blocked"
+                else "model_finish_reason_unknown",
+                message,
+            )
+        try:
+            for call in getattr(message, "tool_call_chunks", []):
+                if not isinstance(
+                    json.loads(call.get("args", ""), parse_constant=_invalid_constant), dict
+                ):
+                    raise ValueError("tool arguments must be an object")
+            for call in getattr(message, "additional_kwargs", {}).get("tool_calls", []):
+                if not isinstance(
+                    json.loads(call["function"]["arguments"], parse_constant=_invalid_constant), dict
+                ):
+                    raise ValueError("tool arguments must be an object")
+            if getattr(message, "invalid_tool_calls", []):
+                raise ValueError("invalid tool calls")
+        except (ValueError, TypeError, KeyError) as exc:
+&gt;           raise ModelGenerationStopped("model_tool_arguments_invalid", message) from exc
+E           mokioclaw.providers.generation.ModelGenerationStopped: model_tool_arguments_invalid
+
+src/mokioclaw/providers/generation.py:91: ModelGenerationStopped
+
+During handling of the above exception, another exception occurred:
+
+    def test_second_truncation_stops_without_third_request():
+        model = Model([cut(), cut()])
+&gt;       with pytest.raises(ModelGenerationStopped, match="model_output_truncated"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'model_output_truncated'
+E         Actual message: 'model_tool_arguments_invalid'
+
+tests/test_generation_reliability.py:70: AssertionError</failure></testcase></testsuite></testsuites>

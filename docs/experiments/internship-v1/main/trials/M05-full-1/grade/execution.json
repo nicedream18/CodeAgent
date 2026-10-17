@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_______ test_background_child_control_is_independent_and_loop_is_closed ________\n\ntmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_background_child_control_0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff8ed67ce0>\n\n    def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, monkeypatch):\n        from mokioclaw.agents.registry import SubagentDefinition, SubagentRegistry\n        from mokioclaw.graph import nodes\n    \n        parent = RunControl()\n        seen = []\n    \n        class Manager:\n            def submit(self, **kwargs):\n                seen.append(kwargs[\"runner\"])\n                return {\n                    \"ok\": True,\n                    \"subagent_run_id\": \"child\",\n                    \"status\": \"queued\",\n                    \"parent_run_id\": kwargs[\"parent_run_id\"],\n                    \"handoff_id\": kwargs[\"handoff_id\"],\n                }\n    \n        registry = SubagentRegistry()\n        registry.register(\n            SubagentDefinition(\n                name=\"demo\",\n                description=\"demo\",\n                legacy_runner=False,\n                background_safe=True,\n                allowed_tools=frozenset({\"FileReadTool\"}),\n                max_tool_calls=1,\n                runner=lambda *_args, **_kwargs: {\"ok\": True, \"summary\": \"done\"},\n            )\n        )\n        runtime = RuntimeState(\n            workspace=tmp_path,\n            approval_mode=\"auto\",\n            run_control=parent,\n            subagent_registry=registry,\n            subagent_task_manager=Manager(),\n            parent_run_id=\"parent\",\n        )\n        # The public delegation helper creates a private child RuntimeState.\n        result = nodes._call_registered_subagent_tool(\n            {\"runtime\": runtime, \"task\": \"demo\"},\n            subagent_name=\"demo\",\n            instruction=\"test\",\n            writer=lambda _: None,\n            run_in_background=True,\n        )\n        assert result[\"ok\"]\n        parent.cancel()\n>       child = seen[0](lambda _: None, threading.Event())\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_run_cancellation.py:174: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/mokioclaw/graph/steps/delegation.py:120: in runner\n    return api.run_subagent(\nsrc/mokioclaw/agents/registry.py:384: in run_subagent\n    check_run(runtime)\nsrc/mokioclaw/core/run_control.py:163: in check_run\n    control.check()\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <mokioclaw.core.run_control.RunControl object at 0xffff8bdf1010>\n\n    def check(self) -> None:\n        if self.cancel_event.is_set():\n>           raise RunInterrupted(\"Run cancelled by user\")\nE           mokioclaw.core.run_control.RunInterrupted: Run cancelled by user\n\nsrc/mokioclaw/core/run_control.py:47: RunInterrupted\n=========================== short test summary info ============================\nFAILED tests/test_run_cancellation.py::test_background_child_control_is_independent_and_loop_is_closed\n1 failed in 1.14s\n....                                                                     [100%]\n4 passed in 1.25s\n",
+  "stderr": "",
+  "duration_ms": 6985,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-8fab295c064a473193a1676e6b18983e.log",
+    "stdout_output_bytes": 3339,
+    "stdout_retained_bytes": 3339,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-a2f728138d98463fb81c2a983ba931b1.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "7f48e6b50bf7a0c96c38f9a8c46262c7d5a30112e6928bccc945492607edad08",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-8fab295c064a473193a1676e6b18983e.log",
+  "stdout_output_bytes": 3339,
+  "stdout_retained_bytes": 3339,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-a2f728138d98463fb81c2a983ba931b1.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "7f48e6b50bf7a0c96c38f9a8c46262c7d5a30112e6928bccc945492607edad08",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

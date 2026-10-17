@@ -1,0 +1,52 @@
+{
+  "status": "failed",
+  "stop_reason": "provider_APIConnectionError",
+  "error": null,
+  "model_metrics": {
+    "requests": 2,
+    "roles": {
+      "intent_router": {
+        "estimated": false,
+        "input_tokens": 439,
+        "output_tokens": 62,
+        "total_tokens": 501,
+        "duration_ms": 1189.238,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "repoAgent": {
+        "estimated": true,
+        "input_tokens": 2614,
+        "output_tokens": 0,
+        "total_tokens": 2614,
+        "duration_ms": 5009.446,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 1
+      }
+    },
+    "estimated": true,
+    "input_tokens": 3053,
+    "output_tokens": 62,
+    "total_tokens": 3115,
+    "duration_ms": 6198.684,
+    "cache_read_tokens": 256,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 0,
+  "actual_path": [
+    "intent_router",
+    "{'type': 'workflow_selected', 'mode': 'full', 'reason': 'explicit configuration or conservative router hint', 'event_id': '11a2b4563d634135bb6244ee11ace82f', 'run_id': 'internship-v1-20261017-M02-auto-3', 'context_version': 0}"
+  ],
+  "stream_ids": [
+    "549620dc9b034faf9ca19e07ed2904d5",
+    "95c9887c2b1b4a469619a6ca82a8e9ba"
+  ],
+  "tool_call_ids": [],
+  "model_claim": null,
+  "run_id": "internship-v1-20261017-M02-auto-3"
+}

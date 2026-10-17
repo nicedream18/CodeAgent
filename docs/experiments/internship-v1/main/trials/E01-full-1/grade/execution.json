@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "FF                                                                       [100%]\n=================================== FAILURES ===================================\n_________________________ test_dotted_name_not_allowed _________________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_dotted_name_not_allowed(app, client):\n        with pytest.raises(ValueError):\n>           flask.Blueprint(\"app.ui\", __name__)\n\ntests/test_blueprints.py:256: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Blueprint 'app.ui'>, name = 'app.ui', import_name = 'test_blueprints'\nstatic_folder = None, static_url_path = None, template_folder = None\nurl_prefix = None, subdomain = None, url_defaults = None, root_path = None\ncli_group = <object object at 0xffffad09d2a0>\n\n    def __init__(\n        self,\n        name: str,\n        import_name: str,\n        static_folder: t.Optional[str] = None,\n        static_url_path: t.Optional[str] = None,\n        template_folder: t.Optional[str] = None,\n        url_prefix: t.Optional[str] = None,\n        subdomain: t.Optional[str] = None,\n        url_defaults: t.Optional[dict] = None,\n        root_path: t.Optional[str] = None,\n        cli_group: t.Optional[str] = _sentinel,  # type: ignore\n    ):\n        super().__init__(\n            import_name=import_name,\n            static_folder=static_folder,\n            static_url_path=static_url_path,\n            template_folder=template_folder,\n            root_path=root_path,\n        )\n        self.name = name\n>       assert \".\" not in name, \"'name' may not contain a dot '.' character.\"\nE       AssertionError: 'name' may not contain a dot '.' character.\n\nsrc/flask/blueprints.py:192: AssertionError\n________________ test_route_decorator_custom_endpoint_with_dots ________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_route_decorator_custom_endpoint_with_dots(app, client):\n        bp = flask.Blueprint(\"bp\", __name__)\n    \n        with pytest.raises(ValueError):\n>           bp.route(\"/\", endpoint=\"a.b\")(lambda: \"\")\n\ntests/test_blueprints.py:326: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/flask/scaffold.py:433: in decorator\n    self.add_url_rule(rule, endpoint, f, **options)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Blueprint 'bp'>, rule = '/', endpoint = 'a.b'\nview_func = <function test_route_decorator_custom_endpoint_with_dots.<locals>.<lambda> at 0xffffaaa30fe0>\noptions = {}\n\n    def add_url_rule(\n        self,\n        rule: str,\n        endpoint: t.Optional[str] = None,\n        view_func: t.Optional[t.Callable] = None,\n        **options: t.Any,\n    ) -> None:\n        \"\"\"Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for\n        the :func:`url_for` function is prefixed with the name of the blueprint.\n        \"\"\"\n        if endpoint:\n>           assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"\nE           AssertionError: Blueprint endpoints should not contain dots\n\nsrc/flask/blueprints.py:365: AssertionError\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E01-full-1/grade/mokio-grade-nxrnxe9j/workspace/.target.xml -\n=========================== short test summary info ============================\nFAILED tests/test_blueprints.py::test_dotted_name_not_allowed - AssertionErro...\nFAILED tests/test_blueprints.py::test_route_decorator_custom_endpoint_with_dots\n2 failed in 0.11s\n...............................................                          [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E01-full-1/grade/mokio-grade-nxrnxe9j/workspace/.regression.xml -\n47 passed, 2 deselected in 0.19s\n",
+  "stderr": "",
+  "duration_ms": 1187,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-9d6d689201b04367b25b8d55904d5296.log",
+    "stdout_output_bytes": 3912,
+    "stdout_retained_bytes": 3912,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-34203414edf8464ca046d58cde095f01.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+    "container_id": "62c91055b04e5d9ba93d3d7e0e9cd598c62b1f662a505697961e20f09788233f",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-9d6d689201b04367b25b8d55904d5296.log",
+  "stdout_output_bytes": 3912,
+  "stdout_retained_bytes": 3912,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-34203414edf8464ca046d58cde095f01.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+  "container_id": "62c91055b04e5d9ba93d3d7e0e9cd598c62b1f662a505697961e20f09788233f",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

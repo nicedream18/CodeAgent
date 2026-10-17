@@ -1,0 +1,44 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_route_decorator_custom_endpoint_with_dots ________________
+
+app = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>
+
+    def test_route_decorator_custom_endpoint_with_dots(app, client):
+        bp = flask.Blueprint("bp", __name__)
+    
+        with pytest.raises(ValueError):
+>           bp.route("/", endpoint="a.b")(lambda: "")
+
+tests/test_blueprints.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/flask/scaffold.py:433: in decorator
+    self.add_url_rule(rule, endpoint, f, **options)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Blueprint 'bp'>, rule = '/', endpoint = 'a.b'
+view_func = <function test_route_decorator_custom_endpoint_with_dots.<locals>.<lambda> at 0xffff7f5b8ea0>
+options = {}
+
+    def add_url_rule(
+        self,
+        rule: str,
+        endpoint: t.Optional[str] = None,
+        view_func: t.Optional[t.Callable] = None,
+        **options: t.Any,
+    ) -> None:
+        """Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for
+        the :func:`url_for` function is prefixed with the name of the blueprint.
+        """
+        if endpoint:
+>           assert "." not in endpoint, "Blueprint endpoints should not contain dots"
+E           AssertionError: Blueprint endpoints should not contain dots
+
+src/flask/blueprints.py:367: AssertionError
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E01-full-1/grade/mokio-grade-ixu79v4r/workspace/.target.xml -
+=========================== short test summary info ============================
+FAILED tests/test_blueprints.py::test_route_decorator_custom_endpoint_with_dots
+1 failed, 1 passed in 0.05s
+...............................................                          [100%]
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E01-full-1/grade/mokio-grade-ixu79v4r/workspace/.regression.xml -
+47 passed, 2 deselected in 0.09s

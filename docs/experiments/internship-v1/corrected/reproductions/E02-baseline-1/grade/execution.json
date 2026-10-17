@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": ".                                                                        [100%]\n- generated xml file: /private/tmp/mokio-corrected-regrade-E02-baseline-1/regrade/mokio-grade-wvdgqppm/workspace/.target.xml -\n1 passed in 0.04s\n..................                                                       [100%]\n- generated xml file: /private/tmp/mokio-corrected-regrade-E02-baseline-1/regrade/mokio-grade-wvdgqppm/workspace/.regression.xml -\n18 passed, 1 deselected in 0.04s\n",
+  "stderr": "",
+  "duration_ms": 795,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-1a98759899254133bf8428125cdd501c.log",
+    "stdout_output_bytes": 469,
+    "stdout_retained_bytes": 469,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-4fc86ef3d6364d3b892557a43b10385c.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+    "container_id": "bd5140f5c0648513c1e9098468e28d4097a835718e827cc760c434d876f599b9",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-1a98759899254133bf8428125cdd501c.log",
+  "stdout_output_bytes": 469,
+  "stdout_retained_bytes": 469,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-4fc86ef3d6364d3b892557a43b10385c.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+  "container_id": "bd5140f5c0648513c1e9098468e28d4097a835718e827cc760c434d876f599b9",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

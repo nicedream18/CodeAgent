@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "experiment_id": "internship-v1-20261017",
+  "frozen_revision": "1e6d1ccaecb345825b658c323cc5e778ec295c21",
+  "scheduled": 56,
+  "terminal": 56,
+  "request_configurations_audited": 1903,
+  "roles": {
+    "intent_router": 44,
+    "repoAgent": 873,
+    "planner": 115,
+    "codeAgent": 470,
+    "context_compressor": 301,
+    "verifier": 100
+  },
+  "profiles": [
+    {
+      "config": {
+        "context_tokens": 32768,
+        "model": "deepseek-chat",
+        "output_tokens": 4096,
+        "sdk_max_retries": 0
+      },
+      "requests": 1903
+    }
+  ],
+  "issues": [],
+  "comparison_conditions_passed": true,
+  "observability_issues": [
+    {
+      "trial_id": "E02-auto-1",
+      "requests_missing_from_outer_events": 6,
+      "duplicate_stream_end_records": 6,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "E02-auto-3",
+      "requests_missing_from_outer_events": 5,
+      "duplicate_stream_end_records": 5,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "E02-light-1",
+      "requests_missing_from_outer_events": 5,
+      "duplicate_stream_end_records": 5,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "E02-light-2",
+      "requests_missing_from_outer_events": 5,
+      "duplicate_stream_end_records": 5,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "E02-light-3",
+      "requests_missing_from_outer_events": 13,
+      "duplicate_stream_end_records": 11,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M02-light-1",
+      "requests_missing_from_outer_events": 7,
+      "duplicate_stream_end_records": 7,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M02-light-2",
+      "requests_missing_from_outer_events": 17,
+      "duplicate_stream_end_records": 15,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M02-light-3",
+      "requests_missing_from_outer_events": 18,
+      "duplicate_stream_end_records": 17,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M03-light-1",
+      "requests_missing_from_outer_events": 7,
+      "duplicate_stream_end_records": 7,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M03-light-2",
+      "requests_missing_from_outer_events": 14,
+      "duplicate_stream_end_records": 12,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M03-light-3",
+      "requests_missing_from_outer_events": 6,
+      "duplicate_stream_end_records": 6,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M07-light-1",
+      "requests_missing_from_outer_events": 7,
+      "duplicate_stream_end_records": 7,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M07-light-2",
+      "requests_missing_from_outer_events": 17,
+      "duplicate_stream_end_records": 15,
+      "missing_end_ids": []
+    },
+    {
+      "trial_id": "M07-light-3",
+      "requests_missing_from_outer_events": 18,
+      "duplicate_stream_end_records": 16,
+      "missing_end_ids": []
+    }
+  ],
+  "event_delivery_checks_passed": false,
+  "trials": [
+    {
+      "trial_id": "E01-full-1",
+      "requests_audited": 38
+    },
+    {
+      "trial_id": "E02-auto-1",
+      "requests_audited": 34
+    },
+    {
+      "trial_id": "E02-auto-2",
+      "requests_audited": 1
+    },
+    {
+      "trial_id": "E02-auto-3",
+      "requests_audited": 31
+    },
+    {
+      "trial_id": "E02-baseline-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-baseline-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-full-2",
+      "requests_audited": 38
+    },
+    {
+      "trial_id": "E02-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-light-1",
+      "requests_audited": 31
+    },
+    {
+      "trial_id": "E02-light-2",
+      "requests_audited": 31
+    },
+    {
+      "trial_id": "E02-light-3",
+      "requests_audited": 39
+    },
+    {
+      "trial_id": "E03-full-1",
+      "requests_audited": 23
+    },
+    {
+      "trial_id": "E04-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M01-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-auto-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-auto-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-auto-3",
+      "requests_audited": 2
+    },
+    {
+      "trial_id": "M02-baseline-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-baseline-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-full-2",
+      "requests_audited": 12
+    },
+    {
+      "trial_id": "M02-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-light-1",
+      "requests_audited": 29
+    },
+    {
+      "trial_id": "M02-light-2",
+      "requests_audited": 39
+    },
+    {
+      "trial_id": "M02-light-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-auto-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-auto-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-auto-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-baseline-1",
+      "requests_audited": 30
+    },
+    {
+      "trial_id": "M03-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-baseline-3",
+      "requests_audited": 37
+    },
+    {
+      "trial_id": "M03-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-full-2",
+      "requests_audited": 21
+    },
+    {
+      "trial_id": "M03-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-light-1",
+      "requests_audited": 29
+    },
+    {
+      "trial_id": "M03-light-2",
+      "requests_audited": 28
+    },
+    {
+      "trial_id": "M03-light-3",
+      "requests_audited": 23
+    },
+    {
+      "trial_id": "M04-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M05-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M06-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-auto-1",
+      "requests_audited": 4
+    },
+    {
+      "trial_id": "M07-auto-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-auto-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-baseline-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-baseline-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-full-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-light-1",
+      "requests_audited": 29
+    },
+    {
+      "trial_id": "M07-light-2",
+      "requests_audited": 33
+    },
+    {
+      "trial_id": "M07-light-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M08-full-1",
+      "requests_audited": 1
+    }
+  ],
+  "note": "Configuration/counts use the canonical producer trace; outer delivery and duplicate end defects are reported separately, never erased. This is not an independent HTTP packet capture or a success score."
+}

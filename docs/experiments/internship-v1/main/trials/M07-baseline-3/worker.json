@@ -1,0 +1,59 @@
+{
+  "status": "failed",
+  "stop_reason": "provider_APIConnectionError",
+  "error": null,
+  "model_metrics": {
+    "requests": 5,
+    "roles": {
+      "codeAgent": {
+        "estimated": false,
+        "input_tokens": 8270,
+        "output_tokens": 305,
+        "total_tokens": 8575,
+        "duration_ms": 3152.1409999999996,
+        "cache_read_tokens": 7296,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 3
+      },
+      "context_compressor": {
+        "estimated": true,
+        "input_tokens": 4850,
+        "output_tokens": 279,
+        "total_tokens": 5129,
+        "duration_ms": 6957.947999999999,
+        "cache_read_tokens": 128,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 2
+      }
+    },
+    "estimated": true,
+    "input_tokens": 13120,
+    "output_tokens": 584,
+    "total_tokens": 13704,
+    "duration_ms": 10110.089,
+    "cache_read_tokens": 7424,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 5,
+  "actual_path": [],
+  "stream_ids": [
+    "f1a64bc0c1f445b49e4c73ae3c4de431",
+    "25d6864159824ce9b56693efa651378e",
+    "4871bf8f8c4f43d3bdc3f81f5ab3e448",
+    "ba1143420a2f46f8ba35737a9658d85b",
+    "21de219717834f98a2146aceece1cd57"
+  ],
+  "tool_call_ids": [
+    "call_00_NyrEd6PgzpUM92J7aWUA4334",
+    "call_01_dFbenMQmzsIz2jYxQCzo4542",
+    "call_00_V3Fre0bTrHrCKG6nIHkO6529",
+    "call_01_mONRzKoB2JGt3eenHFb11120",
+    "call_00_X4aGK1agYAau3DxKvxGN0127",
+    "call_01_VUoYlnhXVksnsU8huD484730"
+  ],
+  "model_claim": null,
+  "run_id": "internship-v1-20261016-M07-baseline-3"
+}

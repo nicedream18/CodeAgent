@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="0.048" timestamp="2026-10-16T17:41:06.581313" hostname="ead296b27e8c"><testcase classname="tests.test_blueprints" name="test_dotted_name_not_allowed" time="0.002" /><testcase classname="tests.test_blueprints" name="test_route_decorator_custom_endpoint_with_dots" time="0.001"><failure message="AssertionError: Blueprint endpoints should not contain dots">app = &lt;Flask 'flask_test'&gt;, client = &lt;FlaskClient &lt;Flask 'flask_test'&gt;&gt;
+
+    def test_route_decorator_custom_endpoint_with_dots(app, client):
+        bp = flask.Blueprint("bp", __name__)
+    
+        with pytest.raises(ValueError):
+&gt;           bp.route("/", endpoint="a.b")(lambda: "")
+
+tests/test_blueprints.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/flask/scaffold.py:433: in decorator
+    self.add_url_rule(rule, endpoint, f, **options)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;Blueprint 'bp'&gt;, rule = '/', endpoint = 'a.b'
+view_func = &lt;function test_route_decorator_custom_endpoint_with_dots.&lt;locals&gt;.&lt;lambda&gt; at 0xffff7f5b8ea0&gt;
+options = {}
+
+    def add_url_rule(
+        self,
+        rule: str,
+        endpoint: t.Optional[str] = None,
+        view_func: t.Optional[t.Callable] = None,
+        **options: t.Any,
+    ) -&gt; None:
+        """Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for
+        the :func:`url_for` function is prefixed with the name of the blueprint.
+        """
+        if endpoint:
+&gt;           assert "." not in endpoint, "Blueprint endpoints should not contain dots"
+E           AssertionError: Blueprint endpoints should not contain dots
+
+src/flask/blueprints.py:367: AssertionError</failure></testcase></testsuite></testsuites>

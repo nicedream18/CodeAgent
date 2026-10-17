@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "valid",
+  "recorded_at": "2026-10-17T03:57:52.014360+00:00",
+  "issues": [
+    "配置与计量对照有效：canonical trace 的1903次请求全部使用同一模型、32768/4096预算及SDK零重试，并与运行计数一致。",
+    "事件展示验收未通过：14个升级trial外层少145条请求事件，canonical trace多134条结束事件；原始记录保留，audit.json单列。初始严格事件审计失败保存在audit.initial-strict.json。",
+    "valid仅表示本批配置、调度、计量和评分可核对，不表示产物成功、UI事件合格或项目所有验收完成；无完整成功运行，不支持架构优劣结论。"
+  ],
+  "evidence": [
+    "audit.json",
+    "audit.initial-strict.json",
+    "manifest.json"
+  ]
+}

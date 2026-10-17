@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "experiment_id": "internship-v1-20261017",
+  "frozen_revision": "1e6d1ccaecb345825b658c323cc5e778ec295c21",
+  "scheduled": 56,
+  "terminal": 56,
+  "request_configurations_audited": 1758,
+  "roles": {
+    "intent_router": 44,
+    "repoAgent": 739,
+    "planner": 109,
+    "codeAgent": 470,
+    "context_compressor": 296,
+    "verifier": 100
+  },
+  "profiles": [
+    {
+      "config": {
+        "context_tokens": 32768,
+        "model": "deepseek-chat",
+        "output_tokens": 4096,
+        "sdk_max_retries": 0
+      },
+      "requests": 1758
+    }
+  ],
+  "issues": [
+    "E02-auto-1: stream start/request/end identifiers do not match one-to-one",
+    "E02-auto-1: request count differs from model metrics",
+    "E02-auto-3: stream start/request/end identifiers do not match one-to-one",
+    "E02-auto-3: request count differs from model metrics",
+    "E02-light-1: stream start/request/end identifiers do not match one-to-one",
+    "E02-light-1: request count differs from model metrics",
+    "E02-light-2: stream start/request/end identifiers do not match one-to-one",
+    "E02-light-2: request count differs from model metrics",
+    "E02-light-3: stream start/request/end identifiers do not match one-to-one",
+    "E02-light-3: request count differs from model metrics",
+    "M02-light-1: stream start/request/end identifiers do not match one-to-one",
+    "M02-light-1: request count differs from model metrics",
+    "M02-light-2: stream start/request/end identifiers do not match one-to-one",
+    "M02-light-2: request count differs from model metrics",
+    "M02-light-3: stream start/request/end identifiers do not match one-to-one",
+    "M02-light-3: request count differs from model metrics",
+    "M03-light-1: stream start/request/end identifiers do not match one-to-one",
+    "M03-light-1: request count differs from model metrics",
+    "M03-light-2: stream start/request/end identifiers do not match one-to-one",
+    "M03-light-2: request count differs from model metrics",
+    "M03-light-3: stream start/request/end identifiers do not match one-to-one",
+    "M03-light-3: request count differs from model metrics",
+    "M07-light-1: stream start/request/end identifiers do not match one-to-one",
+    "M07-light-1: request count differs from model metrics",
+    "M07-light-2: stream start/request/end identifiers do not match one-to-one",
+    "M07-light-2: request count differs from model metrics",
+    "M07-light-3: stream start/request/end identifiers do not match one-to-one",
+    "M07-light-3: request count differs from model metrics"
+  ],
+  "contract_checks_passed": false,
+  "trials": [
+    {
+      "trial_id": "E01-full-1",
+      "requests_audited": 38
+    },
+    {
+      "trial_id": "E02-auto-1",
+      "requests_audited": 28
+    },
+    {
+      "trial_id": "E02-auto-2",
+      "requests_audited": 1
+    },
+    {
+      "trial_id": "E02-auto-3",
+      "requests_audited": 26
+    },
+    {
+      "trial_id": "E02-baseline-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-baseline-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-full-2",
+      "requests_audited": 38
+    },
+    {
+      "trial_id": "E02-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "E02-light-1",
+      "requests_audited": 26
+    },
+    {
+      "trial_id": "E02-light-2",
+      "requests_audited": 26
+    },
+    {
+      "trial_id": "E02-light-3",
+      "requests_audited": 26
+    },
+    {
+      "trial_id": "E03-full-1",
+      "requests_audited": 23
+    },
+    {
+      "trial_id": "E04-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M01-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-auto-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-auto-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-auto-3",
+      "requests_audited": 2
+    },
+    {
+      "trial_id": "M02-baseline-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-baseline-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-full-2",
+      "requests_audited": 12
+    },
+    {
+      "trial_id": "M02-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M02-light-1",
+      "requests_audited": 22
+    },
+    {
+      "trial_id": "M02-light-2",
+      "requests_audited": 22
+    },
+    {
+      "trial_id": "M02-light-3",
+      "requests_audited": 22
+    },
+    {
+      "trial_id": "M03-auto-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-auto-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-auto-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-baseline-1",
+      "requests_audited": 30
+    },
+    {
+      "trial_id": "M03-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-baseline-3",
+      "requests_audited": 37
+    },
+    {
+      "trial_id": "M03-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-full-2",
+      "requests_audited": 21
+    },
+    {
+      "trial_id": "M03-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M03-light-1",
+      "requests_audited": 22
+    },
+    {
+      "trial_id": "M03-light-2",
+      "requests_audited": 14
+    },
+    {
+      "trial_id": "M03-light-3",
+      "requests_audited": 17
+    },
+    {
+      "trial_id": "M04-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M05-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M06-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-auto-1",
+      "requests_audited": 4
+    },
+    {
+      "trial_id": "M07-auto-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-auto-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-baseline-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-baseline-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-baseline-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-full-1",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-full-2",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-full-3",
+      "requests_audited": 40
+    },
+    {
+      "trial_id": "M07-light-1",
+      "requests_audited": 22
+    },
+    {
+      "trial_id": "M07-light-2",
+      "requests_audited": 16
+    },
+    {
+      "trial_id": "M07-light-3",
+      "requests_audited": 22
+    },
+    {
+      "trial_id": "M08-full-1",
+      "requests_audited": 1
+    }
+  ],
+  "note": "Audit of recorded configuration and accounting, not a success score or independent HTTP packet capture."
+}

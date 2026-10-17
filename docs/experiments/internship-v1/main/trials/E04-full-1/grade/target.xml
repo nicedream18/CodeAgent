@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.204" timestamp="2026-10-16T14:59:34.982843" hostname="cb3de0188d4f"><testcase classname="tests.test_requests.TestRequests" name="test_response_decode_unicode" time="0.001"><failure message="assert False&#10; +  where False = all(&lt;generator object TestRequests.test_response_decode_unicode.&lt;locals&gt;.&lt;genexpr&gt; at 0xffff9812b820&gt;)">self = &lt;tests.test_requests.TestRequests object at 0xffff98227430&gt;
+
+    def test_response_decode_unicode(self):
+        """
+        When called with decode_unicode, Response.iter_content should always
+        return unicode.
+        """
+        r = requests.Response()
+        r._content_consumed = True
+        r._content = b'the content'
+        r.encoding = 'ascii'
+    
+        chunks = r.iter_content(decode_unicode=True)
+        assert all(isinstance(chunk, str) for chunk in chunks)
+    
+        # also for streaming
+        r = requests.Response()
+        r.raw = io.BytesIO(b'the content')
+        r.encoding = 'ascii'
+        chunks = r.iter_content(decode_unicode=True)
+        assert all(isinstance(chunk, str) for chunk in chunks)
+    
+        # check for encoding value of None
+        r = requests.Response()
+        r.raw = io.BytesIO(b'the content')
+        r.encoding = None
+        chunks = r.iter_content(decode_unicode=True)
+&gt;       assert all(isinstance(chunk, str) for chunk in chunks)
+E       assert False
+E        +  where False = all(&lt;generator object TestRequests.test_response_decode_unicode.&lt;locals&gt;.&lt;genexpr&gt; at 0xffff9812b820&gt;)
+
+tests/test_requests.py:988: AssertionError</failure></testcase></testsuite></testsuites>

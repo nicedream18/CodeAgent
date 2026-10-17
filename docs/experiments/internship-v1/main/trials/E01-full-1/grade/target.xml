@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.114" timestamp="2026-10-16T15:05:34.413047" hostname="62c91055b04e"><testcase classname="tests.test_blueprints" name="test_dotted_name_not_allowed" time="0.006"><failure message="AssertionError: 'name' may not contain a dot '.' character.">app = &lt;Flask 'flask_test'&gt;, client = &lt;FlaskClient &lt;Flask 'flask_test'&gt;&gt;
+
+    def test_dotted_name_not_allowed(app, client):
+        with pytest.raises(ValueError):
+&gt;           flask.Blueprint("app.ui", __name__)
+
+tests/test_blueprints.py:256: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;Blueprint 'app.ui'&gt;, name = 'app.ui', import_name = 'test_blueprints'
+static_folder = None, static_url_path = None, template_folder = None
+url_prefix = None, subdomain = None, url_defaults = None, root_path = None
+cli_group = &lt;object object at 0xffffad09d2a0&gt;
+
+    def __init__(
+        self,
+        name: str,
+        import_name: str,
+        static_folder: t.Optional[str] = None,
+        static_url_path: t.Optional[str] = None,
+        template_folder: t.Optional[str] = None,
+        url_prefix: t.Optional[str] = None,
+        subdomain: t.Optional[str] = None,
+        url_defaults: t.Optional[dict] = None,
+        root_path: t.Optional[str] = None,
+        cli_group: t.Optional[str] = _sentinel,  # type: ignore
+    ):
+        super().__init__(
+            import_name=import_name,
+            static_folder=static_folder,
+            static_url_path=static_url_path,
+            template_folder=template_folder,
+            root_path=root_path,
+        )
+        self.name = name
+&gt;       assert "." not in name, "'name' may not contain a dot '.' character."
+E       AssertionError: 'name' may not contain a dot '.' character.
+
+src/flask/blueprints.py:192: AssertionError</failure></testcase><testcase classname="tests.test_blueprints" name="test_route_decorator_custom_endpoint_with_dots" time="0.001"><failure message="AssertionError: Blueprint endpoints should not contain dots">app = &lt;Flask 'flask_test'&gt;, client = &lt;FlaskClient &lt;Flask 'flask_test'&gt;&gt;
+
+    def test_route_decorator_custom_endpoint_with_dots(app, client):
+        bp = flask.Blueprint("bp", __name__)
+    
+        with pytest.raises(ValueError):
+&gt;           bp.route("/", endpoint="a.b")(lambda: "")
+
+tests/test_blueprints.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/flask/scaffold.py:433: in decorator
+    self.add_url_rule(rule, endpoint, f, **options)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;Blueprint 'bp'&gt;, rule = '/', endpoint = 'a.b'
+view_func = &lt;function test_route_decorator_custom_endpoint_with_dots.&lt;locals&gt;.&lt;lambda&gt; at 0xffffaaa30fe0&gt;
+options = {}
+
+    def add_url_rule(
+        self,
+        rule: str,
+        endpoint: t.Optional[str] = None,
+        view_func: t.Optional[t.Callable] = None,
+        **options: t.Any,
+    ) -&gt; None:
+        """Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for
+        the :func:`url_for` function is prefixed with the name of the blueprint.
+        """
+        if endpoint:
+&gt;           assert "." not in endpoint, "Blueprint endpoints should not contain dots"
+E           AssertionError: Blueprint endpoints should not contain dots
+
+src/flask/blueprints.py:365: AssertionError</failure></testcase></testsuite></testsuites>

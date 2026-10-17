@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": ".                                                                        [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E02-auto-1/grade/mokio-grade-rmjbd7qj/workspace/.target.xml -\n1 passed in 0.02s\n..................                                                       [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E02-auto-1/grade/mokio-grade-rmjbd7qj/workspace/.regression.xml -\n18 passed, 1 deselected in 0.04s\n",
+  "stderr": "",
+  "duration_ms": 551,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-4c5eec2852684a2ba7962a14e4a2b42b.log",
+    "stdout_output_bytes": 573,
+    "stdout_retained_bytes": 573,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-d3ca8dfa752a4539b175086e14471371.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+    "container_id": "bb43e48a68057d796aec6f65a623d3a2332421e2959d59cdabf630fcd34820e3",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-4c5eec2852684a2ba7962a14e4a2b42b.log",
+  "stdout_output_bytes": 573,
+  "stdout_retained_bytes": 573,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-d3ca8dfa752a4539b175086e14471371.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+  "container_id": "bb43e48a68057d796aec6f65a623d3a2332421e2959d59cdabf630fcd34820e3",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_rules_refresh_before_write_and_stop_remaining_batch ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_rules_refresh_before_writ0')
+
+    def test_rules_refresh_before_write_and_stop_remaining_batch(tmp_path):
+        (tmp_path / "AGENTS.md").write_text("Root coding convention")
+        (tmp_path / "src").mkdir()
+        (tmp_path / "src/AGENTS.md").write_text("Only this directory uses Chinese comments")
+        runtime = RuntimeState(workspace=tmp_path)
+        model, messages = Reply(), [HumanMessage(content="implement")]
+        invoke_streaming(model, messages, state={"runtime": runtime})
+>       assert not write_file(runtime, "src/app.py", "# 中文")["ok"]
+E       assert not True
+
+tests/test_project_optimization.py:51: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_project_optimization.py::test_rules_refresh_before_write_and_stop_remaining_batch
+1 failed in 0.46s
+...                                                                      [100%]
+3 passed in 0.47s

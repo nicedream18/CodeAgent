@@ -15,14 +15,17 @@ flowchart LR
     T --> B[local 或显式 Docker Bash]
 ```
 
-本轮加入可选 Docker 前台 Bash、独立代码验收器和固定 12 题评测集。Docker 实测记录、任务缺陷版/参考修复的 JUnit 结果已归档；真实模型对照报告将在固定 56 次运行全部记录后填写。历史控制行为演示不计作代码任务成功率。
+本轮加入可选 Docker 前台 Bash、独立代码验收器和固定 12 题评测集。正式 56 次真实试验已归档：**完整交付 0/56，部分产物通过 8/56**。此前另有 56 次因配置继承缺陷标为无效对照，原记录全部保留。当前交付可靠性仍需改善，不声称多 Agent 优于单 Agent。[结果、限制与失败分析](docs/experiments/internship-v1/RESULTS.md)。
 
 | 可复核内容 | 证据 |
 |---|---|
 | 366 项原始检查基线 | [基线记录](docs/experiments/internship-baseline-2026-10-16.json) |
+| 当前 403 项检查通过，另有真实容器检查 | [安装与检查证据](docs/experiments/internship-install-acceptance.json) |
 | 真实 ARM64 容器隔离、输出和超时清理 | [Docker 实测](docs/experiments/docker-arm64-2026-10-16.json) |
 | 12 题缺陷版失败 / 参考修复通过 | [任务清单与验收](docs/experiments/internship-v1/) |
 | baseline/full/light/auto 公平比较口径 | [评测设计](docs/internship/evaluation.md) |
+| 56 次正式试验及 56 次无效对照均保留 | [实际结果](docs/experiments/internship-v1/RESULTS.md) |
+| 150 秒真实产物与失败收尾回放 | [演示](docs/internship/demo.md) |
 
 ## 快速运行
 
@@ -58,6 +61,8 @@ Docker 仅覆盖前台 Bash 和独立验收；MCP、Python hooks 和文件工具
 
 - [原教学说明与各阶段实验](docs/teaching-guide.md)
 - [评测任务、预算、冻结与恢复](docs/internship/evaluation.md)
+- [取消、截断、审批复盘](docs/internship/postmortems.md) · [时序图与面试自测](docs/internship/interview.md)
+- [贡献和展示口径](docs/internship/contribution.md) · [本地发布候选与已知限制](docs/internship/release-candidate.md)
 - [协议契约](docs/WIRE_PROTOCOL.md) · [评测契约](docs/EVAL_SCHEMA.json)
 - 真实模型实验必须显式加 `--real-model`，普通 CI 不调用模型。
 

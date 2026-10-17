@@ -1,0 +1,127 @@
+{
+  "status": "failed",
+  "stop_reason": null,
+  "error": "ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction",
+  "model_metrics": {
+    "requests": 30,
+    "roles": {
+      "intent_router": {
+        "estimated": false,
+        "input_tokens": 439,
+        "output_tokens": 62,
+        "total_tokens": 501,
+        "duration_ms": 1269.95,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "codeAgent": {
+        "estimated": false,
+        "input_tokens": 27712,
+        "output_tokens": 1896,
+        "total_tokens": 29608,
+        "duration_ms": 16535.034,
+        "cache_read_tokens": 18048,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 9
+      },
+      "verifier": {
+        "estimated": false,
+        "input_tokens": 11293,
+        "output_tokens": 749,
+        "total_tokens": 12042,
+        "duration_ms": 5907.540999999999,
+        "cache_read_tokens": 7680,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 3
+      },
+      "context_compressor": {
+        "estimated": false,
+        "input_tokens": 1559,
+        "output_tokens": 514,
+        "total_tokens": 2073,
+        "duration_ms": 4484.588,
+        "cache_read_tokens": 384,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 2
+      },
+      "repoAgent": {
+        "estimated": false,
+        "input_tokens": 35893,
+        "output_tokens": 4829,
+        "total_tokens": 40722,
+        "duration_ms": 32194.03,
+        "cache_read_tokens": 21500,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 14
+      },
+      "planner": {
+        "estimated": false,
+        "input_tokens": 6564,
+        "output_tokens": 417,
+        "total_tokens": 6981,
+        "duration_ms": 3011.887,
+        "cache_read_tokens": 896,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      }
+    },
+    "estimated": false,
+    "input_tokens": 83460,
+    "output_tokens": 8467,
+    "total_tokens": 91927,
+    "duration_ms": 63403.03,
+    "cache_read_tokens": 48764,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 27,
+  "actual_path": [
+    "intent_router",
+    "{'type': 'workflow_selected', 'mode': 'light', 'reason': 'explicit configuration or conservative router hint', 'event_id': 'ac07589921c14de09fcd11cb424b28aa', 'run_id': 'internship-v1-20261016-M02-light-1', 'context_version': 0}",
+    "light_executor",
+    "verifier",
+    "{'type': 'workflow_selected', 'mode': 'full', 'reason': 'light path required broader work or verification failed', 'upgraded': True, 'event_id': '056107f1fb144f6ca3d082ca6d8b6238', 'run_id': 'internship-v1-20261016-M02-light-1', 'context_version': 4, 'trace_id': 'trace-20261016-224256-79b6e4', 'trace_seq': 153}"
+  ],
+  "stream_ids": [
+    "e662f295d98741a7ae1ae443074a79ec",
+    "5c1c1cbcf7f84e79a960f77ea3a2213c",
+    "d344ddf56d62421d9979ef7aae3e7fd2",
+    "120c804a545c4138ace4e36330e0ef84",
+    "4347adb886a345b9afc4f042fdc9d48f",
+    "37aae20d2b0940f58b7f0a02f43d7562",
+    "2fafbf0a01784d52aae49e61f4d4bbb0",
+    "12b30415a2e94b709dc8309ba764ffab",
+    "eee03c1a573240c0b8e223b028e6b678",
+    "bc0ea3587ed44b3581f99a75dabc4324",
+    "3d3ad1fa05174169a3de74ce71b5b580",
+    "cb5e5377ba804167856656bccbc88147",
+    "3c17a693f1ed46d18f6d83322d3e061b",
+    "b2498a3bd519452ab6375c3abc72ecd5"
+  ],
+  "tool_call_ids": [
+    "call_00_6OFo84No8xZAG3Kd55758307",
+    "call_01_99FMhsnSRGkZe0GBwMsy8662",
+    "call_00_mEuRbGJunrkRfiKxHBwJ6985",
+    "call_01_fpk7gU3MCmuHG0RC82An4283",
+    "call_00_MlRQ8uKPWLj5jZfyIjwf6321",
+    "call_01_3u1010JOzeplSuvpYraf2550",
+    "call_00_YpzQl7dnEWxUCp2wzJQ24826",
+    "call_01_ABHgRnT12proU27gPEUQ3598",
+    "call_00_s6W9lQLkqc5qaFJlhSly7973",
+    "call_01_XEpZ23Mz3DICAUMT2Duu9044",
+    "call_00_mpaDcIg4NSivdEdQxKTu0851",
+    "call_00_cKr5BbPqpYZijOOntP8n6909",
+    "call_01_xqMUndGr3XcjqjebI1He2506",
+    "call_00_o2JGqDfjx4XJXEKOYEbz0277",
+    "call_01_nnhzmbYsrewncgD69a4G5978"
+  ],
+  "model_claim": false,
+  "run_id": "internship-v1-20261016-M02-light-1"
+}

@@ -1,0 +1,209 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ TestRequests.test_response_decode_unicode ___________________
+
+self = <tests.test_requests.TestRequests object at 0xffff98227430>
+
+    def test_response_decode_unicode(self):
+        """
+        When called with decode_unicode, Response.iter_content should always
+        return unicode.
+        """
+        r = requests.Response()
+        r._content_consumed = True
+        r._content = b'the content'
+        r.encoding = 'ascii'
+    
+        chunks = r.iter_content(decode_unicode=True)
+        assert all(isinstance(chunk, str) for chunk in chunks)
+    
+        # also for streaming
+        r = requests.Response()
+        r.raw = io.BytesIO(b'the content')
+        r.encoding = 'ascii'
+        chunks = r.iter_content(decode_unicode=True)
+        assert all(isinstance(chunk, str) for chunk in chunks)
+    
+        # check for encoding value of None
+        r = requests.Response()
+        r.raw = io.BytesIO(b'the content')
+        r.encoding = None
+        chunks = r.iter_content(decode_unicode=True)
+>       assert all(isinstance(chunk, str) for chunk in chunks)
+E       assert False
+E        +  where False = all(<generator object TestRequests.test_response_decode_unicode.<locals>.<genexpr> at 0xffff9812b820>)
+
+tests/test_requests.py:988: AssertionError
+=============================== warnings summary ===============================
+requests/packages/urllib3/connectionpool.py:105
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/connectionpool.py:105: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/packages/urllib3/connectionpool.py:448
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/connectionpool.py:448: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/packages/urllib3/connectionpool.py:825
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/connectionpool.py:825: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/packages/urllib3/_collections.py:2
+requests/packages/urllib3/_collections.py:2
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/_collections.py:2: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.10 it will stop working
+    from collections import Mapping, MutableMapping
+
+requests/packages/urllib3/poolmanager.py:33
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/poolmanager.py:33: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/models.py:796
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/models.py:796: DeprecationWarning: invalid escape sequence \*
+    """Returns the json-encoded content of a response, if any.
+
+requests/api.py:61
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:61: DeprecationWarning: invalid escape sequence \*
+    """Sends a GET request.
+
+requests/api.py:75
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:75: DeprecationWarning: invalid escape sequence \*
+    """Sends a OPTIONS request.
+
+requests/api.py:88
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:88: DeprecationWarning: invalid escape sequence \*
+    """Sends a HEAD request.
+
+requests/api.py:101
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:101: DeprecationWarning: invalid escape sequence \*
+    """Sends a POST request.
+
+requests/api.py:115
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:115: DeprecationWarning: invalid escape sequence \*
+    """Sends a PUT request.
+
+requests/api.py:128
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:128: DeprecationWarning: invalid escape sequence \*
+    """Sends a PATCH request.
+
+requests/api.py:141
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:141: DeprecationWarning: invalid escape sequence \*
+    """Sends a DELETE request.
+
+requests/sessions.py:482
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:482: DeprecationWarning: invalid escape sequence \*
+    """Sends a GET request. Returns :class:`Response` object.
+
+requests/sessions.py:492
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:492: DeprecationWarning: invalid escape sequence \*
+    """Sends a OPTIONS request. Returns :class:`Response` object.
+
+requests/sessions.py:502
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:502: DeprecationWarning: invalid escape sequence \*
+    """Sends a HEAD request. Returns :class:`Response` object.
+
+requests/sessions.py:512
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:512: DeprecationWarning: invalid escape sequence \*
+    """Sends a POST request. Returns :class:`Response` object.
+
+requests/sessions.py:523
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:523: DeprecationWarning: invalid escape sequence \*
+    """Sends a PUT request. Returns :class:`Response` object.
+
+requests/sessions.py:533
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:533: DeprecationWarning: invalid escape sequence \*
+    """Sends a PATCH request. Returns :class:`Response` object.
+
+requests/sessions.py:543
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:543: DeprecationWarning: invalid escape sequence \*
+    """Sends a DELETE request. Returns :class:`Response` object.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/.target.xml -
+=========================== short test summary info ============================
+FAILED tests/test_requests.py::TestRequests::test_response_decode_unicode - a...
+1 failed, 21 warnings in 0.21s
+.........................                                                [100%]
+=============================== warnings summary ===============================
+requests/packages/urllib3/connectionpool.py:105
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/connectionpool.py:105: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/packages/urllib3/connectionpool.py:448
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/connectionpool.py:448: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/packages/urllib3/connectionpool.py:825
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/connectionpool.py:825: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/packages/urllib3/_collections.py:2
+requests/packages/urllib3/_collections.py:2
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/_collections.py:2: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.10 it will stop working
+    from collections import Mapping, MutableMapping
+
+requests/packages/urllib3/poolmanager.py:33
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/packages/urllib3/poolmanager.py:33: DeprecationWarning: invalid escape sequence \*
+    """
+
+requests/models.py:796
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/models.py:796: DeprecationWarning: invalid escape sequence \*
+    """Returns the json-encoded content of a response, if any.
+
+requests/api.py:61
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:61: DeprecationWarning: invalid escape sequence \*
+    """Sends a GET request.
+
+requests/api.py:75
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:75: DeprecationWarning: invalid escape sequence \*
+    """Sends a OPTIONS request.
+
+requests/api.py:88
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:88: DeprecationWarning: invalid escape sequence \*
+    """Sends a HEAD request.
+
+requests/api.py:101
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:101: DeprecationWarning: invalid escape sequence \*
+    """Sends a POST request.
+
+requests/api.py:115
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:115: DeprecationWarning: invalid escape sequence \*
+    """Sends a PUT request.
+
+requests/api.py:128
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:128: DeprecationWarning: invalid escape sequence \*
+    """Sends a PATCH request.
+
+requests/api.py:141
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/api.py:141: DeprecationWarning: invalid escape sequence \*
+    """Sends a DELETE request.
+
+requests/sessions.py:482
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:482: DeprecationWarning: invalid escape sequence \*
+    """Sends a GET request. Returns :class:`Response` object.
+
+requests/sessions.py:492
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:492: DeprecationWarning: invalid escape sequence \*
+    """Sends a OPTIONS request. Returns :class:`Response` object.
+
+requests/sessions.py:502
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:502: DeprecationWarning: invalid escape sequence \*
+    """Sends a HEAD request. Returns :class:`Response` object.
+
+requests/sessions.py:512
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:512: DeprecationWarning: invalid escape sequence \*
+    """Sends a POST request. Returns :class:`Response` object.
+
+requests/sessions.py:523
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:523: DeprecationWarning: invalid escape sequence \*
+    """Sends a PUT request. Returns :class:`Response` object.
+
+requests/sessions.py:533
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:533: DeprecationWarning: invalid escape sequence \*
+    """Sends a PATCH request. Returns :class:`Response` object.
+
+requests/sessions.py:543
+  /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/requests/sessions.py:543: DeprecationWarning: invalid escape sequence \*
+    """Sends a DELETE request. Returns :class:`Response` object.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E04-full-1/grade/mokio-grade-jwp9ocox/workspace/.regression.xml -
+25 passed, 21 warnings in 0.30s

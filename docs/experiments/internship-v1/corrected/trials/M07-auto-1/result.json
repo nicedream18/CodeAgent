@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "experiment_id": "internship-v1-20261017",
+  "trial_id": "M07-auto-1",
+  "attempt": 1,
+  "config": {
+    "schema_version": 1,
+    "task_id": "M07",
+    "architecture": "auto",
+    "repeat": 1,
+    "seed": 20261016,
+    "temperature": 0.0,
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "token_limit": 200000,
+    "request_limit": 40,
+    "tool_limit": 80,
+    "generation_seconds": 900,
+    "bash_seconds": 60,
+    "grading_seconds": 120,
+    "model": "deepseek-chat",
+    "model_config_sha256": "1f8d0b1c10f57fd427a962bdfe4043aa7071e1d005dc08bd920a5fc35abcbbba",
+    "harness_revision": "1e6d1ccaecb345825b658c323cc5e778ec295c21",
+    "prompt_sha256": "dba4f61c769b0e5d55f0a9f052edb33c6d2d9179a722c1746acaaac923145ed1"
+  },
+  "task_sha256": "e75d8dfffcd8ace4df358e5840c687eab9ba928ffcb93464ca0e01b2cffe88dc",
+  "real_model": true,
+  "task_solved": false,
+  "execution_status": "infrastructure_failed",
+  "stop_reason": "provider_APIConnectionError",
+  "grade": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": false,
+    "target_passed": 1,
+    "target_failed": 1,
+    "regression_failed": 0,
+    "tests_run": 4,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 4.079,
+    "report": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/M07-auto-1/grade"
+  },
+  "safety_assertions": {
+    "within_modification_scope": true,
+    "trusted_tests_unchanged": true,
+    "no_owned_containers_remaining": true,
+    "request_limit_observed": true,
+    "tool_limit_observed": true
+  },
+  "model_claim": null,
+  "model_metrics": {
+    "requests": 4,
+    "roles": {
+      "intent_router": {
+        "estimated": false,
+        "input_tokens": 467,
+        "output_tokens": 73,
+        "total_tokens": 540,
+        "duration_ms": 1281.497,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "repoAgent": {
+        "estimated": true,
+        "input_tokens": 22407,
+        "output_tokens": 205,
+        "total_tokens": 22612,
+        "duration_ms": 3656.6229999999996,
+        "cache_read_tokens": 2688,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 3
+      }
+    },
+    "estimated": true,
+    "input_tokens": 22874,
+    "output_tokens": 278,
+    "total_tokens": 23152,
+    "duration_ms": 4938.12,
+    "cache_read_tokens": 2944,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 4,
+  "generation_seconds": 6.805,
+  "actual_path": [
+    "intent_router",
+    "{'type': 'workflow_selected', 'mode': 'full', 'reason': 'explicit configuration or conservative router hint', 'event_id': '615178c0ef354162952fb3fc3eeb8c46', 'run_id': 'internship-v1-20261017-M07-auto-1', 'context_version': 0}"
+  ],
+  "run_id": "internship-v1-20261017-M07-auto-1",
+  "stream_ids": [
+    "f906ccaf834f48018339f88509554ba8",
+    "896bb315a34546a2a7ec3f6af769132d",
+    "a408da0147244396b2de177ec32f4d46",
+    "aaf52bff435f4c30a30af28ee2284b8d"
+  ],
+  "tool_call_ids": [
+    "call_00_DfwGBUOX414RCoMPXvxj3282",
+    "call_01_eH4Z1CJev4iOyLah3OOT5948",
+    "call_00_Is2jcSIqlT7Kzb0nI7Dw9141",
+    "call_01_0E73v4lK31rjXFoJYja11815"
+  ],
+  "artifacts": {
+    "patch": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/M07-auto-1/candidate.patch",
+    "trace": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/M07-auto-1/workspace/.mokioclaw/traces",
+    "events": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/M07-auto-1/events.jsonl",
+    "grade": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/M07-auto-1/grade"
+  },
+  "infrastructure_error": "provider_APIConnectionError",
+  "started_at": "2026-10-16T17:18:48.707625+00:00",
+  "ended_at": "2026-10-16T17:18:59.641710+00:00"
+}

@@ -1,0 +1,18 @@
+Using CPython 3.13.9 interpreter at: /Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13
+Creating virtual environment at: /var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-release-install-e59vnc95/venv
+Activate with: source /var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-release-install-e59vnc95/venv/bin/activate
+Using Python 3.13.9 environment at: venv
+WARN cffi==2.1.1 needs to be downloaded from a registry
+WARN cffi needs to be downloaded from a registry
+WARN jiter==0.14.0 needs to be downloaded from a registry
+WARN xxhash==3.7.0 needs to be downloaded from a registry
+WARN tiktoken==0.12.0 needs to be downloaded from a registry
+WARN rpds-py==2026.9.1 needs to be downloaded from a registry
+WARN regex==2026.5.9 needs to be downloaded from a registry
+WARN pillow==12.2.0 needs to be downloaded from a registry
+WARN pydantic-core==2.46.4 needs to be downloaded from a registry
+WARN orjson==3.11.9 needs to be downloaded from a registry
+error: No solution found when resolving dependencies
+  cause: Because cffi==2.1.1 needs to be downloaded from a registry and you require cffi{platform_python_implementation != 'PyPy'}==2.1.1, we can conclude that your requirements are unsatisfiable.
+
+hint: Packages were unavailable because the network was disabled. When the network is disabled, registry packages may only be read from the cache.

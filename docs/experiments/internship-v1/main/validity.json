@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "status": "invalid",
+  "recorded_at": "2026-10-16T16:27:28.550320+00:00",
+  "issues": [
+    "同步子 Agent 在 run_subagent 中把运行级 model_profile 重置为 None，未继承评测的 sdk max_retries=0；环境回退仍为同名模型，但请求重试条件不一致。",
+    "该批次保留为真实调用诊断记录，不作为 baseline/full/light/auto 的有效公平对照；不删除失败，不调整事后成功口径。"
+  ],
+  "evidence": [
+    "manifest.json",
+    "../../../../src/mokioclaw/agents/registry.py",
+    "../../../../tests/test_internship_eval.py"
+  ]
+}

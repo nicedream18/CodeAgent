@@ -1,0 +1,81 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_background_child_control_is_independent_and_loop_is_closed ________
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_background_child_control_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff8ed67ce0>
+
+    def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, monkeypatch):
+        from mokioclaw.agents.registry import SubagentDefinition, SubagentRegistry
+        from mokioclaw.graph import nodes
+    
+        parent = RunControl()
+        seen = []
+    
+        class Manager:
+            def submit(self, **kwargs):
+                seen.append(kwargs["runner"])
+                return {
+                    "ok": True,
+                    "subagent_run_id": "child",
+                    "status": "queued",
+                    "parent_run_id": kwargs["parent_run_id"],
+                    "handoff_id": kwargs["handoff_id"],
+                }
+    
+        registry = SubagentRegistry()
+        registry.register(
+            SubagentDefinition(
+                name="demo",
+                description="demo",
+                legacy_runner=False,
+                background_safe=True,
+                allowed_tools=frozenset({"FileReadTool"}),
+                max_tool_calls=1,
+                runner=lambda *_args, **_kwargs: {"ok": True, "summary": "done"},
+            )
+        )
+        runtime = RuntimeState(
+            workspace=tmp_path,
+            approval_mode="auto",
+            run_control=parent,
+            subagent_registry=registry,
+            subagent_task_manager=Manager(),
+            parent_run_id="parent",
+        )
+        # The public delegation helper creates a private child RuntimeState.
+        result = nodes._call_registered_subagent_tool(
+            {"runtime": runtime, "task": "demo"},
+            subagent_name="demo",
+            instruction="test",
+            writer=lambda _: None,
+            run_in_background=True,
+        )
+        assert result["ok"]
+        parent.cancel()
+>       child = seen[0](lambda _: None, threading.Event())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_run_cancellation.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/mokioclaw/graph/steps/delegation.py:120: in runner
+    return api.run_subagent(
+src/mokioclaw/agents/registry.py:384: in run_subagent
+    check_run(runtime)
+src/mokioclaw/core/run_control.py:163: in check_run
+    control.check()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <mokioclaw.core.run_control.RunControl object at 0xffff8bdf1010>
+
+    def check(self) -> None:
+        if self.cancel_event.is_set():
+>           raise RunInterrupted("Run cancelled by user")
+E           mokioclaw.core.run_control.RunInterrupted: Run cancelled by user
+
+src/mokioclaw/core/run_control.py:47: RunInterrupted
+=========================== short test summary info ============================
+FAILED tests/test_run_cancellation.py::test_background_child_control_is_independent_and_loop_is_closed
+1 failed in 1.14s
+....                                                                     [100%]
+4 passed in 1.25s

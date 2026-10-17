@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "experiment_id": "internship-v1-20261016",
+  "trial_id": "E03-full-1",
+  "attempt": 1,
+  "config": {
+    "schema_version": 1,
+    "task_id": "E03",
+    "architecture": "full",
+    "repeat": 1,
+    "seed": 20261016,
+    "temperature": 0.0,
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "token_limit": 200000,
+    "request_limit": 40,
+    "tool_limit": 80,
+    "generation_seconds": 900,
+    "bash_seconds": 60,
+    "grading_seconds": 120,
+    "model": "deepseek-chat",
+    "model_config_sha256": "ecbce61a383fac421703fccfb5a8ac49beffee6935a4530a6096930660c16432",
+    "harness_revision": "486a0f9a14a3110287de8dd2dd87693f6e1c68df",
+    "prompt_sha256": "dba4f61c769b0e5d55f0a9f052edb33c6d2d9179a722c1746acaaac923145ed1"
+  },
+  "task_sha256": "dbe2c9023af76a87d22d7e1d1b14a9611b988213ad852ce4d610245c9bc4ee68",
+  "real_model": true,
+  "task_solved": false,
+  "execution_status": "infrastructure_failed",
+  "stop_reason": "provider_APIConnectionError",
+  "grade": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": false,
+    "target_passed": 0,
+    "target_failed": 2,
+    "regression_failed": 0,
+    "tests_run": 6,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 1.668,
+    "report": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E03-full-1/grade"
+  },
+  "safety_assertions": {
+    "within_modification_scope": true,
+    "trusted_tests_unchanged": true,
+    "no_owned_containers_remaining": true,
+    "request_limit_observed": true,
+    "tool_limit_observed": true
+  },
+  "model_claim": null,
+  "model_metrics": {
+    "requests": 1,
+    "roles": {
+      "intent_router": {
+        "estimated": true,
+        "input_tokens": 4031,
+        "output_tokens": 0,
+        "total_tokens": 4031,
+        "duration_ms": 5031.884,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 1
+      }
+    },
+    "estimated": true,
+    "input_tokens": 4031,
+    "output_tokens": 0,
+    "total_tokens": 4031,
+    "duration_ms": 5031.884,
+    "cache_read_tokens": null,
+    "cache_usage_incomplete": true,
+    "cache_creation_tokens": null
+  },
+  "tool_count": 0,
+  "generation_seconds": 6.881,
+  "actual_path": [],
+  "run_id": "internship-v1-20261016-E03-full-1",
+  "stream_ids": [
+    "0e15b6cfe8304861ae04d96621ccbadd"
+  ],
+  "tool_call_ids": [],
+  "artifacts": {
+    "patch": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E03-full-1/candidate.patch",
+    "trace": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E03-full-1/workspace/.mokioclaw/traces",
+    "events": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E03-full-1/events.jsonl",
+    "grade": "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E03-full-1/grade"
+  },
+  "infrastructure_error": "provider_APIConnectionError",
+  "started_at": "2026-10-16T15:01:23.569876+00:00",
+  "ended_at": "2026-10-16T15:01:32.454946+00:00"
+}

@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_rewind_conflict_new_file_quota_and_lock _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_rewind_conflict_new_file_0')
+
+    def test_rewind_conflict_new_file_quota_and_lock(tmp_path):
+        from mokioclaw.core.session_lock import session_writer
+    
+        runtime = RuntimeState(workspace=tmp_path)
+        assert write_file(runtime, "new.txt", "agent")["ok"]
+        (tmp_path / "new.txt").write_text("user")
+>       assert not rewind(tmp_path, runtime.run_id, apply=True)["ok"]
+E       assert not True
+
+tests/test_project_optimization.py:269: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_project_optimization.py::test_rewind_conflict_new_file_quota_and_lock
+1 failed in 0.54s
+..                                                                       [100%]
+2 passed in 1.05s

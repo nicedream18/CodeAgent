@@ -1,0 +1,118 @@
+{
+  "status": "failed",
+  "stop_reason": null,
+  "error": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+  "model_metrics": {
+    "requests": 24,
+    "roles": {
+      "intent_router": {
+        "estimated": false,
+        "input_tokens": 467,
+        "output_tokens": 73,
+        "total_tokens": 540,
+        "duration_ms": 990.925,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "codeAgent": {
+        "estimated": false,
+        "input_tokens": 30804,
+        "output_tokens": 2150,
+        "total_tokens": 32954,
+        "duration_ms": 18643.297000000002,
+        "cache_read_tokens": 22784,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 11
+      },
+      "verifier": {
+        "estimated": false,
+        "input_tokens": 10633,
+        "output_tokens": 646,
+        "total_tokens": 11279,
+        "duration_ms": 5306.831,
+        "cache_read_tokens": 7936,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 3
+      },
+      "context_compressor": {
+        "estimated": false,
+        "input_tokens": 870,
+        "output_tokens": 295,
+        "total_tokens": 1165,
+        "duration_ms": 2354.714,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "repoAgent": {
+        "estimated": false,
+        "input_tokens": 25076,
+        "output_tokens": 2833,
+        "total_tokens": 27909,
+        "duration_ms": 19312.008,
+        "cache_read_tokens": 19584,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 8
+      }
+    },
+    "estimated": false,
+    "input_tokens": 67850,
+    "output_tokens": 5997,
+    "total_tokens": 73847,
+    "duration_ms": 46607.775000000016,
+    "cache_read_tokens": 50816,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 20,
+  "actual_path": [
+    "intent_router",
+    "{'type': 'workflow_selected', 'mode': 'light', 'reason': 'explicit configuration or conservative router hint', 'event_id': 'fc7442c02a6b43b1958013513d5f78c0', 'run_id': 'internship-v1-20261016-M07-light-1', 'context_version': 0}",
+    "light_executor",
+    "verifier",
+    "{'type': 'workflow_selected', 'mode': 'full', 'reason': 'light path required broader work or verification failed', 'upgraded': True, 'event_id': 'ff7f634245dc4510872be2c4bafbcc35', 'run_id': 'internship-v1-20261016-M07-light-1', 'context_version': 5, 'trace_id': 'trace-20261016-222736-560b68', 'trace_seq': 167}"
+  ],
+  "stream_ids": [
+    "69f152e0f83e4fa08ae343b6661e2632",
+    "8be807ae4d4c45fd850be30e1dcdd5de",
+    "772dc15be19d4d1fb3a8413d69795dc1",
+    "e90dff486c7646d08b770a29ce15fb55",
+    "9f44e9c3b16f4fd8b48c929ebe8455e2",
+    "ce9b48148e6c4be79cb22e1e0a9b7e2f",
+    "8b01c6a102fd4384b4834b05c2a83ff8",
+    "e638649dd4ce4f60b70dbd49f0886742",
+    "f1470295daec4128a1fecded0ab8f339",
+    "a1249220e1104b3f86bd67dbcf29857f",
+    "6a9b05040062423983f8fef278d83646",
+    "05ed20bd83b14767bdad4664f0a67d5d",
+    "165a6319ee1c47dd91fa4b86f87ee3d3",
+    "7a761af2ad2c403a8d305f97aa002d95",
+    "1110abf90f1c4df486fffe8eba599c59",
+    "06d6253232824ac4ba6855a2d21bcf02"
+  ],
+  "tool_call_ids": [
+    "call_00_LkNWRKpKJkpJy8BZ48r86057",
+    "call_01_5vZS2nUlt0tDQUdaFE3R9940",
+    "call_00_Fh2Y9r6sGibQGljlZzne8625",
+    "call_00_98a0MM3IRWx6Mm1husdQ9138",
+    "call_01_cc7M0RPvmZw0sMBEptB43119",
+    "call_00_Ya9wLOPXuiECx5snn0CF7112",
+    "call_01_A9jcOjZcNk12lmUpkqLF2277",
+    "call_00_Inp5yDdN7CKsQBSOuNhD5335",
+    "call_00_QmOsFpuuJ8OiYysddFGj1269",
+    "call_01_DXT8CnM3NB739cjONEtY4659",
+    "call_00_oTxByLsHIxFL8uEeFZLQ4794",
+    "call_00_fFOiVxlcZKlYLCo6GWQi9407",
+    "call_01_7mLXVSo7LmfToOmyYb2u0133",
+    "call_00_UwkD4L9IC4pEJ7ahKO9V1196",
+    "call_01_BVXY5WrfLNq6pJOJcuYo3186"
+  ],
+  "model_claim": false,
+  "run_id": "internship-v1-20261016-M07-light-1"
+}

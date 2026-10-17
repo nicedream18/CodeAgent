@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F                                                                        [100%]\n=================================== FAILURES ===================================\n__________________________ test_config_from_file_toml __________________________\n\n    def test_config_from_file_toml():\n        tomllib = pytest.importorskip(\"tomllib\", reason=\"tomllib added in 3.11\")\n        app = flask.Flask(__name__)\n        current_dir = os.path.dirname(os.path.abspath(__file__))\n>       app.config.from_file(\n            os.path.join(current_dir, \"static\", \"config.toml\"), tomllib.load, text=False\n        )\nE       TypeError: Config.from_file() got an unexpected keyword argument 'text'\n\ntests/test_config.py:43: TypeError\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E02-full-2/grade/mokio-grade-j91s017w/workspace/.target.xml -\n=========================== short test summary info ============================\nFAILED tests/test_config.py::test_config_from_file_toml - TypeError: Config.f...\n1 failed in 0.03s\n..................                                                       [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/trials/E02-full-2/grade/mokio-grade-j91s017w/workspace/.regression.xml -\n18 passed, 1 deselected in 0.03s\n",
+  "stderr": "",
+  "duration_ms": 548,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-d91b2ef85cf1493abc3032993e56737e.log",
+    "stdout_output_bytes": 1363,
+    "stdout_retained_bytes": 1363,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-01c5e6cb2c394ee2859cf43b7b50edb9.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+    "container_id": "a3669cfdb5ae99336bd3e857689fb38eab3c43fa7569e7d1a807e7487fd410d5",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-d91b2ef85cf1493abc3032993e56737e.log",
+  "stdout_output_bytes": 1363,
+  "stdout_retained_bytes": 1363,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-01c5e6cb2c394ee2859cf43b7b50edb9.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:245431cd289d3504258d366c3337d4575f8df61bd2d6e88f0f382f9b997e8a30",
+  "container_id": "a3669cfdb5ae99336bd3e857689fb38eab3c43fa7569e7d1a807e7487fd410d5",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

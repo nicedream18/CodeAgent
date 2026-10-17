@@ -1,3 +1,5 @@
 # Preserve generated test stack traces and candidate patches byte-for-byte.
 docs/experiments/**/*.xml -whitespace
 docs/experiments/**/*.patch -whitespace
+docs/experiments/**/*.log -whitespace
+docs/experiments/install-final-2026-10-17.txt -whitespace

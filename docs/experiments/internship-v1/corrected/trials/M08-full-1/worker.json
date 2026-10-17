@@ -1,0 +1,37 @@
+{
+  "status": "failed",
+  "stop_reason": "provider_APIConnectionError",
+  "error": null,
+  "model_metrics": {
+    "requests": 1,
+    "roles": {
+      "intent_router": {
+        "estimated": true,
+        "input_tokens": 2269,
+        "output_tokens": 0,
+        "total_tokens": 2269,
+        "duration_ms": 17.142,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 1
+      }
+    },
+    "estimated": true,
+    "input_tokens": 2269,
+    "output_tokens": 0,
+    "total_tokens": 2269,
+    "duration_ms": 17.142,
+    "cache_read_tokens": null,
+    "cache_usage_incomplete": true,
+    "cache_creation_tokens": null
+  },
+  "tool_count": 0,
+  "actual_path": [],
+  "stream_ids": [
+    "6e64fba7b2a9411fa07f0c347a12ba5c"
+  ],
+  "tool_call_ids": [],
+  "model_claim": null,
+  "run_id": "internship-v1-20261017-M08-full-1"
+}

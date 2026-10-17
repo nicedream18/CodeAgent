@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.024" timestamp="2026-10-16T17:26:33.646285" hostname="f200712b6d59"><testcase classname="tests.test_config" name="test_config_from_file_toml" time="0.004" /></testsuite></testsuites>

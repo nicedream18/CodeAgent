@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": ".F                                                                       [100%]\n=================================== FAILURES ===================================\n________________ test_route_decorator_custom_endpoint_with_dots ________________\n\napp = <Flask 'flask_test'>, client = <FlaskClient <Flask 'flask_test'>>\n\n    def test_route_decorator_custom_endpoint_with_dots(app, client):\n        bp = flask.Blueprint(\"bp\", __name__)\n    \n        with pytest.raises(ValueError):\n>           bp.route(\"/\", endpoint=\"a.b\")(lambda: \"\")\n\ntests/test_blueprints.py:326: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsrc/flask/scaffold.py:433: in decorator\n    self.add_url_rule(rule, endpoint, f, **options)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <Blueprint 'bp'>, rule = '/', endpoint = 'a.b'\nview_func = <function test_route_decorator_custom_endpoint_with_dots.<locals>.<lambda> at 0xffff7f5b8ea0>\noptions = {}\n\n    def add_url_rule(\n        self,\n        rule: str,\n        endpoint: t.Optional[str] = None,\n        view_func: t.Optional[t.Callable] = None,\n        **options: t.Any,\n    ) -> None:\n        \"\"\"Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for\n        the :func:`url_for` function is prefixed with the name of the blueprint.\n        \"\"\"\n        if endpoint:\n>           assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"\nE           AssertionError: Blueprint endpoints should not contain dots\n\nsrc/flask/blueprints.py:367: AssertionError\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E01-full-1/grade/mokio-grade-ixu79v4r/workspace/.target.xml -\n=========================== short test summary info ============================\nFAILED tests/test_blueprints.py::test_route_decorator_custom_endpoint_with_dots\n1 failed, 1 passed in 0.05s\n...............................................                          [100%]\n- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E01-full-1/grade/mokio-grade-ixu79v4r/workspace/.regression.xml -\n47 passed, 2 deselected in 0.09s\n",
+  "stderr": "",
+  "duration_ms": 654,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-14b43692830143c49f582b5db48da8af.log",
+    "stdout_output_bytes": 2241,
+    "stdout_retained_bytes": 2241,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-fc8c8d1babf64caea6078d5f29521d04.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+    "container_id": "ead296b27e8cf325b40557fd14d27df6c40aa767ddf0ac1be20785196f8820b8",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-14b43692830143c49f582b5db48da8af.log",
+  "stdout_output_bytes": 2241,
+  "stdout_retained_bytes": 2241,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-fc8c8d1babf64caea6078d5f29521d04.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:7d52f3ac4a078e416fcb36a9f64b7239dc7654381611249e38567975bfbbd8d2",
+  "container_id": "ead296b27e8cf325b40557fd14d27df6c40aa767ddf0ac1be20785196f8820b8",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F                                                                        [100%]\n=================================== FAILURES ===================================\n___________ test_late_second_approval_cannot_reverse_first_decision ____________\n\ntmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_late_second_approval_cann0')\n\n    def test_late_second_approval_cannot_reverse_first_decision(tmp_path):\n        from mokioclaw.core.approval import ApprovalRequest\n        from mokioclaw.core.daemon import AgentDaemon, ApprovalWaiter, RunRecord\n    \n        daemon = AgentDaemon(tmp_path / \"daemon\")\n        try:\n            record = RunRecord(\"run-approval\", tmp_path / \"run\")\n            waiter = ApprovalWaiter(ApprovalRequest(\"one\", \"test\", \"test\"))\n            record.waiters[\"one\"] = waiter\n            daemon.runs[record.run_id] = record\n            params = {\"run_id\": record.run_id, \"approval_id\": \"one\", \"approved\": False}\n            assert daemon.resolve_approval(params)[\"ok\"]\n>           assert not daemon.resolve_approval({**params, \"approved\": True})[\"ok\"]\nE           assert not True\n\ntests/test_approval_memory.py:112: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_approval_memory.py::test_late_second_approval_cannot_reverse_first_decision\n1 failed in 0.28s\n..                                                                       [100%]\n2 passed in 0.57s\n",
+  "stderr": "",
+  "duration_ms": 2282,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-deaefe2d8fc743af96d7797e716ef182.log",
+    "stdout_output_bytes": 1446,
+    "stdout_retained_bytes": 1446,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-c624ecf5ef70443f8c4568a8e796f8f7.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "29ad1e7a03782f265dc744242cb788b5b92241ddf1fcdb9c5fc006b615c35b4c",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-deaefe2d8fc743af96d7797e716ef182.log",
+  "stdout_output_bytes": 1446,
+  "stdout_retained_bytes": 1446,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-c624ecf5ef70443f8c4568a8e796f8f7.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "29ad1e7a03782f265dc744242cb788b5b92241ddf1fcdb9c5fc006b615c35b4c",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

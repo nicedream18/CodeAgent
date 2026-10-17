@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.027" timestamp="2026-10-16T16:37:59.561027" hostname="2c3ffe055e89"><testcase classname="tests.test_config" name="test_config_from_file_toml" time="0.003"><failure message="TypeError: Config.from_file() got an unexpected keyword argument 'text'">def test_config_from_file_toml():
+        tomllib = pytest.importorskip("tomllib", reason="tomllib added in 3.11")
+        app = flask.Flask(__name__)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+&gt;       app.config.from_file(
+            os.path.join(current_dir, "static", "config.toml"), tomllib.load, text=False
+        )
+E       TypeError: Config.from_file() got an unexpected keyword argument 'text'
+
+tests/test_config.py:43: TypeError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="0.276" timestamp="2026-10-16T17:04:51.963039+00:00" hostname="03df9b3156c6"><testcase classname="tests.test_eval_literal" name="test_literal_search_backends_and_schema" time="0.001"><failure message="TypeError: grep() got an unexpected keyword argument 'fixed_strings'">tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_literal_search_backends_a0')
+
+    def test_literal_search_backends_and_schema(tmp_path):
+        (tmp_path / "中文.txt").write_text("Foo.bar[0]\nfooXbar0\nfoo.bar[0]\n")
+        runtime = RuntimeState(workspace=tmp_path)
+        results = []
+        for backend in ("python", "rg"):
+            runtime.settings = {"search": {"backend": backend}}
+&gt;           output = grep(runtime, "foo.bar[0]", ignore_case=True, fixed_strings=True)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: grep() got an unexpected keyword argument 'fixed_strings'
+
+tests/test_eval_literal.py:12: TypeError</failure></testcase><testcase classname="tests.test_eval_literal" name="test_default_regex_is_preserved" time="0.003" /></testsuite></testsuites>

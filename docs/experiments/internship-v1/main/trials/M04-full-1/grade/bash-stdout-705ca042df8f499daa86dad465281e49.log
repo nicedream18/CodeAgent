@@ -1,0 +1,27 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_late_second_approval_cannot_reverse_first_decision ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_late_second_approval_cann0')
+
+    def test_late_second_approval_cannot_reverse_first_decision(tmp_path):
+        from mokioclaw.core.approval import ApprovalRequest
+        from mokioclaw.core.daemon import AgentDaemon, ApprovalWaiter, RunRecord
+    
+        daemon = AgentDaemon(tmp_path / "daemon")
+        try:
+            record = RunRecord("run-approval", tmp_path / "run")
+            waiter = ApprovalWaiter(ApprovalRequest("one", "test", "test"))
+            record.waiters["one"] = waiter
+            daemon.runs[record.run_id] = record
+            params = {"run_id": record.run_id, "approval_id": "one", "approved": False}
+            assert daemon.resolve_approval(params)["ok"]
+>           assert not daemon.resolve_approval({**params, "approved": True})["ok"]
+E           assert not True
+
+tests/test_approval_memory.py:112: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_approval_memory.py::test_late_second_approval_cannot_reverse_first_decision
+1 failed in 0.32s
+..                                                                       [100%]
+2 passed in 2.18s

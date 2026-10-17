@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_________________ test_rewind_conflict_new_file_quota_and_lock _________________\n\ntmp_path = PosixPath('/tmp/pytest-of-unknown/pytest-0/test_rewind_conflict_new_file_0')\n\n    def test_rewind_conflict_new_file_quota_and_lock(tmp_path):\n        from mokioclaw.core.session_lock import session_writer\n    \n        runtime = RuntimeState(workspace=tmp_path)\n        assert write_file(runtime, \"new.txt\", \"agent\")[\"ok\"]\n        (tmp_path / \"new.txt\").write_text(\"user\")\n>       assert not rewind(tmp_path, runtime.run_id, apply=True)[\"ok\"]\nE       assert not True\n\ntests/test_project_optimization.py:269: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_project_optimization.py::test_rewind_conflict_new_file_quota_and_lock\n1 failed in 0.54s\n..                                                                       [100%]\n2 passed in 1.05s\n",
+  "stderr": "",
+  "duration_ms": 4262,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-682ffdae3edb4296bf7135f3df64d346.log",
+    "stdout_output_bytes": 1061,
+    "stdout_retained_bytes": 1061,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-cd49c332e96646839e924d9e5b48f5f2.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "49031bc8416e8c9dc189fccf4c2bfb07c471dc4401eb0408da83e6727ffe18a1",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-682ffdae3edb4296bf7135f3df64d346.log",
+  "stdout_output_bytes": 1061,
+  "stdout_retained_bytes": 1061,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-cd49c332e96646839e924d9e5b48f5f2.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "49031bc8416e8c9dc189fccf4c2bfb07c471dc4401eb0408da83e6727ffe18a1",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

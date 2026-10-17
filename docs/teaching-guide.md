@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./logo.png" alt="MokioClaw Logo" width="460" />
+  <img src="../logo.png" alt="MokioClaw Logo" width="460" />
 </p>
 
 <h1 align="center">MokioClaw</h1>
@@ -74,9 +74,9 @@ uv run mokioclaw rewind --workspace ./workspace --apply
 uv run python examples/optimization_demo.py --output /tmp/mokio-optimization.json
 ```
 
-可选 TOML 配置放在 `~/.mokioclaw/config.toml` 或工作区 `.mokioclaw/config.toml`，优先级为显式参数 → 环境变量 → 项目 → 用户 → 默认值。配置示例包含 hooks、角色模型、MCP 服务用途和运行预算，见 [optimization-config.toml](examples/optimization-config.toml)。MCP 默认按需发现；文件回退仅覆盖 FileWrite/FileEdit，Bash/MCP 修改不在覆盖范围内。TUI 空闲时用 `/changes`、`/rewind` 查看并确认回退。
+可选 TOML 配置放在 `~/.mokioclaw/config.toml` 或工作区 `.mokioclaw/config.toml`，优先级为显式参数 → 环境变量 → 项目 → 用户 → 默认值。配置示例包含 hooks、角色模型、MCP 服务用途和运行预算，见 [optimization-config.toml](../examples/optimization-config.toml)。MCP 默认按需发现；文件回退仅覆盖 FileWrite/FileEdit，Bash/MCP 修改不在覆盖范围内。TUI 空闲时用 `/changes`、`/rewind` 查看并确认回退。
 
-各阶段数据流、故障处理和学习要点见 [设计与学习指南](docs/optimization-design.md)，自动化与真实模型数据见 [验收记录](docs/optimization-acceptance.md)。
+各阶段数据流、故障处理和学习要点见 [设计与学习指南](../docs/optimization-design.md)，自动化与真实模型数据见 [验收记录](../docs/optimization-acceptance.md)。
 
 ## Context Engineering
 
@@ -115,7 +115,7 @@ uv run mokioclaw compact --run-id run-xxxxxxxxxxxx --request-id compact-xxxxxxxx
 
 运行中请求返回 `pending`，完成后变为 `applied`、`noop` 或 `failed`。有活动会话写入者时，离线 workspace compact 返回 `session_busy`，避免覆盖运行中的会话。TUI、CLI 与 trace 都标明作用范围和估算方式。Python 本地执行可以传入 `ContextControl`，通过 `request()` 请求下一次调用前压缩，无需 daemon。
 
-任务、最新用户修正、验收标准和 TODO 状态由运行时保留；模型只摘要历史观察。压缩失败会降级或明确停止超限请求。完整事实与版本保存在 `.mokioclaw/context/`，来源目录位于 `.mokioclaw/memory/`；必要要求本身无法装入窗口时，需要增大窗口或缩小任务范围。参见 [完善计划](docs/context-governance-plan.md) 和 [验收记录](docs/context-governance-acceptance.md)。
+任务、最新用户修正、验收标准和 TODO 状态由运行时保留；模型只摘要历史观察。压缩失败会降级或明确停止超限请求。完整事实与版本保存在 `.mokioclaw/context/`，来源目录位于 `.mokioclaw/memory/`；必要要求本身无法装入窗口时，需要增大窗口或缩小任务范围。参见 [完善计划](../docs/context-governance-plan.md) 和 [验收记录](../docs/context-governance-acceptance.md)。
 
 ### 分层记忆
 
@@ -372,11 +372,11 @@ uv run mokioclaw --workspace .mokioclaw/workspaces/demo "帮我查阅明日方�
 
 这一阶段的教学价值是：MultiAgent 不只是“多个节点排队”，还可以是 supervisor 把 specialist agent 当成工具调用，让交接、上下文和职责边界都在终端里清楚呈现。
 
-更完整的 workspace 生命周期、checkpoint、shims、bash-outputs 讲解见 [docs/workspace-lifecycle.md](docs/workspace-lifecycle.md)。
+更完整的 workspace 生命周期、checkpoint、shims、bash-outputs 讲解见 [docs/workspace-lifecycle.md](../docs/workspace-lifecycle.md)。
 
 ## Agent 能力扩展学习路线
 
-MokioClaw 在现有 MultiAgent、Context Engineering 和 Harness 能力上继续补充通用工具权限、失败重试、SKILL.md、可配置 Subagent、MCP stdio、模型 token streaming 与本机 daemon/IPC。每章包含概念、实验和验收步骤，见 [Agent 能力扩展路线](docs/agent-capability-roadmap.md)。
+MokioClaw 在现有 MultiAgent、Context Engineering 和 Harness 能力上继续补充通用工具权限、失败重试、SKILL.md、可配置 Subagent、MCP stdio、模型 token streaming 与本机 daemon/IPC。每章包含概念、实验和验收步骤，见 [Agent 能力扩展路线](../docs/agent-capability-roadmap.md)。
 
 CLI 和 TUI 会自动连接本机 daemon，任务事件会写入 daemon run event log；客户端断开后任务继续运行。按 `Ctrl+C` 会显式取消当前前台任务，已启动的后台 Subagent 继续运行；TUI 的 `Ctrl+Q` 保留退出界面的行为。也可运行 `mokioclaw cancel <run-id>`。可以用 `mokioclaw daemon status` 查看 daemon，用 `mokioclaw daemon stop` 停止。直接调用 `stream_agent_events()` 或 `stream_session_events()` 的 Python 代码仍在当前进程运行。
 
@@ -438,7 +438,7 @@ uv run pytest -q
 uv run mokioclaw "帮我查阅明日方舟阿米娅，并编写一个 HTML 介绍人物"
 ```
 
-MCP 故障诊断、模型流式输出、取消链路和可复现实验见 [MCP 与流式输出验收](docs/mcp-streaming-acceptance.md)。
+MCP 故障诊断、模型流式输出、取消链路和可复现实验见 [MCP 与流式输出验收](../docs/mcp-streaming-acceptance.md)。
 
 ### 可靠生成、协议与交互治理
 
@@ -454,7 +454,7 @@ uv run python examples/reliability_demo.py --output /tmp/reliability.json
 
 TUI 中 Enter 提交，Shift/Alt+Enter 换行；输入 `/` 查看命令，使用 `/skill`、`/agents` 和 `/permissions`。角色配置范例见 `examples/agents/`。
 
-- [设计与模块边界](docs/reliability-design.md)
-- [验收、真实模型观察与基准](docs/reliability-acceptance.md)
-- [接口文档](docs/WIRE_PROTOCOL.md)
-- [故障排查](docs/reliability-troubleshooting.md)
+- [设计与模块边界](../docs/reliability-design.md)
+- [验收、真实模型观察与基准](../docs/reliability-acceptance.md)
+- [接口文档](../docs/WIRE_PROTOCOL.md)
+- [故障排查](../docs/reliability-troubleshooting.md)

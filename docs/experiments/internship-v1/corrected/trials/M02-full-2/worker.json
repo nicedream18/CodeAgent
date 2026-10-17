@@ -1,0 +1,90 @@
+{
+  "status": "failed",
+  "stop_reason": "provider_APIConnectionError",
+  "error": null,
+  "model_metrics": {
+    "requests": 12,
+    "roles": {
+      "intent_router": {
+        "estimated": false,
+        "input_tokens": 439,
+        "output_tokens": 62,
+        "total_tokens": 501,
+        "duration_ms": 1125.625,
+        "cache_read_tokens": 256,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      },
+      "repoAgent": {
+        "estimated": true,
+        "input_tokens": 32164,
+        "output_tokens": 3155,
+        "total_tokens": 35319,
+        "duration_ms": 22790.316,
+        "cache_read_tokens": 17916,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 10
+      },
+      "planner": {
+        "estimated": false,
+        "input_tokens": 4420,
+        "output_tokens": 791,
+        "total_tokens": 5211,
+        "duration_ms": 3764.249,
+        "cache_read_tokens": 1536,
+        "cache_creation_tokens": null,
+        "cache_usage_incomplete": true,
+        "requests": 1
+      }
+    },
+    "estimated": true,
+    "input_tokens": 37023,
+    "output_tokens": 4008,
+    "total_tokens": 41031,
+    "duration_ms": 27680.19,
+    "cache_read_tokens": 19708,
+    "cache_creation_tokens": null,
+    "cache_usage_incomplete": true
+  },
+  "tool_count": 14,
+  "actual_path": [
+    "intent_router",
+    "{'type': 'workflow_selected', 'mode': 'full', 'reason': 'explicit configuration or conservative router hint', 'event_id': 'd8a2984aefa64608a00d521b07c39700', 'run_id': 'internship-v1-20261017-M02-full-2', 'context_version': 0}"
+  ],
+  "stream_ids": [
+    "d7993359bc9a4052b771e4d648b10868",
+    "caabd3a2aa8244fd9d4c6e75860a2f1a",
+    "bcda4cb15b4543f0959d76dfccfc4fd4",
+    "ff56a01298cf4c4e9d5ed972ffb957a7",
+    "958f9b39b2554626bf90a849f4922d7b",
+    "c38c018eb637421e9c4a0077116a97bc",
+    "6812ddc28e834ba99d1f4ceec56c5691",
+    "9927d065bd634f87bd822f9513cdc6a9",
+    "31385a08942641c08defa1f61257c1a6",
+    "9eec7198500e41a6a4dfed1c7bb7f44b",
+    "fc92d2ec61d34f539f4c9a1eaa55797f",
+    "ddee50e5bffb4c46a49a324985443f1c"
+  ],
+  "tool_call_ids": [
+    "call_00_g00yZqUIw8tp09QahCQX3354",
+    "call_01_6rRBYfyG2nKYQUKfvpZV3771",
+    "call_00_V8Egdg3uDeyX4JExXKBy9336",
+    "call_01_8m9PLvEINUMx9QOy6mD67886",
+    "call_00_VxPapOT0NlbobdCPGnDY4494",
+    "call_01_fpRiu6HFFE3CrCBaoXXj3904",
+    "call_00_KDcT9RuW3G4mAnWU8Pja4856",
+    "call_01_PsvirXVgmeAkjR8MfNvJ9347",
+    "call_00_Z5Z8AN1yy141Oi4HyAwh9337",
+    "call_01_MH4rFGFf7TxiDUFRgWLD4950",
+    "call_00_zlKmMGWO0hO8RUX035pr3572",
+    "call_01_5NjzHBbaOQm3yiHlh9c62860",
+    "call_00_IP0dHRbNTf0BkBurF9iU9818",
+    "call_01_jDXhYqoGzyMyj3QdCC412055",
+    "call_00_jllwaiKJRLuPPWgjGtBF5786",
+    "call_01_2iFwpbKfKhjg53hSv18x6453"
+  ],
+  "model_claim": null,
+  "run_id": "internship-v1-20261017-M02-full-2"
+}

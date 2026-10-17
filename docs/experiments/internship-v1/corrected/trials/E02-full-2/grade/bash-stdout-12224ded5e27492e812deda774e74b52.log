@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_config_from_file_toml __________________________
+
+    def test_config_from_file_toml():
+        tomllib = pytest.importorskip("tomllib", reason="tomllib added in 3.11")
+        app = flask.Flask(__name__)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+>       app.config.from_file(
+            os.path.join(current_dir, "static", "config.toml"), tomllib.load, text=False
+        )
+E       TypeError: Config.from_file() got an unexpected keyword argument 'text'
+
+tests/test_config.py:43: TypeError
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E02-full-2/grade/mokio-grade-nf1d5_yu/workspace/.target.xml -
+=========================== short test summary info ============================
+FAILED tests/test_config.py::test_config_from_file_toml - TypeError: Config.f...
+1 failed in 0.03s
+..................                                                       [100%]
+- generated xml file: /Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/trials/E02-full-2/grade/mokio-grade-nf1d5_yu/workspace/.regression.xml -
+18 passed, 1 deselected in 0.03s
