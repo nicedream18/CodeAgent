@@ -11,6 +11,29 @@ from mokioclaw.providers.openai_provider import ConfiguredChatOpenAI
 from mokioclaw.providers.token_estimate import compatible_estimate, encoding
 
 
+def test_demo_fixture_separates_hidden_contract_and_rejects_cache_changes(tmp_path, monkeypatch):
+    from mokioclaw.evaluation import completion_demo
+    from mokioclaw.evaluation.catalog import TASKS
+    from mokioclaw.evaluation.prepare import apply_patch, copy_source
+
+    monkeypatch.setattr(completion_demo, "resolve_image", lambda _: "sha256:demo-fixture")
+    task = completion_demo.prepare_demo_task(tmp_path)
+    directory = tmp_path / "tasks" / "D01"
+    assert "D01" not in TASKS
+    assert task.allowed_paths == ["src/batch_queue.py"]
+    assert not (directory / "base/tests/test_contract.py").exists()
+    assert completion_demo.prepare_demo_task(tmp_path) == task
+    candidate = tmp_path / "candidate"
+    copy_source(directory / "base", candidate)
+    apply_patch(candidate, (directory / "reference.patch").read_text())
+    apply_patch(candidate, (directory / "tests.patch").read_text())
+    assert (candidate / "src/batch_queue.py").read_text() == completion_demo.REFERENCE
+    assert (candidate / "tests/test_contract.py").read_text() == completion_demo.CONTRACT_TESTS
+    (directory / "base/src/batch_queue.py").write_text("changed")
+    with pytest.raises(ValueError, match="frozen fixture changed"):
+        completion_demo.prepare_demo_task(tmp_path)
+
+
 def test_compatible_counter_includes_schemas_without_network_or_external_cache(monkeypatch):
     import tiktoken.load
 

@@ -11,6 +11,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from mokioclaw.core.session_lock import session_writer
+from mokioclaw.evaluation.completion_demo import prepare_demo_task
+from mokioclaw.evaluation.grader import validate_task
 from mokioclaw.evaluation.models import EvalTrialConfig
 from mokioclaw.evaluation.prepare import cache_root, prepare_task, sha, tree_hash
 from mokioclaw.evaluation.runner import _verify_frozen, run_trial, write_json
@@ -43,7 +45,15 @@ repo = Path(__file__).resolve().parents[1]
 load_dotenv(repo / ".env")
 if not all(os.environ.get(k) for k in ("API_KEY", "MODEL", "BASE_URL")):
     raise SystemExit("Configure API_KEY, MODEL and BASE_URL before a real trial")
-task = prepare_task(args.task, args.cache, repo)
+task = (
+    prepare_demo_task(args.cache)
+    if args.task == "D01"
+    else prepare_task(args.task, args.cache, repo)
+)
+if args.task == "D01":
+    validation = validate_task(task, args.cache / "tasks" / "D01", args.cache / "validation" / "D01")
+    if not validation["valid"]:
+        raise SystemExit("Demo baseline/reference validation failed; no model started")
 task_file = args.cache / "tasks" / args.task / "task.json"
 config = EvalTrialConfig(
     task_id=args.task,

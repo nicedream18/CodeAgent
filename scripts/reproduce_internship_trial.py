@@ -8,6 +8,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 
+from mokioclaw.evaluation.completion_demo import prepare_demo_task
 from mokioclaw.evaluation.grader import grade_candidate
 from mokioclaw.evaluation.models import EvalTask
 from mokioclaw.evaluation.prepare import cache_root, copy_source, file_hashes, prepare_task
@@ -23,7 +24,11 @@ if not re.fullmatch(r"[A-Za-z0-9_-]+", args.trial_id):
 source = args.archive / "trials" / args.trial_id
 record = json.loads((source / "result.json").read_text())
 task_id = record["config"]["task_id"]
-task = prepare_task(task_id, args.cache, Path.cwd())
+task = (
+    prepare_demo_task(args.cache)
+    if task_id == "D01"
+    else prepare_task(task_id, args.cache, Path.cwd())
+)
 original_task = EvalTask.model_validate_json(
     (args.archive.parent / "tasks" / f"{task_id}.json").read_text()
 )
