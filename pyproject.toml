@@ -50,4 +50,4 @@ select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
 python_version = "3.13"
 strict = true
 follow_imports = "silent"
-files = ["src/mokioclaw/core/completion_budget.py", "src/mokioclaw/providers/token_estimate.py", "src/mokioclaw/evaluation", "src/mokioclaw/core/execution_backend.py", "src/mokioclaw/core/approval.py", "src/mokioclaw/core/protocol", "src/mokioclaw/providers/generation.py", "src/mokioclaw/providers/usage.py", "src/mokioclaw/providers/payload_trace.py", "src/mokioclaw/core/approval_rules.py", "src/mokioclaw/core/agent_profiles.py", "src/mokioclaw/core/tool_loop.py", "src/mokioclaw/core/transport_trace.py"]
+files = ["scripts/job_readiness_trials.py", "src/mokioclaw/core/completion_budget.py", "src/mokioclaw/providers/token_estimate.py", "src/mokioclaw/evaluation", "src/mokioclaw/core/execution_backend.py", "src/mokioclaw/core/approval.py", "src/mokioclaw/core/protocol", "src/mokioclaw/providers/generation.py", "src/mokioclaw/providers/usage.py", "src/mokioclaw/providers/payload_trace.py", "src/mokioclaw/core/approval_rules.py", "src/mokioclaw/core/agent_profiles.py", "src/mokioclaw/core/tool_loop.py", "src/mokioclaw/core/transport_trace.py"]

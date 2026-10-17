@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "real_model_authorized": true,
+  "authorization": "用户 Goal 2 明确授权最多 18 个固定 trial，无自动重跑、扩展矩阵、修改冻结运行时、推送或发布。",
+  "input_sha256": "859c6cf736feaa4cba27842b08eed1fa4a26e8dddd6c5fbb886f1427dcc39748",
+  "starting_head": "fad47df7ead1c2cc3b7586edebe10269d1efe9f3",
+  "batch_id": "job-readiness-goal2-20261017",
+  "experiment_ids": [
+    "job-readiness-goal2-20261017-b0",
+    "job-readiness-goal2-20261017-b1"
+  ],
+  "scope": {
+    "scheduled_trials": 18,
+    "concurrency": 1,
+    "retry_started_trials": false
+  },
+  "history_unchanged": true,
+  "old_wheel_sha256": "937f67db6956aeafc9920f3d7f075c2918c397fe5506ffbc1f2728cbd5594c15"
+}

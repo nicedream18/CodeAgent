@@ -1,0 +1,436 @@
+{
+  "recorded_at": "2026-10-17T07:18:06.727429+00:00",
+  "real_model": false,
+  "input_sha256": "859c6cf736feaa4cba27842b08eed1fa4a26e8dddd6c5fbb886f1427dcc39748",
+  "versions": {
+    "B0": {
+      "harness_revision": "cad8a153584aa5f860982dee33719dc2664730db",
+      "harness_source_sha256": "345c81e3e56637b6a068b1548790fc1a48a918baf25035055364dbe03404b00b",
+      "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+      "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61",
+      "import_probe": {
+        "executable": "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+        "modules": {
+          "mokioclaw.evaluation.worker": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw/evaluation/worker.py",
+          "mokioclaw.evaluation.runner": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw/evaluation/runner.py",
+          "mokioclaw.core.agent": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw/core/agent.py",
+          "mokioclaw.agents.code_agent": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw/agents/code_agent.py",
+          "mokioclaw.providers.openai_provider": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw/providers/openai_provider.py"
+        }
+      },
+      "offline_controls": {
+        "requests": {
+          "real_model": false,
+          "kind": "requests",
+          "execution_status": "failed",
+          "implementation_source": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw",
+          "stop_reason": "request_budget_exhausted",
+          "passed": false,
+          "file_content": "fixed\n",
+          "workspace_files": [
+            "a.py",
+            "TODO.md"
+          ],
+          "requests": 10,
+          "total_tokens": 1100,
+          "tools": 9,
+          "completion_budget": {}
+        },
+        "tokens": {
+          "real_model": false,
+          "kind": "tokens",
+          "execution_status": "failed",
+          "implementation_source": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw",
+          "stop_reason": "token_budget_exhausted",
+          "passed": false,
+          "file_content": "fixed\n",
+          "workspace_files": [
+            "a.py",
+            "TODO.md"
+          ],
+          "requests": 15,
+          "total_tokens": 1650,
+          "tools": 14,
+          "completion_budget": {}
+        },
+        "tools": {
+          "real_model": false,
+          "kind": "tools",
+          "execution_status": "failed",
+          "implementation_source": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B0/src/mokioclaw",
+          "stop_reason": "tool_budget_exhausted",
+          "passed": false,
+          "file_content": "fixed\n",
+          "workspace_files": [
+            "a.py",
+            "TODO.md"
+          ],
+          "requests": 9,
+          "total_tokens": 990,
+          "tools": 7,
+          "completion_budget": {}
+        }
+      }
+    },
+    "B1": {
+      "harness_revision": "ee5f073a7640c15c1d693c7e93bc067e9eb8da51",
+      "harness_source_sha256": "4f72454c28444f1041dccfa199e1d24a8bd171ffe9bb5c4b47169b6bc9a29a4f",
+      "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+      "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61",
+      "import_probe": {
+        "executable": "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+        "modules": {
+          "mokioclaw.evaluation.worker": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/evaluation/worker.py",
+          "mokioclaw.evaluation.runner": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/evaluation/runner.py",
+          "mokioclaw.core.agent": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/core/agent.py",
+          "mokioclaw.agents.code_agent": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/agents/code_agent.py",
+          "mokioclaw.providers.openai_provider": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw/providers/openai_provider.py"
+        }
+      },
+      "offline_controls": {
+        "requests": {
+          "real_model": false,
+          "kind": "requests",
+          "execution_status": "finished",
+          "implementation_source": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw",
+          "stop_reason": null,
+          "passed": true,
+          "file_content": "fixed\n",
+          "workspace_files": [
+            "a.py",
+            "TODO.md"
+          ],
+          "requests": 9,
+          "total_tokens": 990,
+          "tools": 6,
+          "completion_budget": {
+            "phase": "verification",
+            "draining": true,
+            "trigger": "request_headroom",
+            "reserved_requests": 4,
+            "reserved_tools": 2,
+            "input_estimate": 100,
+            "output_budget": 128,
+            "reserved_tokens_estimate": 912,
+            "estimated": true,
+            "forecast": "current request input and output budget reused for future requests"
+          }
+        },
+        "tokens": {
+          "real_model": false,
+          "kind": "tokens",
+          "execution_status": "finished",
+          "implementation_source": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw",
+          "stop_reason": null,
+          "passed": true,
+          "file_content": "fixed\n",
+          "workspace_files": [
+            "a.py",
+            "TODO.md"
+          ],
+          "requests": 10,
+          "total_tokens": 1100,
+          "tools": 7,
+          "completion_budget": {
+            "phase": "verification",
+            "draining": true,
+            "trigger": "token_headroom",
+            "reserved_requests": 4,
+            "reserved_tools": 2,
+            "input_estimate": 100,
+            "output_budget": 128,
+            "reserved_tokens_estimate": 912,
+            "estimated": true,
+            "forecast": "current request input and output budget reused for future requests"
+          }
+        },
+        "tools": {
+          "real_model": false,
+          "kind": "tools",
+          "execution_status": "finished",
+          "implementation_source": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/checkouts/B1/src/mokioclaw",
+          "stop_reason": null,
+          "passed": true,
+          "file_content": "fixed\n",
+          "workspace_files": [
+            "a.py",
+            "TODO.md"
+          ],
+          "requests": 10,
+          "total_tokens": 1100,
+          "tools": 6,
+          "completion_budget": {
+            "phase": "verification",
+            "draining": true,
+            "trigger": "tool_headroom",
+            "reserved_requests": 4,
+            "reserved_tools": 2,
+            "input_estimate": 100,
+            "output_budget": 128,
+            "reserved_tokens_estimate": 912,
+            "estimated": true,
+            "forecast": "current request input and output budget reused for future requests"
+          }
+        }
+      }
+    }
+  },
+  "tasks": {
+    "M08-v2": {
+      "task_sha256": "7a323d287662bfd0c910c3180427a1023dfc65c4e4df5a357cc8c611ca62e073",
+      "source_sha256": "8e0f48ebf9a82650993181e473d383aec580f195af4bf6f40d415a92d3ad89f7",
+      "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+      "validation": {
+        "valid": true,
+        "base": {
+          "schema_version": 1,
+          "valid": true,
+          "solved": false,
+          "target_passed": 3,
+          "target_failed": 1,
+          "regression_failed": 0,
+          "tests_run": 13,
+          "out_of_scope": [],
+          "tampered_tests": [],
+          "infrastructure_error": null,
+          "seconds": 2.833,
+          "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/validation/M08-v2/base"
+        },
+        "reference": {
+          "schema_version": 1,
+          "valid": true,
+          "solved": true,
+          "target_passed": 4,
+          "target_failed": 0,
+          "regression_failed": 0,
+          "tests_run": 13,
+          "out_of_scope": [],
+          "tampered_tests": [],
+          "infrastructure_error": null,
+          "seconds": 2.823,
+          "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/validation/M08-v2/reference"
+        },
+        "visible": {
+          "ok": true,
+          "exit_code": 0,
+          "timed_out": false,
+          "stdout": "...                                                                      [100%]\n3 passed in 1.27s\n",
+          "stderr": "",
+          "duration_ms": 2195,
+          "backend": "docker",
+          "metadata": {
+            "stdout_truncated": false,
+            "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-ce65541fd4914a79baffdac8a8ba4ce0.log",
+            "stdout_output_bytes": 98,
+            "stdout_retained_bytes": 98,
+            "stdout_output_truncated": false,
+            "stderr_truncated": false,
+            "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-9f57569bb27a4f99a88be0418c6ba905.log",
+            "stderr_output_bytes": 0,
+            "stderr_retained_bytes": 0,
+            "stderr_output_truncated": false,
+            "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+            "container_id": "8d63f069288e45c0aa6b605d55cb1d1f01724f2bc4694da3ca2acca1ad8e7a02",
+            "limits": {
+              "cpus": 2,
+              "memory_mib": 2048,
+              "pids": 128
+            },
+            "network": "none",
+            "read_only_root": true
+          },
+          "stdout_truncated": false,
+          "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-ce65541fd4914a79baffdac8a8ba4ce0.log",
+          "stdout_output_bytes": 98,
+          "stdout_retained_bytes": 98,
+          "stdout_output_truncated": false,
+          "stderr_truncated": false,
+          "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-9f57569bb27a4f99a88be0418c6ba905.log",
+          "stderr_output_bytes": 0,
+          "stderr_retained_bytes": 0,
+          "stderr_output_truncated": false,
+          "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+          "container_id": "8d63f069288e45c0aa6b605d55cb1d1f01724f2bc4694da3ca2acca1ad8e7a02",
+          "limits": {
+            "cpus": 2,
+            "memory_mib": 2048,
+            "pids": 128
+          },
+          "network": "none",
+          "read_only_root": true
+        }
+      }
+    },
+    "M02-v2": {
+      "task_sha256": "038df6fa46e86ca9ea541609e26df312f1cab7a269e310931aecf4be1b6e89f2",
+      "source_sha256": "fb2df68ac514908680e651a6fba489c38b06ce7bcfbbde2d9c6acbf58a13f0db",
+      "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+      "validation": {
+        "valid": true,
+        "base": {
+          "schema_version": 1,
+          "valid": true,
+          "solved": false,
+          "target_passed": 0,
+          "target_failed": 2,
+          "regression_failed": 0,
+          "tests_run": 6,
+          "out_of_scope": [],
+          "tampered_tests": [],
+          "infrastructure_error": null,
+          "seconds": 2.082,
+          "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/validation/M02-v2/base"
+        },
+        "reference": {
+          "schema_version": 1,
+          "valid": true,
+          "solved": true,
+          "target_passed": 2,
+          "target_failed": 0,
+          "regression_failed": 0,
+          "tests_run": 6,
+          "out_of_scope": [],
+          "tampered_tests": [],
+          "infrastructure_error": null,
+          "seconds": 1.932,
+          "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/validation/M02-v2/reference"
+        },
+        "visible": {
+          "ok": true,
+          "exit_code": 0,
+          "timed_out": false,
+          "stdout": "...                                                                      [100%]\n3 passed in 1.53s\n",
+          "stderr": "",
+          "duration_ms": 2474,
+          "backend": "docker",
+          "metadata": {
+            "stdout_truncated": false,
+            "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-f35a9f568f894ad6a6de5030db588798.log",
+            "stdout_output_bytes": 98,
+            "stdout_retained_bytes": 98,
+            "stdout_output_truncated": false,
+            "stderr_truncated": false,
+            "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-4d5db2070e75498a96525db96d8642de.log",
+            "stderr_output_bytes": 0,
+            "stderr_retained_bytes": 0,
+            "stderr_output_truncated": false,
+            "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+            "container_id": "a8fa49afeb3b0437ba6a160ba0cb95f121e5ffa7eda137d6d2d7003130e3e934",
+            "limits": {
+              "cpus": 2,
+              "memory_mib": 2048,
+              "pids": 128
+            },
+            "network": "none",
+            "read_only_root": true
+          },
+          "stdout_truncated": false,
+          "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-f35a9f568f894ad6a6de5030db588798.log",
+          "stdout_output_bytes": 98,
+          "stdout_retained_bytes": 98,
+          "stdout_output_truncated": false,
+          "stderr_truncated": false,
+          "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-4d5db2070e75498a96525db96d8642de.log",
+          "stderr_output_bytes": 0,
+          "stderr_retained_bytes": 0,
+          "stderr_output_truncated": false,
+          "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+          "container_id": "a8fa49afeb3b0437ba6a160ba0cb95f121e5ffa7eda137d6d2d7003130e3e934",
+          "limits": {
+            "cpus": 2,
+            "memory_mib": 2048,
+            "pids": 128
+          },
+          "network": "none",
+          "read_only_root": true
+        }
+      }
+    },
+    "M07-v2": {
+      "task_sha256": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42",
+      "source_sha256": "bc5cca0ccbcaceed2fd64b9deec59587636fcceaadb11cebf6ba8192e5732f80",
+      "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+      "validation": {
+        "valid": true,
+        "base": {
+          "schema_version": 1,
+          "valid": true,
+          "solved": false,
+          "target_passed": 1,
+          "target_failed": 1,
+          "regression_failed": 0,
+          "tests_run": 4,
+          "out_of_scope": [],
+          "tampered_tests": [],
+          "infrastructure_error": null,
+          "seconds": 2.297,
+          "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/validation/M07-v2/base"
+        },
+        "reference": {
+          "schema_version": 1,
+          "valid": true,
+          "solved": true,
+          "target_passed": 2,
+          "target_failed": 0,
+          "regression_failed": 0,
+          "tests_run": 4,
+          "out_of_scope": [],
+          "tampered_tests": [],
+          "infrastructure_error": null,
+          "seconds": 2.216,
+          "report": "/Users/nicedream/.cache/mokioclaw/eval/job-readiness-v1/validation/M07-v2/reference"
+        },
+        "visible": {
+          "ok": true,
+          "exit_code": 0,
+          "timed_out": false,
+          "stdout": "...                                                                      [100%]\n3 passed in 1.13s\n",
+          "stderr": "",
+          "duration_ms": 2027,
+          "backend": "docker",
+          "metadata": {
+            "stdout_truncated": false,
+            "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-826bd1679cf74d39a377830b41798835.log",
+            "stdout_output_bytes": 98,
+            "stdout_retained_bytes": 98,
+            "stdout_output_truncated": false,
+            "stderr_truncated": false,
+            "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-0a285aa554ca408d98e0254737e2670d.log",
+            "stderr_output_bytes": 0,
+            "stderr_retained_bytes": 0,
+            "stderr_output_truncated": false,
+            "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+            "container_id": "bc0675577b405cd9eb4ad5bf49f0329cfa039c507908819150a7d087898aa3b5",
+            "limits": {
+              "cpus": 2,
+              "memory_mib": 2048,
+              "pids": 128
+            },
+            "network": "none",
+            "read_only_root": true
+          },
+          "stdout_truncated": false,
+          "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-826bd1679cf74d39a377830b41798835.log",
+          "stdout_output_bytes": 98,
+          "stdout_retained_bytes": 98,
+          "stdout_output_truncated": false,
+          "stderr_truncated": false,
+          "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-0a285aa554ca408d98e0254737e2670d.log",
+          "stderr_output_bytes": 0,
+          "stderr_retained_bytes": 0,
+          "stderr_output_truncated": false,
+          "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+          "container_id": "bc0675577b405cd9eb4ad5bf49f0329cfa039c507908819150a7d087898aa3b5",
+          "limits": {
+            "cpus": 2,
+            "memory_mib": 2048,
+            "pids": 128
+          },
+          "network": "none",
+          "read_only_root": true
+        }
+      }
+    }
+  },
+  "docker_image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba arm64"
+}
