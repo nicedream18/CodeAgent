@@ -1,16 +1,24 @@
 {
   "schema_version": 1,
-  "recorded_at": "2026-10-17T10:34:28.578141+00:00",
+  "recorded_at": "2026-10-17T10:54:33.620024+00:00",
   "goal": "Goal 3",
-  "status": "本地准备完成、远程待验收",
+  "status": "远程首轮失败，入口修复待复验",
   "local_preparation": "passed",
-  "remote_execution_authorized": false,
+  "remote_execution_authorized": true,
   "remote_verified": false,
   "full_goal_complete": false,
-  "remote_commit": null,
-  "run_url": null,
-  "job_urls": {},
-  "artifact_urls": [],
+  "remote_commit": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
+  "run_url": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469",
+  "job_urls": {
+    "wheel": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/job/117377085112",
+    "docker": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/job/117377085139",
+    "check": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469/job/117377085144"
+  },
+  "artifact_urls": [
+    "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098846365/zip",
+    "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098776740/zip",
+    "https://api.github.com/repos/nicedream18/CodeAgent/actions/artifacts/12098373376/zip"
+  ],
   "tested_code_commit": "9247f7f4d91841f817e071ebc1a1e18a24402147",
   "source_and_checks_sha256": "96f8c79beaffd8fd4ee99ca37f5e6b8affe9bcf6e3e57104dbf372ffa64d5a87",
   "archive_commit_note": "Final delivery commit adds only Goal 3 evidence and status documentation. Compare source_and_checks_sha256 rather than pretending these local reports ran at the later archive commit.",
@@ -83,15 +91,32 @@
     "image_published": false
   },
   "real_model_calls": 0,
-  "remote_writes": 0,
+  "remote_writes": 1,
   "remaining": [
-    "Obtain approval for the full unpublished Git range and artifact scope.",
-    "Push exactly the approved revision and reuse its automatic workflow.",
-    "Collect real Linux check/docker/wheel terminal results and downloadable reports."
+    "Log in to GitHub to read the original failed reports and confirm remote diagnostics.",
+    "Complete local repair checks and obtain approval for the exact additional commit range.",
+    "Run repaired Linux CI and download check/docker/wheel reports before marking complete."
   ],
   "limits": [
     "Local ARM64 evidence does not prove remote Linux success.",
     "No real model calls or repeated real trials.",
     "Docker and dependency preparation use network; actual execution restrictions are unchanged."
-  ]
+  ],
+  "remote_result": {
+    "conclusion": "failure",
+    "jobs": {
+      "wheel": "failure",
+      "docker": "failure",
+      "check": "failure"
+    },
+    "reports_uploaded": 3,
+    "reports_downloaded": false,
+    "download_requires_login": true,
+    "evidence": "remote/39026034469/status.json"
+  },
+  "local_repair": {
+    "state": "testing",
+    "evidence": "local-linux-bootstrap/diagnosis.json",
+    "new_push_authorized": false
+  }
 }

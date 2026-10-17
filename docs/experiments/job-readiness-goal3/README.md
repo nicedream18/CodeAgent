@@ -1,9 +1,25 @@
 # Goal 3：Linux CI 与干净安装证据
 
-本地可评审准备与远程验收分开。远程推送、触发、发布及真实模型调用当前均未授权。
+本地可评审准备与远程验收分开。用户已授权推送固定的 22 个提交至 `8ca634d`；该次 push 已执行并自动触发 CI。
+后续修复提交尚未获远程推送授权；软件包、镜像发布及真实模型调用仍未授权。
 最终状态和本轮证据见 ../../internship/STATUS.md；配置文件和本地 ARM64 结果不能代替远程 Linux 运行链接。
 
-## 本轮本地结果
+## 首次远程运行及入口修复
+
+[39026034469](https://github.com/nicedream18/CodeAgent/actions/runs/39026034469) 对应 `8ca634d`，
+触发方式为 push，三个作业均 failed，三个失败报告上传步骤均 success。
+[远程状态与下载链接](remote/39026034469/status.json) 保留原失败，不改写为通过。
+API 下载返回 401，当前内置浏览器未登录；详细日志和报告正文仍待登录核对。
+
+本地 Linux 诊断发现入口未固定解释器：setup-uv v6 的 python-version 设置 UV_PYTHON，
+不会替换 shell 中的裸 python；报告器把 UV_PYTHON 设为自身 sys.executable，
+因此旧入口可能用 runner 的 Python 3.12 发起要求 >=3.13 的冻结安装。
+[实测诊断](local-linux-bootstrap/diagnosis.json) 中，默认 Python 3.12 时旧入口失败，
+显式 `uv run --no-project --python 3.13.9 python` 启动后 wheel 检查通过，实际报告解释器为 3.13.9。
+三个 workflow 入口均已修正，测试约束版本与 setup-uv 配置一致。
+这份 Linux ARM64 容器诊断不是远程 Linux 验收；远程失败的确切日志原因仍待核对。
+
+## 首轮本地结果（固定代码 9247f7f）
 
 状态：**本地准备完成、远程待验收**。被测代码提交为 `9247f7f4d91841f817e071ebc1a1e18a24402147`。
 后续归档提交只增加本目录证据及 STATUS 文档；源码、检查脚本和打包输入摘要为
@@ -26,6 +42,7 @@ wheel 二进制未上传，旧 dist 保留；临时安装目录会随检查结�
 
 .github/workflows/check.yml 保留 push/pull_request，增加 workflow_dispatch。
 固定 ubuntu-24.04、Python 3.13.9、uv 0.12.19，第三方 actions 固定到已核验的提交 SHA。
+CI 报告器通过 `uv run --no-project --python 3.13.9 python` 启动，不依赖 runner 默认的 python。
 权限仅 contents:read，checkout 不保留认证信息；不提供模型凭证。
 依赖缓存关联系统、架构、Python 和 uv.lock，缓存缺失时仍完整安装及检查。
 

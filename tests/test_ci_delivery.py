@@ -3,6 +3,7 @@
 import importlib.util
 import io
 import json
+import shlex
 import sys
 import tarfile
 import time
@@ -123,7 +124,13 @@ def test_workflow_keeps_three_jobs_manual_trigger_and_failure_artifacts():
         upload = [step for step in job["steps"] if "actions/upload-artifact@" in step.get("uses", "")]
         assert len(upload) == 1 and upload[0]["if"] == "always()"
         assert upload[0]["with"]["retention-days"] == 14
-        assert any(f"--job {name}" in s.get("run", "") for s in job["steps"])
+        entry = [s["run"] for s in job["steps"] if f"--job {name}" in s.get("run", "")]
+        assert len(entry) == 1
+        # setup-uv only sets UV_PYTHON; the runner's bare python can still be 3.12.
+        version = next(s["with"]["python-version"] for s in job["steps"]
+                       if "astral-sh/setup-uv@" in s.get("uses", ""))
+        assert shlex.split(entry[0])[:7] == [
+            "uv", "run", "--no-project", "--python", version, "python", "scripts/ci_report.py"]
         assert not any(s.get("continue-on-error") for s in job["steps"])
     assert "secrets." not in json.dumps(workflow)
 

@@ -1,0 +1,19 @@
+{
+  "recorded_at": "2026-10-17T10:43:52.266777+00:00",
+  "source": "explicit user reply in this chat",
+  "answer": "授权按清单推送并执行远程 CI",
+  "repository": "https://github.com/nicedream18/CodeAgent",
+  "branch": "main",
+  "base": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "head": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
+  "commits": 22,
+  "changed_paths": 2139,
+  "operations": [
+    "push exact approved head to main without force or tags",
+    "reuse automatic push CI",
+    "read run and jobs",
+    "download bounded reports"
+  ],
+  "package_image_release_publication_authorized": false,
+  "additional_pushes_authorized": false
+}

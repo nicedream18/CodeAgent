@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "local_diagnostic_not_remote_acceptance",
+  "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.41",
+  "architecture": "aarch64",
+  "source_commit": "8ca634d1d39c12324aae93b999ebdfff7b9e75b9",
+  "fixed_diagnostic_worktree_dirty": true,
+  "changes_in_diagnostic_clone": [
+    ".github/workflows/check.yml",
+    "tests/test_ci_delivery.py"
+  ],
+  "control": {
+    "default_python": "3.12.12",
+    "UV_PYTHON": "3.13.9",
+    "entry": "python scripts/ci_report.py",
+    "result": "failed",
+    "stage": "frozen-install",
+    "reason": "bootstrap replaces UV_PYTHON with its own sys.executable; requires-python >=3.13"
+  },
+  "fixed": {
+    "default_python": "3.12.12",
+    "entry": "uv run --no-project --python 3.13.9 python scripts/ci_report.py",
+    "actual_report_python": "3.13.9",
+    "result": "passed",
+    "installed_package_verified": true
+  },
+  "remote_logs_confirmed": false,
+  "remote_run": "https://github.com/nicedream18/CodeAgent/actions/runs/39026034469",
+  "real_model_calls": 0,
+  "official_setup_uv_action": "https://github.com/astral-sh/setup-uv/blob/d0cc045d04ccac9d8b7881df0226f9e82c39688e/action.yml",
+  "official_uv_guide": "https://docs.astral.sh/uv/guides/integration/github/"
+}
