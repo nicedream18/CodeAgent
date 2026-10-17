@@ -104,6 +104,7 @@ class RuntimeState(RuntimeConfig):
     active_agent_name: str | None = None
     explicit_skill: str | None = None
     foreground_state: dict[str, Any] | None = None
+    completion_budget: Any = None
     hook_context: list[str] = field(default_factory=list)
     tool_execution_count: int = 0
     read_files: dict[Path, FileSnapshot] = field(default_factory=dict)

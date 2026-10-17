@@ -351,6 +351,9 @@ def _execute_tool(
             "retry_stop_reason": "permission_denied",
             "tool_name": tool.name,
         }
+    completion = getattr(runtime, "completion_budget", None)
+    if completion is not None:
+        completion.before_tool(runtime, on_event or on_retry)
     from mokioclaw.core.hooks import HookContext, run_hooks
 
     hook_denial = run_hooks(runtime, HookContext("PreToolUse", tool.name, call_id, args), on_event)
@@ -413,6 +416,8 @@ def _execute_tool(
                     raise RunBudgetExceeded(
                         "Tool execution budget exhausted", "tool_budget_exhausted"
                     )
+                if completion is not None:
+                    completion.before_tool(runtime, on_event or on_retry)
                 mark_tool_started()
                 runtime.tool_execution_count += 1
                 result = tool.invoke(args)

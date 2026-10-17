@@ -1,0 +1,14 @@
+{
+  "label": "B0",
+  "revision": "cad8a153584aa5f860982dee33719dc2664730db",
+  "source_sha256": "345c81e3e56637b6a068b1548790fc1a48a918baf25035055364dbe03404b00b",
+  "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61",
+  "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+  "task_hashes": {
+    "M08-v2": "7a323d287662bfd0c910c3180427a1023dfc65c4e4df5a357cc8c611ca62e073",
+    "M02-v2": "038df6fa46e86ca9ea541609e26df312f1cab7a269e310931aecf4be1b6e89f2",
+    "M07-v2": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42"
+  },
+  "model_calls": 0,
+  "optimization": "none; repaired task environment and read-only diagnostics only"
+}

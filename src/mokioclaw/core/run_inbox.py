@@ -9,6 +9,8 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
 
+from mokioclaw.core.completion_budget import CompletionYield
+
 _TOOL_PROGRESS = ContextVar("mokio_tool_progress", default=None)
 
 
@@ -33,13 +35,13 @@ def tool_call_batch(calls, messages, writer, node):
     token = _TOOL_PROGRESS.set(progress)
     try:
         yield pending()
-    except RunRedirected:
+    except (RunRedirected, CompletionYield) as signal:
         for offset, call in enumerate(calls[progress["index"] :]):
             result = {
                 "ok": False,
                 "status": "interrupted" if offset == 0 and progress["started"] else "not_executed",
-                "error_type": "user_redirected",
-                "error": "Superseded by a new user instruction; keep completed effects.",
+                "error_type": "user_redirected" if isinstance(signal, RunRedirected) else "completion_budget_reserved",
+                "error": "Current batch stopped; keep completed effects and reconsider unfinished work.",
             }
             messages.append(
                 ToolMessage(

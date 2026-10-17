@@ -42,7 +42,7 @@ def profile_for(runnable):
     return getattr(runnable, "mokio_profile", {})
 
 
-def begin_request(runtime, role, snapshot, budget):
+def begin_request(runtime, role, snapshot, budget, writer=None, *, node=""):
     if runtime is None:
         return time.monotonic()
     metrics = runtime.model_metrics
@@ -57,6 +57,9 @@ def begin_request(runtime, role, snapshot, budget):
             if key not in {"runtime", "messages"}
         }
         raise error
+    control = getattr(runtime, "completion_budget", None)
+    if control is not None:
+        control.before_request(runtime, role, snapshot.input_tokens, budget.output, writer, node)
     metrics["requests"] = metrics.get("requests", 0) + 1
     return time.monotonic()
 

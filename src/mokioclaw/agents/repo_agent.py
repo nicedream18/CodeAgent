@@ -35,6 +35,7 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
         node="repoAgent",
         invoke=invoke_streaming,
         produced=None,
+        report_model=base_model,
     )
     needs_summary = False
     for _ in range(max_loops):
@@ -96,6 +97,8 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
                                 "reference": f"{result.get('path', '')}:{int(call['args'].get('offset', 0)) + 1}",
                             }
                         )
+        if conversation.yielded:
+            break
         if active is not None and active.exhausted:
             needs_summary = True
             break
@@ -117,6 +120,9 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
     except ValueError:
         payload = {"summary": raw}
     payload.setdefault("summary", raw)
+    if conversation.yielded:
+        payload.update(ok=False, stop_reason="completion_budget_reserved")
+        payload["unresolved"] = ["Exploration yielded its remaining capacity to verification."]
     payload["evidence"] = evidence
     payload["state_updates"] = {
         "repo_context": json.dumps(

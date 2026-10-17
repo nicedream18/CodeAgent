@@ -195,7 +195,11 @@ def _controlled_stream(stream, task, options, control, *, session, execution_con
                 status = "failed"
                 lifecycle.state.update(exc.state)
                 lifecycle.state["stop_reason"] = exc.reason
-                lifecycle.state["final_answer"] = f"运行预算已耗尽，当前进展已保存：{exc.reason}"
+                lifecycle.state["final_answer"] = (
+                    f"预留验收阶段未能确认任务完成，当前进展已保存：{exc.reason}"
+                    if exc.reason == "completion_verification_failed"
+                    else f"运行预算已耗尽，当前进展已保存：{exc.reason}"
+                )
                 event = {
                     "type": "run_budget_exhausted",
                     "event_id": api.uuid4().hex,

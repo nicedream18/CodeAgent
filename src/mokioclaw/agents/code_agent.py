@@ -116,6 +116,7 @@ def run_code_agent(
         node="codeAgent",
         invoke=invoke_streaming,
         produced=produced_messages,
+        report_model=model,
     )
     budget_exhausted = False
     needs_summary = False
@@ -191,6 +192,8 @@ def run_code_agent(
                 ):
                     budget_exhausted = True
                     break
+        if conversation.yielded:
+            break
         if budget_exhausted:
             conversation.discard_unanswered(tool_calls, "subagent_tool_budget_exhausted")
             needs_summary = True
@@ -211,16 +214,20 @@ def run_code_agent(
 
     summary = _last_ai_content(produced_messages)
     return {
-        "ok": not budget_exhausted,
+        "ok": not budget_exhausted and not conversation.yielded,
         "summary": summary,
         "todos": todos or state.get("todos", []),
         "messages": messages[2:],
         "tool_events": tool_events,
-        "stop_reason": "tool_budget_exhausted" if budget_exhausted else None,
+        "stop_reason": "completion_budget_reserved" if conversation.yielded else (
+            "tool_budget_exhausted" if budget_exhausted else None
+        ),
         "unresolved": (
-            ["Subagent tool-call budget exhausted; implementation may be incomplete."]
-            if budget_exhausted
-            else []
+            ["Implementation capacity reserved for verification; unfinished work is preserved."]
+            if conversation.yielded else (
+                ["Subagent tool-call budget exhausted; implementation may be incomplete."]
+                if budget_exhausted else []
+            )
         ),
     }
 

@@ -1,0 +1,60 @@
+{
+  "real_model": false,
+  "usage_is_synthetic": true,
+  "driver_sha256": "7862271cb6df348a96ca53e0eb9487cd4308785a559367cf44e6aa38b289c162",
+  "B0_revision": "cad8a153584aa5f860982dee33719dc2664730db",
+  "cases": [
+    {
+      "kind": "requests",
+      "B0": {
+        "execution_status": "failed",
+        "stop_reason": "request_budget_exhausted",
+        "requests": 10,
+        "total_tokens": 1100,
+        "tools": 9
+      },
+      "B1": {
+        "execution_status": "finished",
+        "stop_reason": null,
+        "requests": 9,
+        "total_tokens": 990,
+        "tools": 6
+      }
+    },
+    {
+      "kind": "tokens",
+      "B0": {
+        "execution_status": "failed",
+        "stop_reason": "token_budget_exhausted",
+        "requests": 15,
+        "total_tokens": 1650,
+        "tools": 14
+      },
+      "B1": {
+        "execution_status": "finished",
+        "stop_reason": null,
+        "requests": 10,
+        "total_tokens": 1100,
+        "tools": 7
+      }
+    },
+    {
+      "kind": "tools",
+      "B0": {
+        "execution_status": "failed",
+        "stop_reason": "tool_budget_exhausted",
+        "requests": 9,
+        "total_tokens": 990,
+        "tools": 7
+      },
+      "B1": {
+        "execution_status": "finished",
+        "stop_reason": null,
+        "requests": 10,
+        "total_tokens": 1100,
+        "tools": 6
+      }
+    }
+  ],
+  "scope": "Controlled fixed-response full workflow; no real-model efficiency/success claim."
+}

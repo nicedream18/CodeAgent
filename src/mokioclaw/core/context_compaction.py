@@ -15,6 +15,7 @@ from uuid import uuid4
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
+from mokioclaw.core.completion_budget import CompletionYield
 from mokioclaw.core.context_budget import ContextBudget, ContextBudgetError, snapshot
 from mokioclaw.core.run_control import RunInterrupted
 from mokioclaw.core.tool_output import encoded
@@ -188,7 +189,7 @@ def compact_messages(
         observations = validated_observations(candidate, extract)
     except (RunInterrupted, ModelGenerationStopped):
         raise
-    except Exception as exc:  # noqa: BLE001 - failed summary transports use deterministic memory
+    except (Exception, CompletionYield) as exc:  # noqa: BLE001 - keep deterministic memory on summary failure/reservation
         observations = {
             "summary": "Deterministic history extract",
             **extract,

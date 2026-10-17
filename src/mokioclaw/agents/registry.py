@@ -10,6 +10,7 @@ from typing import Any
 from mokioclaw.agents.code_agent import run_code_agent
 from mokioclaw.agents.repo_agent import run_repo_agent
 from mokioclaw.agents.search_agent import run_search_agent
+from mokioclaw.core.completion_budget import CompletionYield
 from mokioclaw.core.context_budget import ContextBudgetError
 from mokioclaw.core.run_control import RunInterrupted, check_run
 from mokioclaw.core.run_inbox import RunRedirected
@@ -477,7 +478,7 @@ def run_subagent(
             legacy_state=legacy_state,
             legacy_before=legacy_before,
         )
-    except (RunRedirected, RunBudgetExceeded, ModelGenerationStopped) as redirect:
+    except (RunRedirected, RunBudgetExceeded, ModelGenerationStopped, CompletionYield) as redirect:
         if legacy_state is not None:
             for key in definition.state_update_fields:
                 if legacy_state.get(key) is not None:

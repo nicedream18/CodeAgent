@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from mokioclaw.core.completion_budget import activate_completion_budget
 from mokioclaw.core.tool_loop import ToolConversation
 from mokioclaw.graph import nodes as api
 
@@ -8,6 +9,7 @@ def planner_node(state: api.MokioGraphState) -> dict[str, api.Any]:
     writer = api._get_writer()
     working_state: api.MokioGraphState = {**state}
     state["runtime"].foreground_state = working_state
+    completion = activate_completion_budget(state["runtime"])
     if not working_state.get("repo_explored"):
         from mokioclaw.tools.grep_tool import _iter_files
 
@@ -66,19 +68,29 @@ def planner_node(state: api.MokioGraphState) -> dict[str, api.Any]:
         invoke=api.invoke_streaming,
         produced=produced_messages,
     )
-    for response, tool_calls in conversation.rounds(8, lambda: planner):
+    rounds = 0 if completion and completion.draining else 8
+    for response, tool_calls in conversation.rounds(rounds, lambda: planner):
         if not getattr(response, "tool_calls", None):
             break
         with conversation.batch(tool_calls) as pending_calls:
             for call in pending_calls:
                 tool_message = api._execute_planner_tool(working_state, writer, call)
                 conversation.append(tool_message)
+                if completion and completion.draining:
+                    conversation.discard_unanswered(tool_calls, "completion_budget_reserved")
+                    break
+        if completion and completion.draining:
+            break
     else:
-        conversation.finish(
-            model,
-            "The delegation phase has ended. Return a concise factual supervisor summary "
-            "of completed work, observed checks and remaining work. Do not request more tools.",
-        )
+        if not (completion and completion.draining):
+            conversation.finish(
+                model,
+                "The delegation phase has ended. Return a concise factual supervisor summary "
+                "of completed work, observed checks and remaining work. Do not request more tools.",
+            )
+
+    if completion:
+        completion.phase = "verification"
 
     metadata = dict(working_state.get("metadata", {}))
     metadata["planner_raw"] = api._last_ai_content(produced_messages)

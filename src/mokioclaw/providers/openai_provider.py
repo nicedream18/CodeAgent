@@ -207,7 +207,7 @@ def _invoke_once(
     finally:
         REQUEST_BUDGET.reset(token)
     role_name = getattr(runtime, "active_agent_name", None) or node
-    started = begin_request(runtime, role_name, _snapshot, budget)
+    started = begin_request(runtime, role_name, _snapshot, budget, writer, node=node)
     check_run(runtime)
     if callable(getattr(runnable, "bind", None)):
         parameter = os.getenv("MOKIO_MODEL_OUTPUT_PARAMETER", "max_tokens")

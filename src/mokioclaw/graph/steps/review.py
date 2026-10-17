@@ -6,6 +6,11 @@ from mokioclaw.graph import nodes as api
 
 def verifier_node(state: api.MokioGraphState) -> dict[str, api.Any]:
     writer = api._get_writer()
+    runtime = state["runtime"]
+    runtime.foreground_state = state
+    completion = getattr(runtime, "completion_budget", None)
+    if completion:
+        completion.phase = "verification"
     memory = api.build_layered_memory(state, node="verifier")
     writer(api.memory_event(memory, node="verifier"))
     writer(
@@ -118,7 +123,7 @@ def verifier_node(state: api.MokioGraphState) -> dict[str, api.Any]:
         )
     last_error = "" if passed else api._format_verifier_error(reason, recommended, tool_events)
 
-    return {
+    result = {
         "messages": produced_messages,
         "verification_results": api._tool_events_to_verification_results(tool_events),
         "verification_checks": checks,
@@ -132,6 +137,16 @@ def verifier_node(state: api.MokioGraphState) -> dict[str, api.Any]:
         "context_next_node": api.verifier_route({**state, "passed": passed, "attempts": attempts}),
         **api.graph_context_updates(state, messages, "verifier"),
     }
+    if completion and completion.draining and not passed:
+        from mokioclaw.providers.model_policy import RunBudgetExceeded
+
+        error = RunBudgetExceeded(
+            "Reserved completion phase could not verify the task", "completion_verification_failed"
+        )
+        error.state = {key: value for key, value in state.items() if key not in {"runtime", "messages"}}
+        error.state.update({key: value for key, value in result.items() if key != "messages"})
+        raise error
+    return result
 
 
 def verifier_route(state: api.MokioGraphState) -> str:

@@ -89,3 +89,17 @@ def test_read_repeat_diagnostics_require_same_arguments_output_and_context():
     canonical = [{"type": "custom:" + e["type"], "payload": {"payload": e}} for e in events]
     assert analyze_overhead(canonical) == result
     json.dumps(result)
+
+
+def test_diagnostics_use_declared_role_instead_of_shared_runner_node():
+    result = analyze_overhead([
+        {"type": "llm_request", "stream_id": "custom", "role": "reviewer", "node": "codeAgent"},
+        {"type": "model_usage", "stream_id": "custom", "agent": "reviewer",
+         "input_tokens": 1, "output_tokens": 2, "total_tokens": 3},
+        {"type": "tool_result", "tool_call_id": "read", "subagent": "reviewer",
+         "node": "codeAgent", "result": {"ok": True}},
+    ])
+    assert set(result["roles"]) == {"reviewer"}
+    assert result["roles"]["reviewer"]["requests"] == 1
+    assert result["roles"]["reviewer"]["tool_results"] == 1
+    assert result["roles"]["reviewer"]["requests_without_usage"] == 0

@@ -125,6 +125,7 @@ def test_graph_failure_still_writes_failed_trace_and_checkpoint(tmp_path, monkey
 
 def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, monkeypatch):
     from mokioclaw.agents.registry import SubagentDefinition, SubagentRegistry
+    from mokioclaw.core.completion_budget import CompletionBudget
     from mokioclaw.graph import nodes
 
     parent = RunControl()
@@ -142,6 +143,11 @@ def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, mo
             }
 
     registry = SubagentRegistry()
+
+    def child_runner(value, **kwargs):
+        assert value.runtime.completion_budget is None
+        return {"ok": True, "summary": "done"}
+
     registry.register(
         SubagentDefinition(
             name="demo",
@@ -150,7 +156,7 @@ def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, mo
             background_safe=True,
             allowed_tools=frozenset({"FileReadTool"}),
             max_tool_calls=1,
-            runner=lambda *_args, **_kwargs: {"ok": True, "summary": "done"},
+            runner=child_runner,
         )
     )
     runtime = RuntimeState(
@@ -160,6 +166,7 @@ def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, mo
         subagent_registry=registry,
         subagent_task_manager=Manager(),
         parent_run_id="parent",
+        completion_budget=CompletionBudget(draining=True),
     )
     # The public delegation helper creates a private child RuntimeState.
     result = nodes._call_registered_subagent_tool(
@@ -173,6 +180,7 @@ def test_background_child_control_is_independent_and_loop_is_closed(tmp_path, mo
     parent.cancel()
     child = seen[0](lambda _: None, threading.Event())
     assert child["ok"]
+    assert runtime.completion_budget.draining
 
 
 def test_live_daemon_cancel_foreground_preserves_background_work(tmp_path, monkeypatch):

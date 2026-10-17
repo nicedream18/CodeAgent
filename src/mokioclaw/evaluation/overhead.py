@@ -91,7 +91,8 @@ def analyze_overhead(records: list[dict[str, Any]]) -> dict[str, Any]:
             continue
         if identity:
             seen_events.add(identity)
-        role = str(event.get("agent") or event.get("node") or event.get("subagent") or "unknown")
+        role = str(event.get("agent") or event.get("role") or event.get("subagent")
+                   or event.get("node") or "unknown")
         if kind == "llm_request":
             if stream in requests:
                 continue

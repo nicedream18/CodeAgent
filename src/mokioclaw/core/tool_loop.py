@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable, Iterator
-from contextlib import AbstractContextManager
+from contextlib import contextmanager
 from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
+from mokioclaw.core.completion_budget import CompletionYield, report_phase
 from mokioclaw.core.run_inbox import tool_call_batch
 
 
@@ -27,10 +28,13 @@ class ToolConversation:
         node: str,
         invoke: Callable[..., Any],
         produced: list[Any] | None = None,
+        report_model: Any = None,
     ):
         self.messages = messages
         self.state, self.writer, self.node, self.invoke = state, writer, node, invoke
         self.produced = produced
+        self.report_model = report_model
+        self.yielded = False
 
     def request(self, runnable: Any) -> Any:
         runtime = self.state.get("runtime") if self.state else None
@@ -66,8 +70,33 @@ class ToolConversation:
                         "Avoid broad discovery after the target is known; preserve budget for verification and the final report."
                     ),
                 )
-        response = self.invoke(
-            runnable, self.messages, writer=self.writer, node=self.node, state=self.state
+        try:
+            response = self.invoke(
+                runnable, self.messages, writer=self.writer, node=self.node, state=self.state
+            )
+        except CompletionYield as signal:
+            return self._handoff(signal)
+        self.append(response)
+        return response
+
+    def _handoff(self, signal: CompletionYield) -> Any:
+        from langchain_core.messages import AIMessage
+
+        self.yielded = True
+        self.state.update(signal.state)
+        if self.report_model is not None:
+            response = self.finish(
+                self.report_model,
+                "Implementation capacity has been reserved for verification. No more tools are available. "
+                "Report only completed changes, observed checks, failures and unfinished work. "
+                "The verifier will inspect the workspace. Do not claim completion without evidence.",
+            )
+            if response is not None:
+                return response
+        response = AIMessage(
+            content="Runtime handoff: implementation capacity reserved for verification; "
+            "retain completed effects and treat unverified work as unfinished.",
+            response_metadata={"source": "runtime", "stop_reason": "completion_budget_reserved"},
         )
         self.append(response)
         return response
@@ -99,7 +128,8 @@ class ToolConversation:
     def finish(self, model: Any, instruction: str) -> Any:
         """Request one report without binding tools; never execute final calls."""
         self.append(HumanMessage(content=instruction))
-        response = self.request(model)
+        with report_phase((self.state or {}).get("runtime")):
+            response = self.request(model)
         calls = getattr(response, "tool_calls", None) or []
         if calls:
             self.discard_unanswered(calls, "finalization_tools_not_allowed")
@@ -108,6 +138,8 @@ class ToolConversation:
 
     def rounds(self, count: int, binding: Callable[[], Any]) -> Iterator[tuple[Any, Any]]:
         for _ in range(count):
+            if self.yielded:
+                return
             response = self.request(binding())
             calls = getattr(response, "tool_calls", None) or []
             if not calls:
@@ -115,7 +147,18 @@ class ToolConversation:
                 return
             yield response, calls
 
-    def batch(self, calls: Any) -> AbstractContextManager[Any]:
+    @contextmanager
+    def batch(self, calls: Any) -> Iterator[Any]:
         # Keep this context in the caller's lexical scope so exceptions from a
         # specialist reach the batch boundary before the generator is closed.
-        return tool_call_batch(calls, self.messages, self.writer, self.node)
+        try:
+            with tool_call_batch(calls, self.messages, self.writer, self.node) as pending:
+                yield pending
+        except CompletionYield as signal:
+            if self.produced is not None:
+                known = {id(message) for message in self.produced}
+                self.produced.extend(
+                    message for message in self.messages
+                    if isinstance(message, ToolMessage) and id(message) not in known
+                )
+            self._handoff(signal)

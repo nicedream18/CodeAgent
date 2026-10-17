@@ -396,6 +396,9 @@ def state_summary(state: dict[str, Any]) -> dict[str, Any]:
         "repo_explored": state.get("repo_explored", False),
         "stop_reason": state.get("stop_reason", ""),
         "model_metrics": getattr(state.get("runtime"), "model_metrics", {}),
+        "completion_budget": state["runtime"].completion_budget.snapshot()
+        if getattr(state.get("runtime"), "completion_budget", None)
+        else {},
         "project_instructions": instructions(state["runtime"]).manifest()
         if state.get("runtime")
         else [],

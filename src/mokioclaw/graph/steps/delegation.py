@@ -96,6 +96,7 @@ def _call_registered_subagent_tool(
         child_runtime.mcp_loaded_tools = {}
         child_runtime.hook_context = []
         child_runtime.foreground_state = None
+        child_runtime.completion_budget = None
         child_runtime.run_id = f"background-{api.uuid4().hex}"
         child_runtime.run_control.run_id = child_runtime.run_id
         child_runtime.run_control.runtime = child_runtime
