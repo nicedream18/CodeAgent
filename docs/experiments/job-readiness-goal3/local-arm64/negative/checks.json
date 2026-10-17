@@ -1,0 +1,29 @@
+{
+  "real_model_calls": 0,
+  "cases": [
+    {
+      "case": "missing-engine",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "no_pytest_started": true,
+      "result": {
+        "ok": false,
+        "backend": "docker",
+        "error": "failed to connect to the docker API at unix:///tmp/mokio-goal3-absent-engine.sock; check if the path is correct and if the daemon is running: dial unix /tmp/mokio-goal3-absent-engine.sock: connect: no such file or directory\n",
+        "checked_at": "2026-10-17T10:28:40.773050+00:00"
+      }
+    },
+    {
+      "case": "missing-image",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "no_pytest_started": true,
+      "result": {
+        "ok": false,
+        "backend": "docker",
+        "error": "Error response from daemon: No such image: mokioclaw-ci-missing-goal3:never-created\n",
+        "checked_at": "2026-10-17T10:28:40.933000+00:00"
+      }
+    }
+  ]
+}

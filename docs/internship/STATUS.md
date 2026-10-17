@@ -1,11 +1,17 @@
 # 求职交付收敛状态
 
-## Goal 3：本地准备进行中，远程未执行
+## Goal 3：本地准备完成、远程待验收
 
-已补齐普通检查、真实 Docker、wheel 三作业及手动入口、配额报告和离线回归。
-本地预验收已完成 wheel 干净安装及真实 Docker 29 项；最终候选提交与全量结果待核对。
-未取得推送或远程执行授权，不能视为远程 Linux CI 通过。
-操作、配额与授权边界见 [Goal 3](../experiments/job-readiness-goal3/README.md)。
+- 普通检查、真实 Docker、wheel 三作业已实现，支持 push/PR/手动触发；报告有配额、脱敏及失败记录。
+- 本地被测代码：`9247f7f4d91841f817e071ebc1a1e18a24402147`，macOS ARM64、Python 3.13.9、uv 0.12.19。
+- `make check`：455 passed、2 skipped；Ruff、31 个严格 mypy 模块、协议/评测文档及 diff 检查通过。
+- 重新构建独立镜像后，真实 `make check-docker`：29 passed、0 skipped，linux/aarch64；本轮容器清理已确认。
+- wheel 在仓库外全新环境按锁安装，site-packages 导入、两种 CLI 入口、禁网 tokenizer 和文件读取均通过。
+- 引擎不可达、镜像缺失均实测为非零退出，未启动 pytest；旧 wheel、标签、缓存和 Goal 2 的 384 份产物摘要保持原样。
+- 本轮未请求真实模型、未推送或触发远程任务。远程 Linux 运行和报告链接仍待授权后取得，Goal 3 尚未完整完成。
+
+证据：[本地验收](../experiments/job-readiness-goal3/acceptance.json)、[检查](../experiments/job-readiness-goal3/local-arm64/check/summary.md)、[Docker](../experiments/job-readiness-goal3/local-arm64/docker/summary.md)、[wheel](../experiments/job-readiness-goal3/local-arm64/wheel/summary.md)。
+设计、配额与远程授权范围见 [Goal 3](../experiments/job-readiness-goal3/README.md)。
 
 ## Goal 2：18 次有限真实任务验证已完成
 

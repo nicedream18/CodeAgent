@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "backend": "docker",
+  "error": "Error response from daemon: No such image: mokioclaw-ci-missing-goal3:never-created\n",
+  "checked_at": "2026-10-17T10:28:40.933000+00:00"
+}

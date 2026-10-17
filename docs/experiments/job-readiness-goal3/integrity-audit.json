@@ -1,0 +1,29 @@
+{
+  "recorded_at": "2026-10-17T10:33:47.259119+00:00",
+  "runtime_source_sha256": "4f72454c28444f1041dccfa199e1d24a8bd171ffe9bb5c4b47169b6bc9a29a4f",
+  "runtime_source_unchanged": true,
+  "lock_unchanged": true,
+  "old_wheel_unchanged": true,
+  "tag_object": "f8b1c3d7aa82a5fee01b143118d1418fe487e983",
+  "tag_commit": "eb0a1dbb46c11a05fdb4cdfe20e618aaee955ac7",
+  "tag_unchanged": true,
+  "goal2_artifact_count": 384,
+  "goal2_artifact_mismatches": [],
+  "goal2_archive_index_unchanged": true,
+  "historical_cache_manifests": {
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-d01-v1/manifest.json": true,
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-v1/manifest.json": true,
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-m02-v2/manifest.json": true,
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-m02-v3/manifest.json": true,
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/completion-20261017-m02-v4/manifest.json": true,
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261016/manifest.json": true,
+    "/Users/nicedream/.cache/mokioclaw/eval/internship-v1/experiments/internship-v1-20261017/manifest.json": true
+  },
+  "historical_paths_changed": "",
+  "old_image_id": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "old_image_unchanged": true,
+  "final_docker_owner_containers": [],
+  "tested_inputs_sha256": "96f8c79beaffd8fd4ee99ca37f5e6b8affe9bcf6e3e57104dbf372ffa64d5a87",
+  "real_model_calls": 0,
+  "remote_writes": 0
+}

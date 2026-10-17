@@ -1,0 +1,6 @@
+{
+  "ok": false,
+  "backend": "docker",
+  "error": "failed to connect to the docker API at unix:///tmp/mokio-goal3-absent-engine.sock; check if the path is correct and if the daemon is running: dial unix /tmp/mokio-goal3-absent-engine.sock: connect: no such file or directory\n",
+  "checked_at": "2026-10-17T10:28:40.773050+00:00"
+}

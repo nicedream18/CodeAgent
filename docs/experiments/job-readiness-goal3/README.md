@@ -3,6 +3,25 @@
 本地可评审准备与远程验收分开。远程推送、触发、发布及真实模型调用当前均未授权。
 最终状态和本轮证据见 ../../internship/STATUS.md；配置文件和本地 ARM64 结果不能代替远程 Linux 运行链接。
 
+## 本轮本地结果
+
+状态：**本地准备完成、远程待验收**。被测代码提交为 `9247f7f4d91841f817e071ebc1a1e18a24402147`。
+后续归档提交只增加本目录证据及 STATUS 文档；源码、检查脚本和打包输入摘要为
+`96f8c79beaffd8fd4ee99ca37f5e6b8affe9bcf6e3e57104dbf372ffa64d5a87`。
+本地报告保留实际被测提交，不把文档归档提交冒充已执行版本。
+
+| 本地 macOS ARM64 验证 | 实际结果 | 证据 |
+|---|---|---|
+| 普通检查 | 455 passed / 2 skipped，Ruff、31 模块 mypy、文档与 diff 通过 | [报告](local-arm64/check/report.json) |
+| 重新构建及真实 Docker | 29 passed / 0 skipped，linux/aarch64，owner 清理完成 | [报告](local-arm64/docker/report.json) |
+| wheel 干净安装 | site-packages 导入、console/module 入口、禁网资源和文件读取通过 | [报告](local-arm64/wheel/report.json) |
+| 缺失引擎／镜像 | 两例均明确 exit 1，未启动测试 | [预期失败](local-arm64/negative/checks.json) |
+| 历史保留 | Goal 2 的 384 项、7 份历史缓存、旧 wheel/标签/镜像均未变 | [审计](integrity-audit.json) |
+
+新 wheel SHA256：`605001843b1c5e1ff3a105bf76abdbee5a17f43e1e19338d28522e1974f38359`。
+wheel 二进制未上传，旧 dist 保留；临时安装目录会随检查结束清理，实际路径及版本收据保留在报告中。
+[验收索引](acceptance.json) 明确标记远程未授权、未验收；当前没有远程 run/job/artifact 链接。
+
 ## 三个作业、同一入口
 
 .github/workflows/check.yml 保留 push/pull_request，增加 workflow_dispatch。
