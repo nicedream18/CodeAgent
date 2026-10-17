@@ -49,7 +49,20 @@ def full_executor(state):
             "upgraded": True,
         }
     )
-    result = build_complex_workflow().invoke({**state, "workflow_upgraded": True, "passed": False})
+    # A nested invoke consumes its custom stream without forwarding it to the
+    # outer graph. Forward incrementally so upgraded runs keep their model/tool
+    # events and acknowledge stream endings before lifecycle cleanup.
+    from langgraph.config import get_stream_writer
+
+    parent_writer = get_stream_writer()
+    result = {**state, "workflow_upgraded": True, "passed": False}
+    for mode, event in build_complex_workflow().stream(
+        result, stream_mode=["values", "custom"]
+    ):
+        if mode == "custom":
+            parent_writer(event)
+        else:
+            result = event
     return {key: value for key, value in result.items() if key != "runtime"}
 
 

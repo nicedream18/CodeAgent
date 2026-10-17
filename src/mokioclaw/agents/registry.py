@@ -432,13 +432,17 @@ def run_subagent(
 
     def event_writer(event: dict[str, Any]) -> None:
         if writer is not None:
-            writer(
-                {
-                    **event,
-                    "handoff_id": event.get("handoff_id") or handoff_id,
-                    "subagent": event.get("subagent") or name,
-                }
-            )
+            annotated = {
+                **event,
+                "handoff_id": event.get("handoff_id") or handoff_id,
+                "subagent": event.get("subagent") or name,
+            }
+            writer(annotated)
+            # A pending stream-end keeps the producer's original dictionary.
+            # Preserve its trace identity even if graph delivery is interrupted.
+            for key in ("event_id", "trace_id", "trace_seq", "run_id", "context_version"):
+                if key in annotated:
+                    event[key] = annotated[key]
 
     budget = SubagentToolBudget(name, handoff_id, limit, event_writer)
     runtime.active_agent_tools = configured_tools

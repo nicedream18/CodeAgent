@@ -163,6 +163,13 @@ def test_light_verification_failure_escalates_once_preserving_completed_edit(
     assert len(upgrades) == 1
     journals = list((tmp_path / ".mokioclaw/changes").glob("*/manifest.json"))
     assert len(json.loads(journals[0].read_text())["changes"]) == 1
+    custom = [row["event"] for row in events if row.get("type") == "custom_event"]
+    counts = {
+        name: [e["stream_id"] for e in custom if e.get("type") == name]
+        for name in ("llm_stream_start", "llm_request", "llm_stream_end")
+    }
+    assert counts["llm_stream_start"] == counts["llm_request"] == counts["llm_stream_end"]
+    assert len(set(counts["llm_request"])) == custom[-1]["model_metrics"]["requests"]
 
 
 def test_budget_stop_persists_failed_reason_without_model_request(tmp_path, monkeypatch):
@@ -177,6 +184,56 @@ def test_budget_stop_persists_failed_reason_without_model_request(tmp_path, monk
         row.get("event", {}).get("stop_reason") == "token_budget_exhausted" for row in events
     )
     assert events[-1]["event"]["status"] == "failed"
+
+
+def test_upgraded_graph_failure_keeps_one_end_per_stream_in_trace(
+    tmp_path, local_models, monkeypatch
+):
+    from langchain_core.messages import AIMessage, HumanMessage
+    from langgraph.graph import END, START, StateGraph
+
+    from mokioclaw.core.context_budget import ContextBudgetError
+    from mokioclaw.graph import light, nodes, workflow
+    from mokioclaw.graph.state import MokioGraphState
+    from mokioclaw.providers.openai_provider import invoke_streaming
+
+    class Fixed:
+        def invoke(self, messages):
+            return AIMessage(content="partial progress")
+
+    def failed_full(state):
+        invoke_streaming(
+            Fixed(), [HumanMessage(content="inspect")], state=state,
+            writer=nodes._get_writer(), node="upgraded_test",
+        )
+        raise ContextBudgetError("controlled post-generation failure")
+
+    def build_failed_full():
+        graph = StateGraph(MokioGraphState)
+        graph.add_node("failed_full", failed_full)
+        graph.add_edge(START, "failed_full")
+        graph.add_edge("failed_full", END)
+        return graph.compile()
+
+    (tmp_path / "app.txt").write_text("before")
+    monkeypatch.setattr(light, "verifier_node", lambda _: {"passed": False})
+    monkeypatch.setattr(workflow, "build_complex_workflow", build_failed_full)
+    events = []
+    with pytest.raises(ContextBudgetError, match="controlled"):
+        for event in stream_agent_events(
+            "update app.txt", workspace=tmp_path, workflow_mode="light", approval_mode="deny"
+        ):
+            events.append(event)
+    trace = next((tmp_path / ".mokioclaw/traces").glob("*/events.jsonl"))
+    rows = [json.loads(line) for line in trace.read_text().splitlines()]
+    starts = [r["stream_id"] for r in rows if r["type"] == "custom:llm_stream_start"]
+    ends = [r["stream_id"] for r in rows if r["type"] == "custom:llm_stream_end"]
+    assert len(starts) == len(set(starts)) == len(ends) == len(set(ends))
+    assert set(starts) == set(ends)
+    custom = [e["event"] for e in events if e.get("type") == "custom_event"]
+    assert custom[-1]["status"] == "failed"
+    requests = [e["stream_id"] for e in custom if e.get("type") == "llm_request"]
+    assert len(requests) == custom[-1]["model_metrics"]["requests"]
 
 
 def test_cli_new_commands_and_tui_mode_flag(monkeypatch, tmp_path):
