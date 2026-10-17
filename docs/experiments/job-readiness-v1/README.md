@@ -48,3 +48,28 @@ Goal 2 经另行授权后，再在相同三个任务上执行 B0/B1 × 3 次；�
 首次新增全量检查与负控制并行执行时，pytest 收集到了报告目录内暂存的可信测试，出现模块收集冲突。
 已将 grader 的可执行 staging 移至系统临时目录，报告目录只保存输出，并补充边界测试。
 原失败日志保留在 checks；后续统一检查重新运行。该问题属于评测器目录隔离，不计为 Agent 任务失败。
+
+## 本轮交付结果
+
+- B0：`cad8a153584aa5f860982dee33719dc2664730db`；B1：`ee5f073a7640c15c1d693c7e93bc067e9eb8da51`。两者任务、提示词目录和依赖锁摘要相同，运行时主要差异为完成预算预留。
+- 额外修正了诊断器对声明式角色名的归属，属于离线报告兼容，不改变模型请求；B0/B1 比较统一使用最新诊断器。
+- `make check`：437 passed、2 skipped；Ruff、24 个严格 mypy 模块、协议/评测文档和 diff 检查通过。
+- `make check-docker`：真实 linux/aarch64 29 passed。
+- 设计、故障处理和限制见 [DESIGN.md](DESIGN.md)。离线前后结果见 offline-controls/comparison.json，所有用量都是固定模型的合成值。
+- 下一阶段输入见 goal2-input.json：18 条任务/版本/重复组合，需单独授权真实模型。现有 validate_completion 脚本用于单次预览/验证；重复编号与双版本编排由 Goal 2 的外层驱动调用冻结 checkout 的 run_trial，不修改 B0/B1。
+
+## 复现 B0 / B1 离线边界
+
+从包含本轮实验驱动的项目根目录执行。驱动会输出实际载入的源码路径，便于确认版本。
+
+```sh
+# 在独立目录导出冻结源码，不改当前工作区
+mkdir -p /tmp/mokio-b0-src
+git archive cad8a153584aa5f860982dee33719dc2664730db src | tar -x -C /tmp/mokio-b0-src
+# 使用项目 venv 的 Python 和同一驱动，对三个 kind 分别运行
+PYTHONPATH=/tmp/mokio-b0-src/src .venv/bin/python examples/completion_budget_demo.py --kind requests
+uv run python examples/completion_budget_demo.py --kind requests
+```
+
+同样替换为 tokens/tools。若从其他工作目录执行，请将 Python、DRIVER 和 PYTHONPATH 改成绝对路径。
+`b0.json`、`b1.json` 保存源码/提示词/锁摘要；task-artifacts.json 保存任务材料摘要；acceptance.json 保存最终逐项审计。

@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "purpose": "Goal 2 input only; requires separate authorization",
+  "real_model_authorized": false,
+  "scheduled_trials": 18,
+  "seed": 20261017,
+  "versions": {
+    "B0": {
+      "label": "B0",
+      "revision": "cad8a153584aa5f860982dee33719dc2664730db",
+      "source_sha256": "345c81e3e56637b6a068b1548790fc1a48a918baf25035055364dbe03404b00b",
+      "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61",
+      "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+      "task_hashes": {
+        "M08-v2": "7a323d287662bfd0c910c3180427a1023dfc65c4e4df5a357cc8c611ca62e073",
+        "M02-v2": "038df6fa46e86ca9ea541609e26df312f1cab7a269e310931aecf4be1b6e89f2",
+        "M07-v2": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42"
+      },
+      "model_calls": 0,
+      "optimization": "none; repaired task environment and read-only diagnostics only"
+    },
+    "B1": {
+      "label": "B1",
+      "revision": "ee5f073a7640c15c1d693c7e93bc067e9eb8da51",
+      "source_sha256": "4f72454c28444f1041dccfa199e1d24a8bd171ffe9bb5c4b47169b6bc9a29a4f",
+      "prompt_sha256": "31cda37501df9e9130c8e4204888edc4cc59386ddd565fefefa1bfa86738ef61",
+      "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+      "task_hashes": {
+        "M08-v2": "7a323d287662bfd0c910c3180427a1023dfc65c4e4df5a357cc8c611ca62e073",
+        "M02-v2": "038df6fa46e86ca9ea541609e26df312f1cab7a269e310931aecf4be1b6e89f2",
+        "M07-v2": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42"
+      },
+      "model_calls": 0,
+      "optimization": "cooperative completion reserve; no increase to existing hard caps"
+    }
+  },
+  "model": {
+    "model_env": "MODEL",
+    "endpoint_env": "BASE_URL",
+    "credential_env": "API_KEY",
+    "temperature": 0,
+    "sdk_max_retries": 0
+  },
+  "budgets": {
+    "context_tokens": 32768,
+    "output_tokens": 4096,
+    "token_limit": 200000,
+    "request_limit": 40,
+    "tool_limit": 80,
+    "generation_seconds": 900,
+    "bash_seconds": 60,
+    "grading_seconds": 120
+  },
+  "concurrency": 1,
+  "retry_started_trials": false,
+  "trials": [
+    {
+      "version": "B1",
+      "task_id": "M02-v2",
+      "architecture": "full",
+      "repeat": 3
+    },
+    {
+      "version": "B1",
+      "task_id": "M08-v2",
+      "architecture": "full",
+      "repeat": 2
+    },
+    {
+      "version": "B1",
+      "task_id": "M08-v2",
+      "architecture": "full",
+      "repeat": 1
+    },
+    {
+      "version": "B0",
+      "task_id": "M08-v2",
+      "architecture": "full",
+      "repeat": 1
+    },
+    {
+      "version": "B0",
+      "task_id": "M07-v2",
+      "architecture": "full",
+      "repeat": 1
+    },
+    {
+      "version": "B1",
+      "task_id": "M07-v2",
+      "architecture": "full",
+      "repeat": 1
+    },
+    {
+      "version": "B0",
+      "task_id": "M07-v2",
+      "architecture": "full",
+      "repeat": 2
+    },
+    {
+      "version": "B0",
+      "task_id": "M07-v2",
+      "architecture": "full",
+      "repeat": 3
+    },
+    {
+      "version": "B1",
+      "task_id": "M02-v2",
+      "architecture": "full",
+      "repeat": 1
+    },
+    {
+      "version": "B1",
+      "task_id": "M07-v2",
+      "architecture": "full",
+      "repeat": 2
+    },
+    {
+      "version": "B1",
+      "task_id": "M08-v2",
+      "architecture": "full",
+      "repeat": 3
+    },
+    {
+      "version": "B0",
+      "task_id": "M08-v2",
+      "architecture": "full",
+      "repeat": 2
+    },
+    {
+      "version": "B0",
+      "task_id": "M02-v2",
+      "architecture": "full",
+      "repeat": 2
+    },
+    {
+      "version": "B1",
+      "task_id": "M02-v2",
+      "architecture": "full",
+      "repeat": 2
+    },
+    {
+      "version": "B0",
+      "task_id": "M02-v2",
+      "architecture": "full",
+      "repeat": 3
+    },
+    {
+      "version": "B1",
+      "task_id": "M07-v2",
+      "architecture": "full",
+      "repeat": 3
+    },
+    {
+      "version": "B0",
+      "task_id": "M02-v2",
+      "architecture": "full",
+      "repeat": 1
+    },
+    {
+      "version": "B0",
+      "task_id": "M08-v2",
+      "architecture": "full",
+      "repeat": 3
+    }
+  ],
+  "experiment_isolation": "Separate experiment ID per version; repeated trial IDs never share an output directory. Outer driver must use each frozen checkout and existing run_trial API.",
+  "restrictions": [
+    "No source/prompt/task changes after freeze",
+    "All roles same model configuration",
+    "No web/MCP/custom hooks/background/persistent grants",
+    "Failures and infrastructure errors retained",
+    "No changes to historical 56-trial scores"
+  ]
+}

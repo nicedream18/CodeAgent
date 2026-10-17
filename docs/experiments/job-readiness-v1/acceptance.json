@@ -1,0 +1,90 @@
+{
+  "recorded_at": "2026-10-17T07:09:46.104709+00:00",
+  "goal": "Goal 1",
+  "engineering_acceptance": "passed",
+  "requirements": {
+    "baseline_and_existing_changes": {
+      "status": "proved",
+      "evidence": [
+        "baseline.json",
+        "checks/initial-make-check.log",
+        "checks/initial-docker.log"
+      ]
+    },
+    "three_frozen_v2_tasks": {
+      "status": "proved",
+      "evidence": [
+        "task-artifacts.json",
+        "rebuild.json",
+        "tasks/*/task.json",
+        "tasks/*/validation/validation.json",
+        "negative-controls/results.json"
+      ]
+    },
+    "role_overhead_diagnostics": {
+      "status": "proved",
+      "evidence": [
+        "src/mokioclaw/evaluation/overhead.py",
+        "diagnostics/d01.json",
+        "diagnostics/m02-v4.json",
+        "tests/test_job_readiness.py"
+      ]
+    },
+    "completion_reserve_and_fault_boundaries": {
+      "status": "proved_offline",
+      "evidence": [
+        "DESIGN.md",
+        "offline-controls/comparison.json",
+        "tests/test_completion_reservation.py",
+        "tests/test_run_cancellation.py"
+      ]
+    },
+    "full_and_real_docker_checks": {
+      "status": "proved",
+      "pytest_passed": 437,
+      "pytest_skipped": 2,
+      "strict_mypy_modules": 24,
+      "docker_check_passed": 29,
+      "evidence": [
+        "checks/b1-make-check.log",
+        "checks/b1-docker.log"
+      ]
+    },
+    "reproducible_B0_B1": {
+      "status": "proved",
+      "B0": "cad8a153584aa5f860982dee33719dc2664730db",
+      "B1": "ee5f073a7640c15c1d693c7e93bc067e9eb8da51",
+      "same_tasks_prompts_lock": true,
+      "git_archives_match_source_hashes": true
+    },
+    "history_and_old_distribution": {
+      "status": "proved",
+      "old_tags_unchanged": true,
+      "old_wheel_unchanged": true,
+      "old_experiment_manifests_unchanged": true,
+      "historical_git_reports_unchanged": true
+    },
+    "authorized_scope": {
+      "status": "proved",
+      "real_model_calls": 0,
+      "pushes": 0,
+      "publications": 0
+    },
+    "design_experiment_results_handoff": {
+      "status": "proved",
+      "evidence": [
+        "README.md",
+        "DESIGN.md",
+        "goal2-input.json",
+        "../../internship/STATUS.md"
+      ]
+    }
+  },
+  "real_model_effectiveness": "not_measured_in_this_goal",
+  "limitations": [
+    "Future-request token reserve is heuristic",
+    "Reserved verification may still fail under actual usage/model differences",
+    "No new cross-file real-model success or remote CI is claimed",
+    "Goal 2 requires separate authorization"
+  ]
+}
