@@ -19,7 +19,8 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
         for name in ("FileReadTool", "GrepTool", "FileGlobTool")
         if runtime.active_agent_tools is None or name in runtime.active_agent_tools
     ]
-    model = create_role_model(create_model, state["runtime"], "repoAgent").bind_tools(tools)
+    base_model = create_role_model(create_model, state["runtime"], "repoAgent")
+    model = base_model.bind_tools(tools)
     messages = [
         SystemMessage(
             content="Explore the repository read-only before implementation. Trace entry points, call chains, conventions and tests. Return JSON with summary, entry_points, call_chains, conventions, suggested_changes, tests, evidence, and unresolved. Cite only observed files and lines. Never edit files. Return at most ten key files."
@@ -35,7 +36,14 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
         invoke=invoke_streaming,
         produced=None,
     )
-    for response, tool_calls in conversation.rounds(max_loops + 1, lambda: model):
+    needs_summary = False
+    for _ in range(max_loops):
+        active = runtime.active_subagent_budget
+        if active is not None and active.used >= active.limit:
+            needs_summary = True
+            break
+        response = conversation.request(model)
+        tool_calls = getattr(response, "tool_calls", None) or []
         if not getattr(response, "tool_calls", None):
             break
         with conversation.batch(tool_calls) as pending_calls:
@@ -88,6 +96,19 @@ def run_repo_agent(state, instruction, *, writer=None, max_loops=8):
                                 "reference": f"{result.get('path', '')}:{int(call['args'].get('offset', 0)) + 1}",
                             }
                         )
+        if active is not None and active.exhausted:
+            needs_summary = True
+            break
+    else:
+        needs_summary = True
+    if needs_summary:
+        conversation.finish(
+            base_model,
+            "Repository exploration has ended; no more tools are available in this handoff. "
+            "Return the requested concise JSON now: observed entry points, conventions, tests, "
+            "suggested edit locations and unresolved questions. Do not reproduce entire source files "
+            "or claim implementation is complete. The code agent can read exact source before editing.",
+        )
     raw = str(messages[-1].content)
     try:
         payload = json.loads(raw.strip().removeprefix("```json").removesuffix("```").strip())

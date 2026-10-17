@@ -76,6 +76,7 @@ def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[
         "verification_commands": state.get("verification_commands", []),
         "latest_user_corrections": state.get("latest_user_corrections", []),
         "repo_context": _repo_projection(runtime, state.get("repo_context", "")),
+        "repo_explored": bool(state.get("repo_explored")),
         "research_notes": _short_text(
             state.get("research_notes", ""), MAX_TEXT_CHARS["research_notes"]
         ),

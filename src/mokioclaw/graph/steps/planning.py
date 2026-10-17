@@ -74,8 +74,10 @@ def planner_node(state: api.MokioGraphState) -> dict[str, api.Any]:
                 tool_message = api._execute_planner_tool(working_state, writer, call)
                 conversation.append(tool_message)
     else:
-        produced_messages.append(
-            api.AIMessage(content="planner stopped after the maximum supervisor tool loop count.")
+        conversation.finish(
+            model,
+            "The delegation phase has ended. Return a concise factual supervisor summary "
+            "of completed work, observed checks and remaining work. Do not request more tools.",
         )
 
     metadata = dict(working_state.get("metadata", {}))
@@ -232,6 +234,7 @@ def _execute_planner_tool(
     tool = tools.get(name)
     if tool is None:
         result = api.tool_failure_result(f"unknown tool: {name}", tool_name=name)
+        result["available_tools"] = sorted(tools)
     else:
         try:
             result = api.execute_tool(
@@ -268,6 +271,12 @@ def _planner_input(state: api.MokioGraphState, memory: dict[str, api.Any]) -> st
             + str(state.get("session_context", ""))
         )
     parts.append("Layered memory snapshot:\n" + api.format_layered_memory_for_prompt(memory))
+    if state.get("repo_explored"):
+        parts.append(
+            "Repository exploration already completed. Use repo_context to plan and delegate implementation. "
+            "The code agent must read exact source before editing; do not ask the repo agent to copy the same "
+            "method again merely to prepare that handoff. Request new exploration only for a specific missing dependency."
+        )
     return "\n\n".join(parts)
 
 

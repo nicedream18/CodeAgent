@@ -118,8 +118,13 @@ def run_code_agent(
         produced=produced_messages,
     )
     budget_exhausted = False
+    needs_summary = False
     final_response_allowance = 1 if runtime.active_subagent_budget is not None else 0
     for _ in range(max_loops + final_response_allowance):
+        active = runtime.active_subagent_budget
+        if active is not None and active.used >= active.limit:
+            needs_summary = True
+            break
         current_tools = build_tools(runtime)
         if runtime.light_active and not runtime.evaluation_mode:
             current_tools = [
@@ -187,16 +192,22 @@ def run_code_agent(
                     budget_exhausted = True
                     break
         if budget_exhausted:
+            conversation.discard_unanswered(tool_calls, "subagent_tool_budget_exhausted")
+            needs_summary = True
             break
         if runtime.light_escalation and runtime.light_active:
             break
     else:
-        message = (
-            "codeAgent stopped after the final response allowance."
-            if final_response_allowance
-            else "codeAgent stopped after the maximum tool loop count; verifier will inspect current files."
+        needs_summary = True
+
+    if needs_summary:
+        report = conversation.finish(
+            model,
+            "Your implementation tool phase has ended. No more tools are available in this handoff. "
+            "Return a concise factual report of completed edits, actual checks and failures, and unfinished work. "
+            "Do not request tools or claim tests passed unless their results were observed. The planner/verifier will inspect the files.",
         )
-        produced_messages.append(AIMessage(content=message))
+        budget_exhausted = budget_exhausted or report is None
 
     summary = _last_ai_content(produced_messages)
     return {
@@ -246,6 +257,7 @@ def execute_code_agent_tool(
                 on_event=on_event,
             )
             result = budget_failure or tool_failure_result(f"unknown tool: {name}", tool_name=name)
+            result["available_tools"] = sorted(tools)
         else:
             try:
                 result = execute_tool(
@@ -319,7 +331,7 @@ def _code_agent_input(state: MokioGraphState, instruction: str, memory: dict[str
 
 def _last_ai_content(messages: list[Any]) -> str:
     for message in reversed(messages):
-        if isinstance(message, ToolMessage):
+        if not isinstance(message, AIMessage):
             continue
         content = getattr(message, "content", "")
         if content:

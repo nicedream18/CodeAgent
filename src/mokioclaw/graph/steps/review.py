@@ -57,19 +57,26 @@ def verifier_node(state: api.MokioGraphState) -> dict[str, api.Any]:
                 writer(event)
                 conversation.append(tool_message)
     else:
-        produced_messages.append(
-            api.AIMessage(
-                content=api.json.dumps(
-                    {
-                        "passed": False,
-                        "reason": "Verifier stopped after the maximum tool loop count.",
-                        "checks": [],
-                        "recommended_next_instruction": "Inspect the workspace and complete the unfinished task.",
-                    },
-                    ensure_ascii=False,
+        report = conversation.finish(
+            model,
+            "The inspection phase has ended; no more tools are available. Return only verifier "
+            "JSON with passed, reason, checks and recommended_next_instruction. Judge only observed "
+            "workspace evidence and actual check results; report missing evidence as a failure.",
+        )
+        if report is None:
+            produced_messages.append(
+                api.AIMessage(
+                    content=api.json.dumps(
+                        {
+                            "passed": False,
+                            "reason": "Verifier stopped after the maximum tool loop count.",
+                            "checks": [],
+                            "recommended_next_instruction": "Inspect the workspace and complete the unfinished task.",
+                        },
+                        ensure_ascii=False,
+                    )
                 )
             )
-        )
 
     parsed = api._extract_json(api._last_ai_content(produced_messages)) or {
         "passed": False,
@@ -145,6 +152,7 @@ def _execute_read_only_tool(
     tool = tools.get(name)
     if tool is None:
         result = api.tool_failure_result(f"unknown tool: {name}", tool_name=name)
+        result["available_tools"] = sorted(tools)
     else:
         try:
             result = api.execute_tool(
