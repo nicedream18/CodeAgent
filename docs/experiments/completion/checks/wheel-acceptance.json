@@ -1,0 +1,9 @@
+{
+  "wheel_sha256": "c933d53d08d47847d017a9233b4c80db98c75d28094e77e6ec4898af93ced18f",
+  "installed_from": "/private/tmp/mokio-completion-wheel-env/lib/python3.13/site-packages/mokioclaw/__init__.py",
+  "isolated_frozen_offline_install": true,
+  "tokenizer_network_disabled": true,
+  "estimation_method": "cl100k_base_estimate",
+  "sample_tokens": 41,
+  "api_key_used": false
+}

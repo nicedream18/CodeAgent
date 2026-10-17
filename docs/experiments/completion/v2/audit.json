@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "experiment_id": "completion-20261017-m02-v2",
+  "frozen_revision": "ab03cf83ce743f8d781969dfb48946aad28e3f18",
+  "scheduled": 1,
+  "terminal": 1,
+  "request_configurations_audited": 23,
+  "roles": {
+    "intent_router": 1,
+    "repoAgent": 6,
+    "planner": 4,
+    "codeAgent": 12
+  },
+  "profiles": [
+    {
+      "config": {
+        "context_tokens": 32768,
+        "model": "deepseek-chat",
+        "output_tokens": 4096,
+        "sdk_max_retries": 0
+      },
+      "requests": 23
+    }
+  ],
+  "issues": [],
+  "comparison_conditions_passed": true,
+  "observability_issues": [],
+  "event_delivery_checks_passed": true,
+  "trials": [
+    {
+      "trial_id": "M02-full-1",
+      "requests_audited": 23
+    }
+  ],
+  "note": "Configuration/counts use the canonical producer trace; outer delivery and duplicate end defects are reported separately, never erased. This is not an independent HTTP packet capture or a success score."
+}

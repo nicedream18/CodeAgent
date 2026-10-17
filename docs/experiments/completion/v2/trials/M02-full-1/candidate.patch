@@ -1,0 +1,31 @@
+--- a/src/mokioclaw/providers/generation.py
++++ b/src/mokioclaw/providers/generation.py
+@@ -60,12 +60,27 @@
+             "name": item.get("name") or "unknown_tool",
+             "args": item.get("args", ""),
+         }
++    # Chunk-only calls may lack a real id; synthesize a stable unique one so a
++    # backfilled ToolMessage always matches an AIMessage tool_call id.
++    used: set[str] = set()
++    for call in calls.values():
++        key = call["id"]
++        if not key or key in used:
++            base = key or "call"
++            suffix = 0
++            while f"{base}_{suffix}" in used or f"{base}_{suffix}" in calls:
++                suffix += 1
++            key = f"{base}_{suffix}"
++            call["id"] = key
++        used.add(key)
+     return list(calls.values())
+ 
+ 
+ def validate_generation(message: Any) -> GenerationOutcome:
+     result = outcome(message)
+-    if False:
++    if result.reason == "output_limit":
++        # Truncated output: every declared call is void, and partial JSON must
++        # never be parsed (an SDK may have "completed" it) or executed.
+         raise ModelGenerationStopped("model_output_truncated", message)
+     if result.reason in {"blocked", "unknown"}:
+         raise ModelGenerationStopped(

@@ -1,0 +1,34 @@
+{
+  "fake_success": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": false,
+    "target_passed": 0,
+    "target_failed": 3,
+    "regression_failed": 0,
+    "tests_run": 5,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 1.321,
+    "report": "/tmp/mokio-completion-d01-negative-checks/fake_success"
+  },
+  "tests_only": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": false,
+    "target_passed": 0,
+    "target_failed": 3,
+    "regression_failed": 0,
+    "tests_run": 5,
+    "out_of_scope": [
+      "tests/test_queue.py"
+    ],
+    "tampered_tests": [
+      "tests/test_queue.py"
+    ],
+    "infrastructure_error": null,
+    "seconds": 1.219,
+    "report": "/tmp/mokio-completion-d01-negative-checks/tests_only"
+  }
+}

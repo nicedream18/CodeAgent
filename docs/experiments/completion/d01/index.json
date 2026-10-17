@@ -1,0 +1,35 @@
+[
+  {
+    "trial_id": "D01-full-1",
+    "task": "D01",
+    "architecture": "full",
+    "run_status": "finished",
+    "task_solved": true,
+    "independent_artifact_passed": true,
+    "grade_valid": true,
+    "stop_reason": null,
+    "worker_error": null,
+    "infrastructure_error": null,
+    "observed_model_path": [
+      "intent_router",
+      "workflow:full",
+      "repoAgent",
+      "planner",
+      "codeAgent",
+      "planner",
+      "verifier"
+    ],
+    "requests": 19,
+    "total_tokens": 89762,
+    "generation_seconds": 36.845,
+    "grading_seconds": 1.367,
+    "archive_sha256": {
+      "file-changes.json": "1734d21bb91b3150db04325886feb25f224cc7bfe8cd026a0425f5d58413992a",
+      "result.json": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2",
+      "candidate.patch": "93b0556e0b88d10b039dea054b64a35ff5696f35d3e33c7d935f13b40d9e92a1",
+      "worker.json": "d2265321ccdfdbca59c0de4ae0860d325e870b5a752eda054616cd8d4a3f4542",
+      "trace.tar.gz": "610f18f595045f472b0c6e6c98cf74ad81ce6aec0d582b77200494664e7cca9e",
+      "changed-files.tar.gz": "521b79a86d85138765eeb2c426b0b87e818259d7326fc8611af31823c82873a8"
+    }
+  }
+]

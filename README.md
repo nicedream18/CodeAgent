@@ -17,15 +17,17 @@ flowchart LR
 
 本轮加入可选 Docker 前台 Bash、独立代码验收器和固定 12 题评测集。正式 56 次真实试验已归档：**完整交付 0/56，部分产物通过 8/56**。此前另有 56 次因配置继承缺陷标为无效对照，原记录全部保留。当前交付可靠性仍需改善，不声称多 Agent 优于单 Agent。[结果、限制与失败分析](docs/experiments/internship-v1/RESULTS.md)。
 
+新增一个小型真实模型成功案例：full 流程自主修复 FIFO 队列边界，正常汇报后独立 Docker 验收 **5/5 通过**，归档重建后再次通过。使用 19 次请求、18 次工具、约 37 秒生成；这是受控单例，不计入历史矩阵。[播放演示与复现](docs/internship/demo.md)。
+
 | 可复核内容 | 证据 |
 |---|---|
 | 366 项原始检查基线 | [基线记录](docs/experiments/internship-baseline-2026-10-16.json) |
-| 当前 403 项检查通过，另有真实容器检查 | [安装与检查证据](docs/experiments/internship-install-acceptance.json) |
+| 当前 414 项检查通过，真实 Docker 29 项通过 | [本轮检查证据](docs/experiments/completion/checks/) |
 | 真实 ARM64 容器隔离、输出和超时清理 | [Docker 实测](docs/experiments/docker-arm64-2026-10-16.json) |
 | 12 题缺陷版失败 / 参考修复通过 | [任务清单与验收](docs/experiments/internship-v1/) |
 | baseline/full/light/auto 公平比较口径 | [评测设计](docs/internship/evaluation.md) |
 | 56 次正式试验及 56 次无效对照均保留 | [实际结果](docs/experiments/internship-v1/RESULTS.md) |
-| 150 秒真实产物与失败收尾回放 | [演示](docs/internship/demo.md) |
+| 150 秒真实模型完整交付回放，另保留失败案例 | [演示](docs/internship/demo.md) |
 
 ## 快速运行
 

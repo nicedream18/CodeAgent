@@ -1,0 +1,24 @@
+{
+  "real_model": false,
+  "kind": "independent_regrade",
+  "original_run_status": "finished",
+  "original_task_solved": true,
+  "original_artifact_passed": true,
+  "regrade": {
+    "schema_version": 1,
+    "valid": true,
+    "solved": true,
+    "target_passed": 3,
+    "target_failed": 0,
+    "regression_failed": 0,
+    "tests_run": 5,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 1.463,
+    "report": "/tmp/mokio-completion-d01-regrade/regrade"
+  },
+  "same_test_outcome": true,
+  "image_changed": false,
+  "output": "/tmp/mokio-completion-d01-regrade"
+}

@@ -1,0 +1,10 @@
+{
+  "TODO.md": {
+    "before": null,
+    "after": "d4ce0d0bbfdf2938a25b61b43e508dc25a007985ce2b44dda442d0be444a2656"
+  },
+  "src/flask/config.py": {
+    "before": "51ba3f8eecd262c00aa83daf0f7be6ea68ec3e8dc43890dd484cd8abc94a4c92",
+    "after": "550e8e83f361cc4749f237412f5deae3e7bf44baf06a46093b9969b703a37188"
+  }
+}

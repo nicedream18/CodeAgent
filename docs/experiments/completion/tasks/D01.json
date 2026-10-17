@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "D01",
+  "version": "completion-demo-v1",
+  "source": "MokioAgent controlled FIFO queue demonstration; not a benchmark task",
+  "base_commit": "controlled-fixture-2afb0ae10f19d3d3c7d4e3a85b65b100e2254a2c32339baaf3c5e0db5217663c",
+  "source_sha256": "2afb0ae10f19d3d3c7d4e3a85b65b100e2254a2c32339baaf3c5e0db5217663c",
+  "dependency_sha256": "3f01c889a22728e62b4d10e6f6316552b936a150104d398928da4905604d2b34",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "修复 src/batch_queue.py 的 take_batch(items, limit)。\nitems 是可变列表，limit 是整数。要求按 FIFO 顺序移除并返回至多 limit 项，\n列表中剩余项的顺序不变；limit=0 时返回空列表且不消费；limit<0 时抛出\nValueError，不能改变原列表（包括空列表）。保留正常排空与空队列行为。\n只修改实现，运行可见测试并自行检查这些边界，再汇报修改和实际验证结果。\n可见测试命令：PYTHONPATH=src:. python -m pytest -q。\n这是受控的小任务演示，不属于 internship-v1 的 12 任务或架构对照成绩。\n",
+  "allowed_paths": [
+    "src/batch_queue.py"
+  ],
+  "target_tests": [
+    "tests/test_contract.py"
+  ],
+  "regression_tests": [
+    "tests/test_queue.py"
+  ],
+  "reference_patch_sha256": "7140ad220afba9d4c2f51bb7143cf8048b6b2082e95add4a55cbfe5bae6d7245",
+  "trusted_tests_sha256": "",
+  "test_patch_sha256": "db42d135ad573f8c00bf187385a3249b4b9deea4519059cc402a69d64cb29167",
+  "dataset_revision": null,
+  "upstream_license": null
+}

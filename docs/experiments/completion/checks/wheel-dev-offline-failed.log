@@ -1,0 +1,9 @@
+Using Python 3.13.9 environment at: /private/tmp/mokio-completion-wheel-env
+WARN ast-serialize==0.13.0 needs to be downloaded from a registry
+WARN ast-serialize needs to be downloaded from a registry
+WARN librt==0.16.0 needs to be downloaded from a registry
+WARN ruff==0.17.0 needs to be downloaded from a registry
+error: No solution found when resolving dependencies
+  cause: Because ast-serialize==0.13.0 needs to be downloaded from a registry and you require ast-serialize==0.13.0, we can conclude that your requirements are unsatisfiable.
+
+hint: Packages were unavailable because the network was disabled. When the network is disabled, registry packages may only be read from the cache.

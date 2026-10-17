@@ -1,0 +1,37 @@
+[
+  {
+    "trial_id": "E02-full-1",
+    "task": "E02",
+    "architecture": "full",
+    "run_status": "failed",
+    "task_solved": false,
+    "independent_artifact_passed": false,
+    "grade_valid": true,
+    "stop_reason": "token_budget_exhausted",
+    "worker_error": null,
+    "infrastructure_error": null,
+    "observed_model_path": [
+      "intent_router",
+      "workflow:full",
+      "repoAgent",
+      "planner",
+      "repoAgent",
+      "planner",
+      "codeAgent",
+      "planner",
+      "codeAgent"
+    ],
+    "requests": 31,
+    "total_tokens": 188733,
+    "generation_seconds": 60.816,
+    "grading_seconds": 0.765,
+    "archive_sha256": {
+      "file-changes.json": "5d32900aed9ef62bfa52ec0e070c0f77f23620a777bcf7a82caf006921c3ecdd",
+      "result.json": "f660f2d7f4b43df5bfc444bdcb1c04b62b6fd0b63314f3a81b578100f46af3c1",
+      "candidate.patch": "a91f9bfe5a3298607e5422fc1ccd5f3c0cc5d9296b860836cdd1fb0d4e346af9",
+      "worker.json": "5805af24fa027df87a38f5f3f82af9e1e5f95c55585d5d7d17a9d98903b3c829",
+      "trace.tar.gz": "bccae0e32db3957c33eaab11c9a01aa7721faffffa0b66625451614df69f4b80",
+      "changed-files.tar.gz": "30f1f63599f35b8d1fe36357848435cd59e13df77e24fb30c8292e5e47652412"
+    }
+  }
+]

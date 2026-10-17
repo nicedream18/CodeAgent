@@ -1,0 +1,90 @@
+--- a/src/mokioclaw/providers/generation.py
++++ b/src/mokioclaw/providers/generation.py
+@@ -45,27 +45,46 @@
+ 
+ 
+ def declared_calls(message: Any) -> list[dict[str, Any]]:
++    """Enumerate every tool call declared by a response, complete or partial.
++
++    Complete calls (``tool_calls``/``invalid_tool_calls``) win over streamed
++    fragments (``tool_call_chunks``); fragments only fill in calls that were
++    never completed, and never overwrite a complete call. Keys are the call id
++    when present, otherwise a stable positional key, so ids and indexes cannot
++    collide.
++    """
++    if message is None:
++        return []
+     calls: dict[str, dict[str, Any]] = {}
+-    for item in [*getattr(message, "tool_calls", []), *getattr(message, "invalid_tool_calls", [])]:
+-        key = str(item.get("id") or len(calls))
+-        calls[key] = {
+-            "id": key,
+-            "name": item.get("name") or "unknown_tool",
+-            "args": item.get("args", {}),
+-        }
+-    for item in getattr(message, "tool_call_chunks", []):
+-        key = str(item.get("id") or item.get("index", len(calls)))
+-        calls[key] = {
+-            "id": key,
+-            "name": item.get("name") or "unknown_tool",
+-            "args": item.get("args", ""),
+-        }
+-    return list(calls.values())
++    order: list[str] = []
++
++    def _add(key: str, name: Any, args: Any) -> None:
++        if key not in calls:
++            order.append(key)
++        calls[key] = {"id": key, "name": name or "unknown_tool", "args": args}
++
++    for position, item in enumerate(
++        [*getattr(message, "tool_calls", []), *getattr(message, "invalid_tool_calls", [])]
++    ):
++        if not isinstance(item, dict):
++            continue
++        key = str(item.get("id") or f"call_{position}")
++        _add(key, item.get("name"), item.get("args", {}))
++    for position, item in enumerate(getattr(message, "tool_call_chunks", []) or []):
++        if not isinstance(item, dict):
++            continue
++        key = str(item.get("id") or f"call_{position}")
++        if key in calls:
++            continue
++        _add(key, item.get("name"), item.get("args", ""))
++    return [calls[key] for key in order]
+ 
+ 
+ def validate_generation(message: Any) -> GenerationOutcome:
+     result = outcome(message)
+-    if False:
++    if result.reason == "output_limit":
++        # Truncated output voids every declared call, including ones that look
++        # complete: partial JSON must never be executed or SDK-completed.
+         raise ModelGenerationStopped("model_output_truncated", message)
+     if result.reason in {"blocked", "unknown"}:
+         raise ModelGenerationStopped(
+--- a/src/mokioclaw/providers/openai_provider.py
++++ b/src/mokioclaw/providers/openai_provider.py
+@@ -80,7 +80,12 @@
+ def invoke_streaming(
+     runnable, messages, *, writer=None, node="", state=None, allow_compaction=True
+ ):
+-    """Retry one truncated generation without executing its discarded calls."""
++    """Retry one truncated generation without executing its discarded calls.
++
++    A truncated response (finish_reason length/max_tokens) voids every tool call
++    it declared, complete-looking ones included. Exactly one re-decision is
++    allowed; a second truncation re-raises so the run stops safely.
++    """
+     from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+ 
+     from mokioclaw.providers.generation import ModelGenerationStopped, declared_calls
+@@ -102,7 +107,7 @@
+             calls = declared_calls(exc.message)
+             messages.append(
+                 AIMessage(
+-                    content=_text_content(exc.message.content),
++                    content=_text_content(getattr(exc.message, "content", "")),
+                     tool_calls=[{"id": c["id"], "name": c["name"], "args": {}} for c in calls],
+                 )
+             )

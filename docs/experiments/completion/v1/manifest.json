@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "purpose": "targeted_completion_validation_not_architecture_benchmark",
+  "harness_revision": "ea66b6788aa44ed5f78bd55e65148517d5f0ace9",
+  "harness_source_sha256": "25554e1db533c03f6109ca8bceb0313ef657c702203bd4ea850f372fdeeb264a",
+  "lock_sha256": "6a9c93792b1fa2f633a575b89d94cb5777d828b8d753074ca9714b9c7bdc43e1",
+  "prompt_sha256": "dba4f61c769b0e5d55f0a9f052edb33c6d2d9179a722c1746acaaac923145ed1",
+  "model_config_sha256": "9d31aac840b71bdfd0d971660c2eed50960a805b47321acd283f500d8881ce7d",
+  "tasks": {
+    "E02": "6477bc07ec96c90cee968ba2abe06444567ea55a169bfa22c3ce3d5ef37d74c3"
+  },
+  "trials": [
+    {
+      "profile": "targeted",
+      "config": {
+        "schema_version": 1,
+        "task_id": "E02",
+        "architecture": "full",
+        "repeat": 1,
+        "seed": 20261016,
+        "temperature": 0,
+        "context_tokens": 32768,
+        "output_tokens": 4096,
+        "token_limit": 200000,
+        "request_limit": 40,
+        "tool_limit": 80,
+        "generation_seconds": 900,
+        "bash_seconds": 60,
+        "grading_seconds": 120,
+        "model": "deepseek-chat",
+        "model_config_sha256": "9d31aac840b71bdfd0d971660c2eed50960a805b47321acd283f500d8881ce7d",
+        "harness_revision": "ea66b6788aa44ed5f78bd55e65148517d5f0ace9",
+        "prompt_sha256": "dba4f61c769b0e5d55f0a9f052edb33c6d2d9179a722c1746acaaac923145ed1"
+      }
+    }
+  ],
+  "note": "Original benchmark records are unchanged. No automatic retries of started trials."
+}

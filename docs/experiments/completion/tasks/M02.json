@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "M02",
+  "version": "internship-v1",
+  "source": "MokioAgent seeded defect",
+  "base_commit": "6e88c21c294fe041a821a21e0abad9dc095b9364",
+  "source_sha256": "759176704a32f69b8a66174aef071bfac915824ea11ea6d0ed943ea28482a2c0",
+  "dependency_sha256": "be2fc457e711056486910794dd90675ea8d201890259c1057df46f13be83a547",
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "requirement": "模型返回 length/max_tokens 时，该响应的所有工具调用（包括看似完整的调用）都必须作废并补齐未执行结果；只允许重新决策一次，再次截断安全停止。原始半截 JSON 不得用 SDK 补全值执行。保留取消、纠正和预算检查。",
+  "allowed_paths": [
+    "src/mokioclaw/**"
+  ],
+  "target_tests": [
+    "tests/test_generation_reliability.py::test_truncated_batch_is_closed_and_replanned_once",
+    "tests/test_generation_reliability.py::test_second_truncation_stops_without_third_request"
+  ],
+  "regression_tests": [
+    "tests/test_generation_reliability.py::test_partial_json_never_uses_sdk_tolerant_parse",
+    "tests/test_generation_reliability.py::test_abnormal_finish_does_not_retry"
+  ],
+  "reference_patch_sha256": "23a37c228d89426bb67a66e7283a72fee41cc5a0edec269b6777cf72e01d9a24",
+  "trusted_tests_sha256": "1c30880ea7ebd34a3f3bb2fc760604ad2376f65fa1508749d118ae7879ba8d74",
+  "test_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dataset_revision": null,
+  "upstream_license": null
+}

@@ -1,0 +1,34 @@
+{
+  "recorded_at": "2026-10-17T06:06:18.530032+00:00",
+  "source_revision": "fd4f29f7b012d0b5bf13714b813f7fdb05ec9b12",
+  "source_sha256": "ef4fa4450ca5245dd2548bc4e5c309868e271550342ceb985488024ba2bb0660",
+  "pytest": {
+    "passed": 414,
+    "skipped": 2,
+    "reason": "Docker-gated cases are exercised by separate real-container checks"
+  },
+  "ruff": "passed",
+  "mypy": {
+    "strict_modules": 21,
+    "status": "passed"
+  },
+  "protocol_and_eval_docs": "passed",
+  "git_diff_check": "passed",
+  "real_docker": {
+    "passed": 29,
+    "platform": "linux/aarch64",
+    "engine_unavailable_is_failure": true
+  },
+  "targeted_real_attempts": 5,
+  "complete_deliveries": 1,
+  "successful_experiment": "completion-20261017-d01-v1",
+  "scope": "controlled six-line FIFO defect; outside frozen benchmark",
+  "independent_regrade": {
+    "tests": 5,
+    "passed": true,
+    "image_changed": false
+  },
+  "original_benchmark_unchanged": true,
+  "remote_linux_ci": "not_run",
+  "release_tag_and_original_wheel": "unchanged"
+}

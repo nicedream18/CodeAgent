@@ -1,0 +1,37 @@
+LangGraph MultiAgent workflow finished: PASSED
+
+Plan: Done: take_batch validates limit first, then slices and deletes at most limit items from the front. Visible tests pass (2 passed) and boundary self-checks pass.
+
+Todos:
+- [completed] Rewrite take_batch in src/batch_queue.py: validate limit<0 (raise ValueError before any mutation), slice at most limit items FIFO, del items[:n], return batch.
+- [completed] Run PYTHONPATH=src:. python -m pytest -q and self-check boundaries (limit=0, limit<0 with empty/non-empty list, drain, empty queue).
+
+Research sources:
+(none)
+
+Verifier:
+src/batch_queue.py 的 take_batch 已正确实现：先校验 limit<0 抛 ValueError（未触碰 items），再用 min(limit,len(items)) 切片并 del items[:n]，FIFO 顺序与剩余顺序均保持；可见测试 2 passed，边界自检全部通过。
+
+Checks:
+- 实现正确性（src/batch_queue.py）: PASS - 文件内容为：if limit < 0: raise ValueError(...); n = min(limit, len(items)); batch = items[:n]; del items[:n]; return batch。校验在任何变更之前，无 off-by-one。
+- 可见测试 PYTHONPATH=src:. python -m pytest -q: PASS - 2 passed in 0.01s，exit=0（test_empty_queue、test_drain_in_fifo_order）。
+- limit=0 不消费: PASS - take_batch(['a','b'],0) 返回 [] 且 items 仍为 ['a','b']。
+- FIFO 部分取出与剩余顺序: PASS - take_batch(['a','b','c'],2)==['a','b']，剩余 ['c']；take_batch(list(range(10)),3)==[0,1,2]，剩余 [3..9] 顺序不变。
+- limit<0 抛 ValueError 且不改列表: PASS - 非空 ['a','b'] 与空列表 [] 均抛 ValueError，调用后列表内容不变。
+- 正常排空与空队列: PASS - take_batch(['a','b'],5)==['a','b'] 且清空；take_batch([],3)==[] 且保持空。
+- 修改范围: PASS - 工作区仅含 README.md、TODO.md、src、tests；测试文件 tests/test_queue.py 未被改动，实现改动限于 src/batch_queue.py。
+
+Context compression:
+(none)
+
+CodeAgent summary:
+## 修改内容
+
+只修改了 `src/batch_queue.py`（唯一允许修改的文件），函数最终内容：
+
+```python
+def take_batch(items, limit):
+    """Remove a FIFO batch from a mutable list."""
+    if limit < 0:
+        raise ValueError("limit must be non-negative")
+    n =...
