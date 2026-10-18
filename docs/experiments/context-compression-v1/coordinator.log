@@ -1,0 +1,509 @@
+START 1/18 off D01-full-2
+{"position": 1, "arm": "off", "trial_id": "D01-full-2", "status": "finished", "solved": true, "tokens": 111593, "generation_seconds": 42.181}
+START 2/18 on D01-full-2
+{"position": 2, "arm": "on", "trial_id": "D01-full-2", "status": "finished", "solved": true, "tokens": 83812, "generation_seconds": 35.966}
+START 3/18 on D01-full-3
+{"position": 3, "arm": "on", "trial_id": "D01-full-3", "status": "finished", "solved": true, "tokens": 85111, "generation_seconds": 37.312}
+START 4/18 off D01-full-3
+{"position": 4, "arm": "off", "trial_id": "D01-full-3", "status": "finished", "solved": true, "tokens": 84071, "generation_seconds": 39.363}
+START 5/18 on M07-v2-full-2
+{"position": 5, "arm": "on", "trial_id": "M07-v2-full-2", "status": "failed", "solved": false, "tokens": 194225, "generation_seconds": 69.165}
+START 6/18 off M07-v2-full-2
+{"position": 6, "arm": "off", "trial_id": "M07-v2-full-2", "status": "failed", "solved": false, "tokens": 184249, "generation_seconds": 68.631}
+START 7/18 off M08-v2-full-2
+{"position": 7, "arm": "off", "trial_id": "M08-v2-full-2", "status": "finished", "solved": true, "tokens": 187348, "generation_seconds": 81.133}
+START 8/18 on M08-v2-full-2
+{"position": 8, "arm": "on", "trial_id": "M08-v2-full-2", "status": "failed", "solved": false, "tokens": 194502, "generation_seconds": 68.344}
+START 9/18 on M08-v2-full-3
+{"position": 9, "arm": "on", "trial_id": "M08-v2-full-3", "status": "failed", "solved": false, "tokens": 185458, "generation_seconds": 70.743}
+START 10/18 off M08-v2-full-3
+{"position": 10, "arm": "off", "trial_id": "M08-v2-full-3", "status": "failed", "solved": false, "tokens": 188850, "generation_seconds": 71.454}
+START 11/18 on D01-full-1
+{"position": 11, "arm": "on", "trial_id": "D01-full-1", "status": "finished", "solved": true, "tokens": 87076, "generation_seconds": 39.135}
+START 12/18 off D01-full-1
+{"position": 12, "arm": "off", "trial_id": "D01-full-1", "status": "finished", "solved": true, "tokens": 98679, "generation_seconds": 38.99}
+START 13/18 on M08-v2-full-1
+{"position": 13, "arm": "on", "trial_id": "M08-v2-full-1", "status": "failed", "solved": false, "tokens": 184176, "generation_seconds": 120.218}
+START 14/18 off M08-v2-full-1
+{"position": 14, "arm": "off", "trial_id": "M08-v2-full-1", "status": "failed", "solved": false, "tokens": 183643, "generation_seconds": 75.086}
+START 15/18 off M07-v2-full-3
+{"position": 15, "arm": "off", "trial_id": "M07-v2-full-3", "status": "failed", "solved": false, "tokens": 183701, "generation_seconds": 60.873}
+START 16/18 on M07-v2-full-3
+{"position": 16, "arm": "on", "trial_id": "M07-v2-full-3", "status": "failed", "solved": false, "tokens": 188756, "generation_seconds": 60.19}
+START 17/18 off M07-v2-full-1
+{"position": 17, "arm": "off", "trial_id": "M07-v2-full-1", "status": "failed", "solved": false, "tokens": 187252, "generation_seconds": 64.569}
+START 18/18 on M07-v2-full-1
+{"position": 18, "arm": "on", "trial_id": "M07-v2-full-1", "status": "failed", "solved": false, "tokens": 192407, "generation_seconds": 71.277}
+{
+  "schema_version": 1,
+  "experiment_id": "context-compression-20261018-v1",
+  "harness_revision": "d3d95210e6bf985429c8d8ce4d22138ef2bfb680",
+  "real_model": true,
+  "planned": 18,
+  "recorded": 18,
+  "complete": true,
+  "measurement_valid": true,
+  "arms": {
+    "on": {
+      "planned": 9,
+      "terminal": 9,
+      "solved": 3,
+      "completion_rate": 0.3333333333333333,
+      "artifact_passed": 9,
+      "invalid_grades": 0,
+      "infrastructure_failed": 0,
+      "out_of_scope_trials": 0,
+      "input_tokens": 1313976,
+      "output_tokens": 81547,
+      "total_tokens": 1395523,
+      "provider_reported_total_tokens": 1395523,
+      "estimated_requests": 0,
+      "usage_missing_requests": 0,
+      "requests": 209,
+      "compression_requests": 0,
+      "compression_tokens": 0,
+      "compression_applied": 0,
+      "compression_model_ms": 0,
+      "on_trials_without_applied_compression": 9,
+      "generation_seconds": {
+        "n": 9,
+        "min": 35.966,
+        "median": 68.344,
+        "max": 120.218
+      },
+      "successful_generation_seconds": {
+        "n": 3,
+        "min": 35.966,
+        "median": 37.312,
+        "max": 39.135
+      },
+      "grading_seconds": {
+        "n": 9,
+        "min": 1.361,
+        "median": 2.992,
+        "max": 5.069
+      },
+      "stop_reasons": {
+        "finished": 3,
+        "token_budget_exhausted": 6
+      },
+      "failure_categories": {
+        "finished": 3,
+        "token_budget_exhausted": 6
+      },
+      "cache_read_tokens": {
+        "known_sum": 195328,
+        "unknown_requests": 0
+      },
+      "cache_creation_tokens": {
+        "known_sum": null,
+        "unknown_requests": 209
+      },
+      "measurement_valid": true
+    },
+    "off": {
+      "planned": 9,
+      "terminal": 9,
+      "solved": 4,
+      "completion_rate": 0.4444444444444444,
+      "artifact_passed": 9,
+      "invalid_grades": 0,
+      "infrastructure_failed": 0,
+      "out_of_scope_trials": 0,
+      "input_tokens": 1329844,
+      "output_tokens": 79542,
+      "total_tokens": 1409386,
+      "provider_reported_total_tokens": 1409386,
+      "estimated_requests": 0,
+      "usage_missing_requests": 0,
+      "requests": 210,
+      "compression_requests": 0,
+      "compression_tokens": 0,
+      "compression_applied": 0,
+      "compression_model_ms": 0,
+      "on_trials_without_applied_compression": 0,
+      "generation_seconds": {
+        "n": 9,
+        "min": 38.99,
+        "median": 64.569,
+        "max": 81.133
+      },
+      "successful_generation_seconds": {
+        "n": 4,
+        "min": 38.99,
+        "median": 40.772,
+        "max": 81.133
+      },
+      "grading_seconds": {
+        "n": 9,
+        "min": 1.258,
+        "median": 3.339,
+        "max": 4.517
+      },
+      "stop_reasons": {
+        "finished": 4,
+        "token_budget_exhausted": 5
+      },
+      "failure_categories": {
+        "finished": 4,
+        "token_budget_exhausted": 5
+      },
+      "cache_read_tokens": {
+        "known_sum": 231296,
+        "unknown_requests": 0
+      },
+      "cache_creation_tokens": {
+        "known_sum": null,
+        "unknown_requests": 210
+      },
+      "measurement_valid": true
+    }
+  },
+  "tasks": {
+    "D01": {
+      "on": {
+        "planned": 3,
+        "terminal": 3,
+        "solved": 3,
+        "completion_rate": 1.0,
+        "artifact_passed": 3,
+        "invalid_grades": 0,
+        "infrastructure_failed": 0,
+        "out_of_scope_trials": 0,
+        "input_tokens": 238128,
+        "output_tokens": 17871,
+        "total_tokens": 255999,
+        "provider_reported_total_tokens": 255999,
+        "estimated_requests": 0,
+        "usage_missing_requests": 0,
+        "requests": 54,
+        "compression_requests": 0,
+        "compression_tokens": 0,
+        "compression_applied": 0,
+        "compression_model_ms": 0,
+        "on_trials_without_applied_compression": 3,
+        "generation_seconds": {
+          "n": 3,
+          "min": 35.966,
+          "median": 37.312,
+          "max": 39.135
+        },
+        "successful_generation_seconds": {
+          "n": 3,
+          "min": 35.966,
+          "median": 37.312,
+          "max": 39.135
+        },
+        "grading_seconds": {
+          "n": 3,
+          "min": 1.361,
+          "median": 1.385,
+          "max": 1.41
+        },
+        "stop_reasons": {
+          "finished": 3
+        },
+        "failure_categories": {
+          "finished": 3
+        },
+        "cache_read_tokens": {
+          "known_sum": 48768,
+          "unknown_requests": 0
+        },
+        "cache_creation_tokens": {
+          "known_sum": null,
+          "unknown_requests": 54
+        },
+        "measurement_valid": true
+      },
+      "off": {
+        "planned": 3,
+        "terminal": 3,
+        "solved": 3,
+        "completion_rate": 1.0,
+        "artifact_passed": 3,
+        "invalid_grades": 0,
+        "infrastructure_failed": 0,
+        "out_of_scope_trials": 0,
+        "input_tokens": 274923,
+        "output_tokens": 19420,
+        "total_tokens": 294343,
+        "provider_reported_total_tokens": 294343,
+        "estimated_requests": 0,
+        "usage_missing_requests": 0,
+        "requests": 60,
+        "compression_requests": 0,
+        "compression_tokens": 0,
+        "compression_applied": 0,
+        "compression_model_ms": 0,
+        "on_trials_without_applied_compression": 0,
+        "generation_seconds": {
+          "n": 3,
+          "min": 38.99,
+          "median": 39.363,
+          "max": 42.181
+        },
+        "successful_generation_seconds": {
+          "n": 3,
+          "min": 38.99,
+          "median": 39.363,
+          "max": 42.181
+        },
+        "grading_seconds": {
+          "n": 3,
+          "min": 1.258,
+          "median": 1.911,
+          "max": 2.568
+        },
+        "stop_reasons": {
+          "finished": 3
+        },
+        "failure_categories": {
+          "finished": 3
+        },
+        "cache_read_tokens": {
+          "known_sum": 53248,
+          "unknown_requests": 0
+        },
+        "cache_creation_tokens": {
+          "known_sum": null,
+          "unknown_requests": 60
+        },
+        "measurement_valid": true
+      }
+    },
+    "M07-v2": {
+      "on": {
+        "planned": 3,
+        "terminal": 3,
+        "solved": 0,
+        "completion_rate": 0.0,
+        "artifact_passed": 3,
+        "invalid_grades": 0,
+        "infrastructure_failed": 0,
+        "out_of_scope_trials": 0,
+        "input_tokens": 542579,
+        "output_tokens": 32809,
+        "total_tokens": 575388,
+        "provider_reported_total_tokens": 575388,
+        "estimated_requests": 0,
+        "usage_missing_requests": 0,
+        "requests": 81,
+        "compression_requests": 0,
+        "compression_tokens": 0,
+        "compression_applied": 0,
+        "compression_model_ms": 0,
+        "on_trials_without_applied_compression": 3,
+        "generation_seconds": {
+          "n": 3,
+          "min": 60.19,
+          "median": 69.165,
+          "max": 71.277
+        },
+        "successful_generation_seconds": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "grading_seconds": {
+          "n": 3,
+          "min": 2.992,
+          "median": 3.688,
+          "max": 3.928
+        },
+        "stop_reasons": {
+          "token_budget_exhausted": 3
+        },
+        "failure_categories": {
+          "token_budget_exhausted": 3
+        },
+        "cache_read_tokens": {
+          "known_sum": 68608,
+          "unknown_requests": 0
+        },
+        "cache_creation_tokens": {
+          "known_sum": null,
+          "unknown_requests": 81
+        },
+        "measurement_valid": true
+      },
+      "off": {
+        "planned": 3,
+        "terminal": 3,
+        "solved": 0,
+        "completion_rate": 0.0,
+        "artifact_passed": 3,
+        "invalid_grades": 0,
+        "infrastructure_failed": 0,
+        "out_of_scope_trials": 0,
+        "input_tokens": 524668,
+        "output_tokens": 30534,
+        "total_tokens": 555202,
+        "provider_reported_total_tokens": 555202,
+        "estimated_requests": 0,
+        "usage_missing_requests": 0,
+        "requests": 80,
+        "compression_requests": 0,
+        "compression_tokens": 0,
+        "compression_applied": 0,
+        "compression_model_ms": 0,
+        "on_trials_without_applied_compression": 0,
+        "generation_seconds": {
+          "n": 3,
+          "min": 60.873,
+          "median": 64.569,
+          "max": 68.631
+        },
+        "successful_generation_seconds": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "grading_seconds": {
+          "n": 3,
+          "min": 3.314,
+          "median": 3.339,
+          "max": 3.585
+        },
+        "stop_reasons": {
+          "token_budget_exhausted": 3
+        },
+        "failure_categories": {
+          "token_budget_exhausted": 3
+        },
+        "cache_read_tokens": {
+          "known_sum": 87680,
+          "unknown_requests": 0
+        },
+        "cache_creation_tokens": {
+          "known_sum": null,
+          "unknown_requests": 80
+        },
+        "measurement_valid": true
+      }
+    },
+    "M08-v2": {
+      "on": {
+        "planned": 3,
+        "terminal": 3,
+        "solved": 0,
+        "completion_rate": 0.0,
+        "artifact_passed": 3,
+        "invalid_grades": 0,
+        "infrastructure_failed": 0,
+        "out_of_scope_trials": 0,
+        "input_tokens": 533269,
+        "output_tokens": 30867,
+        "total_tokens": 564136,
+        "provider_reported_total_tokens": 564136,
+        "estimated_requests": 0,
+        "usage_missing_requests": 0,
+        "requests": 74,
+        "compression_requests": 0,
+        "compression_tokens": 0,
+        "compression_applied": 0,
+        "compression_model_ms": 0,
+        "on_trials_without_applied_compression": 3,
+        "generation_seconds": {
+          "n": 3,
+          "min": 68.344,
+          "median": 70.743,
+          "max": 120.218
+        },
+        "successful_generation_seconds": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "grading_seconds": {
+          "n": 3,
+          "min": 2.913,
+          "median": 4.555,
+          "max": 5.069
+        },
+        "stop_reasons": {
+          "token_budget_exhausted": 3
+        },
+        "failure_categories": {
+          "token_budget_exhausted": 3
+        },
+        "cache_read_tokens": {
+          "known_sum": 77952,
+          "unknown_requests": 0
+        },
+        "cache_creation_tokens": {
+          "known_sum": null,
+          "unknown_requests": 74
+        },
+        "measurement_valid": true
+      },
+      "off": {
+        "planned": 3,
+        "terminal": 3,
+        "solved": 1,
+        "completion_rate": 0.3333333333333333,
+        "artifact_passed": 3,
+        "invalid_grades": 0,
+        "infrastructure_failed": 0,
+        "out_of_scope_trials": 0,
+        "input_tokens": 530253,
+        "output_tokens": 29588,
+        "total_tokens": 559841,
+        "provider_reported_total_tokens": 559841,
+        "estimated_requests": 0,
+        "usage_missing_requests": 0,
+        "requests": 70,
+        "compression_requests": 0,
+        "compression_tokens": 0,
+        "compression_applied": 0,
+        "compression_model_ms": 0,
+        "on_trials_without_applied_compression": 0,
+        "generation_seconds": {
+          "n": 3,
+          "min": 71.454,
+          "median": 75.086,
+          "max": 81.133
+        },
+        "successful_generation_seconds": {
+          "n": 1,
+          "min": 81.133,
+          "median": 81.133,
+          "max": 81.133
+        },
+        "grading_seconds": {
+          "n": 3,
+          "min": 3.992,
+          "median": 3.999,
+          "max": 4.517
+        },
+        "stop_reasons": {
+          "finished": 1,
+          "token_budget_exhausted": 2
+        },
+        "failure_categories": {
+          "finished": 1,
+          "token_budget_exhausted": 2
+        },
+        "cache_read_tokens": {
+          "known_sum": 90368,
+          "unknown_requests": 0
+        },
+        "cache_creation_tokens": {
+          "known_sum": null,
+          "unknown_requests": 70
+        },
+        "measurement_valid": true
+      }
+    }
+  },
+  "paired_token_delta_median": 1040,
+  "limits": [
+    "Compression token and latency overhead included; cache reads not added to input twice.",
+    "Estimated usage is not precise API billing; missing cache creation remains unknown.",
+    "Failure stopping time is not successful task latency; D01 is a controlled short task.",
+    "No significance claim from three repeats; remote prompt caching is measured but not controlled."
+  ]
+}

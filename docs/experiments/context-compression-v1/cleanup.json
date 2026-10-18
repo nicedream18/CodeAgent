@@ -1,0 +1,10 @@
+{
+  "frozen_runtime_commit": "d3d95210e6bf985429c8d8ce4d22138ef2bfb680",
+  "recorded_worker_pids_alive": [],
+  "owned_containers_remaining": [],
+  "coordinator_exit_code": 0,
+  "real_model_trials": 18,
+  "reruns": 0,
+  "extra_trials": 0,
+  "scope": "Checks this matrix worker PIDs and Docker owner labels after coordinator termination."
+}

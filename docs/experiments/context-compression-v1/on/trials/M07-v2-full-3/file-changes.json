@@ -1,0 +1,14 @@
+{
+  "TODO.md": {
+    "before": null,
+    "after": "0adc2ed158639150b88748a74274093ef57eecd71fa57a7b3859db200c38b9d9"
+  },
+  "src/mokioclaw/tools/grep_tool.py": {
+    "before": "a51ed7ddd24c5c9c99c3a6f058147000d64ff4a8be66b44c64a49ab155cf2af6",
+    "after": "0d5ccc2ab1425d08d475a055a045e20fe0727a9df05f0bb585d9c69c2ccbca23"
+  },
+  "src/mokioclaw/tools/registry.py": {
+    "before": "9086ebe0928bd91cef0376d6f624bafccea0974b9f0d708d4e0d353e5fefa747",
+    "after": "1c586edbd258671e5a7c35151badb703e4ee8817aa58af8c4b0389b6b48961b2"
+  }
+}

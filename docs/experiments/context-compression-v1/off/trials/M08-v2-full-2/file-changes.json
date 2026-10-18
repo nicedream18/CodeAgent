@@ -1,0 +1,14 @@
+{
+  "TODO.md": {
+    "before": null,
+    "after": "32af0d2d3c425bb77a61cb563f37b556058aee44279cf8192057c8327ae82dca"
+  },
+  "src/mokioclaw/cli/app.py": {
+    "before": "dc7679de1a03cedb339b1d9f77f8f0b6ea3579d74aaa32d3bc18de9b4b213f0c",
+    "after": "16abd79b07723b4132bd6cea61b3420e87cae2f95ac4959748a4e017d4f71a39"
+  },
+  "src/mokioclaw/core/transport_trace.py": {
+    "before": "8c2863e03cf03549f5379fb1836935c57e421f049c5f5513df511304448d12c9",
+    "after": "c59a4524683d7b577b8dd891a6ebc815e299789d71063c548789ffea882cd7a6"
+  }
+}

@@ -1,0 +1,78 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -2,6 +2,7 @@
+ 
+ import json
+ import sys
++from datetime import UTC, datetime
+ from pathlib import Path
+ from typing import Annotated, Literal
+ 
+@@ -431,6 +432,28 @@
+     )
+ 
+ 
++def _parse_iso8601_utc(value: str) -> datetime | None:
++    """Parse an ISO8601 timestamp that carries ``Z`` or a UTC offset.
++
++    Returns an aware datetime normalized to UTC, or ``None`` when the value is
++    malformed or lacks timezone information.
++    """
++    if not isinstance(value, str):
++        return None
++    text = value.strip()
++    if not text:
++        return None
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError:
++        return None
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        return None
++    return parsed.astimezone(UTC)
++
++
+ @app.command("trace")
+ def trace_command(
+     workspace: Path | None = None,
+@@ -439,12 +462,27 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = typer.Option(
++        None,
++        "--since",
++        help="Only show records at or after this ISO8601 time (requires Z or UTC offset).",
++    ),
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+     from mokioclaw.core.transport_trace import TraceReader
++
++    since_utc: datetime | None = None
++    if since is not None:
++        since_utc = _parse_iso8601_utc(since)
++        if since_utc is None:
++            raise typer.BadParameter(
++                f"invalid ISO8601 timestamp {since!r}; expected a value with 'Z' or a UTC offset "
++                "(e.g. 2024-01-01T00:00:00Z or 2024-01-01T08:00:00+08:00)",
++                param_hint="--since",
++            )
+ 
+     reader = TraceReader()
+     try:
+@@ -457,6 +495,10 @@
+                     continue
+                 if direction and record.get("direction", "CORE") != direction:
+                     continue
++                if since_utc is not None:
++                    record_ts = _parse_iso8601_utc(record.get("timestamp"))
++                    if record_ts is None or record_ts < since_utc:
++                        continue
+                 if raw:
+                     typer.echo(json.dumps(record, ensure_ascii=False))
+                 else:

@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "kind": "post_hoc_context_exposure",
+  "frozen_runtime_commit": "d3d95210e6bf985429c8d8ce4d22138ef2bfb680",
+  "recorded_trials": 18,
+  "original_scores_unchanged": true,
+  "rows": [
+    {
+      "arm": "off",
+      "task_id": "D01",
+      "repeat": 2,
+      "run_id": "context-compression-20261018-v1-off-D01-full-2",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 9508,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "7038ddd7cb6b1a3d36fe201ab5020efa54769546c5aa2109490369d7b5638953"
+    },
+    {
+      "arm": "on",
+      "task_id": "D01",
+      "repeat": 2,
+      "run_id": "context-compression-20261018-v1-on-D01-full-2",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 8559,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "a3b5f6e72819cc25e906cecddc8957b6894610b231d682126f749e4035899134"
+    },
+    {
+      "arm": "on",
+      "task_id": "D01",
+      "repeat": 3,
+      "run_id": "context-compression-20261018-v1-on-D01-full-3",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 8658,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "c6b9ce6ab10869a1ca30ffc702f3d51bb8e3c8ba4d460d89dfb9d08bc952ada0"
+    },
+    {
+      "arm": "off",
+      "task_id": "D01",
+      "repeat": 3,
+      "run_id": "context-compression-20261018-v1-off-D01-full-3",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 8473,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "c25800842c18312999783789fcc29e8b7cffb1bcaba8b4346b94877eea047eda"
+    },
+    {
+      "arm": "on",
+      "task_id": "M07-v2",
+      "repeat": 2,
+      "run_id": "context-compression-20261018-v1-on-M07-v2-full-2",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 15002,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "34d140333dfcf1965ec7f30d6c58deff072872d9a5310703e40d683b692d5823"
+    },
+    {
+      "arm": "off",
+      "task_id": "M07-v2",
+      "repeat": 2,
+      "run_id": "context-compression-20261018-v1-off-M07-v2-full-2",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 14024,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "3856f973f9636085d10267dae440da03182988e4583a895f7823b753314fee61"
+    },
+    {
+      "arm": "off",
+      "task_id": "M08-v2",
+      "repeat": 2,
+      "run_id": "context-compression-20261018-v1-off-M08-v2-full-2",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 18781,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "af4fc7ea80d2bc541fa702d7740fc5d49681c12a1094c29e55dda819ea1ce27c"
+    },
+    {
+      "arm": "on",
+      "task_id": "M08-v2",
+      "repeat": 2,
+      "run_id": "context-compression-20261018-v1-on-M08-v2-full-2",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 16671,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "0d33517617551ee34b490c6ba34e0870ae7df2aa6e1171e96fc1768378c8ae8d"
+    },
+    {
+      "arm": "on",
+      "task_id": "M08-v2",
+      "repeat": 3,
+      "run_id": "context-compression-20261018-v1-on-M08-v2-full-3",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 15396,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "a1e926c2f3a56241bd6d7f52eb7faa3f0aaee36c9429a473e375f7d474a12e96"
+    },
+    {
+      "arm": "off",
+      "task_id": "M08-v2",
+      "repeat": 3,
+      "run_id": "context-compression-20261018-v1-off-M08-v2-full-3",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 15974,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "6f612dfb017ea36788c5d6cf2d1592bf0c679619e13ed72a127a28704f0a99cc"
+    },
+    {
+      "arm": "on",
+      "task_id": "D01",
+      "repeat": 1,
+      "run_id": "context-compression-20261018-v1-on-D01-full-1",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 8814,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "52d27f3461fe9bc7d3f1425757da2ae43e4425983719a5ee7c96dd4ffe8ea2a9"
+    },
+    {
+      "arm": "off",
+      "task_id": "D01",
+      "repeat": 1,
+      "run_id": "context-compression-20261018-v1-off-D01-full-1",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 8535,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "bb76d09281c36ef94808a25ecb25e274aa68a979f58e39cdfe3ea14d5340301d"
+    },
+    {
+      "arm": "on",
+      "task_id": "M08-v2",
+      "repeat": 1,
+      "run_id": "context-compression-20261018-v1-on-M08-v2-full-1",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 14941,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "7785e8f2c95b5ce9206005538a402861285f0004b73b9386ee65f2635b278f63"
+    },
+    {
+      "arm": "off",
+      "task_id": "M08-v2",
+      "repeat": 1,
+      "run_id": "context-compression-20261018-v1-off-M08-v2-full-1",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 16438,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "fc11eba37d8cd8099202721078b86f2d5855098697f645dd91ae5e16916f1fe0"
+    },
+    {
+      "arm": "off",
+      "task_id": "M07-v2",
+      "repeat": 3,
+      "run_id": "context-compression-20261018-v1-off-M07-v2-full-3",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 14160,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "f7a5804fb20265ab9de394132b849f08b5b595db10a76489f22bc6392aa8b5a5"
+    },
+    {
+      "arm": "on",
+      "task_id": "M07-v2",
+      "repeat": 3,
+      "run_id": "context-compression-20261018-v1-on-M07-v2-full-3",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 14939,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "d6efc5094a9a3cf37d6b14411b655fca3a9f68776a7582de3b93a769f32c1f8f"
+    },
+    {
+      "arm": "off",
+      "task_id": "M07-v2",
+      "repeat": 1,
+      "run_id": "context-compression-20261018-v1-off-M07-v2-full-1",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 14644,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "ddeff6196656d6243ecc35bfc9d2505e05ea4f9889cba39425d089b7e5ec3edc"
+    },
+    {
+      "arm": "on",
+      "task_id": "M07-v2",
+      "repeat": 1,
+      "run_id": "context-compression-20261018-v1-on-M07-v2-full-1",
+      "compression_applied": 0,
+      "summary_requests": 0,
+      "max_request_input_estimate": 17279,
+      "high_watermarks": [
+        23500
+      ],
+      "input_limits": [
+        27648
+      ],
+      "graph_watermark_crossings": 0,
+      "source_trace_sha256": "f4668df6e51919ffc0ad3662a886f2787e7afb2f613aef48f3c4ab81da3d6d4a"
+    }
+  ],
+  "notes": [
+    "Input estimates and watermarks are runtime trigger diagnostics, not API-reported usage.",
+    "No causal token/latency benefit is attributable to compression in trials without actual compression."
+  ]
+}

@@ -1,6 +1,8 @@
 # Context Compression A/B Benchmark
 
-目标：在同一冻结版本、模型和预算下，比较**开启与关闭上下文压缩**的实际模型 token、完整交付率与生成延迟。用户已选择并授权 18 次真实试验，见 [authorization.json](authorization.json)。实现验证与真实效果分开记录；结果在本轮矩阵完成后归档，不预设压缩一定节省资源。
+目标：在同一冻结版本、模型和预算下，比较**开启与关闭上下文压缩**的实际模型 token、完整交付率与生成延迟。用户已选择并授权 18 次真实试验，见 [authorization.json](authorization.json)。
+
+**18/18 次真实试验已归档**，详见 [结果与限制](RESULTS.md)。开启组 / 关闭组实际总 Token 为 1,395,523 / 1,409,386，完整交付为 3/9 / 4/9，生成延迟中位数为 68.344 / 64.569 秒。开启组实际压缩 0 次；本批未形成实际压缩处理差异，不能将这些差异归因于压缩。实现回归通过与真实效果结论分开记录。
 
 ## 运行方式
 
@@ -63,4 +65,4 @@ uv run pytest -q tests/test_compression_benchmark.py tests/test_context_governan
 make check
 ```
 
-测试中的 usage 是可控 fixture，明确不计入真实效果；真实试验的原始记录、版本、结果表和限制将在本目录另行归档。旧 Goal 1～4 和正式/无效批次不被覆盖。
+测试中的 usage 是可控 fixture，明确不计入真实效果；真实试验的原始记录、版本、结果表和限制见 [RESULTS.md](RESULTS.md)。[归档复核](verify_archive.py)与[压力分析](analyze_pressure.py)只读已有 trace，不调用模型或工具。旧 Goal 1～4 和正式/无效批次不被覆盖。

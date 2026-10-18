@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "source_commit": "d3d95210e6bf985429c8d8ce4d22138ef2bfb680",
+  "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "executable": "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "architecture": "arm64",
+  "packages": {
+    "mokioclaw": "0.2.0",
+    "langchain-openai": "1.2.1",
+    "langgraph": "1.2.0",
+    "tiktoken": "0.12.0"
+  },
+  "docker_image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "concurrency": 1,
+  "model": "deepseek-chat",
+  "model_endpoint_fingerprint_only": "1f8d0b1c10f57fd427a962bdfe4043aa7071e1d005dc08bd920a5fc35abcbbba",
+  "note": "Host scheduling and remote prompt-cache state not fully controlled. Paired order and cache usage recorded."
+}

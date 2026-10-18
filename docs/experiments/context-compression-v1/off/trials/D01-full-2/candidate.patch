@@ -1,0 +1,12 @@
+--- a/src/batch_queue.py
++++ b/src/batch_queue.py
+@@ -1,6 +1,8 @@
+ def take_batch(items, limit):
+     """Remove a FIFO batch from a mutable list."""
++    if limit < 0:
++        raise ValueError("limit must be non-negative")
+     batch = []
+-    while items and len(batch) <= limit:
++    while items and len(batch) < limit:
+         batch.append(items.pop(0))
+     return batch

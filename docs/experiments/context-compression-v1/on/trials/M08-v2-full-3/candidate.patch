@@ -1,0 +1,85 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,17 +439,34 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: str | None = typer.Option(
++        None,
++        "--since",
++        help="Only show records at or after this ISO8601 time (requires Z or UTC offset).",
++    ),
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
+-    from mokioclaw.core.transport_trace import TraceReader
++    from mokioclaw.core.transport_trace import TraceReader, parse_since, record_is_at_or_after
++
++    since_utc = None
++    if since is not None:
++        try:
++            since_utc = parse_since(since)
++        except ValueError as exc:
++            raise typer.BadParameter(
++                f"{exc}; expected ISO8601 with 'Z' or a UTC offset, e.g. 2024-01-01T00:00:00Z",
++                param_hint="--since",
++            ) from exc
+ 
+     reader = TraceReader()
+     try:
+         while True:
+             for _path, record in reader.read(workspace, daemon_root=daemon_state_dir()):
++                if since_utc is not None and not record_is_at_or_after(record, since_utc):
++                    continue
+                 payload = record.get("payload", {})
+                 if run_id and (record.get("run_id") or payload.get("run_id")) != run_id:
+                     continue
+--- a/src/mokioclaw/core/transport_trace.py
++++ b/src/mokioclaw/core/transport_trace.py
+@@ -111,6 +111,44 @@
+                     continue
+ 
+ 
++def _parse_aware_iso8601(value: str) -> datetime:
++    """Parse an ISO8601 string that must carry a timezone; return aware UTC datetime."""
++    if not isinstance(value, str):
++        raise ValueError("timestamp must be a string")
++    text = value.strip()
++    if not text:
++        raise ValueError("timestamp is empty")
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError as exc:
++        raise ValueError(f"invalid ISO8601 timestamp: {value!r}") from exc
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError(f"timestamp is missing a timezone: {value!r}")
++    return parsed.astimezone(UTC)
++
++
++def parse_since(value: str) -> datetime:
++    """Parse a ``--since`` boundary; requires a timezone (``Z`` or UTC offset)."""
++    return _parse_aware_iso8601(value)
++
++
++def record_is_at_or_after(record: dict[str, Any], since_utc: datetime) -> bool:
++    """True when the record timestamp is at or after ``since_utc`` (UTC compare).
++
++    Records with a missing, empty, or unparsable timestamp are excluded.
++    """
++    raw = record.get("timestamp") if isinstance(record, dict) else None
++    if not isinstance(raw, str) or not raw.strip():
++        return False
++    try:
++        record_dt = _parse_aware_iso8601(raw)
++    except ValueError:
++        return False
++    return record_dt >= since_utc
++
++
+ class TraceReader:
+     """Incremental reader with one cursor per file, never one key per event."""
+ 

@@ -1,0 +1,103 @@
+--- a/src/mokioclaw/cli/app.py
++++ b/src/mokioclaw/cli/app.py
+@@ -439,17 +439,32 @@
+     direction: str | None = None,
+     follow: bool = False,
+     raw: bool = False,
++    since: Annotated[
++        str | None,
++        typer.Option(
++            "--since",
++            help="Only show records at or after this ISO8601 instant (requires Z or UTC offset).",
++        ),
++    ] = None,
+ ) -> None:
+     """Read existing traces, optionally following new records; never execute work."""
+     import time
+ 
+     from mokioclaw.core.daemon_client import daemon_state_dir
++    from mokioclaw.core.trace_time import parse_since, record_at_or_after
+     from mokioclaw.core.transport_trace import TraceReader
++
++    try:
++        since_dt = parse_since(since)
++    except ValueError as exc:
++        raise typer.BadParameter(str(exc), param_hint="--since") from exc
+ 
+     reader = TraceReader()
+     try:
+         while True:
+             for _path, record in reader.read(workspace, daemon_root=daemon_state_dir()):
++                if since_dt is not None and not record_at_or_after(record, since_dt):
++                    continue
+                 payload = record.get("payload", {})
+                 if run_id and (record.get("run_id") or payload.get("run_id")) != run_id:
+                     continue
+--- a/src/mokioclaw/core/trace_time.py
++++ b/src/mokioclaw/core/trace_time.py
+@@ -0,0 +1,65 @@
++"""ISO8601 helpers for the ``mokioclaw trace --since`` filter.
++
++The boundary must be an explicit instant: a ``Z`` suffix or a UTC offset is
++required so that comparisons are unambiguous. All comparisons happen in UTC.
++"""
++
++from __future__ import annotations
++
++from datetime import datetime, timezone
++from typing import Any
++
++__all__ = ["parse_since", "record_at_or_after"]
++
++
++def _parse_iso8601(value: str) -> datetime | None:
++    """Parse an ISO8601 string, returning an aware datetime or ``None``.
++
++    Handles the ``Z`` suffix explicitly (``datetime.fromisoformat`` rejects it
++    before Python 3.11) and accepts fractional seconds.
++    """
++    if not isinstance(value, str):
++        return None
++    text = value.strip()
++    if not text:
++        return None
++    if text.endswith(("Z", "z")):
++        text = text[:-1] + "+00:00"
++    try:
++        parsed = datetime.fromisoformat(text)
++    except ValueError:
++        return None
++    return parsed
++
++
++def parse_since(value: str | None) -> datetime | None:
++    """Parse a ``--since`` value into an aware UTC datetime.
++
++    Returns ``None`` when ``value`` is ``None`` (no filtering). Raises
++    ``ValueError`` for unparseable values or values without a timezone.
++    """
++    if value is None:
++        return None
++    parsed = _parse_iso8601(value)
++    if parsed is None:
++        raise ValueError(f"Invalid ISO8601 timestamp: {value!r}")
++    if parsed.tzinfo is None or parsed.utcoffset() is None:
++        raise ValueError(
++            f"Timestamp must include a timezone (Z or UTC offset): {value!r}"
++        )
++    return parsed.astimezone(timezone.utc)
++
++
++def record_at_or_after(record: dict[str, Any], since: datetime) -> bool:
++    """Return True when ``record``'s timestamp is at or after ``since`` (UTC).
++
++    Records with a missing, non-string, naive, or unparseable timestamp are
++    treated as not matching (skipped).
++    """
++    timestamp = record.get("timestamp")
++    if not isinstance(timestamp, str):
++        return False
++    parsed = _parse_iso8601(timestamp)
++    if parsed is None or parsed.tzinfo is None or parsed.utcoffset() is None:
++        return False
++    return parsed.astimezone(timezone.utc) >= since

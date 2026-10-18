@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "...                                                                      [100%]\n3 passed in 0.01s\n..                                                                       [100%]\n2 passed in 0.01s\n",
+  "stderr": "",
+  "duration_ms": 1264,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-8c403e22ca1d4740a1423b59d991305e.log",
+    "stdout_output_bytes": 196,
+    "stdout_retained_bytes": 196,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-2b83f1704b624dae8065124a5d5d70d8.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "6e00484fb7ab0cc17674a41c6ad02b1df72b9b0d3fceb7f298610af3fcaa7c5a",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-8c403e22ca1d4740a1423b59d991305e.log",
+  "stdout_output_bytes": 196,
+  "stdout_retained_bytes": 196,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-2b83f1704b624dae8065124a5d5d70d8.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "6e00484fb7ab0cc17674a41c6ad02b1df72b9b0d3fceb7f298610af3fcaa7c5a",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

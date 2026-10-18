@@ -1,0 +1,10 @@
+{
+  "TODO.md": {
+    "before": null,
+    "after": "003f7125214656c837f9a5518a4ceeed06cc9151939eb3dc24df68ba6b752219"
+  },
+  "src/mokioclaw/cli/app.py": {
+    "before": "dc7679de1a03cedb339b1d9f77f8f0b6ea3579d74aaa32d3bc18de9b4b213f0c",
+    "after": "d3818be6687a859e6e7b49fc131ee8a9f5337f91801bff63fdf3523de4faa624"
+  }
+}
