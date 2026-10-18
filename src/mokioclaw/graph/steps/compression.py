@@ -10,7 +10,8 @@ def context_monitor_node(state: api.MokioGraphState) -> dict[str, api.Any]:
     reserve = budget.output
     token_limit = budget.high
     token_count = api.estimate_context_tokens(state)
-    should_compress = token_count >= token_limit
+    enabled = getattr(state.get("runtime"), "context_compression_enabled", True)
+    should_compress = bool(enabled and token_count >= token_limit)
     next_node = state.get("context_next_node") or "verifier"
     event = {
         "type": "context_monitor",
@@ -23,6 +24,7 @@ def context_monitor_node(state: api.MokioGraphState) -> dict[str, api.Any]:
         "safety_tokens": budget.safety,
         "estimated": True,
         "should_compress": should_compress,
+        "compression_enabled": enabled,
         "next_node": next_node,
         "message_count": len(state.get("messages", [])),
     }

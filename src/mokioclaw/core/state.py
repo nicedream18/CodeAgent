@@ -72,6 +72,7 @@ class RuntimeConfig:
     context_max_depth: int = 8
     context_max_nodes: int = 1000
     context_token_limit: int | None = None
+    context_compression_enabled: bool = True
     model_context_reserve_tokens: int = 8192
     context_safety_tokens: int = 1024
     context_high_ratio: float = 0.85
@@ -133,6 +134,8 @@ class RuntimeState(RuntimeConfig):
     subagent_applied_results: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
+        if not isinstance(self.context_compression_enabled, bool):
+            raise ValueError("context_compression_enabled must be a boolean")
         if self.execution_backend not in {"local", "docker"}:
             raise ValueError("execution_backend must be local or docker")
         if self.mcp_timeout_seconds <= 0:

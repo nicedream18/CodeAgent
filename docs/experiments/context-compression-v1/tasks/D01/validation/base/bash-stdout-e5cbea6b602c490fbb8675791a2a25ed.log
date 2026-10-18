@@ -1,0 +1,41 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________________ test_exact_limit_and_remaining_queue _____________________
+
+    def test_exact_limit_and_remaining_queue():
+        items = ["a", "b", "c", "d"]
+>       assert take_batch(items, 2) == ["a", "b"]
+E       AssertionError: assert ['a', 'b', 'c'] == ['a', 'b']
+E         
+E         Left contains one more item: 'c'
+E         Use -v to get more diff
+
+tests/test_contract.py:8: AssertionError
+__________________________ test_zero_does_not_consume __________________________
+
+    def test_zero_does_not_consume():
+        items = ["a", "b"]
+>       assert take_batch(items, 0) == []
+E       AssertionError: assert ['a'] == []
+E         
+E         Left contains one more item: 'a'
+E         Use -v to get more diff
+
+tests/test_contract.py:14: AssertionError
+__________________ test_negative_is_rejected_without_mutation __________________
+
+    def test_negative_is_rejected_without_mutation():
+        for items in ([], ["a", "b"]):
+            original = items.copy()
+>           with pytest.raises(ValueError):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_contract.py:21: Failed
+=========================== short test summary info ============================
+FAILED tests/test_contract.py::test_exact_limit_and_remaining_queue - Asserti...
+FAILED tests/test_contract.py::test_zero_does_not_consume - AssertionError: a...
+FAILED tests/test_contract.py::test_negative_is_rejected_without_mutation - F...
+3 failed in 0.02s
+..                                                                       [100%]
+2 passed in 0.01s

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "source": "User request for context-compression benchmark and explicit answer selecting 18 real trials on 2026-10-18",
+  "task_count": 3,
+  "arms": [
+    "on",
+    "off"
+  ],
+  "repeats_per_task_arm": 3,
+  "max_started_trials": 18,
+  "no_automatic_retries": true,
+  "real_model_authorized": true,
+  "push_authorized": false,
+  "historical_experiments_unchanged": true
+}

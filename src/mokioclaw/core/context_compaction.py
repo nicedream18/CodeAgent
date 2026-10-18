@@ -171,6 +171,8 @@ def compact_messages(
     request_id=None,
     summarizer=None,
 ) -> tuple[list[Any], dict[str, Any]]:
+    if not getattr(state.get("runtime"), "context_compression_enabled", True):
+        raise ContextBudgetError("Context compression is disabled for this run")
     before = snapshot(model, messages, budget)
     protected, groups = message_groups(messages)
     if not groups:
@@ -335,6 +337,7 @@ def prepare_model_context(
 ):
     state = state if state is not None else {}
     runtime = state.get("runtime")
+    compression_enabled = bool(getattr(runtime, "context_compression_enabled", True))
     budget = ContextBudget.from_runtime(runtime)
     before = snapshot(model, messages, budget)
     control = getattr(runtime, "context_control", None)
@@ -344,7 +347,15 @@ def prepare_model_context(
         else None
     )
     try:
-        if allow_compaction and (request or before.input_tokens >= budget.high):
+        if request and not compression_enabled:
+            completed = control.finish(
+                request["request_id"], "failed", ok=False,
+                error_type="context_compression_disabled",
+            )
+            if writer:
+                writer({**completed, "type": "context_compact_request"})
+            request = None
+        if allow_compaction and compression_enabled and (request or before.input_tokens >= budget.high):
             replacement, result = compact_messages(
                 model,
                 messages,
@@ -371,7 +382,8 @@ def prepare_model_context(
         raise
     except Exception as exc:
         event = {
-            "type": "context_compression_failed",
+            "type": "context_compression_failed" if compression_enabled else "context_budget_exceeded",
+            "compression_enabled": compression_enabled,
             "event_id": uuid4().hex,
             "scope": "run",
             "agent": node,
@@ -390,6 +402,7 @@ def prepare_model_context(
         runtime.context_request_sequence += 1
     event = {
         "type": "context_budget",
+        "compression_enabled": compression_enabled,
         "event_id": uuid4().hex,
         **current.as_dict(),
         "scope": "run",

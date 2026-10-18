@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "repeats": 3,
+  "max_started_trials": 18,
+  "trials": [
+    {
+      "task_id": "D01",
+      "repeat": 2,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "D01",
+      "repeat": 2,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "D01",
+      "repeat": 3,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "D01",
+      "repeat": 3,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M07-v2",
+      "repeat": 2,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "M07-v2",
+      "repeat": 2,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M08-v2",
+      "repeat": 2,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M08-v2",
+      "repeat": 2,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "M08-v2",
+      "repeat": 3,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "M08-v2",
+      "repeat": 3,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "D01",
+      "repeat": 1,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "D01",
+      "repeat": 1,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M08-v2",
+      "repeat": 1,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "M08-v2",
+      "repeat": 1,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M07-v2",
+      "repeat": 3,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M07-v2",
+      "repeat": 3,
+      "arm": "on",
+      "enabled": true
+    },
+    {
+      "task_id": "M07-v2",
+      "repeat": 1,
+      "arm": "off",
+      "enabled": false
+    },
+    {
+      "task_id": "M07-v2",
+      "repeat": 1,
+      "arm": "on",
+      "enabled": true
+    }
+  ],
+  "real_model_started": false,
+  "architecture": "full",
+  "context_tokens": 32768,
+  "output_tokens": 4096,
+  "token_limit": 200000,
+  "request_limit": 40,
+  "tool_limit": 80,
+  "generation_seconds": 900,
+  "bash_seconds": 60,
+  "grading_seconds": 120,
+  "seed": 20261018
+}

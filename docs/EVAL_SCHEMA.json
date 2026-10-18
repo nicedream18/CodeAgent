@@ -142,6 +142,11 @@
           "title": "Architecture",
           "type": "string"
         },
+        "context_compression_enabled": {
+          "default": true,
+          "title": "Context Compression Enabled",
+          "type": "boolean"
+        },
         "repeat": {
           "maximum": 3,
           "minimum": 1,
@@ -251,6 +256,11 @@
               ],
               "title": "Architecture",
               "type": "string"
+            },
+            "context_compression_enabled": {
+              "default": true,
+              "title": "Context Compression Enabled",
+              "type": "boolean"
             },
             "repeat": {
               "maximum": 3,

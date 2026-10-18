@@ -43,6 +43,7 @@ class EvalTask(Versioned):
 class EvalTrialConfig(Versioned):
     task_id: str
     architecture: Architecture
+    context_compression_enabled: bool = Field(default=True, strict=True)
     repeat: int = Field(ge=1, le=3)
     seed: int = 20261016
     temperature: float = 0

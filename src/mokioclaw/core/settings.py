@@ -61,6 +61,7 @@ def configure_runtime(runtime, *, explicit: dict | None = None) -> None:
         "context_max_depth",
         "context_max_nodes",
         "context_token_limit",
+        "context_compression_enabled",
         "model_context_reserve_tokens",
         "context_safety_tokens",
         "context_high_ratio",
@@ -90,6 +91,11 @@ def configure_runtime(runtime, *, explicit: dict | None = None) -> None:
                 "bash_allow_patterns",
             }:
                 value = json.loads(raw)
+            elif name == "context_compression_enabled":
+                normalized = raw.strip().lower()
+                if normalized not in {"true", "false", "1", "0"}:
+                    raise ValueError("MOKIO_CONTEXT_COMPRESSION_ENABLED must be true/false or 1/0")
+                value = normalized in {"true", "1"}
             elif name in {
                 "context_high_ratio",
                 "context_target_ratio",

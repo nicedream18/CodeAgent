@@ -28,6 +28,8 @@ flowchart LR
 
 当前没有证据支持多 Agent 优于单 Agent；跨多个源文件修改后的完整交付仍未验证。上述各批次分母独立，测试通过数不是解题成功率。[事实和限制索引](docs/internship/showcase/FACTS.md)。
 
+[Context Compression A/B Benchmark](docs/experiments/context-compression-v1/README.md)提供相同 full 流程下的压缩开关对照，比较包含摘要开销的 token、独立交付率与延迟；未加 `--real-model` 只预览，不产生效果数据。
+
 ## 快速体验（不需要模型凭证）
 
 需要 Python 3.13、uv。首次安装需要联网或已有依赖缓存；安装后的以下示例与回放不访问模型，也不需要 Docker：

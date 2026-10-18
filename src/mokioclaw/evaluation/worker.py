@@ -38,6 +38,7 @@ def initialize(runtime: Any, config: EvalTrialConfig, image: str, owner: str) ->
     runtime.docker_image = image
     runtime.workflow_mode = "full" if config.architecture == "baseline" else config.architecture
     runtime.context_token_limit = config.context_tokens
+    runtime.context_compression_enabled = config.context_compression_enabled
     runtime.model_context_reserve_tokens = config.output_tokens
     runtime.run_token_limit = config.token_limit
     runtime.run_request_limit = config.request_limit
@@ -238,6 +239,7 @@ def main(spec_path: Path) -> None:
             "tool_call_ids": calls,
             "model_claim": claim,
             "run_id": getattr(runtime, "run_id", spec["owner"]),
+            "context_compression_enabled": getattr(runtime, "context_compression_enabled", None),
         }
         Path(spec["output"]).write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n")
         watcher.set()

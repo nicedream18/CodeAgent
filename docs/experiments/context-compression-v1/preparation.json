@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "suite": "context-compression-v1",
+  "tasks": {
+    "D01": {
+      "task_sha256": "969e85bd7f8ead13379eda37dd53aad5e9a03d8bbe047bcbf386fb351b3012eb",
+      "materials_sha256": "1e99a489bd6bf6e47b117ec2385006dc5eae9b8bcee49c7ef7555baca0131227",
+      "validation_sha256": "49814010f4fb223868b5d99b92f7ff5990412bf8333fe037f8c645158c6f20b4",
+      "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba"
+    },
+    "M07-v2": {
+      "task_sha256": "cf157ef473033f1b9a60124e6ad27afdbf4880fb2d5dbfcba93d4320e20ece42",
+      "materials_sha256": "048eb5657a5307a5933077fa3b9d3e06c9b5a95750a2d1f7152a99c02203d0e8",
+      "validation_sha256": "d5783fef3f950de18d5a7bedecff23cd8be57171d50e1188259cb65cf424918b",
+      "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba"
+    },
+    "M08-v2": {
+      "task_sha256": "7a323d287662bfd0c910c3180427a1023dfc65c4e4df5a357cc8c611ca62e073",
+      "materials_sha256": "d92740925218e53923f0924d15e17ea9d37c1d050381700b1c3f2c305ea52a77",
+      "validation_sha256": "99372434be48df554bf1d48145e7c1167f55be85af538ea08751d7041fa3ff62",
+      "image": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba"
+    }
+  },
+  "real_model_calls": 0
+}

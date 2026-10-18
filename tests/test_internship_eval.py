@@ -231,8 +231,9 @@ def test_evaluation_provider_failure_is_controlled_and_does_not_leak_key(tmp_pat
 
 
 @pytest.mark.parametrize("architecture", ["baseline", "full", "light", "auto"])
+@pytest.mark.parametrize("enabled", [True, False])
 def test_actual_subagent_requests_inherit_evaluation_model_profile(
-    tmp_path, monkeypatch, architecture
+    tmp_path, monkeypatch, architecture, enabled
 ):
     from langchain_core.messages import AIMessageChunk
 
@@ -251,6 +252,7 @@ def test_actual_subagent_requests_inherit_evaluation_model_profile(
     monkeypatch.setenv("MODEL", "wrong-fallback-model")
     monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
     observed = []
+    events = []
 
     async def fixed_stream(self, messages, config=None, **kwargs):
         observed.append((self.model_name, self.max_retries, dict(self.mokio_profile)))
@@ -264,16 +266,16 @@ def test_actual_subagent_requests_inherit_evaluation_model_profile(
     control = RunControl()
     runtime = RuntimeState(workspace=tmp_path, run_control=control)
     initialize(
-        runtime, config().model_copy(update={"architecture": architecture}), "sha256:fixture", "test"
+        runtime, config().model_copy(update={"architecture": architecture, "context_compression_enabled": enabled}), "sha256:fixture", "test"
     )
     try:
         # Exercise real selection, binding, streaming and request accounting, not
         # just the initializer. The environment deliberately names another model.
         for role in ("intent_router", "planner", "verifier", "context_compressor"):
             model = create_role_model(create_model, runtime, role)
-            invoke_streaming(model, [], state={"runtime": runtime}, node=role)
+            invoke_streaming(model, [], state={"runtime": runtime}, node=role, writer=events.append)
         for name in ("repoAgent", "codeAgent"):
-            result = run_subagent({"runtime": runtime, "task": "inspect"}, name, "inspect")
+            result = run_subagent({"runtime": runtime, "task": "inspect"}, name, "inspect", writer=events.append)
             assert result["ok"], result
             assert runtime.model_profile == "evaluation"
     finally:
@@ -281,6 +283,8 @@ def test_actual_subagent_requests_inherit_evaluation_model_profile(
     assert len(observed) == runtime.model_metrics["requests"] == 6
     assert all(model == "offline-fixture" and retries == 0 for model, retries, _ in observed)
     assert all(p["context_tokens"] == 32768 and p["output_tokens"] == 4096 for _, _, p in observed)
+    policies = [e["compression_enabled"] for e in events if e.get("type") == "context_budget"]
+    assert len(policies) == 6 and all(value is enabled for value in policies)
 
 
 def test_explicit_subagent_model_override_restores_parent_on_failure(tmp_path):

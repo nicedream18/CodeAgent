@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.018" timestamp="2026-10-18T11:22:17.517940+00:00" hostname="af89b8fc1c44"><testcase classname="tests.test_contract" name="test_exact_limit_and_remaining_queue" time="0.000"><failure message="AssertionError: assert ['a', 'b', 'c'] == ['a', 'b']&#10;  &#10;  Left contains one more item: 'c'&#10;  Use -v to get more diff">def test_exact_limit_and_remaining_queue():
+        items = ["a", "b", "c", "d"]
+&gt;       assert take_batch(items, 2) == ["a", "b"]
+E       AssertionError: assert ['a', 'b', 'c'] == ['a', 'b']
+E         
+E         Left contains one more item: 'c'
+E         Use -v to get more diff
+
+tests/test_contract.py:8: AssertionError</failure></testcase><testcase classname="tests.test_contract" name="test_zero_does_not_consume" time="0.000"><failure message="AssertionError: assert ['a'] == []&#10;  &#10;  Left contains one more item: 'a'&#10;  Use -v to get more diff">def test_zero_does_not_consume():
+        items = ["a", "b"]
+&gt;       assert take_batch(items, 0) == []
+E       AssertionError: assert ['a'] == []
+E         
+E         Left contains one more item: 'a'
+E         Use -v to get more diff
+
+tests/test_contract.py:14: AssertionError</failure></testcase><testcase classname="tests.test_contract" name="test_negative_is_rejected_without_mutation" time="0.000"><failure message="Failed: DID NOT RAISE &lt;class 'ValueError'&gt;">def test_negative_is_rejected_without_mutation():
+        for items in ([], ["a", "b"]):
+            original = items.copy()
+&gt;           with pytest.raises(ValueError):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE &lt;class 'ValueError'&gt;
+
+tests/test_contract.py:21: Failed</failure></testcase></testsuite></testsuites>

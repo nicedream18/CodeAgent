@@ -14,6 +14,10 @@ from mokioclaw.evaluation.runner import report_experiment, run_experiment
 
 app = typer.Typer(help="Prepare and independently grade the frozen internship code tasks.")
 
+from mokioclaw.evaluation.compression_cli import app as compression_app  # noqa: E402
+
+app.add_typer(compression_app, name="compression")
+
 
 @app.command("list")
 def list_command() -> None:

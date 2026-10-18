@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "FFF                                                                      [100%]\n=================================== FAILURES ===================================\n_____________________ test_exact_limit_and_remaining_queue _____________________\n\n    def test_exact_limit_and_remaining_queue():\n        items = [\"a\", \"b\", \"c\", \"d\"]\n>       assert take_batch(items, 2) == [\"a\", \"b\"]\nE       AssertionError: assert ['a', 'b', 'c'] == ['a', 'b']\nE         \nE         Left contains one more item: 'c'\nE         Use -v to get more diff\n\ntests/test_contract.py:8: AssertionError\n__________________________ test_zero_does_not_consume __________________________\n\n    def test_zero_does_not_consume():\n        items = [\"a\", \"b\"]\n>       assert take_batch(items, 0) == []\nE       AssertionError: assert ['a'] == []\nE         \nE         Left contains one more item: 'a'\nE         Use -v to get more diff\n\ntests/test_contract.py:14: AssertionError\n__________________ test_negative_is_rejected_without_mutation __________________\n\n    def test_negative_is_rejected_without_mutation():\n        for items in ([], [\"a\", \"b\"]):\n            original = items.copy()\n>           with pytest.raises(ValueError):\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^\nE           Failed: DID NOT RAISE <class 'ValueError'>\n\ntests/test_contract.py:21: Failed\n=========================== short test summary info ============================\nFAILED tests/test_contract.py::test_exact_limit_and_remaining_queue - Asserti...\nFAILED tests/test_contract.py::test_zero_does_not_consume - AssertionError: a...\nFAILED tests/test_contract.py::test_negative_is_rejected_without_mutation - F...\n3 failed in 0.02s\n..                                                                       [100%]\n2 passed in 0.01s\n",
+  "stderr": "",
+  "duration_ms": 1276,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-e5cbea6b602c490fbb8675791a2a25ed.log",
+    "stdout_output_bytes": 1760,
+    "stdout_retained_bytes": 1760,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-d9cf5322404b4c438c436950056ba0c9.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "container_id": "af89b8fc1c44313e4c7f783da36782141c7dbfff8f84c5ffe5c5e5c9ab507bf3",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-e5cbea6b602c490fbb8675791a2a25ed.log",
+  "stdout_output_bytes": 1760,
+  "stdout_retained_bytes": 1760,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-d9cf5322404b4c438c436950056ba0c9.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "container_id": "af89b8fc1c44313e4c7f783da36782141c7dbfff8f84c5ffe5c5e5c9ab507bf3",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}
