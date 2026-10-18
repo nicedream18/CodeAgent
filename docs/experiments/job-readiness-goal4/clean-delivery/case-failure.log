@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "case": "verifier-budget",
+  "read_only": true,
+  "real_model_calls": 0,
+  "archive": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/trace.tar.gz",
+  "trace_member": ".mokioclaw/traces/trace-20261017-152133-c4d634/events.jsonl",
+  "run_id": "job-readiness-goal2-20261017-b1-M08-v2-full-1",
+  "frozen_commit": "ee5f073a7640c15c1d693c7e93bc067e9eb8da51",
+  "execution_status": "failed",
+  "stop_reason": "token_budget_exhausted",
+  "task_solved": false,
+  "grade_valid": true,
+  "artifact_passed": true,
+  "tests_run": 13,
+  "requests": 25,
+  "tools": 31,
+  "total_tokens": 187464,
+  "estimated": false,
+  "last_streams": [
+    {
+      "seq": 245,
+      "stream_id": "580bb626eefe4d388cdb08bc6388cfaa",
+      "node": "verifier",
+      "status": "finished"
+    },
+    {
+      "seq": 257,
+      "stream_id": "d2ef6112519d419f975fe2430b4202fa",
+      "node": "verifier",
+      "status": "finished"
+    },
+    {
+      "seq": 269,
+      "stream_id": "54f52701b8c94e3e939003e4fd34dd2f",
+      "node": "verifier",
+      "status": "finished"
+    },
+    {
+      "seq": 282,
+      "stream_id": "545885638baa4202aeed3c81f378ec47",
+      "node": "verifier",
+      "status": "finished"
+    }
+  ],
+  "last_milestones": [
+    {
+      "seq": 281,
+      "type": "custom:checkpoint_saved",
+      "node": null,
+      "tool_call_id": null,
+      "status": "running",
+      "stop_reason": null
+    },
+    {
+      "seq": 287,
+      "type": "custom:tool_result",
+      "node": "verifier",
+      "tool_call_id": "call_00_KqUuGhKbIwn7Sq1evghs6627",
+      "status": null,
+      "stop_reason": null
+    },
+    {
+      "seq": 290,
+      "type": "custom:tool_result",
+      "node": "verifier",
+      "tool_call_id": "call_01_omTcZXh7rtswVrZJogn79969",
+      "status": null,
+      "stop_reason": null
+    },
+    {
+      "seq": 292,
+      "type": "custom:run_budget_exhausted",
+      "node": null,
+      "tool_call_id": null,
+      "status": null,
+      "stop_reason": "token_budget_exhausted"
+    },
+    {
+      "seq": 293,
+      "type": "custom:checkpoint_saved",
+      "node": null,
+      "tool_call_id": null,
+      "status": "failed",
+      "stop_reason": null
+    },
+    {
+      "seq": 294,
+      "type": "run_end",
+      "node": null,
+      "tool_call_id": null,
+      "status": "failed",
+      "stop_reason": null
+    }
+  ],
+  "note": "Metadata only. No archive extraction, model request, tool replay or regrading."
+}

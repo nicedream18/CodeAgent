@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T05:17:41.036243+00:00",
+  "status": "passed",
+  "steps": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/check_showcase.py"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "facts-links.log",
+      "timeout_seconds": 120,
+      "timed_out": false,
+      "seconds": 0.189,
+      "output_bytes": 230,
+      "log_bytes": 230,
+      "log_truncated": false,
+      "output_complete": true,
+      "output_errors": [],
+      "name": "facts-links"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/gen_protocol_doc.py",
+        "--check"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "protocol.log",
+      "timeout_seconds": 120,
+      "timed_out": false,
+      "seconds": 0.187,
+      "output_bytes": 0,
+      "log_bytes": 0,
+      "log_truncated": false,
+      "output_complete": true,
+      "output_errors": [],
+      "name": "protocol"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "scripts/gen_eval_doc.py",
+        "--check"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "eval-schema.log",
+      "timeout_seconds": 120,
+      "timed_out": false,
+      "seconds": 0.128,
+      "output_bytes": 0,
+      "log_bytes": 0,
+      "log_truncated": false,
+      "output_complete": true,
+      "output_errors": [],
+      "name": "eval-schema"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "diff.log",
+      "timeout_seconds": 120,
+      "timed_out": false,
+      "seconds": 0.078,
+      "output_bytes": 0,
+      "log_bytes": 0,
+      "log_truncated": false,
+      "output_complete": true,
+      "output_errors": [],
+      "name": "diff"
+    }
+  ],
+  "validated_delivery_source_and_checks_sha256": "7f0410ae3b3969d57b7886e62ad1d58c169448695e2575d80c80bc5bbc3f1e79",
+  "source_and_helpers_match_tested_edeacfd": true,
+  "subsequent_changes": "Evidence/status docs and source-backed failure classification only; final facts checked here.",
+  "historical_files_verified": 2245,
+  "real_model_calls": 0,
+  "remote_writes": 0,
+  "goal4_evidence_markdown_links": {
+    "status": "passed",
+    "documents": 2,
+    "links": 43
+  }
+}

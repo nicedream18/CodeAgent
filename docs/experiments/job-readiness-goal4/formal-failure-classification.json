@@ -1,0 +1,108 @@
+{
+  "status": "passed",
+  "note": "The 13 ContextBudgetError trials have null summary stop_reason. Classification is proven by original worker.error, not inferred from null.",
+  "summary_stop_reason_counts": {
+    "request_budget_exhausted": 32,
+    "provider_APIConnectionError": 11,
+    "null": 13
+  },
+  "context_error_worker_evidence": [
+    {
+      "trial_id": "E02-auto-1",
+      "path": "docs/experiments/internship-v1/corrected/trials/E02-auto-1/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "c925d974c2447888772fa9464a49cb01e85f0615426b303f7f5b123b84d427f1"
+    },
+    {
+      "trial_id": "E02-auto-3",
+      "path": "docs/experiments/internship-v1/corrected/trials/E02-auto-3/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "a92215c806c73a313abb7ca8699400aae2fbfe351bb845ae5da85bb00f35ebff"
+    },
+    {
+      "trial_id": "E02-light-1",
+      "path": "docs/experiments/internship-v1/corrected/trials/E02-light-1/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "212471d57367f34423f136ea421ebbc1828be5034e0cfd98c0f072e9a8660ae5"
+    },
+    {
+      "trial_id": "E02-light-2",
+      "path": "docs/experiments/internship-v1/corrected/trials/E02-light-2/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "bc17bc5f59eba4414b74165f40dd59846408e64738b7b6a0d0a94f3afb231252"
+    },
+    {
+      "trial_id": "E02-light-3",
+      "path": "docs/experiments/internship-v1/corrected/trials/E02-light-3/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction",
+      "sha256": "de9caa6a4f0dbe2f33fa420b8703bd70d1682108cc25791280b8295695bef0f9"
+    },
+    {
+      "trial_id": "M02-light-1",
+      "path": "docs/experiments/internship-v1/corrected/trials/M02-light-1/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "0d4a2e9ef8ea170611aba2150bde015099bdaaa43b936d99aec9101e551b8b99"
+    },
+    {
+      "trial_id": "M02-light-2",
+      "path": "docs/experiments/internship-v1/corrected/trials/M02-light-2/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction",
+      "sha256": "9eefd18f6da8623adc72afcef30e9540cf5cfcb5b5a96d73a7a30fff122c6166"
+    },
+    {
+      "trial_id": "M03-light-1",
+      "path": "docs/experiments/internship-v1/corrected/trials/M03-light-1/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "9e126c44940bf4557fd15acd35e479de9d2654e2899946abc0de85733c21a182"
+    },
+    {
+      "trial_id": "M03-light-2",
+      "path": "docs/experiments/internship-v1/corrected/trials/M03-light-2/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction",
+      "sha256": "235937271e6a2669e5da51ecdb2238a04545b8deac0ce73821df767535e1a790"
+    },
+    {
+      "trial_id": "M03-light-3",
+      "path": "docs/experiments/internship-v1/corrected/trials/M03-light-3/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "365be531baf3b814008ba3ff5bab5904640eefec4268e17b9297153cc721cf58"
+    },
+    {
+      "trial_id": "M07-light-1",
+      "path": "docs/experiments/internship-v1/corrected/trials/M07-light-1/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task",
+      "sha256": "b9f5f1dfd3ab0fdaa5fd60e0ca0a649756026ca73f6d4a30254146f1fdd40af6"
+    },
+    {
+      "trial_id": "M07-light-2",
+      "path": "docs/experiments/internship-v1/corrected/trials/M07-light-2/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction",
+      "sha256": "695dbaf32870836744e1a944e3a51853cb11305cbcdb1425b38989f0f8a0b542"
+    },
+    {
+      "trial_id": "M07-light-3",
+      "path": "docs/experiments/internship-v1/corrected/trials/M07-light-3/worker.json",
+      "pointer": "/error",
+      "expected": "ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction",
+      "sha256": "e25947b856c7c275f77a61de60a84346c0ab0e30baa9d8a209c999dddf29f5e3"
+    }
+  ],
+  "total": 56,
+  "original_receipts_unchanged": true,
+  "initial_probe": {
+    "status": "assertion_failed",
+    "reason": "Checking the summary stop_reason for a context substring was too narrow; original worker.error supplied the authoritative classification."
+  }
+}

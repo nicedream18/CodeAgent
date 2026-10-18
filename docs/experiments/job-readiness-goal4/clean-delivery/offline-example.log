@@ -1,0 +1,11 @@
+{
+  "simulation": true,
+  "real_model": false,
+  "independent_check": "add(2,3) == 5",
+  "requests": 3,
+  "tools": 2,
+  "path": [
+    "baseline"
+  ],
+  "note": "Scripted fixture only; excluded from real coding-task statistics."
+}

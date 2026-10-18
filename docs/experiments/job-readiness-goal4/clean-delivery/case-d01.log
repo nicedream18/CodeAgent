@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "case": "d01",
+  "read_only": true,
+  "real_model_calls": 0,
+  "archive": "docs/experiments/completion/d01/trials/D01-full-1/trace.tar.gz",
+  "trace_member": ".mokioclaw/traces/trace-20261017-135902-6651a2/events.jsonl",
+  "run_id": "completion-20261017-d01-v1-D01-full-1",
+  "frozen_commit": "fd4f29f7b012d0b5bf13714b813f7fdb05ec9b12",
+  "execution_status": "finished",
+  "stop_reason": null,
+  "task_solved": true,
+  "grade_valid": true,
+  "artifact_passed": true,
+  "tests_run": 5,
+  "requests": 19,
+  "tools": 18,
+  "total_tokens": 89762,
+  "estimated": false,
+  "last_streams": [
+    {
+      "seq": 158,
+      "stream_id": "c24ccbe81abb44c7bd090f8b5a026c5f",
+      "node": "planner",
+      "status": "finished"
+    },
+    {
+      "seq": 171,
+      "stream_id": "1a76265245c74b3d98747ec192467192",
+      "node": "verifier",
+      "status": "finished"
+    },
+    {
+      "seq": 184,
+      "stream_id": "4f938ba75b824d4f8f8210a9089b5bab",
+      "node": "verifier",
+      "status": "finished"
+    },
+    {
+      "seq": 193,
+      "stream_id": "0890213370cf466db1de6da3efdcdd41",
+      "node": "verifier",
+      "status": "finished"
+    }
+  ],
+  "last_milestones": [
+    {
+      "seq": 189,
+      "type": "custom:tool_result",
+      "node": "verifier",
+      "tool_call_id": "call_00_AWUNgKLoeJMquLQxtelt1256",
+      "status": null,
+      "stop_reason": null
+    },
+    {
+      "seq": 198,
+      "type": "custom:checkpoint_saved",
+      "node": null,
+      "tool_call_id": null,
+      "status": "running",
+      "stop_reason": null
+    },
+    {
+      "seq": 201,
+      "type": "custom:checkpoint_saved",
+      "node": null,
+      "tool_call_id": null,
+      "status": "running",
+      "stop_reason": null
+    },
+    {
+      "seq": 203,
+      "type": "custom:checkpoint_saved",
+      "node": null,
+      "tool_call_id": null,
+      "status": "running",
+      "stop_reason": null
+    },
+    {
+      "seq": 204,
+      "type": "custom:checkpoint_saved",
+      "node": null,
+      "tool_call_id": null,
+      "status": "finished",
+      "stop_reason": null
+    },
+    {
+      "seq": 205,
+      "type": "run_end",
+      "node": null,
+      "tool_call_id": null,
+      "status": "finished",
+      "stop_reason": null
+    }
+  ],
+  "note": "Metadata only. No archive extraction, model request, tool replay or regrading."
+}

@@ -71,8 +71,21 @@
 - [report.json](../../../docs/experiments/internship-v1/corrected/report.json) · JSON pointer `/independent_artifact_passed` = `8`
 - [report.json](../../../docs/experiments/internship-v1/corrected/report.json) · JSON pointer `/budget_stops` = `32`
 - [report.json](../../../docs/experiments/internship-v1/corrected/report.json) · JSON pointer `/infrastructure_failures` = `11`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/E02-auto-1/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/E02-auto-3/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/E02-light-1/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/E02-light-2/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/E02-light-3/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M02-light-1/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M02-light-2/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M03-light-1/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M03-light-2/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M03-light-3/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M07-light-1/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required instructions exceed the input budget; enlarge the window or reduce the task"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M07-light-2/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction"`
+- [worker.json](../../../docs/experiments/internship-v1/corrected/trials/M07-light-3/worker.json) · JSON pointer `/error` = `"ContextBudgetError: required task, acceptance criteria and schemas cannot fit after compaction"`
 
-限制：8 份通过产物均未正常收尾；不称为完成 8 题，不与后续批次合并。
+限制：8 份通过产物均未正常收尾；不称为完成 8 题，不与后续批次合并。 13 次上下文错误由原 worker.error 核实；汇总 stop_reason 为 null，不据此假定原因。
 
 ## F07：此前 56 次配置不一致的真实试验保留为无效对照
 

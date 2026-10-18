@@ -9,7 +9,7 @@
 | B0 `cad8a15`，3 题各 3 次 | 1/9 | 8/9 | [Goal 2](../../experiments/job-readiness-goal2/RESULTS.md)，唯一成功只改一个源文件 |
 | B1 `ee5f073`，相同 3 题各 3 次 | 0/9 | 8/9 | 9 次均进入 verifier，但均预算停止；不能称完成预留提升交付率 |
 
-正式矩阵核心比较为 M02/M03/M07/E02 × baseline/full/light/auto × 3 次，共 48 次；其余 8 题 full 覆盖。四架构均 0/12 完整交付。运行失败包含 32 次请求预算停止、13 次上下文预算错误和 11 次连接失败；不从分母删去基础设施问题。[机器报告](../../experiments/internship-v1/corrected/report.json)。
+正式矩阵核心比较为 M02/M03/M07/E02 × baseline/full/light/auto × 3 次，共 48 次；其余 8 题 full 覆盖。四架构均 0/12 完整交付。运行失败包含 32 次请求预算停止、13 次上下文预算错误和 11 次连接失败；不从分母删去基础设施问题。13 次上下文错误的汇总 stop_reason 为 null，已核对原 worker.error，见[分类证据](../../experiments/job-readiness-goal4/formal-failure-classification.json)。[机器报告](../../experiments/internship-v1/corrected/report.json)。
 
 Goal 2 是 M02-v2/M07-v2/M08-v2 的版本对照，流程均为 full；不是四架构对照。18 次中 16 次 token 停止、1 次正常结束、1 次连接失败；每版各 1 次越界修改，评分保留原文件。[范围与失败分析](../../experiments/job-readiness-goal2/ANALYSIS.md)。
 
