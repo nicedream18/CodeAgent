@@ -1,0 +1,13 @@
+                                                                                
+ Usage: python -m mokioclaw doctor [OPTIONS]                                    
+                                                                                
+ Check backend availability without executing a model request.                  
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --execution-backend        [local|docker]  [default: local]                  │
+│ --image                    TEXT            [default:                         │
+│                                            mokioclaw-execution:0.2.0]        │
+│ --json                                                                       │
+│ --help                                     Show this message and exit.       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

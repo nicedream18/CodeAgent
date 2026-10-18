@@ -1,75 +1,63 @@
 # MokioAgent / MokioClaw
 
-面向本地代码任务的 Agent 工程项目：用 LangGraph 组织探索、规划、实现和验收，并保留工具审批、取消、运行中纠正、恢复及可追踪记录。默认完整多 Agent 流程，默认本机执行。
+面向本地代码任务的 Agent 工程学习项目。用 LangGraph 组织探索、规划、实现和验收，重点研究：**模型生成不完整时不执行工具、运行中纠正使旧调用失效、用独立测试区分产物与交付**。默认完整多 Agent 流程、local 执行；light/auto 与 Docker 均需显式配置。
 
 ```mermaid
 flowchart LR
-    U[用户任务] --> R[路由]
-    R --> P[planner]
-    P <--> E[只读仓库探索]
-    P <--> C[codeAgent]
-    P --> V[verifier]
-    V -->|未通过| P
-    V -->|通过| F[结果与 trace]
-    C --> T[规则 / 权限 / hooks / 审批]
-    T --> B[local 或显式 Docker Bash]
+    UI[CLI / TUI] --> D[daemon 与运行控制]
+    D --> R[路由 / planner]
+    R <--> S[repoAgent / codeAgent]
+    R --> V[模型 verifier]
+    V -->|继续修改| R
+    V --> F[最终汇报与运行终态]
+    S --> T[完整性 / 权限 / hooks / 审批]
+    V --> T
+    T --> B[文件工具 / local 或 Docker Bash]
+    D --> A[checkpoint / trace]
+    B -.评测时重建候选.-> G[独立可信测试与 trial 判定]
 ```
 
-本轮加入可选 Docker 前台 Bash、独立代码验收器和固定 12 题评测集。正式 56 次真实试验已归档：**完整交付 0/56，部分产物通过 8/56**。此前另有 56 次因配置继承缺陷标为无效对照，原记录全部保留。当前交付可靠性仍需改善，不声称多 Agent 优于单 Agent。[结果、限制与失败分析](docs/experiments/internship-v1/RESULTS.md)。
+**从这里看项目：** [展示包入口](docs/internship/showcase/README.md) · [架构](docs/internship/showcase/architecture.md) · [实验表](docs/internship/showcase/experiments.md) · [三条执行链](docs/internship/showcase/chains.md)
 
-新增一个小型真实模型成功案例：full 流程自主修复 FIFO 队列边界，正常汇报后独立 Docker 验收 **5/5 通过**，归档重建后再次通过。使用 19 次请求、18 次工具、约 37 秒生成；这是受控单例，不计入历史矩阵。[播放演示与复现](docs/internship/demo.md)。
-
-另已完成冻结 B0/B1 的 **18 次真实任务对照**：完整交付分别为 **1/9、0/9**，独立产物通过均为 **8/9**。完成预算预留让 B1 的 9 次运行均进入验收，但本批未改善完整交付率。成功与失败案例均可从归档重建。[对照报告](docs/experiments/job-readiness-goal2/RESULTS.md)、[失败分析](docs/experiments/job-readiness-goal2/ANALYSIS.md)、[真实记录回放](docs/experiments/job-readiness-goal2/DEMO.md)。
-
-| 可复核内容 | 证据 |
+| 已验证事实 | 原始证据与限制 |
 |---|---|
-| 366 项原始检查基线 | [基线记录](docs/experiments/internship-baseline-2026-10-16.json) |
-| Goal 2 验收 444 项检查通过，真实 Docker 29 项通过 | [Goal 2 检查证据](docs/experiments/job-readiness-goal2/checks/) |
-| 真实 ARM64 容器隔离、输出和超时清理 | [Docker 实测](docs/experiments/docker-arm64-2026-10-16.json) |
-| 12 题缺陷版失败 / 参考修复通过 | [任务清单与验收](docs/experiments/internship-v1/) |
-| baseline/full/light/auto 公平比较口径 | [评测设计](docs/internship/evaluation.md) |
-| 56 次正式试验及 56 次无效对照均保留 | [实际结果](docs/experiments/internship-v1/RESULTS.md) |
-| 150 秒真实模型完整交付回放，另保留失败案例 | [演示](docs/internship/demo.md) |
-| 三个 v2 任务环境、角色诊断及完成预算预留 | [Goal 1 设计、离线实验与 B0/B1](docs/experiments/job-readiness-v1/) |
-| Linux CI 全量 455 项、真实 Docker 29 项及 wheel 干净安装通过（748ca5d） | [Goal 3 运行与验收证据](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552) |
+| D01 单文件任务正常结束，可信 Docker 测试 5/5；19 次请求、18 次工具、36.845 秒生成 | [既有 150 秒讲解回放](docs/internship/demo.md)，受控单例，不代表跨文件能力 |
+| 正式 56 次矩阵完整交付 0/56，独立产物通过 8/56 | [正式结果](docs/experiments/internship-v1/RESULTS.md)；另 56 次配置不一致的无效对照保留 |
+| 后续 B0/B1 各 9 次：完整交付 1/9、0/9；产物通过均 8/9 | [冻结对照](docs/experiments/job-readiness-goal2/RESULTS.md)，没有证明完成预算预留提升交付率 |
+| Linux 普通检查 455 通过、2 跳过；真实 Docker 29 通过；wheel 干净安装通过 | [CI 运行](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552)，对应 `748ca5d`，不是后续文档提交 |
 
-## 快速运行
+当前没有证据支持多 Agent 优于单 Agent；跨多个源文件修改后的完整交付仍未验证。上述各批次分母独立，测试通过数不是解题成功率。[事实和限制索引](docs/internship/showcase/FACTS.md)。
 
-需要 Python 3.13 和 uv。离线演示不需要密钥：
+## 快速体验（不需要模型凭证）
+
+需要 Python 3.13、uv。首次安装需要联网或已有依赖缓存；安装后的以下示例与回放不访问模型，也不需要 Docker：
 
 ```sh
 uv sync --frozen
-uv run python examples/internship_offline.py
-make check
-uv run mokioclaw eval list
-uv run mokioclaw eval run --profile core
+uv run --no-sync mokioclaw --help
+uv run --no-sync python examples/internship_offline.py
+uv run --no-sync python scripts/replay_internship_demo.py docs/internship/success-demo.cast --no-wait
+uv run --no-sync python scripts/inspect_showcase_case.py verifier-budget
 ```
 
-真实模型使用已有 OpenAI 兼容接口。复制 `.env.example` 到 `.env`，填写自己的 MODEL、BASE_URL、API_KEY：
+离线示例使用固定响应模型，输出 `simulation=true`、`real_model=false`；不计入真实任务成绩。案例查看器只读归档，不重放工具。[干净环境步骤、预期输出和排错](docs/internship/showcase/reproduce.md)。
+
+## 使用自己的模型
+
+将 `.env.example` 复制为 `.env`，填写自己的 `MODEL`、`BASE_URL`、`API_KEY`，再针对自己的工作区运行：
 
 ```sh
-uv run mokioclaw "分析当前仓库并修复你能验证的问题" --workspace /absolute/path/to/workspace
+uv run mokioclaw "阅读项目并提出可验证的修改" --workspace /absolute/path/to/workspace
 uv run mokioclaw tui --workspace /absolute/path/to/workspace
 ```
 
-Docker 需显式开启，启动引擎并准备依赖镜像：
+默认 local 的命令在宿主执行，工具仍经过权限和审批。Docker 仅隔离前台 Bash 与独立评分；文件工具、MCP 和 Python hooks 仍在宿主，挂载工作区中的秘密仍可能被读取。准备镜像与真实检查见[执行边界](docs/internship/execution.md)和[复现说明](docs/internship/showcase/reproduce.md)。
 
-```sh
-docker build -t mokioclaw-execution:0.2.0 docker/execution
-uv run mokioclaw doctor --execution-backend docker --json
-make check-docker
-uv run mokioclaw "执行项目测试并解释结果" --workspace /absolute/path/to/workspace --execution-backend docker
-```
+## 开发与学习
 
-Docker 仅覆盖前台 Bash 和独立验收；MCP、Python hooks 和文件工具仍在宿主运行，工作区中的秘密仍可被容器读取。后台 Bash 不支持 Docker，不会自动回落到 local。[完整边界与故障排查](docs/internship/execution.md)。
+- `make check`：冻结安装、pytest、Ruff、mypy、协议/评测文档和 diff 检查；普通 CI 不调用真实模型。
+- [教学说明](docs/teaching-guide.md) · [工具与评测契约](docs/internship/contracts.md) · [评测设计](docs/internship/evaluation.md)
+- [工程复盘](docs/internship/postmortems.md) · [核心取舍](docs/internship/showcase/tradeoffs.md) · [简历草稿](docs/internship/showcase/resume.md)
+- [维护练习](docs/internship/showcase/practice.md) · [当前状态](docs/internship/STATUS.md) · [贡献与 AI 辅助范围](docs/internship/contribution.md)
 
-## 学习与复现
-
-- [原教学说明与各阶段实验](docs/teaching-guide.md)
-- [评测任务、预算、冻结与恢复](docs/internship/evaluation.md)
-- [取消、截断、审批复盘](docs/internship/postmortems.md) · [时序图与面试自测](docs/internship/interview.md)
-- [贡献和展示口径](docs/internship/contribution.md) · [本地发布候选与已知限制](docs/internship/release-candidate.md)
-- [协议契约](docs/WIRE_PROTOCOL.md) · [评测契约](docs/EVAL_SCHEMA.json)
-- 真实模型实验必须显式加 `--real-model`，普通 CI 不调用模型。
-
-这是用于学习与工程展示的本地 Agent。公开案例可能已进入模型训练数据；本项目的离线子集不代表官方 SWE-bench 成绩，也不据此声称未见任务泛化。
+公开任务可能已进入模型训练数据。本地固定子集不是官方 SWE-bench 成绩，不据此声称未见任务泛化。

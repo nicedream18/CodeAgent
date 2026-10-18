@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T05:13:52.670515+00:00",
+  "historical_files_verified": 2245,
+  "historical_cache_manifests_verified": 7,
+  "runtime_source_unchanged": true,
+  "lock_and_workflow_unchanged": true,
+  "historical_wheel_tag_image_unchanged": true,
+  "real_model_calls": 0,
+  "remote_writes": 0
+}

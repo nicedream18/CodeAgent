@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "session_token": "goal4-delivery-local",
+  "exit_code": 0,
+  "collected": 13,
+  "counts": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "error": 0,
+    "xfailed": 0,
+    "xpassed": 0,
+    "deselected": 0
+  },
+  "passed_nodeids": [
+    "tests/test_showcase_delivery.py::test_real_case_inspection_never_launches_process_or_network",
+    "tests/test_showcase_delivery.py::test_missing_or_ambiguous_trace_is_rejected[names0]",
+    "tests/test_showcase_delivery.py::test_missing_or_ambiguous_trace_is_rejected[names1]",
+    "tests/test_showcase_delivery.py::test_oversized_trace_is_rejected_before_json_read",
+    "tests/test_showcase_delivery.py::test_mismatched_terminal_cannot_be_presented_as_verified",
+    "tests/test_showcase_delivery.py::test_fact_checker_rejects_changed_evidence_and_boolean_number_confusion",
+    "tests/test_showcase_delivery.py::test_local_links_check_missing_lines_and_escape_without_fetching_urls",
+    "tests/test_showcase_delivery.py::test_json_pointer_supports_escaped_keys_and_array_indices",
+    "tests/test_generation_reliability.py::test_truncated_batch_is_closed_and_replanned_once",
+    "tests/test_run_cancellation.py::test_cancel_rpc_is_idempotent_wakes_approval_and_preserves_terminal_state",
+    "tests/test_optimization_integration.py::test_actual_daemon_approval_correction_replans_and_rejects_late_approval",
+    "tests/test_optimization_integration.py::test_sync_subagent_correction_keeps_completed_write_and_closes_old_tool_group",
+    "tests/test_internship_eval.py::test_empty_or_forged_test_report_cannot_claim_solved"
+  ],
+  "nodeids_truncated": false,
+  "seconds": 1.258
+}

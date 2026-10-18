@@ -1,0 +1,15 @@
+                                                                                
+ Usage: python -m mokioclaw trace [OPTIONS]                                     
+                                                                                
+ Read existing traces, optionally following new records; never execute work.    
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --workspace                   PATH                                           │
+│ --run-id                      TEXT                                           │
+│ --layer                       TEXT                                           │
+│ --direction                   TEXT                                           │
+│ --follow       --no-follow          [default: no-follow]                     │
+│ --raw          --no-raw             [default: no-raw]                        │
+│ --help                              Show this message and exit.              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

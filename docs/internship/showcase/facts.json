@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "facts": [
+    {
+      "id": "F01",
+      "claim": "远程 Linux 普通检查 455 通过、2 跳过",
+      "version": "748ca5d",
+      "scope": "Goal 3 单次远程运行",
+      "limitation": "不是 Agent 任务成功率；文档归档提交未被该运行测试。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/check/pytest-summary.json",
+          "pointer": "/counts/passed",
+          "expected": 455,
+          "sha256": "1fa6aa3e789ba9f3c12bdeaf3b2d64f8624cf67e7f2906d247db88e8cf0a940e"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/check/pytest-summary.json",
+          "pointer": "/counts/skipped",
+          "expected": 2,
+          "sha256": "1fa6aa3e789ba9f3c12bdeaf3b2d64f8624cf67e7f2906d247db88e8cf0a940e"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/check/report.json",
+          "pointer": "/metadata/commit",
+          "expected": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+          "sha256": "4201c60f2225c3fa35606eb45caef95d17efbbb1730ca315128d5a5bf225314e"
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "claim": "远程真实 Docker 29 通过、0 跳过",
+      "version": "748ca5d",
+      "scope": "Linux x86_64 实际容器检查",
+      "limitation": "Docker 仅覆盖前台 Bash 和可信评分；不证明整个 Agent 沙箱化。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/docker/docker-detail/pytest-summary.json",
+          "pointer": "/counts/passed",
+          "expected": 29,
+          "sha256": "671c9909fa298fafba34c061852224d913d742ebf31aedc2c41d6050dbbfdd8a"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/docker/docker-detail/pytest-summary.json",
+          "pointer": "/counts/skipped",
+          "expected": 0,
+          "sha256": "671c9909fa298fafba34c061852224d913d742ebf31aedc2c41d6050dbbfdd8a"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/docker/report.json",
+          "pointer": "/docker/cleanup/confirmed",
+          "expected": true,
+          "sha256": "48f3f3ba5344cef88a0c64a35ccc04f2ba0de595354326f749ce78ce10fe4fe3"
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "claim": "wheel 在仓库外全新环境导入、CLI 和离线资源检查通过",
+      "version": "748ca5d",
+      "scope": "Goal 3 wheel 作业",
+      "limitation": "已验收 wheel 对应远程版本；后续 README 变化会改变新 wheel 元数据。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/wheel/report.json",
+          "pointer": "/installed_probe/ok",
+          "expected": true,
+          "sha256": "6a8bfb38f52dedb9577bee87ae7723ce33d087e3a150046031047f345b211558"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/wheel/report.json",
+          "pointer": "/installed_probe/site_packages_verified",
+          "expected": true,
+          "sha256": "6a8bfb38f52dedb9577bee87ae7723ce33d087e3a150046031047f345b211558"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/remote/39028453552/wheel/report.json",
+          "pointer": "/wheel/sha256",
+          "expected": "605001843b1c5e1ff3a105bf76abdbee5a17f43e1e19338d28522e1974f38359",
+          "sha256": "6a8bfb38f52dedb9577bee87ae7723ce33d087e3a150046031047f345b211558"
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "claim": "D01 正常完成并通过 5 项可信测试",
+      "version": "fd4f29f",
+      "scope": "一个六行 FIFO 函数的受控单文件任务",
+      "limitation": "自主生成的一次成功案例；不属于 12 题矩阵，不代表跨文件成功率。",
+      "evidence": [
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/execution_status",
+          "expected": "finished",
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/task_solved",
+          "expected": true,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/grade/tests_run",
+          "expected": 5,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "claim": "D01 使用 19 次模型请求、18 次工具、36.845 秒生成",
+      "version": "fd4f29f",
+      "scope": "同一个 D01-full-1 trial",
+      "limitation": "150 秒是讲解回放时长，不是原运行耗时。",
+      "evidence": [
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/model_metrics/requests",
+          "expected": 19,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/tool_count",
+          "expected": 18,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/generation_seconds",
+          "expected": 36.845,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/model_metrics/total_tokens",
+          "expected": 89762,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/model_metrics/cache_read_tokens",
+          "expected": 16256,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        },
+        {
+          "path": "docs/experiments/completion/d01/trials/D01-full-1/result.json",
+          "pointer": "/model_metrics/cache_creation_tokens",
+          "expected": null,
+          "sha256": "34c767a2e37e98af59921b96eb3b880515531e6b6604d87f808ad46cd21c18f2"
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "claim": "正式矩阵 56 次完整交付 0，独立产物通过 8",
+      "version": "1e6d1cc",
+      "scope": "12 题：48 次核心架构对照与 8 次 full 覆盖",
+      "limitation": "8 份通过产物均未正常收尾；不称为完成 8 题，不与后续批次合并。",
+      "evidence": [
+        {
+          "path": "docs/experiments/internship-v1/corrected/report.json",
+          "pointer": "/scheduled",
+          "expected": 56,
+          "sha256": "4e1c4caf6ee5a482f631e4d9c6252041618ff45e9cd1769b5a206e0314f3fce1"
+        },
+        {
+          "path": "docs/experiments/internship-v1/corrected/report.json",
+          "pointer": "/recorded",
+          "expected": 56,
+          "sha256": "4e1c4caf6ee5a482f631e4d9c6252041618ff45e9cd1769b5a206e0314f3fce1"
+        },
+        {
+          "path": "docs/experiments/internship-v1/corrected/report.json",
+          "pointer": "/solved",
+          "expected": 0,
+          "sha256": "4e1c4caf6ee5a482f631e4d9c6252041618ff45e9cd1769b5a206e0314f3fce1"
+        },
+        {
+          "path": "docs/experiments/internship-v1/corrected/report.json",
+          "pointer": "/independent_artifact_passed",
+          "expected": 8,
+          "sha256": "4e1c4caf6ee5a482f631e4d9c6252041618ff45e9cd1769b5a206e0314f3fce1"
+        },
+        {
+          "path": "docs/experiments/internship-v1/corrected/report.json",
+          "pointer": "/budget_stops",
+          "expected": 32,
+          "sha256": "4e1c4caf6ee5a482f631e4d9c6252041618ff45e9cd1769b5a206e0314f3fce1"
+        },
+        {
+          "path": "docs/experiments/internship-v1/corrected/report.json",
+          "pointer": "/infrastructure_failures",
+          "expected": 11,
+          "sha256": "4e1c4caf6ee5a482f631e4d9c6252041618ff45e9cd1769b5a206e0314f3fce1"
+        }
+      ]
+    },
+    {
+      "id": "F07",
+      "claim": "此前 56 次配置不一致的真实试验保留为无效对照",
+      "version": "初始 internship-v1 批次",
+      "scope": "同步 Subagent 未继承 SDK 零重试配置",
+      "limitation": "不能作为公平架构比较；既不是正式成绩也不能删除。",
+      "evidence": [
+        {
+          "path": "docs/experiments/internship-v1/main/validity.json",
+          "pointer": "/status",
+          "expected": "invalid",
+          "sha256": "995543f470d3e2aa2617c08af67052ce16f346c1ebc4fa06716552803842cd7a"
+        },
+        {
+          "path": "docs/experiments/internship-v1/main/report.json",
+          "pointer": "/recorded",
+          "expected": 56,
+          "sha256": "e2f661a430023af6f15197fdafd3dcc5b2291dea8d78c8343f3da397497d63ed"
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "claim": "B0/B1 各 9 次：完整交付 1/9 与 0/9，产物通过均 8/9",
+      "version": "B0 cad8a15 / B1 ee5f073",
+      "scope": "M02-v2、M07-v2、M08-v2，各版各题 3 次",
+      "limitation": "没有证明完成预留提高交付率；唯一完整成功仅修改一个源文件。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/terminal",
+          "expected": 18,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/complete_deliveries",
+          "expected": 1,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/complete_deliveries",
+          "expected": 0,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/independent_artifact_passes",
+          "expected": 8,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/independent_artifact_passes",
+          "expected": 8,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/multiple_source_file_deliveries",
+          "expected": 0,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/multiple_source_file_deliveries",
+          "expected": 0,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        }
+      ]
+    },
+    {
+      "id": "F09",
+      "claim": "Goal 2 共 427 请求、486 工具、3,350,157 token（含估算）",
+      "version": "B0/B1 冻结版本",
+      "scope": "18 个 trial，B0 有 1 个估算请求",
+      "limitation": "缓存读取包含在输入中，创建量未知；连接失败实际计费未知，不报告费用。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/requests_total",
+          "expected": 208,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/requests_total",
+          "expected": 219,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/tools_total",
+          "expected": 238,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/tools_total",
+          "expected": 248,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/usage/total_tokens/known_sum",
+          "expected": 1656405,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/usage/total_tokens/known_sum",
+          "expected": 1693752,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B0/estimated_usage_requests",
+          "expected": 1,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/usage/cache_creation_tokens/known_sum",
+          "expected": null,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        }
+      ]
+    },
+    {
+      "id": "F10",
+      "claim": "代表失败：产物通过 13 项，但运行因 token 预算停止",
+      "version": "ee5f073",
+      "scope": "B1 / M08-v2-full-1 单个 trial",
+      "limitation": "verifier 未形成最终判断；不是测试失败，也不能算完整交付。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/execution_status",
+          "expected": "failed",
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/stop_reason",
+          "expected": "token_budget_exhausted",
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/task_solved",
+          "expected": false,
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/grade/solved",
+          "expected": true,
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/grade/tests_run",
+          "expected": 13,
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/model_metrics/requests",
+          "expected": 25,
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/tool_count",
+          "expected": 31,
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/b1/trials/M08-v2-full-1/result.json",
+          "pointer": "/model_metrics/total_tokens",
+          "expected": 187464,
+          "sha256": "c63d179366fb81e9e4ffc0edb20875e22b330daee8bae9a4fd189f06b86b1eda"
+        }
+      ]
+    },
+    {
+      "id": "F11",
+      "claim": "B1 的 9 次均进入 verifier，但完整交付仍为 0",
+      "version": "ee5f073",
+      "scope": "Goal 2 角色交接观察",
+      "limitation": "交接变化不是有效性提升；因果尚未通过额外消融确认。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/verifier_entered_trials",
+          "expected": 9,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/completion_reserve_triggered_trials",
+          "expected": 8,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal2/comparison.json",
+          "pointer": "/versions/B1/assessments/verifier_passed/unknown",
+          "expected": 9,
+          "sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f"
+        }
+      ]
+    },
+    {
+      "id": "F12",
+      "claim": "本地 ARM64 与远程 Linux 证据分别保存",
+      "version": "Goal 3 最终验收",
+      "scope": "本地 macOS、容器 Linux ARM64、远程 Linux x86_64",
+      "limitation": "架构不同的镜像摘要分别记录；不能声称本地运行等于远程 CI。",
+      "evidence": [
+        {
+          "path": "docs/experiments/job-readiness-goal3/acceptance.json",
+          "pointer": "/checks/make_check/passed",
+          "expected": 455,
+          "sha256": "e7c0ea57cf77d1ceed46aa098632207c242d793a203dc4071086d3abe9fc4ab3"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/acceptance.json",
+          "pointer": "/checks/real_docker/passed",
+          "expected": 29,
+          "sha256": "e7c0ea57cf77d1ceed46aa098632207c242d793a203dc4071086d3abe9fc4ab3"
+        },
+        {
+          "path": "docs/experiments/job-readiness-goal3/acceptance.json",
+          "pointer": "/remote_verified",
+          "expected": true,
+          "sha256": "e7c0ea57cf77d1ceed46aa098632207c242d793a203dc4071086d3abe9fc4ab3"
+        }
+      ]
+    }
+  ]
+}

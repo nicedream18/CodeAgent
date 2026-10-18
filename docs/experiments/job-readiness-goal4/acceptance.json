@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "goal": "Goal 4",
+  "status": "delivery_commit_verification_pending",
+  "automatic_deliverables_complete": false,
+  "base_commit": "5be75d9f23cd6fa2f63f4c8b242478c9e39d7089",
+  "validated_remote_commit": "748ca5d198df5f42c4a1fc8364022dc7abddda25",
+  "requirements": {
+    "fact_sources_versions_and_limits": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/facts.json",
+        "docs/internship/showcase/FACTS.md"
+      ]
+    },
+    "readme_positioning_architecture_quickstart_results": {
+      "status": "proved_locally",
+      "evidence": [
+        "README.md"
+      ]
+    },
+    "three_one_page_overviews": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/architecture.md",
+        "docs/internship/showcase/experiments.md",
+        "docs/internship/showcase/tradeoffs.md"
+      ]
+    },
+    "three_chains_diagrams_source_tests_normal_failure_limits": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/chains.md",
+        "docs/experiments/job-readiness-goal4/source-review.json",
+        "docs/experiments/job-readiness-goal4/mermaid-parse.json"
+      ]
+    },
+    "existing_d01_and_representative_failure": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/demo.md",
+        "docs/internship/showcase/cases.md"
+      ]
+    },
+    "read_only_case_inspection": {
+      "status": "proved_locally",
+      "evidence": [
+        "scripts/inspect_showcase_case.py",
+        "tests/test_showcase_delivery.py"
+      ]
+    },
+    "clean_install_offline_replay_fixed_fault_docker": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/reproduce.md",
+        "docs/experiments/job-readiness-goal4/clean-base/report.json",
+        "docs/experiments/job-readiness-goal4/docker/result.json"
+      ]
+    },
+    "resume_with_evidence_and_unconfirmed_contribution_fields": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/resume.md",
+        "docs/internship/contribution.md"
+      ]
+    },
+    "practice_and_separate_answers": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/practice.md",
+        "docs/internship/showcase/answers.md"
+      ]
+    },
+    "blank_personal_record_and_checklist": {
+      "status": "proved_locally",
+      "evidence": [
+        "docs/internship/showcase/record-template.md"
+      ]
+    },
+    "links_facts_and_new_helper_quality_checks": {
+      "status": "proved_locally",
+      "evidence": [
+        "scripts/check_showcase.py",
+        "docs/experiments/job-readiness-goal4/delivery-checks/report.json"
+      ]
+    }
+  },
+  "checks": {
+    "facts": 12,
+    "new_helper_tests": 8,
+    "targeted_tests": 13,
+    "fixed_fault_controls": 3,
+    "strict_mypy_files": 2,
+    "mermaid_diagrams": 6,
+    "real_docker_passed": 29,
+    "real_docker_skipped": 0
+  },
+  "real_model_calls": 0,
+  "remote_writes": 0,
+  "publications": 0,
+  "human_maintenance_acceptance": "not_performed; blank template",
+  "cross_source_file_delivery": "not_claimed",
+  "remaining": [
+    "Commit deliverable and verify new helpers in a clean checkout of that commit."
+  ]
+}

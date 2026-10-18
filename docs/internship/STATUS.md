@@ -1,5 +1,12 @@
 # 求职交付收敛状态
 
+## Goal 4：展示包已整理，最终交付复核中
+
+- 新入口：[求职展示包](showcase/README.md)。包含架构、实验、取舍、三条执行链、成功/失败案例、简历草稿与独立维护练习。
+- 12 条事实带原始报告、版本、JSON pointer 和摘要；只读案例查看不执行历史工具。
+- 本轮干净 checkout 安装、离线示例/回放及真实 Docker 29 项通过；新增工具和交付提交的最终检查另见[验收记录](../experiments/job-readiness-goal4/README.md)。
+- 没有新增真实模型试验、跨文件成功宣传、推送或发布；本人练习结果保持待填写。
+
 ## Goal 3：已完成
 
 - 远程已验收提交：`748ca5d198df5f42c4a1fc8364022dc7abddda25`；[Linux CI 运行](https://github.com/nicedream18/CodeAgent/actions/runs/39028453552) 三作业均 success。
@@ -45,6 +52,6 @@
 三种离线容量上限下，实际 B0 源码都在修改后停止；同一固定驱动的 B1 都进入 verifier 并正常结束。
 验收失败负例保持 failed 和已有文件修改；取消、纠正、工具重试、旧批次关闭、压缩、后台隔离、light/strict checkpoint 与 trace 均有回归。
 预留采用当前输入/输出预算预测，不能保证真实模型一定完成，不能作为费用硬上限或成功率提升结论。
-基线实验、真实跨文件任务、远程 Linux CI 和本人掌握程度分别属于后续 Goal，本轮不代填通过。
+以上是 Goal 1 当时的边界；后续真实对照与远程 CI 结果见上方 Goal 2/3。真实跨文件完整交付和本人掌握程度仍未确认。
 
 设计与操作说明：[Goal 1](../experiments/job-readiness-v1/README.md)、[预算设计](../experiments/job-readiness-v1/DESIGN.md)。

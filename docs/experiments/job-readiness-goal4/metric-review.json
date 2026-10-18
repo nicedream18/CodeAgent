@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "source": "docs/experiments/job-readiness-goal2/comparison.json",
+  "source_sha256": "b00504f3577086f9d84a6f686ec0d9bb629b7c9074a635ad7835973b3e953a0f",
+  "checked": {
+    "B0": [
+      208,
+      238,
+      1572513,
+      83892,
+      1656405,
+      228096,
+      [
+        46.058,
+        60.425,
+        128.853
+      ]
+    ],
+    "B1": [
+      219,
+      248,
+      1601229,
+      92523,
+      1693752,
+      192896,
+      [
+        54.345,
+        71.346,
+        77.283
+      ]
+    ]
+  },
+  "summed_requests": 427,
+  "summed_tools": 486,
+  "summed_tokens": 3350157,
+  "token_stops": 16,
+  "unknown_cache_creation_preserved": true,
+  "estimated_requests": 1
+}

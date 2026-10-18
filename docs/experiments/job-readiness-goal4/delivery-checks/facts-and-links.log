@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "facts": 12,
+  "documents": 22,
+  "local_links": 219,
+  "errors": [],
+  "limits": "Checks local targets/line ranges and frozen JSON facts. Diagrams and prose require source review; remote URLs are not probed."
+}

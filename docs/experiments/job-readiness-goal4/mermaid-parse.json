@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "mermaid_version": "11.12.0",
+  "mode": "syntax parse with jsdom; not a rendered screenshot",
+  "diagrams": [
+    {
+      "file": "README.md",
+      "diagram": 1,
+      "diagram_type": "flowchart-v2",
+      "sha256": "b9090411ead9eaea8f50e7625c1225f85308068266b4222b9060890432da0a47",
+      "syntax": "passed"
+    },
+    {
+      "file": "docs/internship/showcase/architecture.md",
+      "diagram": 1,
+      "diagram_type": "flowchart-v2",
+      "sha256": "d1d702155e5d0e6427047f7f92dc1a01cef591861784a40ef12123bd64be1539",
+      "syntax": "passed"
+    },
+    {
+      "file": "docs/internship/showcase/chains.md",
+      "diagram": 1,
+      "diagram_type": "sequence",
+      "sha256": "24236ecc2971e0ce4a8db9664bf0521758d44c71f59ca5858e60aa51f81dde25",
+      "syntax": "passed"
+    },
+    {
+      "file": "docs/internship/showcase/chains.md",
+      "diagram": 2,
+      "diagram_type": "sequence",
+      "sha256": "c7e956385940636ce247fe668adba845f588e3390b7bd035b7e645f8a5407933",
+      "syntax": "passed"
+    },
+    {
+      "file": "docs/internship/showcase/chains.md",
+      "diagram": 3,
+      "diagram_type": "sequence",
+      "sha256": "85f393a9da83a8bb9db407420e5ae6baa66c34ffbc1d3c73f29ee3d146254e49",
+      "syntax": "passed"
+    },
+    {
+      "file": "docs/internship/interview.md",
+      "diagram": 1,
+      "diagram_type": "sequence",
+      "sha256": "5232c9ee25e138e7e06a259b84e1e720a6e02ed48bc9e0f1c12b361c10e254d7",
+      "syntax": "passed"
+    }
+  ],
+  "all_passed": true
+}

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "method": "Agent source inspection plus specified offline tests, not human maintenance acceptance",
+  "reviews": [
+    {
+      "id": "diagram-and-chain-1",
+      "sources": [
+        "src/mokioclaw/providers/openai_provider.py",
+        "src/mokioclaw/providers/generation.py",
+        "src/mokioclaw/core/tool_loop.py",
+        "src/mokioclaw/tools/execution.py"
+      ],
+      "findings": [
+        "raw finish reason and JSON validated before response returns",
+        "one regeneration only, same pre-request gates",
+        "schema, policy and approval precede side effects"
+      ],
+      "tests": [
+        "tests/test_generation_reliability.py::test_truncated_batch_is_closed_and_replanned_once"
+      ],
+      "source_sha256": {
+        "src/mokioclaw/providers/openai_provider.py": "0e851607963137c069ce78de0a5f5fcd820f40e197c286bc694e33ad18dbb5a7",
+        "src/mokioclaw/providers/generation.py": "a9d3edd24990915c8459b2e56312bc7128c6a0b7ed5d047c6151a3749af0b15d",
+        "src/mokioclaw/core/tool_loop.py": "c8dab3aa9b65574f302968933897cc046123f4bd54c492624507efc040d7161c",
+        "src/mokioclaw/tools/execution.py": "2d4b59908110bba5650dd4e5efe51f4710145f38590ec95001e1b7486af5b33d"
+      }
+    },
+    {
+      "id": "diagram-and-chain-2",
+      "sources": [
+        "src/mokioclaw/core/daemon.py",
+        "src/mokioclaw/core/run_control.py",
+        "src/mokioclaw/core/run_inbox.py",
+        "src/mokioclaw/core/runner/events.py",
+        "src/mokioclaw/graph/steps/delegation.py"
+      ],
+      "findings": [
+        "producer boundary applies inbox; queued messages are not consumed on token forwarding",
+        "stale approval revoked and context/args/backend rechecked",
+        "background creates an independent RunControl; completed effects remain"
+      ],
+      "tests": [
+        "tests/test_optimization_integration.py::test_actual_daemon_approval_correction_replans_and_rejects_late_approval",
+        "tests/test_optimization_integration.py::test_sync_subagent_correction_keeps_completed_write_and_closes_old_tool_group"
+      ],
+      "source_sha256": {
+        "src/mokioclaw/core/daemon.py": "78cf1b4b2d8375046623524a887dba3a038e99256c10b3f8db244ccba9cac1f4",
+        "src/mokioclaw/core/run_control.py": "65b0a11434d900caf36d1d715ab2236489f01bca7ef68beeafc911e20125a656",
+        "src/mokioclaw/core/run_inbox.py": "6b4d1f56bbade1b2fcc91d81356292d5cf822e1146e09508305369f3817dd14f",
+        "src/mokioclaw/core/runner/events.py": "9d9df0a2ac84272c246afceef66103f386845d9eb98d9ce4e73b913cf300ebe2",
+        "src/mokioclaw/graph/steps/delegation.py": "8fe9014fd90f234d05dca7a4e860db74f7170ec9b650a270d30e4a718159ed69"
+      }
+    },
+    {
+      "id": "diagram-and-chain-3",
+      "sources": [
+        "src/mokioclaw/graph/steps/review.py",
+        "src/mokioclaw/graph/steps/final.py",
+        "src/mokioclaw/core/runner/lifecycle.py",
+        "src/mokioclaw/evaluation/grader.py",
+        "src/mokioclaw/evaluation/runner.py"
+      ],
+      "findings": [
+        "normal graph exit can report internal FAILED; run finished is not proof of correctness",
+        "independent grading runs after worker exit; never changes daemon terminal status",
+        "task_solved requires finished and credible nonempty independent grade"
+      ],
+      "tests": [
+        "tests/test_internship_eval.py::test_empty_or_forged_test_report_cannot_claim_solved"
+      ],
+      "source_sha256": {
+        "src/mokioclaw/graph/steps/review.py": "a4cd47f01e40b3bebf4ea53f7a147f4e1a1f771171adc38d127b18061b9770f5",
+        "src/mokioclaw/graph/steps/final.py": "074b39586ea87e16349fbfda821969e818c206fa053f933876bb4a86e6c36bd4",
+        "src/mokioclaw/core/runner/lifecycle.py": "1df19eceb630ade0ab935371a44e130fee239dda8d1c205d6f2b7f778831f653",
+        "src/mokioclaw/evaluation/grader.py": "a6b5a5712f40a4f5c9172e1f8fa5170750dba8e234b76a5bc7ebeb3bb9fdb834",
+        "src/mokioclaw/evaluation/runner.py": "4304bf7b1ddfe812fc90766c3c3875ae09aa3c785f9b7ef2f51bebbdc07e4da3"
+      }
+    },
+    {
+      "id": "command-contract",
+      "sources": [
+        "src/mokioclaw/cli/app.py",
+        "examples/internship_offline.py",
+        "scripts/replay_internship_demo.py",
+        "scripts/check_docker.py"
+      ],
+      "findings": [
+        "doctor requires explicit --image for a nondefault tag; env variable alone does not select its image",
+        "offline example uses a scripted model and temporary workspace",
+        "replay only prints archived frames; trace --since belongs to task candidate, not current product"
+      ],
+      "source_sha256": {
+        "src/mokioclaw/cli/app.py": "f9943fd5b36cad8b84ba4ba593ac593348fb99417f411240caa7db17a43c6495",
+        "examples/internship_offline.py": "34f55884f110fa0fb3b922aedb80673a0f9fbed4237da7273b858c83a2e7eabc",
+        "scripts/replay_internship_demo.py": "7649d7a0da6cd4fcf7f0cefafb215bb648b91b3ac7c872deeab1fe4694474000",
+        "scripts/check_docker.py": "333361cbd88eb61599bfb77b43dd23e402047f297ca3679a4b9833ee62920a43"
+      }
+    }
+  ],
+  "diagram_count": 6,
+  "syntax_evidence": "mermaid-parse.json",
+  "limitation": "Syntax parsing and source review are not a screenshot/layout review."
+}

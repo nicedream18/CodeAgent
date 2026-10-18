@@ -47,7 +47,7 @@ Docker 是命令后端：每条前台命令新建容器，挂载与文件工具�
 模型调用仍在宿主，MCP/Python hooks 和文件工具也在宿主。工作区内容并未脱敏，不能称整个 Agent 已完全沙箱化。
 
 证据：test_execution_backend.py 的保存规则隔离、迟到批准、light/strict 恢复和真实容器测试。
-macOS ARM64 的原始实验记录见 docker-arm64-2026-10-16.json；Linux CI 已配置真实容器检查，不代表本机已经执行远程 CI。
+macOS ARM64 的原始实验记录见 docker-arm64-2026-10-16.json；随后 Goal 3 在 748ca5d 完成远程真实容器验收，见 [Linux 报告](../experiments/job-readiness-goal3/remote/39028453552/docker/report.json)；不要将该证据归到最初 ARM64 实验版本。
 
 取舍：每次启停容器增加延迟；没有常驻状态、不自动安装依赖、后台 Bash 明确拒绝。通过固定准备镜像换取一致性和更容易解释的边界。
 
