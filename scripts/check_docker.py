@@ -16,6 +16,7 @@ from ci_support import child_environment, run_command, write_json
 from mokioclaw.core.execution_backend import BackendUnavailable, docker_cli, doctor
 
 REQUIRED = {
+    "tests/test_collaboration_pressure.py::test_real_docker_context_pressure",
     "tests/test_execution_backend.py::test_real_docker_isolation_timeout_and_paths",
     "tests/test_internship_eval.py::test_real_grader_rejects_noop_test_edits_and_fake_success",
 }
@@ -52,9 +53,10 @@ def check(output: Path) -> dict[str, Any]:
                            CI_REPORT_TOKEN=token, PYTEST_PLUGINS="ci_pytest_plugin")
         try:
             command = run_command([sys.executable, "-m", "pytest", "-q",
-                                   "tests/test_execution_backend.py", "tests/test_internship_eval.py"],
+                                   "tests/test_execution_backend.py", "tests/test_internship_eval.py",
+                                   "tests/test_collaboration_pressure.py::test_real_docker_context_pressure"],
                                   cwd=Path(__file__).resolve().parents[1], environment=environment,
-                                  log=output / "pytest.log", timeout=120)
+                                  log=output / "pytest.log", timeout=180)
             receipt_path = output / "pytest-summary.json"
             receipt = json.loads(receipt_path.read_text()) if receipt_path.exists() else {}
             result.update(ok=command["status"] == "passed" and credible_tests(receipt, token),

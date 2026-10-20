@@ -91,6 +91,9 @@ def _call_registered_subagent_tool(
         from mokioclaw.core.run_control import RunControl
 
         child_runtime.run_control = RunControl()
+        child_runtime.loop_guard = None
+        child_runtime.loop_stream_id = ""
+        child_runtime.loop_tool_call_id = ""
         child_runtime.instructions = None
         child_runtime.model_metrics = {}
         child_runtime.mcp_loaded_tools = {}
@@ -118,13 +121,25 @@ def _call_registered_subagent_tool(
 
             token = CURRENT_RUN.set(child_runtime.run_control)
             try:
-                return api.run_subagent(
-                    child_state,
-                    name,
-                    instruction,
-                    writer=child_writer,
-                    handoff_id=handoff_id,
-                )
+                from mokioclaw.core.loop_guard import LoopRecovery, guard_for
+                from mokioclaw.core.loop_guard import event as loop_event
+
+                while True:
+                    try:
+                        return api.run_subagent(
+                            child_state, name, instruction, writer=child_writer, handoff_id=handoff_id,
+                        )
+                    except LoopRecovery as signal:
+                        child_state.update(signal.state)
+                        if guard_for(child_runtime).recover():
+                            child_writer(loop_event(child_runtime, "replan", signal.decision.reason))
+                            child_state["last_error"] = "Change strategy after loop protection: " + signal.decision.reason
+                            continue
+                        child_writer(loop_event(child_runtime, "stop", signal.decision.reason))
+                        return {"ok": False, "stop_reason": signal.reason,
+                                "summary": signal.decision.reason,
+                                "loop_guard": guard_for(child_runtime).snapshot()}
+
             finally:
                 CURRENT_RUN.reset(token)
                 child_runtime.run_control.close()

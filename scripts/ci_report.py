@@ -164,7 +164,7 @@ def docker(checks: Checks, work: Path) -> None:
     checks.environment["MOKIO_EVAL_DOCKER_IMAGE"] = grading_image
     checks.environment["MOKIO_DOCKER_IMAGE"] = image
     checks.environment["MOKIO_DOCKER_REPORT"] = str(checks.output / "docker-detail")
-    checks.step("real-docker-tests", ["make", "check-docker"], timeout=180)
+    checks.step("real-docker-tests", ["make", "check-docker"], timeout=300)
     detail = json.loads((checks.output / "docker-detail/result.json").read_text())
     if (not detail["ok"] or detail["image_digest"] != image
             or detail["grading_image"]["image_digest"] != grading_image):

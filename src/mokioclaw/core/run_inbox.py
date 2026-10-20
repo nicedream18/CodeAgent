@@ -8,8 +8,10 @@ import threading
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
+from typing import Any
 
 from mokioclaw.core.completion_budget import CompletionYield
+from mokioclaw.core.loop_guard import LoopRecovery
 
 _TOOL_PROGRESS = ContextVar("mokio_tool_progress", default=None)
 
@@ -35,12 +37,17 @@ def tool_call_batch(calls, messages, writer, node):
     token = _TOOL_PROGRESS.set(progress)
     try:
         yield pending()
-    except (RunRedirected, CompletionYield) as signal:
+    except (RunRedirected, CompletionYield, LoopRecovery) as signal:
+        answered = {m.tool_call_id for m in messages if isinstance(m, ToolMessage)}
         for offset, call in enumerate(calls[progress["index"] :]):
+            if call["id"] in answered:
+                continue
             result = {
                 "ok": False,
                 "status": "interrupted" if offset == 0 and progress["started"] else "not_executed",
-                "error_type": "user_redirected" if isinstance(signal, RunRedirected) else "completion_budget_reserved",
+                "error_type": ("collaboration_loop_detected" if isinstance(signal, LoopRecovery)
+                               else "user_redirected" if isinstance(signal, RunRedirected)
+                               else "completion_budget_reserved"),
                 "error": "Current batch stopped; keep completed effects and reconsider unfinished work.",
             }
             messages.append(
@@ -180,7 +187,7 @@ def merge_session_requirements(session, inbox):
             known.add(item["message_id"])
 
 
-def check_redirect(runtime, *, preserve_progress=True):
+def check_redirect(runtime: Any, *, preserve_progress: bool = True) -> None:
     inbox = getattr(getattr(runtime, "run_control", None), "inbox", None)
     if inbox is not None and inbox.pending():
         redirect = RunRedirected()

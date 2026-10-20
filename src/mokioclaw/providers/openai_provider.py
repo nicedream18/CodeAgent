@@ -218,6 +218,8 @@ def _invoke_once(
     owned = control is None
     control = control or RunControl()
     stream_id = uuid4().hex
+    if runtime is not None:
+        runtime.loop_stream_id = stream_id
     metadata = {
         "node": node,
         "stream_id": stream_id,

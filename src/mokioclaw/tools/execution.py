@@ -179,8 +179,23 @@ def _validate_tool_args(tool: BaseTool, args: dict[str, Any]) -> dict[str, Any] 
 def execute_tool(runtime, tool, args, **kwargs) -> Any:
     from mokioclaw.core.tool_output import bound_tool_result
 
+    check_run(runtime)
+    from mokioclaw.core.run_inbox import check_redirect
+
+    check_redirect(runtime)
+    runtime.loop_tool_call_id = kwargs.get("tool_call_id") or f"{tool.name}-call"
+    call_fingerprint = ""
+    if runtime.loop_guard_enabled:
+        from mokioclaw.core.loop_guard import before_tool
+
+        call_fingerprint = before_tool(runtime, tool.name, args)
     before = runtime.tool_execution_count
     result = _execute_tool(runtime, tool, args, **kwargs)
+    if runtime.loop_guard_enabled:
+        from mokioclaw.core.loop_guard import sync_guard
+
+        guard = sync_guard(runtime)
+        guard.observe(call_fingerprint, tool.name, result)
     bounded = bound_tool_result(
         result,
         runtime,
@@ -363,6 +378,10 @@ def _execute_tool(
     denied = authorize_tool(runtime, tool.name, args, tool_call_id=call_id, event_writer=on_event)
     check_run(runtime)
     check_redirect(runtime)
+    if runtime.loop_guard_enabled:
+        from mokioclaw.core.loop_guard import before_tool
+
+        before_tool(runtime, tool.name, args)
     if denied is not None:
         return {
             **denied,

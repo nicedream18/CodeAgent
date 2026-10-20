@@ -92,10 +92,10 @@ def test_pytest_receipt_keeps_counts_and_required_nodeids(tmp_path, monkeypatch)
     stats = {"passed": [SimpleNamespace(nodeid=n) for n in sorted(checks.REQUIRED)],
              "skipped": [SimpleNamespace()]}
     manager = SimpleNamespace(getplugin=lambda _: SimpleNamespace(stats=stats))
-    session = SimpleNamespace(config=SimpleNamespace(pluginmanager=manager), testscollected=3)
+    session = SimpleNamespace(config=SimpleNamespace(pluginmanager=manager), testscollected=len(checks.REQUIRED)+1)
     plugin.pytest_sessionfinish(session, 0)
     value = json.loads(destination.read_text())
-    assert value["counts"]["passed"] == 2 and value["counts"]["skipped"] == 1
+    assert value["counts"]["passed"] == len(checks.REQUIRED) and value["counts"]["skipped"] == 1
     assert checks.credible_tests(value, "nonce")
 
 

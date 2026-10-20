@@ -1,0 +1,26 @@
+............................................s.....F.......               [100%]
+=================================== FAILURES ===================================
+____________ test_pytest_receipt_keeps_counts_and_required_nodeids _____________
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-274/test_pytest_receipt_keeps_coun0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1125b95e0>
+
+    def test_pytest_receipt_keeps_counts_and_required_nodeids(tmp_path, monkeypatch):
+        plugin = load("ci_pytest_plugin", "ci_pytest_plugin_test")
+        monkeypatch.setattr(plugin, "NESTED", False)
+        destination = tmp_path / "receipt.json"
+        monkeypatch.setenv("CI_PYTEST_REPORT", str(destination))
+        monkeypatch.setenv("CI_REPORT_TOKEN", "nonce")
+        stats = {"passed": [SimpleNamespace(nodeid=n) for n in sorted(checks.REQUIRED)],
+                 "skipped": [SimpleNamespace()]}
+        manager = SimpleNamespace(getplugin=lambda _: SimpleNamespace(stats=stats))
+        session = SimpleNamespace(config=SimpleNamespace(pluginmanager=manager), testscollected=3)
+        plugin.pytest_sessionfinish(session, 0)
+        value = json.loads(destination.read_text())
+>       assert value["counts"]["passed"] == 2 and value["counts"]["skipped"] == 1
+E       assert (3 == 2)
+
+tests/test_ci_delivery.py:98: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_ci_delivery.py::test_pytest_receipt_keeps_counts_and_required_nodeids - assert (3 == 2)
+1 failed, 56 passed, 1 skipped in 11.41s

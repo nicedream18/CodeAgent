@@ -320,6 +320,8 @@ def _merge_graph_update(state: dict[str, Any], event: Any) -> None:
 def _custom_event_needs_checkpoint(event: Any) -> bool:
     if not isinstance(event, dict):
         return False
+    if event.get("type") in {"loop_replan", "loop_stop"}:
+        return True
     if event.get("type") != "tool_result":
         return False
     result = event.get("result")

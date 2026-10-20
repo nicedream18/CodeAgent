@@ -1,0 +1,317 @@
+{
+  "version": 1,
+  "execution_context": {
+    "backend": "local",
+    "image_digest": ""
+  },
+  "updated_at": "2026-10-20T03:48:42.111095+00:00",
+  "mode": "light",
+  "status": "failed",
+  "workspace": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0",
+  "checkpoint_dir": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/checkpoints",
+  "checkpoint_file": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/checkpoints/checkpoint.json",
+  "recovery_file": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/checkpoints/RECOVERY.md",
+  "state_file": "",
+  "events_file": "",
+  "task": "inspect missing file",
+  "latest_node": "codeAgent",
+  "next_node": "planner",
+  "attempts": 0,
+  "max_attempts": 3,
+  "summary": {
+    "loop_guard": {
+      "version": 1,
+      "history": [
+        {
+          "call": "a0cd1c94f2e160d5f57b76aa08d4d624704ea6a442a3c8dc8f955a8ac540462b",
+          "result": "181c8451121fdba6330cb1f9d091ae74c3c6f4bec2e695e860f65c15cffab8d6",
+          "failure": false,
+          "ok": true,
+          "epoch": 2,
+          "boundary": 2,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        },
+        {
+          "call": "e461a1e57f298f836def5a829751f4a6a87abf2e31bbd9d9cbd4083d84b95513",
+          "result": "179fe3fdf46ac9d20974cb29aaf6346763ac995a926e6261250ed101d27b15fa",
+          "failure": true,
+          "ok": false,
+          "epoch": 2,
+          "boundary": 2,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        },
+        {
+          "call": "e461a1e57f298f836def5a829751f4a6a87abf2e31bbd9d9cbd4083d84b95513",
+          "result": "179fe3fdf46ac9d20974cb29aaf6346763ac995a926e6261250ed101d27b15fa",
+          "failure": true,
+          "ok": false,
+          "epoch": 2,
+          "boundary": 2,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        },
+        {
+          "call": "e461a1e57f298f836def5a829751f4a6a87abf2e31bbd9d9cbd4083d84b95513",
+          "result": "179fe3fdf46ac9d20974cb29aaf6346763ac995a926e6261250ed101d27b15fa",
+          "failure": true,
+          "ok": false,
+          "epoch": 2,
+          "boundary": 2,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        },
+        {
+          "call": "e461a1e57f298f836def5a829751f4a6a87abf2e31bbd9d9cbd4083d84b95513",
+          "result": "179fe3fdf46ac9d20974cb29aaf6346763ac995a926e6261250ed101d27b15fa",
+          "failure": true,
+          "ok": false,
+          "epoch": 3,
+          "boundary": 3,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        },
+        {
+          "call": "e461a1e57f298f836def5a829751f4a6a87abf2e31bbd9d9cbd4083d84b95513",
+          "result": "179fe3fdf46ac9d20974cb29aaf6346763ac995a926e6261250ed101d27b15fa",
+          "failure": true,
+          "ok": false,
+          "epoch": 3,
+          "boundary": 3,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        },
+        {
+          "call": "e461a1e57f298f836def5a829751f4a6a87abf2e31bbd9d9cbd4083d84b95513",
+          "result": "179fe3fdf46ac9d20974cb29aaf6346763ac995a926e6261250ed101d27b15fa",
+          "failure": true,
+          "ok": false,
+          "epoch": 3,
+          "boundary": 3,
+          "failure_kind": "ebe557cb65a443d4e6f9fae37266f8ea4ad6e8fd6729d8f54917a8f34db6469a"
+        }
+      ],
+      "evidence": [],
+      "scope": "c6af454923407c230c52b2049959fc5c180aa82623442ebda89d374abdf03764",
+      "workspace": "0ff78ebb9aa8afcf42f90227426eb3a063748655ed46f8aeeb4931439501efdc",
+      "epoch": 3,
+      "boundary": 3,
+      "rounds": 6,
+      "recoveries": 1,
+      "warning": "repeated_failure",
+      "verifications": [],
+      "pending": ""
+    },
+    "plan_summary": "Coordinate specialist agents to complete and verify the requested deliverable.",
+    "explicit_skill": null,
+    "inbox_reference": ".mokioclaw/inbox/local-4e78a7d4b58f4c44afb3adfcca9f1db8.json",
+    "repo_context": "{\"summary\": \"no relevant files\"}",
+    "repo_explored": true,
+    "stop_reason": "collaboration_loop_detected",
+    "model_metrics": {
+      "requests": 13,
+      "roles": {
+        "intent_router": {
+          "estimated": true,
+          "input_tokens": 1350,
+          "output_tokens": 37,
+          "total_tokens": 1387,
+          "duration_ms": 0.968,
+          "cache_read_tokens": null,
+          "cache_usage_incomplete": true,
+          "cache_creation_tokens": null,
+          "requests": 1
+        },
+        "planner": {
+          "estimated": true,
+          "input_tokens": 11184,
+          "output_tokens": 542,
+          "total_tokens": 11726,
+          "duration_ms": 2.683,
+          "cache_read_tokens": null,
+          "cache_usage_incomplete": true,
+          "cache_creation_tokens": null,
+          "requests": 2
+        },
+        "codeAgent": {
+          "estimated": true,
+          "input_tokens": 66090,
+          "output_tokens": 931,
+          "total_tokens": 67021,
+          "duration_ms": 9.586,
+          "cache_read_tokens": null,
+          "cache_usage_incomplete": true,
+          "cache_creation_tokens": null,
+          "requests": 9
+        },
+        "repoAgent": {
+          "estimated": true,
+          "input_tokens": 1325,
+          "output_tokens": 33,
+          "total_tokens": 1358,
+          "duration_ms": 2.043,
+          "cache_read_tokens": null,
+          "cache_usage_incomplete": true,
+          "cache_creation_tokens": null,
+          "requests": 1
+        }
+      },
+      "estimated": true,
+      "input_tokens": 79949,
+      "output_tokens": 1543,
+      "total_tokens": 81492,
+      "duration_ms": 15.28,
+      "cache_read_tokens": null,
+      "cache_usage_incomplete": true,
+      "cache_creation_tokens": null
+    },
+    "completion_budget": {},
+    "project_instructions": [],
+    "context_version": 0,
+    "latest_user_corrections": [],
+    "agent_handoffs": [],
+    "applied_subagent_results": [],
+    "todos": [
+      {
+        "id": "todo-1",
+        "content": "Clarify the deliverable and acceptance criteria.",
+        "status": "pending",
+        "note": ""
+      },
+      {
+        "id": "todo-2",
+        "content": "Delegate specialist work needed for the task.",
+        "status": "pending",
+        "note": ""
+      },
+      {
+        "id": "todo-3",
+        "content": "Verify the generated result.",
+        "status": "pending",
+        "note": ""
+      }
+    ],
+    "todo_count": 3,
+    "acceptance_criteria": [
+      "The requested deliverable exists.",
+      "The verifier model confirms completion."
+    ],
+    "verification_commands": [],
+    "passed": false,
+    "attempts": 0,
+    "sources": [],
+    "source_count": 0,
+    "research_notes": "",
+    "code_agent_summary": "",
+    "test_report": {},
+    "testing_required": true,
+    "verifier_summary": "",
+    "last_error": "Loop recovery: failed_call_loop. Change strategy; reuse preserved evidence and completed modifications.",
+    "context_summary": "",
+    "history_summary": "",
+    "final_answer": "协作循环保护已停止任务，已有修改和证据已保存：failed_call_loop"
+  },
+  "workspace_manifest": [
+    {
+      "path": ".mokioclaw/changes/local-4e78a7d4b58f4c44afb3adfcca9f1db8/353279c32a264c619ab2673021f2d466.bin",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.694915+00:00"
+    },
+    {
+      "path": ".mokioclaw/changes/local-4e78a7d4b58f4c44afb3adfcca9f1db8/manifest.json",
+      "size": 405,
+      "mtime": "2026-10-20T03:48:42.022686+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-29073e57f0e046cdaeedfec3b7d4bcd3.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.700826+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-372d17429bfa4296ab578ca4a51bb7cd.log",
+      "size": 35,
+      "mtime": "2026-10-20T03:48:40.588089+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-434fd2dac6f94d75a7e0c89c4eda0953.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.675382+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-68fc94745e644194b3b9eceaffcaea69.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:41.443997+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-7d39f9ba2d1746e79593a91839a0bf7b.log",
+      "size": 31,
+      "mtime": "2026-10-20T03:48:41.433635+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-ac94757e68234a2e80b639e5de555ccf.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.697212+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-b3e0bf947f294473a108794cd8fdf92d.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:41.458289+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-dbf5032b35584390a69e6cef01de8836.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.692089+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-e36a9b7572624738900b3bf4c4d5ff04.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.705178+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-edb31114134f4d3cacac61dd24db8816.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:40.715611+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-f1338215ebb24173a45b0ec44de843c3.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:41.468613+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-f2fa69d4f0f140d286ed238e771a493f.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:41.462903+00:00"
+    },
+    {
+      "path": ".mokioclaw/diagnostics/model-stream-fe85cfcbbeeb4e909b3cf2eb48e38da1.log",
+      "size": 0,
+      "mtime": "2026-10-20T03:48:41.474309+00:00"
+    },
+    {
+      "path": ".mokioclaw/inbox/local-4e78a7d4b58f4c44afb3adfcca9f1db8.json",
+      "size": 2,
+      "mtime": "2026-10-20T03:48:40.506056+00:00"
+    },
+    {
+      "path": ".mokioclaw/session/writer.lock",
+      "size": 62,
+      "mtime": "2026-10-20T03:48:40.505620+00:00"
+    },
+    {
+      "path": ".mokioclaw/traces/trace-20261020-114840-5378eb/events.jsonl",
+      "size": 141432,
+      "mtime": "2026-10-20T03:48:42.022321+00:00"
+    },
+    {
+      "path": "TODO.md",
+      "size": 425,
+      "mtime": "2026-10-20T03:48:40.669119+00:00"
+    },
+    {
+      "path": "effect.txt",
+      "size": 9,
+      "mtime": "2026-10-20T03:48:40.695385+00:00"
+    }
+  ],
+  "git": {
+    "dir": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/checkpoints/git",
+    "commit": "d17abeb",
+    "error": null
+  },
+  "resume_command": "uv run mokioclaw --resume /private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0"
+}

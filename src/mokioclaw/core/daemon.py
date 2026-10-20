@@ -407,6 +407,16 @@ class AgentDaemon:
         os.environ["MOKIO_DAEMON_WORKER"] = "1"
         context_token = set_daemon_context(self.subagent_manager, record.run_id, record.append)
 
+        def supersede_approvals():
+            with record.condition:
+                for waiter in record.waiters.values():
+                    waiter.decision = ApprovalDecision(False, "Superseded by collaboration loop protection")
+                    waiter.event.set()
+                record.waiters.clear()
+            record.append({"type": "custom_event", "event": {"type": "approvals_superseded"}})
+
+        record.run_control.supersede_approvals = supersede_approvals
+
         def approval_handler(request: ApprovalRequest) -> ApprovalDecision:
             waiter = ApprovalWaiter(request)
             with record.condition:

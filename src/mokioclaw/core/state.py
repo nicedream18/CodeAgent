@@ -72,6 +72,7 @@ class RuntimeConfig:
     context_max_depth: int = 8
     context_max_nodes: int = 1000
     context_token_limit: int | None = None
+    loop_guard_enabled: bool = True
     context_compression_enabled: bool = True
     model_context_reserve_tokens: int = 8192
     context_safety_tokens: int = 1024
@@ -85,6 +86,9 @@ class RuntimeConfig:
 @dataclass
 class RuntimeState(RuntimeConfig):
     workspace: Path
+    loop_guard: Any = None
+    loop_stream_id: str = ""
+    loop_tool_call_id: str = ""
     execution_image_digest: str = ""
     light_active: bool = False
     light_target: str | None = None
@@ -134,6 +138,8 @@ class RuntimeState(RuntimeConfig):
     subagent_applied_results: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
+        if not isinstance(self.loop_guard_enabled, bool):
+            raise ValueError("loop_guard_enabled must be a boolean")
         if not isinstance(self.context_compression_enabled, bool):
             raise ValueError("context_compression_enabled must be a boolean")
         if self.execution_backend not in {"local", "docker"}:

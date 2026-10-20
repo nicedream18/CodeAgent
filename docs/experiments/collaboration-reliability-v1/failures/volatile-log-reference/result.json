@@ -1,0 +1,93 @@
+{
+  "ok": false,
+  "backend": "docker",
+  "image_digest": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609",
+  "platform": "linux/aarch64",
+  "checked_at": "2026-10-20T03:42:20.853081+00:00",
+  "grading_image": {
+    "ok": true,
+    "backend": "docker",
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "platform": "linux/aarch64"
+  },
+  "command": {
+    "command": [
+      "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_execution_backend.py",
+      "tests/test_internship_eval.py",
+      "tests/test_collaboration_pressure.py::test_real_docker_context_pressure"
+    ],
+    "status": "failed",
+    "exit_code": 1,
+    "log": "pytest.log",
+    "timeout_seconds": 180,
+    "timed_out": false,
+    "seconds": 37.076,
+    "output_bytes": 2889,
+    "log_bytes": 2889,
+    "log_truncated": false,
+    "tail": ".................................F                                       [100%]\n=================================== FAILURES ===================================\n______________________ test_real_docker_context_pressure _______________________\n\ntmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-286/test_real_docker_context_press0')\n\n    def test_real_docker_context_pressure(tmp_path):\n        import os\n    \n        if os.getenv(\"MOKIO_TEST_DOCKER\") != \"1\":\n            pytest.skip(\"explicit real Docker integration suite only\")\n        from mokioclaw.core.execution_backend import doctor\n    \n        image = os.getenv(\"MOKIO_DOCKER_IMAGE\", \"mokioclaw-execution:0.2.0\")\n        check = doctor(\"docker\", image)\n        assert check[\"ok\"], check\n        for scenario in (\"command_tail\", \"repair_correction\"):\n            for enabled in (True, False):\n                result = run_case(\n                    tmp_path / f\"{scenario}-{enabled}\",\n                    scenario,\n                    enabled=enabled,\n                    manual=scenario == \"repair_correction\",\n                    execution_backend=\"docker\",\n                    docker_image=check[\"image_digest\"],\n                )\n                assert result[\"image_digest\"] == check[\"image_digest\"]\n                assert result[\"artifact_passed\"] == enabled\n                assert (\n                    result[\"compression_count\"] >= 1\n                    if enabled\n                    else result[\"stop_reason\"] == \"context_budget_exceeded\"\n                )\n    \n        # Each invocation creates a fresh container ID/log path. These must not\n        # manufacture progress or allow the fourth unchanged failure to execute.\n        from mokioclaw.core.loop_guard import LoopRecovery\n        from mokioclaw.core.state import RuntimeState\n        from mokioclaw.tools.execution import execute_tool\n        from mokioclaw.tools.registry import build_tool\n        area = tmp_path / \"repeat-container\"\n        area.mkdir()\n        runtime = RuntimeState(workspace=area,execution_backend=\"docker\",docker_image=check[\"image_digest\"],approval_mode=\"auto\")\n        tool = build_tool(runtime,\"BashTool\")\n        args = {\"command\":\"python -c 'raise SystemExit(2)'\"}\n        for _ in range(3):\n            assert not execute_tool(runtime,tool,args)[\"ok\"]\n>       with pytest.raises(LoopRecovery,match=\"failed_call_loop\"):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE <class 'mokioclaw.core.loop_guard.LoopRecovery'>\n\ntests/test_collaboration_pressure.py:85: Failed\n=========================== short test summary info ============================\nFAILED tests/test_collaboration_pressure.py::test_real_docker_context_pressure - Failed: DID NOT RAISE <class 'mokioclaw.core.loop_guard.LoopRecovery'>\n1 failed, 33 passed in 35.13s\n",
+    "output_complete": true,
+    "output_errors": []
+  },
+  "pytest": {
+    "schema_version": 1,
+    "session_token": "c2fb36f214b24bcda368701690546dbb",
+    "exit_code": 1,
+    "collected": 34,
+    "counts": {
+      "passed": 33,
+      "failed": 1,
+      "skipped": 0,
+      "error": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "deselected": 0
+    },
+    "passed_nodeids": [
+      "tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[0]",
+      "tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[1]",
+      "tests/test_execution_backend.py::test_tiny_preview_still_drains_large_output_without_unbounded_memory[4]",
+      "tests/test_execution_backend.py::test_local_timeout_kills_descendants_and_output_is_bounded",
+      "tests/test_execution_backend.py::test_backend_rules_keep_legacy_local_and_separate_images",
+      "tests/test_execution_backend.py::test_docker_unavailable_never_falls_back",
+      "tests/test_execution_backend.py::test_docker_background_is_rejected_before_launch",
+      "tests/test_execution_backend.py::test_real_docker_isolation_timeout_and_paths",
+      "tests/test_execution_backend.py::test_missing_image_is_controlled",
+      "tests/test_execution_backend.py::test_runtime_explicit_backend_and_config_precedence",
+      "tests/test_execution_backend.py::test_once_approval_is_invalid_after_backend_change",
+      "tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[light]",
+      "tests/test_execution_backend.py::test_resume_with_different_backend_redecides_and_reverifies[strict]",
+      "tests/test_internship_eval.py::test_schedule_has_exactly_56_unique_predeclared_trials",
+      "tests/test_internship_eval.py::test_eval_cli_offline_is_separate_from_real_statistics",
+      "tests/test_internship_eval.py::test_request_and_tool_limits_stop_before_another_operation",
+      "tests/test_internship_eval.py::test_empty_or_forged_test_report_cannot_claim_solved",
+      "tests/test_internship_eval.py::test_baseline_uses_real_shared_loop_without_router_or_verifier",
+      "tests/test_internship_eval.py::test_real_grader_rejects_noop_test_edits_and_fake_success",
+      "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[baseline]",
+      "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[full]",
+      "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[light]",
+      "tests/test_internship_eval.py::test_evaluation_execution_capabilities_match_for_all_architectures[auto]",
+      "tests/test_internship_eval.py::test_evaluation_provider_failure_is_controlled_and_does_not_leak_key",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[True-baseline]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[True-full]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[True-light]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[True-auto]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[False-baseline]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[False-full]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[False-light]",
+      "tests/test_internship_eval.py::test_actual_subagent_requests_inherit_evaluation_model_profile[False-auto]",
+      "tests/test_internship_eval.py::test_explicit_subagent_model_override_restores_parent_on_failure"
+    ],
+    "nodeids_truncated": false,
+    "seconds": 35.131
+  },
+  "owner": "ci-489a1b139024480b8db5a04c2b9c41f7",
+  "cleanup": {
+    "removed": [],
+    "confirmed": true
+  }
+}

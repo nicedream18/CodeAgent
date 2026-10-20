@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from mokioclaw.core import agent as api
+from mokioclaw.core.loop_guard import LoopRecovery
 
 
 def _graph_envelopes(workflow, inputs, *, terminal=False):
@@ -31,6 +32,53 @@ def _graph_envelopes(workflow, inputs, *, terminal=False):
             if inbox and (terminal or inputs.get("intent_route") == "chat") and not inbox.seal():
                 raise RunRedirected()
             return
+        except LoopRecovery as signal:
+            from mokioclaw.core.loop_guard import event as loop_event
+            from mokioclaw.core.loop_guard import guard_for
+
+            if iterator is not None and hasattr(iterator, "close"):
+                iterator.close()
+                iterator = None
+            inputs.update(signal.state)
+            api.check_run(runtime)
+            if inbox is not None and inbox.pending():
+                corrections = []
+                inbox.apply(inputs, corrections.append)
+                if terminal:
+                    workflow = api.build_complex_workflow()
+                    runtime.light_active, runtime.light_target = False, None
+                for correction in corrections:
+                    yield {"type": "custom_event", "event": correction}
+                yield {
+                    "type": "graph_event",
+                    "event": {
+                        "run_redirect": {
+                            key: value for key, value in inputs.items() if key != "runtime"
+                        }
+                    },
+                }
+                continue
+            inputs.update(passed=False, final_answer="", context_next_node="planner")
+            if not guard_for(runtime).recover():
+                raise
+            inputs["last_error"] = (
+                "Loop recovery: "
+                + signal.decision.reason
+                + ". Change strategy; reuse preserved evidence and completed modifications."
+            )
+            # Light execution upgrades once; background runs never enter this parent loop.
+            if terminal:
+                workflow = api.build_complex_workflow()
+                runtime.light_active, runtime.light_target = False, None
+                inputs["workflow_upgraded"] = True
+            payload = loop_event(runtime, "replan", signal.decision.reason)
+            yield {"type": "custom_event", "event": payload}
+            yield {
+                "type": "graph_event",
+                "event": {
+                    "loop_replan": {key: value for key, value in inputs.items() if key != "runtime"}
+                },
+            }
         except RunRedirected as redirect:
             if iterator is not None and hasattr(iterator, "close"):
                 iterator.close()

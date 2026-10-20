@@ -12,7 +12,8 @@ flowchart TB
     G <--> S[同步 repoAgent / codeAgent / testAgent]
     G --> M[统一模型适配与完整性检查]
     S --> M
-    M --> T[共享工具循环与执行策略]
+    M --> LG[LoopGuard: 提示 / 一次恢复 / 停止]
+    LG --> T[共享工具循环与执行策略]
     T --> P[参数 / 静态权限 / 前置 hook / 审批 / 版本复核]
     P --> X[执行 / 有界结果 / 后置 hook]
     X --> H[宿主文件工具 / MCP / hooks]
@@ -37,3 +38,5 @@ flowchart TB
 实现交接后，运行时自动安排 `codeAgent → testAgent → Verifier`。testAgent 是独立注册的第四个子 Agent，默认用 8 次工具预算读取代码和测试、运行检查、报告失败及缺口；修复或补测试再交回 codeAgent。`test_report` 的命令、退出码和状态来自实际工具执行，Verifier 保留最终任务验收，历史独立评分器继续保持可信测试边界。[测试角色说明](../../testing-agent.md)。
 
 同步子任务的已完成副作用保留；前台取消阻止后续步骤。显式后台任务有独立生命周期，父任务取消不等于后台取消。Docker 只是命令后端，不隔离宿主的模型调用、文件工具、MCP 或 hooks。
+
+协作保护跨同步角色共享有界摘要，压缩不清空历史或恢复额度。后台独立恢复，不消耗父任务额度；后台 FIFO 排队取消立即释放闭包，终态缓存 128 项、事件尾部 256 条。见[实现与压力复现](../../collaboration-reliability.md)。

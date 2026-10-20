@@ -149,13 +149,24 @@ def verifier_node(state: api.MokioGraphState) -> dict[str, api.Any]:
         "context_next_node": api.verifier_route({**state, "passed": passed, "attempts": attempts}),
         **api.graph_context_updates(state, messages, "verifier"),
     }
+    if runtime.loop_guard_enabled:
+        from mokioclaw.core.loop_guard import guard_for
+
+        # Model-authored reasons/check labels cannot manufacture progress.
+        # Only executor results and the independently captured test commands
+        # contribute to the repeat-failure signature.
+        observed = api._tool_events_to_verification_results(tool_events)
+        observed.extend(state.get("test_report", {}).get("commands", []))
+        guard_for(runtime).verification(observed, passed)
     if completion and completion.draining and not passed:
         from mokioclaw.providers.model_policy import RunBudgetExceeded
 
         error = RunBudgetExceeded(
             "Reserved completion phase could not verify the task", "completion_verification_failed"
         )
-        error.state = {key: value for key, value in state.items() if key not in {"runtime", "messages"}}
+        error.state = {
+            key: value for key, value in state.items() if key not in {"runtime", "messages"}
+        }
         error.state.update({key: value for key, value in result.items() if key != "messages"})
         raise error
     return result

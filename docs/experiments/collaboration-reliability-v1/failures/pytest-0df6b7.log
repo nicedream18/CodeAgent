@@ -1,0 +1,30 @@
+...................F............................s.............           [100%]
+=================================== FAILURES ===================================
+_________________ test_verifier_prose_cannot_reset_no_progress _________________
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-277/test_verifier_prose_cannot_res0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1165b3890>
+
+    def test_verifier_prose_cannot_reset_no_progress(tmp_path,monkeypatch):
+        from mokioclaw.graph import nodes
+        g = guard_for(rt := runtime(tmp_path))
+        g.verification([],False)
+        for _ in range(6):
+            g.model_round()
+        class Model:
+            def bind_tools(self,tools):
+                return self
+            def invoke(self,messages):
+                return AIMessage(content='{"passed":false,"reason":"unique prose does not mean new facts","checks":[{"name":"unique text","passed":false,"detail":"claimed new evidence"}]}')
+        monkeypatch.setattr(nodes,'create_model',Model)
+        # The role's one request can proceed because only one failure is known;
+        # its fabricated "new check" must not reset the six rounds afterward.
+        nodes.verifier_node({'runtime':rt,'task':'inspect','messages':[],'max_attempts':9})
+>       assert g.model_round().reason=='no_progress'
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'reason'
+
+tests/test_loop_guard.py:412: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_loop_guard.py::test_verifier_prose_cannot_reset_no_progress - AttributeError: 'NoneType' object has no attribute 'reason'
+1 failed, 60 passed, 1 skipped in 11.09s

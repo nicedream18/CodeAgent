@@ -126,6 +126,9 @@ def print_custom_event(event: dict[str, Any]) -> None:
         "workflow_selected",
         "hook_result",
         "run_budget_exhausted",
+        "loop_warning",
+        "loop_replan",
+        "loop_stop",
     }:
         from mokioclaw.cli.event_summary import summarize_custom_event
 

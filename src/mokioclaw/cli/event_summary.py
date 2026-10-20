@@ -39,6 +39,10 @@ def summarize_event(event: dict[str, Any]) -> EventSummary:
 
 def summarize_custom_event(event: dict[str, Any]) -> EventSummary:
     event_type = event.get("type", "event")
+    if event_type in {"loop_warning", "loop_replan", "loop_stop"}:
+        title = {"loop_warning": "循环提示", "loop_replan": "循环恢复 · 重规划", "loop_stop": "循环保护 · 已停止"}[event_type]
+        return EventSummary(title, f"{event.get('reason')}: {event.get('message', '')}",
+                            "error" if event_type == "loop_stop" else "info", "yellow")
     if event_type == "run_budget_exhausted":
         return EventSummary("运行预算已耗尽", event.get("message", ""), "error")
     if event_type == "workflow_selected":

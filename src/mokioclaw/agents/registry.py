@@ -13,6 +13,7 @@ from mokioclaw.agents.search_agent import run_search_agent
 from mokioclaw.agents.test_agent import run_test_agent
 from mokioclaw.core.completion_budget import CompletionYield
 from mokioclaw.core.context_budget import ContextBudgetError
+from mokioclaw.core.loop_guard import LoopRecovery
 from mokioclaw.core.run_control import RunInterrupted, check_run
 from mokioclaw.core.run_inbox import RunRedirected
 from mokioclaw.core.state import RuntimeState, SubagentToolBudget
@@ -489,7 +490,10 @@ def run_subagent(
             legacy_state=legacy_state,
             legacy_before=legacy_before,
         )
-    except (RunRedirected, RunBudgetExceeded, ModelGenerationStopped, CompletionYield) as redirect:
+    except (RunRedirected, RunBudgetExceeded, ModelGenerationStopped, CompletionYield, LoopRecovery) as redirect:
+        if isinstance(redirect, LoopRecovery):
+            redirect.state = {key: copy.deepcopy(value) for key, value in state.items()
+                              if key not in {"runtime", "messages"}}
         if legacy_state is not None:
             for key in definition.state_update_fields:
                 if legacy_state.get(key) is not None:

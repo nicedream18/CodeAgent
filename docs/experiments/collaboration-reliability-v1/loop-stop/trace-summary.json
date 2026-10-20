@@ -1,0 +1,135 @@
+{
+  "orchestration": {
+    "backend": "crewai",
+    "version": "1.15.28"
+  },
+  "trace_id": "trace-20261020-114840-5378eb",
+  "status": "failed",
+  "model_metrics": {
+    "requests": 13,
+    "roles": {
+      "intent_router": {
+        "estimated": true,
+        "input_tokens": 1350,
+        "output_tokens": 37,
+        "total_tokens": 1387,
+        "duration_ms": 0.968,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 1
+      },
+      "planner": {
+        "estimated": true,
+        "input_tokens": 11184,
+        "output_tokens": 542,
+        "total_tokens": 11726,
+        "duration_ms": 2.683,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 2
+      },
+      "codeAgent": {
+        "estimated": true,
+        "input_tokens": 66090,
+        "output_tokens": 931,
+        "total_tokens": 67021,
+        "duration_ms": 9.586,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 9
+      },
+      "repoAgent": {
+        "estimated": true,
+        "input_tokens": 1325,
+        "output_tokens": 33,
+        "total_tokens": 1358,
+        "duration_ms": 2.043,
+        "cache_read_tokens": null,
+        "cache_usage_incomplete": true,
+        "cache_creation_tokens": null,
+        "requests": 1
+      }
+    },
+    "estimated": true,
+    "input_tokens": 79949,
+    "output_tokens": 1543,
+    "total_tokens": 81492,
+    "duration_ms": 15.28,
+    "cache_read_tokens": null,
+    "cache_usage_incomplete": true,
+    "cache_creation_tokens": null
+  },
+  "workspace": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0",
+  "trace_dir": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/traces/trace-20261020-114840-5378eb",
+  "events_file": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/traces/trace-20261020-114840-5378eb/events.jsonl",
+  "summary_file": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/traces/trace-20261020-114840-5378eb/summary.json",
+  "timeline_file": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-292/test_real_flow_unwinds_child_r0/.mokioclaw/traces/trace-20261020-114840-5378eb/timeline.md",
+  "started_at": "2026-10-20T03:48:40.506172+00:00",
+  "ended_at": "2026-10-20T03:48:42.112410+00:00",
+  "duration_ms": 1606,
+  "event_count": 156,
+  "node_visits": {
+    "intent_router": 1,
+    "loop_replan": 1
+  },
+  "tool_calls": 11,
+  "failed_tool_calls": 12,
+  "tool_retries": 0,
+  "tool_retry_errors": {},
+  "tool_error_types": {
+    "collaboration_loop_detected": 6,
+    "tool_error": 6
+  },
+  "tool_retry_stops": {
+    "retry_limit_reached": 0,
+    "non_idempotent_side_effect": 0
+  },
+  "approval_count": 0,
+  "permission_decisions": {
+    "requested": 0,
+    "granted": 9,
+    "denied": 0
+  },
+  "checkpoint_count": 17,
+  "handoff_count": 2,
+  "subagent_budget_exhaustions": 0,
+  "subagent_result_status": {
+    "ok": 0,
+    "failed": 0
+  },
+  "background_subagent_total": 0,
+  "context_governance": {
+    "compactions": 0,
+    "truncations": 0,
+    "failures": 0,
+    "max_input_tokens": 8821,
+    "estimation_methods": [
+      "utf8_bytes"
+    ]
+  },
+  "background_subagent_status_counts": {},
+  "background_subagents": [],
+  "handoffs": [
+    {
+      "handoff_id": "70196b32-ab7f-429f-bbed-5884a31f11c0",
+      "subagent": "codeAgent",
+      "instruction": "inspect missing file",
+      "status": "running"
+    },
+    {
+      "handoff_id": "c0fc79b5-fb0b-4ced-b91b-d150a4fba578",
+      "subagent": "codeAgent",
+      "instruction": "inspect missing file",
+      "status": "running"
+    }
+  ],
+  "skill_load_successes": 0,
+  "skill_load_failures": 0,
+  "skills_used": [],
+  "final_status": "",
+  "errors": [],
+  "timeline_omitted": 36
+}

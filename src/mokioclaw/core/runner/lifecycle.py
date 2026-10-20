@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from mokioclaw.core import agent as api
+from mokioclaw.core.loop_guard import LoopRecovery
 
 
 class _RunLifecycle:
@@ -190,6 +191,21 @@ def _controlled_stream(stream, task, options, control, *, session, execution_con
                     f"模型生成未完整完成，当前进展已保存：{exc.reason}"
                 )
                 event = {"type": "model_generation_stopped", "reason": exc.reason}
+                lifecycle.record_emitted(event)
+                yield {"type": "custom_event", "event": event}
+            except LoopRecovery as exc:
+                status = "failed"
+                lifecycle.state.update(exc.state)
+                lifecycle.state.update(
+                    passed=False,
+                    stop_reason=exc.reason,
+                    final_answer="协作循环保护已停止任务，已有修改和证据已保存："
+                    + exc.decision.reason,
+                )
+                from mokioclaw.core.loop_guard import event as loop_event
+
+                event = loop_event(runtime, "stop", exc.decision.reason)
+                event["stop_reason"] = exc.reason
                 lifecycle.record_emitted(event)
                 yield {"type": "custom_event", "event": event}
             except api.RunBudgetExceeded as exc:

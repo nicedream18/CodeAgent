@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+    "examples/collaboration_pressure.py",
+    "--output",
+    "/private/tmp/mokio-collaboration-0g8ut04r/accepted-experiments/pressure"
+  ],
+  "status": "passed",
+  "exit_code": 0,
+  "log": "pressure-command.log",
+  "timeout_seconds": 240,
+  "timed_out": false,
+  "seconds": 6.729,
+  "output_bytes": 148,
+  "log_bytes": 148,
+  "log_truncated": false,
+  "tail": "{\"passed\": true, \"cases\": 12, \"real_model\": false, \"result\": \"/private/tmp/mokio-collaboration-0g8ut04r/accepted-experiments/pressure/result.json\"}\n",
+  "output_complete": true,
+  "output_errors": []
+}

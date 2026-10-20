@@ -83,3 +83,7 @@
 以上是 Goal 1 当时的边界；后续真实对照与远程 CI 结果见上方 Goal 2/3。真实跨文件完整交付和本人掌握程度仍未确认。
 
 设计与操作说明：[Goal 1](../experiments/job-readiness-v1/README.md)、[预算设计](../experiments/job-readiness-v1/DESIGN.md)。
+
+## 协作可靠性完善
+
+默认启用 LoopGuard，保守识别重复失败/序列及无进展；一次重规划后再次触发安全停止。后台队列取消即释放等待项，缓存有界；新增 16K 实际压缩压力实验。实现与边界见[设计](../collaboration-reliability.md)，本轮检查见[结果](../experiments/collaboration-reliability-v1/RESULTS.md)。既有真实实验分母保持原样。

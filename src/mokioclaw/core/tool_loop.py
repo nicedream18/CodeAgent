@@ -70,6 +70,10 @@ class ToolConversation:
                         "Avoid broad discovery after the target is known; preserve budget for verification and the final report."
                     ),
                 )
+        if runtime is not None and runtime.loop_guard_enabled:
+            from mokioclaw.core.loop_guard import prepare_request
+
+            prepare_request(runtime, self.messages, self.writer, self.node)
         try:
             response = self.invoke(
                 runnable, self.messages, writer=self.writer, node=self.node, state=self.state
@@ -102,6 +106,36 @@ class ToolConversation:
         return response
 
     def append(self, message: Any) -> None:
+        runtime = self.state.get("runtime") if self.state else None
+        if runtime is not None and runtime.loop_guard_enabled and isinstance(message, ToolMessage):
+            from mokioclaw.tools.registry import tool_spec_for
+
+            if message.name and tool_spec_for(message.name) is None:
+                from mokioclaw.core.execution_backend import execution_fingerprint
+                from mokioclaw.core.loop_guard import guard_for
+
+                call = next(
+                    (
+                        c
+                        for m in reversed(self.messages)
+                        for c in (getattr(m, "tool_calls", None) or [])
+                        if c["id"] == message.tool_call_id
+                    ),
+                    None,
+                )
+                if call is not None:
+                    guard = guard_for(runtime)
+                    try:
+                        result = json.loads(str(message.content))
+                    except ValueError:
+                        result = {"ok": False, "error_type": "invalid_input"}
+                    guard.observe(
+                        guard.call_fingerprint(
+                            message.name, call.get("args", {}), execution_fingerprint(runtime)
+                        ),
+                        message.name,
+                        result,
+                    )
         self.messages.append(message)
         if self.produced is not None:
             self.produced.append(message)
@@ -153,12 +187,30 @@ class ToolConversation:
         # specialist reach the batch boundary before the generator is closed.
         try:
             with tool_call_batch(calls, self.messages, self.writer, self.node) as pending:
-                yield pending
+
+                def checked() -> Iterator[Any]:
+                    runtime = self.state.get("runtime") if self.state else None
+                    for call in pending:
+                        from mokioclaw.tools.registry import tool_spec_for
+
+                        if (
+                            runtime is not None
+                            and runtime.loop_guard_enabled
+                            and tool_spec_for(call["name"]) is None
+                        ):
+                            from mokioclaw.core.loop_guard import before_tool
+
+                            runtime.loop_tool_call_id = call["id"]
+                            before_tool(runtime, call["name"], call.get("args", {}))
+                        yield call
+
+                yield checked()
         except CompletionYield as signal:
             if self.produced is not None:
                 known = {id(message) for message in self.produced}
                 self.produced.extend(
-                    message for message in self.messages
+                    message
+                    for message in self.messages
                     if isinstance(message, ToolMessage) and id(message) not in known
                 )
             self._handoff(signal)

@@ -1,0 +1,55 @@
+.................................F                                       [100%]
+=================================== FAILURES ===================================
+______________________ test_real_docker_context_pressure _______________________
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-286/test_real_docker_context_press0')
+
+    def test_real_docker_context_pressure(tmp_path):
+        import os
+    
+        if os.getenv("MOKIO_TEST_DOCKER") != "1":
+            pytest.skip("explicit real Docker integration suite only")
+        from mokioclaw.core.execution_backend import doctor
+    
+        image = os.getenv("MOKIO_DOCKER_IMAGE", "mokioclaw-execution:0.2.0")
+        check = doctor("docker", image)
+        assert check["ok"], check
+        for scenario in ("command_tail", "repair_correction"):
+            for enabled in (True, False):
+                result = run_case(
+                    tmp_path / f"{scenario}-{enabled}",
+                    scenario,
+                    enabled=enabled,
+                    manual=scenario == "repair_correction",
+                    execution_backend="docker",
+                    docker_image=check["image_digest"],
+                )
+                assert result["image_digest"] == check["image_digest"]
+                assert result["artifact_passed"] == enabled
+                assert (
+                    result["compression_count"] >= 1
+                    if enabled
+                    else result["stop_reason"] == "context_budget_exceeded"
+                )
+    
+        # Each invocation creates a fresh container ID/log path. These must not
+        # manufacture progress or allow the fourth unchanged failure to execute.
+        from mokioclaw.core.loop_guard import LoopRecovery
+        from mokioclaw.core.state import RuntimeState
+        from mokioclaw.tools.execution import execute_tool
+        from mokioclaw.tools.registry import build_tool
+        area = tmp_path / "repeat-container"
+        area.mkdir()
+        runtime = RuntimeState(workspace=area,execution_backend="docker",docker_image=check["image_digest"],approval_mode="auto")
+        tool = build_tool(runtime,"BashTool")
+        args = {"command":"python -c 'raise SystemExit(2)'"}
+        for _ in range(3):
+            assert not execute_tool(runtime,tool,args)["ok"]
+>       with pytest.raises(LoopRecovery,match="failed_call_loop"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'mokioclaw.core.loop_guard.LoopRecovery'>
+
+tests/test_collaboration_pressure.py:85: Failed
+=========================== short test summary info ============================
+FAILED tests/test_collaboration_pressure.py::test_real_docker_context_pressure - Failed: DID NOT RAISE <class 'mokioclaw.core.loop_guard.LoopRecovery'>
+1 failed, 33 passed in 35.13s

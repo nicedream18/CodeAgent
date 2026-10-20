@@ -273,6 +273,9 @@ def build_light_resume_inputs(
         },
     }
     _copy_summary_fields(inputs, summary)
+    from mokioclaw.core.loop_guard import LoopGuard
+
+    runtime.loop_guard = LoopGuard.restore(summary.get("loop_guard", {}))
     return inputs
 
 
@@ -334,6 +337,9 @@ def serialize_state(state: dict[str, Any]) -> dict[str, Any]:
         serialized[key] = json_safe(value)
     runtime = state.get("runtime")
     if runtime is not None:
+        from mokioclaw.core.loop_guard import guard_for
+
+        serialized["loop_guard"] = guard_for(runtime).snapshot()
         serialized["applied_subagent_results"] = sorted(runtime.subagent_applied_results)
         from mokioclaw.core.context_compaction import critical_facts
 
@@ -344,6 +350,9 @@ def serialize_state(state: dict[str, Any]) -> dict[str, Any]:
 
 def deserialize_state(data: dict[str, Any], runtime: Any) -> dict[str, Any]:
     state = dict(data)
+    from mokioclaw.core.loop_guard import LoopGuard
+
+    runtime.loop_guard = LoopGuard.restore(state.pop("loop_guard", {}))
     runtime.context_version = int(state.get("context_version", 0))
     if runtime.context_control is not None:
         runtime.context_control.version = runtime.context_version
@@ -384,7 +393,10 @@ def deserialize_messages(messages: list[Any]) -> list[BaseMessage]:
 def state_summary(state: dict[str, Any]) -> dict[str, Any]:
     todos = state.get("todos", [])
     sources = state.get("sources", [])
+    from mokioclaw.core.loop_guard import guard_for
+
     return {
+        "loop_guard": guard_for(state["runtime"]).snapshot() if state.get("runtime") else {},
         "plan_summary": trim_text(state.get("plan_summary", ""), 1200),
         "explicit_skill": getattr(state.get("runtime"), "explicit_skill", None),
         "inbox_reference": str(

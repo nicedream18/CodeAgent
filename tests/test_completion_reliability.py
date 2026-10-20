@@ -172,7 +172,7 @@ def test_finalization_cannot_bypass_global_budget_or_execute_new_calls(tmp_path)
 def test_verifier_gets_a_tool_free_decision_after_last_inspection(tmp_path, monkeypatch):
     from mokioclaw.graph import nodes
 
-    (tmp_path / "a.py").write_text("observed\n")
+    (tmp_path / "a.py").write_text("".join(f"observed line {i}\n" for i in range(8)))
     calls = []
 
     class Bound:
@@ -183,7 +183,7 @@ def test_verifier_gets_a_tool_free_decision_after_last_inspection(tmp_path, monk
                 tool_calls=[
                     {
                         "name": "FileReadTool",
-                        "args": {"file_path": "a.py"},
+                        "args": {"file_path": "a.py", "offset": len(calls)-1, "limit": 1},
                         "id": f"read-{len(calls)}",
                     }
                 ],
