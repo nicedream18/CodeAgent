@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "base_commit": "8df67d7e2caaa0ef04502563706d3b382585af99",
+  "tested_tree_dirty": true,
+  "identity": "Base commit plus source_and_checks_sha256 identifies the tested migration before a local commit.",
+  "source_and_checks_sha256": "77a2595aae050adc30f79fa4fbbef079e5012e35e2be7a84474f369c2eada812",
+  "lock_sha256": "68fc0a65d66931e0f465dae77db41e6155da4412909e4464381721a72002b05e",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "crewai": "1.15.28",
+  "mcp": "1.28.1",
+  "check": {
+    "status": "passed",
+    "passed": 496,
+    "skipped": 2,
+    "strict_mypy_files": 38,
+    "report": "check/report.json"
+  },
+  "docker": {
+    "status": "passed",
+    "passed": 33,
+    "skipped": 0,
+    "image": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609",
+    "cleanup_confirmed": true,
+    "report": "docker/result.json",
+    "build_index": "https://mirrors.aliyun.com/pypi/simple"
+  },
+  "wheel": {
+    "status": "passed",
+    "site_packages_verified": true,
+    "offline_flow_executed": true,
+    "python_files_compared_to_source": 107,
+    "sha256": "a3dd02752a5239bf53b40aa4eaa772c9f04448385c7403586ad85416ff58dfe9",
+    "report": "wheel/result.json"
+  },
+  "offline_example": {
+    "status": "passed",
+    "scripted_requests": 3,
+    "tools": 2,
+    "assertion": "add(2,3) == 5",
+    "real_model": false,
+    "report": "offline/result.json"
+  },
+  "linux_flow": {
+    "status": "passed",
+    "passed": 11,
+    "network": "none",
+    "cleanup_confirmed": true,
+    "report": "linux-flow/linux-flow-result.json"
+  },
+  "historical_grading_image": {
+    "ok": true,
+    "backend": "docker",
+    "image_digest": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+    "platform": "linux/aarch64"
+  },
+  "preserved_failed_docker_attempt": {
+    "passed": 32,
+    "failed": 1,
+    "cause": "Frozen MCP 2 task source was incorrectly graded inside current MCP 1 execution image.",
+    "report": "failed-docker/result.json"
+  },
+  "historical_image_unchanged": "sha256:122a00775cb27f1e8fc02b10ca32b4466d21f5e14df7964c6de0436dce9d48ba",
+  "real_model_calls": 0,
+  "remote_ci_run": false,
+  "pushed": false,
+  "published": false,
+  "credential_scan": "Passed for whitelisted files; no HOME, credential directory, virtualenv or wheel binary is archived."
+}

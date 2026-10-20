@@ -100,10 +100,10 @@ class WorkflowModel:
 
 @pytest.fixture
 def local_models(monkeypatch):
-    from mokioclaw.agents import code_agent, repo_agent
+    from mokioclaw.agents import code_agent, repo_agent, test_agent
     from mokioclaw.graph import nodes
 
-    for module in (nodes, code_agent, repo_agent):
+    for module in (nodes, code_agent, repo_agent, test_agent):
         monkeypatch.setattr(module, "create_model", WorkflowModel)
 
 
@@ -129,6 +129,7 @@ def test_real_workflow_modes_produce_same_verified_file(tmp_path, local_models, 
     assert any(row.get("event", {}).get("mode") == expected for row in events)
     metrics = terminal["model_metrics"]
     assert metrics["roles"]["verifier"]["requests"] == 2
+    assert metrics["roles"]["testAgent"]["requests"] == 2
     assert ("planner" in metrics["roles"]) == (mode == "full")
     assert metrics["estimated"]
     summaries = list((tmp_path / ".mokioclaw/traces").glob("*/summary.json"))
@@ -190,11 +191,10 @@ def test_upgraded_graph_failure_keeps_one_end_per_stream_in_trace(
     tmp_path, local_models, monkeypatch
 ):
     from langchain_core.messages import AIMessage, HumanMessage
-    from langgraph.graph import END, START, StateGraph
 
     from mokioclaw.core.context_budget import ContextBudgetError
     from mokioclaw.graph import light, nodes, workflow
-    from mokioclaw.graph.state import MokioGraphState
+    from mokioclaw.orchestration.runtime import single_step_workflow
     from mokioclaw.providers.openai_provider import invoke_streaming
 
     class Fixed:
@@ -209,11 +209,7 @@ def test_upgraded_graph_failure_keeps_one_end_per_stream_in_trace(
         raise ContextBudgetError("controlled post-generation failure")
 
     def build_failed_full():
-        graph = StateGraph(MokioGraphState)
-        graph.add_node("failed_full", failed_full)
-        graph.add_edge(START, "failed_full")
-        graph.add_edge("failed_full", END)
-        return graph.compile()
+        return single_step_workflow("failed_full", failed_full)
 
     (tmp_path / "app.txt").write_text("before")
     monkeypatch.setattr(light, "verifier_node", lambda _: {"passed": False})

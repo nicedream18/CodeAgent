@@ -1,0 +1,44 @@
+{
+  "local": {
+    "command": [
+      "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+      "examples/testing_agent_demo.py",
+      "--execution-backend",
+      "local"
+    ],
+    "status": "passed",
+    "exit_code": 0,
+    "log": "local.log",
+    "timeout_seconds": 120,
+    "timed_out": false,
+    "seconds": 2.086,
+    "output_bytes": 286,
+    "log_bytes": 286,
+    "log_truncated": false,
+    "tail": "{\n  \"simulation\": true,\n  \"real_model\": false,\n  \"real_checks\": true,\n  \"execution_backend\": \"local\",\n  \"outcomes\": [\n    {\n      \"fixed\": false,\n      \"status\": \"failed\",\n      \"exit_code\": 1\n    },\n    {\n      \"fixed\": true,\n      \"status\": \"passed\",\n      \"exit_code\": 0\n    }\n  ]\n}\n",
+    "output_complete": true,
+    "output_errors": []
+  },
+  "docker": {
+    "command": [
+      "/Users/nicedream/xm/MokioAgent/.venv/bin/python",
+      "examples/testing_agent_demo.py",
+      "--execution-backend",
+      "docker",
+      "--docker-image",
+      "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609"
+    ],
+    "status": "passed",
+    "exit_code": 0,
+    "log": "docker.log",
+    "timeout_seconds": 120,
+    "timed_out": false,
+    "seconds": 3.031,
+    "output_bytes": 287,
+    "log_bytes": 287,
+    "log_truncated": false,
+    "tail": "{\n  \"simulation\": true,\n  \"real_model\": false,\n  \"real_checks\": true,\n  \"execution_backend\": \"docker\",\n  \"outcomes\": [\n    {\n      \"fixed\": false,\n      \"status\": \"failed\",\n      \"exit_code\": 1\n    },\n    {\n      \"fixed\": true,\n      \"status\": \"passed\",\n      \"exit_code\": 0\n    }\n  ]\n}\n",
+    "output_complete": true,
+    "output_errors": []
+  }
+}

@@ -189,6 +189,13 @@ def _call_registered_subagent_tool(
             "run_in_background": False,
         }
     )
+    definition = (runtime.subagent_registry or api.registered_subagents()).get(name)
+    base = runtime.agent_profiles.get(name, {}).get("base", name)
+    if definition is not None and base == "codeAgent":
+        # An implementation attempt invalidates previous testing, even if it later
+        # returns partial work or a correction/cancellation interrupts the handoff.
+        state["testing_required"] = True
+        state["test_report"] = {}
     previous_registry = runtime.subagent_registry
     registry_override = None
     # Preserve the old monkeypatch hook while keeping the call inside the same

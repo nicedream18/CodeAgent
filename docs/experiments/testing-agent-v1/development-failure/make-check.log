@@ -1,0 +1,245 @@
+uv sync --frozen
+   Building mokioclaw @ file:///private/tmp/mokio-crewai-YJSObx/repo
+      Built mokioclaw @ file:///private/tmp/mokio-crewai-YJSObx/repo
+Prepared 1 package in 192ms
+Uninstalled 2 packages in 58ms
+Installed 1 package in 1ms
+ ~ mokioclaw==0.2.0 (from file:///private/tmp/mokio-crewai-YJSObx/repo)
+ - pip==25.2
+uv run ruff check src tests scripts examples
+All checks passed!
+uv run mypy
+Success: no issues found in 39 source files
+uv run python scripts/gen_protocol_doc.py --check
+uv run python scripts/gen_eval_doc.py --check
+uv run pytest -q
+........................................................................ [ 14%]
+......FFFF........F..................................................... [ 28%]
+............................................s........................... [ 42%]
+...........................................s............................ [ 56%]
+...............................FFF...................................... [ 70%]
+........................................................................ [ 84%]
+........................................................................ [ 98%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[requests-request_headroom] _
+
+kind = 'requests', trigger = 'request_headroom'
+
+    @pytest.mark.parametrize("kind,trigger", [
+        ("requests", "request_headroom"), ("tokens", "token_headroom"), ("tools", "tool_headroom"),
+    ])
+    def test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier(kind, trigger):
+        result = run_demo(kind)
+>       assert not result["real_model"] and result["execution_status"] == "finished"
+E       AssertionError: assert (not False and 'failed' == 'finished'
+E         
+E         - finished
+E         + failed)
+
+tests/test_completion_reservation.py:29: AssertionError
+_ test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tokens-token_headroom] _
+
+kind = 'tokens', trigger = 'token_headroom'
+
+    @pytest.mark.parametrize("kind,trigger", [
+        ("requests", "request_headroom"), ("tokens", "token_headroom"), ("tools", "tool_headroom"),
+    ])
+    def test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier(kind, trigger):
+        result = run_demo(kind)
+>       assert not result["real_model"] and result["execution_status"] == "finished"
+E       AssertionError: assert (not False and 'failed' == 'finished'
+E         
+E         - finished
+E         + failed)
+
+tests/test_completion_reservation.py:29: AssertionError
+_ test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tools-tool_headroom] _
+
+kind = 'tools', trigger = 'tool_headroom'
+
+    @pytest.mark.parametrize("kind,trigger", [
+        ("requests", "request_headroom"), ("tokens", "token_headroom"), ("tools", "tool_headroom"),
+    ])
+    def test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier(kind, trigger):
+        result = run_demo(kind)
+>       assert not result["real_model"] and result["execution_status"] == "finished"
+E       AssertionError: assert (not False and 'failed' == 'finished'
+E         
+E         - finished
+E         + failed)
+
+tests/test_completion_reservation.py:29: AssertionError
+_ test_failed_reserved_verification_stops_without_redelegation_or_synthetic_success _
+
+    def test_failed_reserved_verification_stops_without_redelegation_or_synthetic_success():
+        result = run_demo(passed=False)
+        assert result["execution_status"] == "failed" and not result["passed"]
+        assert result["stop_reason"] == "completion_verification_failed"
+        assert result["file_content"] == "fixed\n"
+>       assert len([e for e in result["events"] if e["type"] == "handoff"]) == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'from': 'planner', 'handoff_id': 'e99137ec-b0b7-41c4-88bd-77829cbc51ab', 'instruction': 'Fix a.py', 'run_in_backgrou... Report observed command outcomes and missing tests; delegate repairs to codeAgent.', 'run_in_background': False, ...}])
+
+tests/test_completion_reservation.py:52: AssertionError
+_ test_real_stream_lifecycle_saves_completion_phase_and_terminal_trace[light-True] _
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-260/test_real_stream_lifecycle_sav0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x115072740>
+mode = 'light', passed = True
+
+    @pytest.mark.parametrize("mode,passed", [("light", True), ("strict", False)])
+    def test_real_stream_lifecycle_saves_completion_phase_and_terminal_trace(
+        tmp_path, monkeypatch, mode, passed
+    ):
+        from mokioclaw.agents import code_agent, repo_agent
+        from mokioclaw.core import agent
+        from mokioclaw.core.run_control import RunControl
+        from mokioclaw.graph import nodes
+    
+        monkeypatch.setenv("HOME", str(tmp_path / "home"))
+        monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
+        monkeypatch.setattr(nodes, "create_model", lambda: demo.Coordinator(passed))
+        monkeypatch.setattr(code_agent, "create_model", demo.Code)
+        monkeypatch.setattr(repo_agent, "create_model", demo.Repo)
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        (workspace / "a.py").write_text("bad\n")
+        control = RunControl()
+    
+        def initialize(runtime):
+            runtime.run_request_limit = 10
+            runtime.run_tool_limit = 80
+            runtime.context_token_limit = 8192
+            runtime.model_context_reserve_tokens = 128
+    
+        control.runtime_initializer = initialize
+        try:
+            events = list(agent.stream_agent_events(
+                "Change bad to fixed in a.py", workspace=workspace, run_control=control,
+                approval_mode="auto", checkpoint_mode=mode, workflow_mode="full",
+            ))
+        finally:
+            control.close()
+        checkpoint = json.loads((workspace / ".mokioclaw/checkpoints/checkpoint.json").read_text())
+>       assert checkpoint["status"] == ("finished" if passed else "failed")
+E       AssertionError: assert 'failed' == 'finished'
+E         
+E         - finished
+E         + failed
+
+tests/test_completion_reservation.py:189: AssertionError
+__________ test_real_workflow_modes_produce_same_verified_file[full] ___________
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-260/test_real_workflow_modes_produ0')
+local_models = None, mode = 'full'
+
+    @pytest.mark.parametrize("mode", ["full", "light", "auto"])
+    def test_real_workflow_modes_produce_same_verified_file(tmp_path, local_models, mode):
+        (tmp_path / "app.txt").write_text("before")
+        events = list(
+            stream_agent_events(
+                "将 app.txt 的 before 改成 after",
+                workspace=tmp_path,
+                workflow_mode=mode,
+                approval_mode="deny",
+            )
+        )
+        assert (tmp_path / "app.txt").read_text() == "after"
+        terminal = [
+            row["event"]
+            for row in events
+            if row.get("type") == "custom_event" and row["event"].get("type") == "run_finished"
+        ][-1]
+        assert terminal["status"] == "finished"
+        expected = "full" if mode == "full" else "light"
+        assert any(row.get("event", {}).get("mode") == expected for row in events)
+        metrics = terminal["model_metrics"]
+>       assert metrics["roles"]["verifier"]["requests"] == 2
+E       assert 6 == 2
+
+tests/test_optimization_workflows.py:131: AssertionError
+__________ test_real_workflow_modes_produce_same_verified_file[light] __________
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-260/test_real_workflow_modes_produ1')
+local_models = None, mode = 'light'
+
+    @pytest.mark.parametrize("mode", ["full", "light", "auto"])
+    def test_real_workflow_modes_produce_same_verified_file(tmp_path, local_models, mode):
+        (tmp_path / "app.txt").write_text("before")
+        events = list(
+            stream_agent_events(
+                "将 app.txt 的 before 改成 after",
+                workspace=tmp_path,
+                workflow_mode=mode,
+                approval_mode="deny",
+            )
+        )
+        assert (tmp_path / "app.txt").read_text() == "after"
+        terminal = [
+            row["event"]
+            for row in events
+            if row.get("type") == "custom_event" and row["event"].get("type") == "run_finished"
+        ][-1]
+        assert terminal["status"] == "finished"
+        expected = "full" if mode == "full" else "light"
+        assert any(row.get("event", {}).get("mode") == expected for row in events)
+        metrics = terminal["model_metrics"]
+>       assert metrics["roles"]["verifier"]["requests"] == 2
+E       assert 6 == 2
+
+tests/test_optimization_workflows.py:131: AssertionError
+__________ test_real_workflow_modes_produce_same_verified_file[auto] ___________
+
+tmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-260/test_real_workflow_modes_produ2')
+local_models = None, mode = 'auto'
+
+    @pytest.mark.parametrize("mode", ["full", "light", "auto"])
+    def test_real_workflow_modes_produce_same_verified_file(tmp_path, local_models, mode):
+        (tmp_path / "app.txt").write_text("before")
+        events = list(
+            stream_agent_events(
+                "将 app.txt 的 before 改成 after",
+                workspace=tmp_path,
+                workflow_mode=mode,
+                approval_mode="deny",
+            )
+        )
+        assert (tmp_path / "app.txt").read_text() == "after"
+        terminal = [
+            row["event"]
+            for row in events
+            if row.get("type") == "custom_event" and row["event"].get("type") == "run_finished"
+        ][-1]
+        assert terminal["status"] == "finished"
+        expected = "full" if mode == "full" else "light"
+        assert any(row.get("event", {}).get("mode") == expected for row in events)
+        metrics = terminal["model_metrics"]
+>       assert metrics["roles"]["verifier"]["requests"] == 2
+E       assert 6 == 2
+
+tests/test_optimization_workflows.py:131: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[requests-request_headroom] - AssertionError: assert (not False and 'failed' == 'finished'
+  
+  - finished
+  + failed)
+FAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tokens-token_headroom] - AssertionError: assert (not False and 'failed' == 'finished'
+  
+  - finished
+  + failed)
+FAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tools-tool_headroom] - AssertionError: assert (not False and 'failed' == 'finished'
+  
+  - finished
+  + failed)
+FAILED tests/test_completion_reservation.py::test_failed_reserved_verification_stops_without_redelegation_or_synthetic_success - AssertionError: assert 2 == 1
+ +  where 2 = len([{'from': 'planner', 'handoff_id': 'e99137ec-b0b7-41c4-88bd-77829cbc51ab', 'instruction': 'Fix a.py', 'run_in_backgrou... Report observed command outcomes and missing tests; delegate repairs to codeAgent.', 'run_in_background': False, ...}])
+FAILED tests/test_completion_reservation.py::test_real_stream_lifecycle_saves_completion_phase_and_terminal_trace[light-True] - AssertionError: assert 'failed' == 'finished'
+  
+  - finished
+  + failed
+FAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[full] - assert 6 == 2
+FAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[light] - assert 6 == 2
+FAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[auto] - assert 6 == 2
+8 failed, 502 passed, 2 skipped in 48.33s
+make: *** [check] Error 1

@@ -99,6 +99,18 @@ def verifier_node(state: api.MokioGraphState) -> dict[str, api.Any]:
     passed = bool(parsed.get("passed"))
     reason = str(parsed.get("reason") or "")
     recommended = str(parsed.get("recommended_next_instruction") or "")
+    testing = state.get("test_report", {})
+    testing_status = testing.get("status")
+    testing_blocked = state.get("testing_required") or testing_status in {"failed", "incomplete"}
+    testing_blocked = testing_blocked or (
+        testing_status == "not_run" and bool(state.get("verification_commands"))
+    )
+    if testing_blocked:
+        passed = False
+        detail = "Independent testing is pending, failed or incomplete; inspect test_report."
+        checks.append({"name": "testAgent", "passed": False, "detail": detail})
+        reason = (reason + " " + detail).strip()
+        recommended = "Delegate the missing tests or failure repair, then rerun testAgent."
     attempts = state.get("attempts", 0) + 1
     todos = [dict(todo) for todo in state.get("todos", [])]
     if passed:

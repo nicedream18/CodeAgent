@@ -332,6 +332,12 @@ def summarize_graph_event(payload: dict[str, Any]) -> EventSummary:
     if node in {"actor", "codeAgent"}:
         summary = update.get("code_agent_summary") or update.get("last_actor_summary") or update
         return EventSummary("codeAgent Summary", shorten(summary, 800), "agent", "cyan")
+    if node == "testAgent":
+        report = update.get("test_report", {})
+        return EventSummary(
+            "testAgent", f"status: {report.get('status', 'incomplete')}\n"
+            + shorten(report, 1600), "agent", "green" if report.get("status") == "passed" else "yellow",
+        )
     if node == "verifier":
         return EventSummary(
             "Verifier",

@@ -1,1 +1,1 @@
-"""LangGraph workflow for MokioClaw."""
+"""CrewAI Flow workflow for MokioClaw."""

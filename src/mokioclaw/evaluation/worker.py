@@ -83,11 +83,9 @@ def initialize(runtime: Any, config: EvalTrialConfig, image: str, owner: str) ->
 
 
 def baseline_stream(task: str, **options: Any) -> Any:
-    from langgraph.config import get_stream_writer
-    from langgraph.graph import END, START, StateGraph
-
     from mokioclaw.agents.code_agent import run_code_agent
     from mokioclaw.graph.state import MokioGraphState
+    from mokioclaw.orchestration.runtime import get_stream_writer, single_step_workflow
 
     lifecycle = options["_lifecycle"]
 
@@ -99,14 +97,11 @@ def baseline_stream(task: str, **options: Any) -> Any:
             "todos": result["todos"],
         }
 
-    graph = StateGraph(MokioGraphState)
-    graph.add_node("baseline", implement)
-    graph.add_edge(START, "baseline")
-    graph.add_edge("baseline", END)
+    workflow = single_step_workflow("baseline", implement)
     from mokioclaw.core.agent import _graph_envelopes
 
     yield from cast(Callable[..., Any], _graph_envelopes)(
-        graph.compile(), lifecycle.state, terminal=True
+        workflow, lifecycle.state, terminal=True
     )
 
 

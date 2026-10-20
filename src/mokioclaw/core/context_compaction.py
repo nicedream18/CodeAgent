@@ -35,6 +35,8 @@ FACT_FIELDS = (
     "repo_explored",
     "repo_context",
     "code_agent_summary",
+    "test_report",
+    "testing_required",
 )
 
 
@@ -212,7 +214,7 @@ def compact_messages(
         facts_path = Path(".mokioclaw") / "context" / scope / f"facts-{uuid4().hex}.json"
         _atomic_json(runtime.workspace / facts_path, facts)
     prompt_facts = dict(facts)
-    for key in ("repo_context", "code_agent_summary"):
+    for key in ("repo_context", "code_agent_summary", "test_report"):
         if len(str(prompt_facts.get(key, ""))) > 1600:
             prompt_facts[key] = {
                 "summary": str(prompt_facts[key])[:1600],
@@ -418,7 +420,8 @@ def prepare_model_context(
 
 def graph_context_updates(state: dict[str, Any], messages: list[Any], node: str) -> dict[str, Any]:
     from langchain_core.messages import RemoveMessage
-    from langgraph.graph.message import REMOVE_ALL_MESSAGES
+
+    from mokioclaw.orchestration.messages import REMOVE_ALL_MESSAGES
 
     runtime = state["runtime"]
     if node not in runtime.context_replacements:

@@ -88,6 +88,8 @@ def build_layered_memory(state: dict[str, Any], *, node: str = "graph") -> dict[
         "verifier_summary": _short_text(
             state.get("verifier_summary", ""), MAX_TEXT_CHARS["verifier_summary"]
         ),
+        "test_report": _short_text(json.dumps(state.get("test_report", {}), ensure_ascii=False), 4000),
+        "testing_required": bool(state.get("testing_required")),
         "verification_checks": state.get("verification_checks", [])[-20:],
         "source_catalogue": source_catalogue,
         "last_error": _short_text(state.get("last_error", ""), MAX_TEXT_CHARS["last_error"]),

@@ -6,7 +6,7 @@
 sequenceDiagram
     participant U as CLI/TUI
     participant D as daemon
-    participant G as LangGraph / RunControl
+    participant G as CrewAI Flows / RunControl
     participant M as 兼容模型
     participant T as 工具策略与审批
     participant B as local / Docker Bash
@@ -43,7 +43,7 @@ sequenceDiagram
 
 ## 问答练习
 
-- 为什么保留 LangGraph 和完整流程？为了显式表达协调、状态和教学边界；是否更有效必须看同任务对照数据，不能凭架构复杂度判断。
+- 为什么使用 CrewAI Flows，而不把执行器改为 CrewAI Agent/Crew？Flow 显式表达路由、循环与节点边界；原有模型—工具循环继续统一管理审批、取消、纠正和预算，避免引入第二套隐式模型请求与重试。完整流程是否更有效仍须看固定任务对照，不能凭框架或架构复杂度判断。
 - baseline 是否故意减弱工具？没有，执行 Agent 复用同一文件/搜索/Bash/Skill 能力和全局预算，只去掉协调与模型验收。
 - light 为何可能更贵？验收未通过或需要跨文件时升级到 full，前面的请求已经消耗；需要查看实际路径而非只看配置名称。
 - temperature=0 为什么还要重复？外部服务与生成仍可能存在差异，三次只是小样本，不能用来声称稳定泛化。
@@ -63,6 +63,8 @@ sequenceDiagram
 用当前报告填写真实数字，不照搬历史 366 或控制演示 passed 数。
 
 简历描述应明确 AI 辅助范围。设计、编码、验证中哪些由本人独立完成，需要本人据实确认，不把生成代码全部归为独立手写成果。
+
+以上真实任务对照数字对应迁移前冻结版本。当前 CrewAI 迁移采用离线模型和本地服务回归，没有复跑真实矩阵或远程 CI；见 [迁移说明](../crewai-migration.md)。
 
 ## 当前展示与练习入口
 

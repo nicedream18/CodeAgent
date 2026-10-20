@@ -9,7 +9,6 @@ from typing import Any  # noqa: F401
 from uuid import uuid4  # noqa: F401
 
 from dotenv import load_dotenv  # noqa: F401
-from langgraph.graph import add_messages  # noqa: F401
 
 from mokioclaw.agents.registry import parse_subagent_configs, registered_subagents  # noqa: F401
 from mokioclaw.core.checkpoint import (
@@ -38,6 +37,7 @@ from mokioclaw.core.state import RuntimeState  # noqa: F401
 from mokioclaw.core.tool_policy import parse_bash_patterns, parse_tool_policies  # noqa: F401
 from mokioclaw.core.trace import TraceRecorder, normalize_trace_mode  # noqa: F401
 from mokioclaw.graph.workflow import build_complex_workflow, build_entry_workflow  # noqa: F401
+from mokioclaw.orchestration.messages import add_messages  # noqa: F401
 from mokioclaw.providers.generation import ModelGenerationStopped  # noqa: F401
 from mokioclaw.providers.model_policy import RunBudgetExceeded  # noqa: F401
 from mokioclaw.tools.mcp_tools import parse_mcp_servers  # noqa: F401

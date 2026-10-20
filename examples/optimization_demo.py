@@ -17,8 +17,6 @@ from unittest.mock import patch
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
-from langgraph.config import get_stream_writer
-from langgraph.graph import END, START, StateGraph
 from optimization_models import CrossModuleModel, WorkflowModel
 
 from mokioclaw.core.agent import _graph_envelopes, stream_agent_events
@@ -28,7 +26,7 @@ from mokioclaw.core.run_control import RunControl
 from mokioclaw.core.run_inbox import RunInbox
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.core.trace import TraceRecorder
-from mokioclaw.graph.state import MokioGraphState
+from mokioclaw.orchestration.runtime import get_stream_writer, single_step_workflow
 from mokioclaw.providers.openai_provider import create_model, invoke_streaming
 from mokioclaw.tools.execution import execute_tool
 from mokioclaw.tools.file_tools import edit_file, read_file
@@ -363,13 +361,10 @@ def steering(root, real):
             )
         return {"final_answer": str(response.content)}
 
-    graph = StateGraph(MokioGraphState)
-    graph.add_node("step", step)
-    graph.add_edge(START, "step")
-    graph.add_edge("step", END)
+    workflow = single_step_workflow("step", step)
     state = {"runtime": runtime, "task": "create file", "messages": []}
     try:
-        for envelope in _graph_envelopes(graph.compile(), state, terminal=True):
+        for envelope in _graph_envelopes(workflow, state, terminal=True):
             if envelope["type"] == "custom_event":
                 recorder.record_custom_event(envelope["event"])
         recorder.end(status="finished", latest_node="step", final_state=state)

@@ -10,6 +10,7 @@ from typing import Any
 from mokioclaw.agents.code_agent import run_code_agent
 from mokioclaw.agents.repo_agent import run_repo_agent
 from mokioclaw.agents.search_agent import run_search_agent
+from mokioclaw.agents.test_agent import run_test_agent
 from mokioclaw.core.completion_budget import CompletionYield
 from mokioclaw.core.context_budget import ContextBudgetError
 from mokioclaw.core.run_control import RunInterrupted, check_run
@@ -115,6 +116,15 @@ def default_subagents() -> dict[str, SubagentDefinition]:
             state_update_fields=frozenset({"research_notes", "sources"}),
             background_safe=True,
         ),
+        "testAgent": SubagentDefinition(
+            "testAgent", "Independently run checks and diagnose failures after implementation",
+            run_test_agent,
+            frozenset({"FileReadTool", "FileGlobTool", "GrepTool", "BashTool"}),
+            8,
+            context_fields=("repo_context", "code_agent_summary", "acceptance_criteria",
+                            "verification_commands", "latest_user_corrections", "test_report"),
+            state_update_fields=frozenset({"test_report", "testing_required"}),
+        ),
         "codeAgent": SubagentDefinition(
             "codeAgent",
             "Implement and verify workspace changes",
@@ -138,6 +148,7 @@ def default_subagents() -> dict[str, SubagentDefinition]:
             10,
             context_fields=(
                 "repo_context",
+                "test_report",
                 "repo_explored",
                 "research_notes",
                 "sources",

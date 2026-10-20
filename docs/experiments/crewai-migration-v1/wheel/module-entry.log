@@ -1,0 +1,56 @@
+                                                                                
+ Usage: python -m mokioclaw [OPTIONS] COMMAND [ARGS]...                         
+                                                                                
+ mokioclaw: a CrewAI Flow CodeAgent. Use `mokioclaw "task"` for Rich output or  
+ `mokioclaw tui` for Textual TUI.                                               
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --workspace           -w      PATH                Workspace for generated    │
+│                                                   files. Defaults to a fresh │
+│                                                   .mokioclaw/workspaces/wor… │
+│                                                   directory.                 │
+│ --max-attempts                INTEGER             Maximum                    │
+│                                                   planner/actor/verifier     │
+│                                                   attempts before            │
+│                                                   finalizing.                │
+│                                                   [default: 3]               │
+│ --approval-mode               [inline|auto|deny]  Human approval mode for    │
+│                                                   high-risk BashTool         │
+│                                                   commands: inline, auto, or │
+│                                                   deny.                      │
+│ --checkpoint-mode             [light|strict|off]  Checkpoint mode: light,    │
+│                                                   strict, or off.            │
+│ --trace-mode                  [on|off]            Trace logging mode: on or  │
+│                                                   off.                       │
+│ --resume                      PATH                Resume from an existing    │
+│                                                   MokioClaw workspace.       │
+│ --skill                       TEXT                                           │
+│ --execution-backend           [local|docker]                                 │
+│ --workflow-mode               [full|light|auto]                              │
+│ --install-completion                              Install completion for the │
+│                                                   current shell.             │
+│ --show-completion                                 Show completion for the    │
+│                                                   current shell, to copy it  │
+│                                                   or customize the           │
+│                                                   installation.              │
+│ --help                                            Show this message and      │
+│                                                   exit.                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ cancel       Cancel a foreground run while keeping detached Subagents        │
+│              running.                                                        │
+│ send         Queue a correction for a running foreground task.               │
+│ rewind       Preview file-tool changes; --apply restores matching files.     │
+│ tui          Open the Textual terminal interface.                            │
+│ compact      Compact a saved session or request compaction of a running      │
+│              Agent.                                                          │
+│ trace        Read existing traces, optionally following new records; never   │
+│              execute work.                                                   │
+│ doctor       Check backend availability without executing a model request.   │
+│ daemon       Manage the local MokioClaw Agent daemon.                        │
+│ subagent     Inspect and control daemon-managed Subagents.                   │
+│ permissions  Inspect or revoke user-owned project approval rules.            │
+│ eval         Prepare and independently grade the frozen internship code      │
+│              tasks.                                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

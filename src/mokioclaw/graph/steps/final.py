@@ -26,10 +26,11 @@ def final_node(state: api.MokioGraphState) -> dict[str, api.Any]:
             f"removed {latest.get('removed_messages')} message(s)"
         )
     final_answer = (
-        f"LangGraph MultiAgent workflow finished: {status}\n\n"
+        f"CrewAI Flow MultiAgent workflow finished: {status}\n\n"
         f"Plan: {state.get('plan_summary', '')}\n\n"
         f"Todos:\n{todos}\n\n"
         f"Research sources:\n{sources or '(none)'}\n\n"
+        f"testAgent: {state.get('test_report', {}).get('status', 'not_run')}\n\n"
         f"Verifier:\n{state.get('verifier_summary', '')}\n\n"
         f"Checks:\n{checks or '(none)'}\n\n"
         f"Context compression:\n{compression_text}\n\n"

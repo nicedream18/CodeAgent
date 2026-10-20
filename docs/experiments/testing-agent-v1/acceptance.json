@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "base_commit": "8df67d7e2caaa0ef04502563706d3b382585af99",
+  "tested_tree_dirty": true,
+  "source_and_checks_sha256": "09db98a2e8ff13952b275ffbbb00c9d510834fd7ffb0af30155e9b08f6e60a59",
+  "lock_sha256": "68fc0a65d66931e0f465dae77db41e6155da4412909e4464381721a72002b05e",
+  "checks": {
+    "passed": 511,
+    "skipped": 2,
+    "strict_mypy_files": 39,
+    "new_testing_cases": 15
+  },
+  "demo": {
+    "local": "passed",
+    "docker": "passed",
+    "observed_exit_codes": [
+      1,
+      0
+    ],
+    "docker_image": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609"
+  },
+  "real_model_calls": 0,
+  "pushed": false,
+  "published": false,
+  "scope": "Automatic foreground testAgent in full/light; baseline and frozen experiments unchanged.",
+  "existing_changes_preserved": true,
+  "credential_findings": 0
+}

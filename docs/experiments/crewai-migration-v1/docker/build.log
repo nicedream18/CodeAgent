@@ -1,0 +1,392 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 531B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/4] FROM docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f
+#4 resolve docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 11.30kB done
+#5 DONE 0.0s
+
+#6 [2/4] RUN apt-get update && apt-get install -y --no-install-recommends git ripgrep && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/4] COPY requirements.txt /opt/mokio-requirements.txt
+#7 DONE 0.0s
+
+#8 [4/4] RUN pip install --no-cache-dir -r /opt/mokio-requirements.txt
+#8 0.880 Looking in indexes: https://mirrors.aliyun.com/pypi/simple
+#8 0.880 Ignoring colorama: markers 'os_name == "nt" or sys_platform == "win32"' don't match your environment
+#8 0.880 Ignoring pywin32: markers 'sys_platform == "win32"' don't match your environment
+#8 1.164 Collecting aiofiles==24.1.0 (from -r /opt/mokio-requirements.txt (line 3))
+#8 1.191   Downloading aiofiles-24.1.0-py3-none-any.whl (15 kB)
+#8 1.431 Collecting aiohappyeyeballs==2.7.1 (from -r /opt/mokio-requirements.txt (line 5))
+#8 1.704   Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+#8 5.645 Collecting aiohttp==3.14.5 (from -r /opt/mokio-requirements.txt (line 7))
+#8 5.727   Downloading aiohttp-3.14.5-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (1.9 MB)
+#8 12.95      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 252.9 kB/s  0:00:07
+#8 13.23 Collecting aiosignal==1.4.0 (from -r /opt/mokio-requirements.txt (line 11))
+#8 13.55   Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+#8 13.85 Collecting aiosqlite==0.21.0 (from -r /opt/mokio-requirements.txt (line 13))
+#8 13.88   Downloading aiosqlite-0.21.0-py3-none-any.whl (15 kB)
+#8 14.11 Collecting annotated-doc==0.0.4 (from -r /opt/mokio-requirements.txt (line 15))
+#8 14.35   Downloading annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
+#8 14.67 Collecting annotated-types==0.7.0 (from -r /opt/mokio-requirements.txt (line 17))
+#8 15.03   Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+#8 15.28 Collecting anyio==4.13.0 (from -r /opt/mokio-requirements.txt (line 19))
+#8 15.31   Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+#8 15.79 Collecting appdirs==1.4.4 (from -r /opt/mokio-requirements.txt (line 27))
+#8 16.10   Downloading appdirs-1.4.4-py2.py3-none-any.whl (9.6 kB)
+#8 16.44 Collecting ast-serialize==0.13.0 (from -r /opt/mokio-requirements.txt (line 32))
+#8 16.66   Downloading ast_serialize-0.13.0-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (1.3 MB)
+#8 21.68      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 245.1 kB/s  0:00:05
+#8 21.93 Collecting attrs==26.1.0 (from -r /opt/mokio-requirements.txt (line 34))
+#8 21.96   Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+#8 22.02 Collecting bcrypt==5.0.0 (from -r /opt/mokio-requirements.txt (line 39))
+#8 22.08   Downloading bcrypt-5.0.0-cp39-abi3-manylinux_2_34_aarch64.whl (275 kB)
+#8 22.93 Collecting build==1.6.1 (from -r /opt/mokio-requirements.txt (line 41))
+#8 22.95   Downloading build-1.6.1-py3-none-any.whl (31 kB)
+#8 23.22 Collecting cel-python==0.5.0 (from -r /opt/mokio-requirements.txt (line 43))
+#8 23.24   Downloading cel_python-0.5.0-py3-none-any.whl (84 kB)
+#8 23.68 Collecting certifi==2026.4.22 (from -r /opt/mokio-requirements.txt (line 45))
+#8 23.70   Downloading certifi-2026.4.22-py3-none-any.whl (135 kB)
+#8 24.39 Collecting cffi==2.1.1 (from -r /opt/mokio-requirements.txt (line 52))
+#8 24.45   Downloading cffi-2.1.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (222 kB)
+#8 25.76 Collecting charset-normalizer==3.4.7 (from -r /opt/mokio-requirements.txt (line 54))
+#8 25.94   Downloading charset_normalizer-3.4.7-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (207 kB)
+#8 26.43 Collecting chromadb==1.5.9 (from -r /opt/mokio-requirements.txt (line 58))
+#8 26.65   Downloading chromadb-1.5.9-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (22.7 MB)
+#8 133.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 22.7/22.7 MB 199.9 kB/s  0:01:46
+#8 133.2 Collecting click==8.3.3 (from -r /opt/mokio-requirements.txt (line 60))
+#8 133.3   Downloading click-8.3.3-py3-none-any.whl (110 kB)
+#8 134.1 Collecting crewai==1.15.28 (from -r /opt/mokio-requirements.txt (line 72))
+#8 134.2   Downloading crewai-1.15.28-py3-none-any.whl (1.4 MB)
+#8 141.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 218.7 kB/s  0:00:06
+#8 141.1 Collecting crewai-cli==1.15.28 (from -r /opt/mokio-requirements.txt (line 74))
+#8 141.2   Downloading crewai_cli-1.15.28-py3-none-any.whl (238 kB)
+#8 141.9 Collecting crewai-core==1.15.28 (from -r /opt/mokio-requirements.txt (line 76))
+#8 141.9   Downloading crewai_core-1.15.28-py3-none-any.whl (1.3 MB)
+#8 146.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 230.2 kB/s  0:00:05
+#8 147.9 Collecting cryptography==50.0.2 (from -r /opt/mokio-requirements.txt (line 80))
+#8 147.9   Downloading cryptography-50.0.2-cp311-abi3-manylinux_2_34_aarch64.whl (4.7 MB)
+#8 167.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 242.1 kB/s  0:00:19
+#8 167.3 Collecting deprecation==2.1.0 (from -r /opt/mokio-requirements.txt (line 86))
+#8 167.5   Downloading deprecation-2.1.0-py2.py3-none-any.whl (11 kB)
+#8 167.8 Collecting distro==1.9.0 (from -r /opt/mokio-requirements.txt (line 88))
+#8 167.8   Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+#8 168.0 Collecting docstring-parser==0.18.0 (from -r /opt/mokio-requirements.txt (line 90))
+#8 168.0   Downloading docstring_parser-0.18.0-py3-none-any.whl (22 kB)
+#8 168.3 Collecting durationpy==0.11 (from -r /opt/mokio-requirements.txt (line 92))
+#8 168.5   Downloading durationpy-0.11-py3-none-any.whl (4.1 kB)
+#8 168.7 Collecting et-xmlfile==2.0.0 (from -r /opt/mokio-requirements.txt (line 94))
+#8 168.7   Downloading et_xmlfile-2.0.0-py3-none-any.whl (18 kB)
+#8 168.8 Collecting filelock==4.2.4 (from -r /opt/mokio-requirements.txt (line 96))
+#8 168.8   Downloading filelock-4.2.4-py3-none-any.whl (162 kB)
+#8 169.4 Collecting flatbuffers==25.12.19 (from -r /opt/mokio-requirements.txt (line 98))
+#8 169.5   Downloading flatbuffers-25.12.19-py2.py3-none-any.whl (26 kB)
+#8 169.7 Collecting frozenlist==1.8.0 (from -r /opt/mokio-requirements.txt (line 100))
+#8 169.8   Downloading frozenlist-1.8.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (233 kB)
+#8 170.4 Collecting fsspec==2026.9.0 (from -r /opt/mokio-requirements.txt (line 104))
+#8 170.5   Downloading fsspec-2026.9.0-py3-none-any.whl (221 kB)
+#8 171.4 Collecting google-re2==1.1.20251105 (from -r /opt/mokio-requirements.txt (line 106))
+#8 171.5   Downloading google_re2-1.1.20251105-1-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl (572 kB)
+#8 173.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 572.4/572.4 kB 288.9 kB/s  0:00:02
+#8 173.9 Collecting googleapis-common-protos==1.75.5 (from -r /opt/mokio-requirements.txt (line 108))
+#8 173.9   Downloading googleapis_common_protos-1.75.5-py3-none-any.whl (307 kB)
+#8 179.1 Collecting grpcio==1.84.0 (from -r /opt/mokio-requirements.txt (line 112))
+#8 179.4   Downloading grpcio-1.84.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (7.0 MB)
+#8 210.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 223.8 kB/s  0:00:30
+#8 210.6 Collecting h11==0.16.0 (from -r /opt/mokio-requirements.txt (line 116))
+#8 210.6   Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#8 210.7 Collecting hf-xet==1.7.0 (from -r /opt/mokio-requirements.txt (line 120))
+#8 210.8   Downloading hf_xet-1.7.0-cp38-abi3-manylinux_2_28_aarch64.whl (4.0 MB)
+#8 227.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.0/4.0 MB 238.0 kB/s  0:00:16
+#8 227.4 Collecting httpcore==1.0.9 (from -r /opt/mokio-requirements.txt (line 122))
+#8 227.4   Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#8 227.6 Collecting httptools==0.9.0 (from -r /opt/mokio-requirements.txt (line 124))
+#8 227.8   Downloading httptools-0.9.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (516 kB)
+#8 229.5 Collecting httpx==0.28.1 (from -r /opt/mokio-requirements.txt (line 126))
+#8 229.5   Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#8 230.0 Collecting httpx-sse==0.4.3 (from -r /opt/mokio-requirements.txt (line 137))
+#8 230.2   Downloading httpx_sse-0.4.3-py3-none-any.whl (9.0 kB)
+#8 230.3 Collecting huggingface-hub==1.16.1 (from -r /opt/mokio-requirements.txt (line 139))
+#8 230.4   Downloading huggingface_hub-1.16.1-py3-none-any.whl (668 kB)
+#8 232.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 668.2/668.2 kB 317.5 kB/s  0:00:01
+#8 232.6 Collecting idna==3.20 (from -r /opt/mokio-requirements.txt (line 141))
+#8 232.6   Downloading idna-3.20-py3-none-any.whl (69 kB)
+#8 233.1 Collecting importlib-resources==7.1.0 (from -r /opt/mokio-requirements.txt (line 147))
+#8 233.1   Downloading importlib_resources-7.1.0-py3-none-any.whl (37 kB)
+#8 233.4 Collecting iniconfig==2.3.0 (from -r /opt/mokio-requirements.txt (line 149))
+#8 233.7   Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+#8 233.8 Collecting instructor==1.15.4 (from -r /opt/mokio-requirements.txt (line 151))
+#8 233.8   Downloading instructor-1.15.4-py3-none-any.whl (252 kB)
+#8 234.6 Collecting jinja2==3.1.6 (from -r /opt/mokio-requirements.txt (line 153))
+#8 234.7   Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#8 235.6 Collecting jiter==0.14.0 (from -r /opt/mokio-requirements.txt (line 155))
+#8 235.9   Downloading jiter-0.14.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (343 kB)
+#8 237.2 Collecting jmespath==1.1.0 (from -r /opt/mokio-requirements.txt (line 159))
+#8 237.2   Downloading jmespath-1.1.0-py3-none-any.whl (20 kB)
+#8 237.4 Collecting json-repair==0.60.1 (from -r /opt/mokio-requirements.txt (line 161))
+#8 237.4   Downloading json_repair-0.60.1-py3-none-any.whl (48 kB)
+#8 237.7 Collecting json5==0.10.0 (from -r /opt/mokio-requirements.txt (line 163))
+#8 237.7   Downloading json5-0.10.0-py3-none-any.whl (34 kB)
+#8 238.0 Collecting jsonpatch==1.33 (from -r /opt/mokio-requirements.txt (line 165))
+#8 238.3   Downloading jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+#8 238.6 Collecting jsonpointer==3.1.1 (from -r /opt/mokio-requirements.txt (line 167))
+#8 238.8   Downloading jsonpointer-3.1.1-py3-none-any.whl (7.7 kB)
+#8 239.1 Collecting jsonref==1.1.0 (from -r /opt/mokio-requirements.txt (line 169))
+#8 239.5   Downloading jsonref-1.1.0-py3-none-any.whl (9.4 kB)
+#8 239.5 Collecting jsonschema==4.26.0 (from -r /opt/mokio-requirements.txt (line 171))
+#8 239.6   Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+#8 240.0 Collecting jsonschema-specifications==2025.9.1 (from -r /opt/mokio-requirements.txt (line 175))
+#8 240.0   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+#8 240.2 Collecting kubernetes==36.0.3 (from -r /opt/mokio-requirements.txt (line 177))
+#8 240.2   Downloading kubernetes-36.0.3-py2.py3-none-any.whl (4.6 MB)
+#8 260.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 226.4 kB/s  0:00:19
+#8 260.5 Collecting lance-namespace==0.13.0 (from -r /opt/mokio-requirements.txt (line 179))
+#8 260.7   Downloading lance_namespace-0.13.0-py3-none-any.whl (13 kB)
+#8 261.0 Collecting lance-namespace-urllib3-client==0.13.0 (from -r /opt/mokio-requirements.txt (line 181))
+#8 261.0   Downloading lance_namespace_urllib3_client-0.13.0-py3-none-any.whl (406 kB)
+#8 263.3 Collecting lancedb==0.30.0 (from -r /opt/mokio-requirements.txt (line 183))
+#8 263.6   Downloading lancedb-0.30.0-cp39-abi3-manylinux_2_28_aarch64.whl (43.9 MB)
+#8 433.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.9/43.9 MB 292.3 kB/s  0:02:50
+#8 433.7 Collecting langchain-core==1.4.0 (from -r /opt/mokio-requirements.txt (line 185))
+#8 433.7   Downloading langchain_core-1.4.0-py3-none-any.whl (548 kB)
+#8 435.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 548.1/548.1 kB 301.1 kB/s  0:00:01
+#8 435.4 Collecting langchain-openai==1.2.1 (from -r /opt/mokio-requirements.txt (line 189))
+#8 435.6   Downloading langchain_openai-1.2.1-py3-none-any.whl (98 kB)
+#8 436.1 Collecting langchain-protocol==0.0.15 (from -r /opt/mokio-requirements.txt (line 191))
+#8 436.3   Downloading langchain_protocol-0.0.15-py3-none-any.whl (7.0 kB)
+#8 436.6 Collecting langsmith==0.8.4 (from -r /opt/mokio-requirements.txt (line 193))
+#8 436.6   Downloading langsmith-0.8.4-py3-none-any.whl (398 kB)
+#8 437.9 Collecting lark==1.3.1 (from -r /opt/mokio-requirements.txt (line 195))
+#8 438.0   Downloading lark-1.3.1-py3-none-any.whl (113 kB)
+#8 438.9 Collecting librt==0.16.0 (from -r /opt/mokio-requirements.txt (line 197))
+#8 439.0   Downloading librt-0.16.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (502 kB)
+#8 441.1 Collecting linkify-it-py==2.1.0 (from -r /opt/mokio-requirements.txt (line 199))
+#8 441.2   Downloading linkify_it_py-2.1.0-py3-none-any.whl (19 kB)
+#8 441.5 Collecting markdown-it-py==4.2.0 (from -r /opt/mokio-requirements.txt (line 201))
+#8 441.6   Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+#8 442.1 Collecting markupsafe==3.0.4 (from -r /opt/mokio-requirements.txt (line 206))
+#8 442.3   Downloading markupsafe-3.0.4-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (24 kB)
+#8 442.6 Collecting mcp==1.28.1 (from -r /opt/mokio-requirements.txt (line 208))
+#8 442.6   Downloading mcp-1.28.1-py3-none-any.whl (222 kB)
+#8 443.5 Collecting mdit-py-plugins==0.6.1 (from -r /opt/mokio-requirements.txt (line 212))
+#8 443.5   Downloading mdit_py_plugins-0.6.1-py3-none-any.whl (66 kB)
+#8 443.8 Collecting mdurl==0.1.2 (from -r /opt/mokio-requirements.txt (line 214))
+#8 444.0   Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+#8 444.4 Collecting mmh3==5.3.1 (from -r /opt/mokio-requirements.txt (line 216))
+#8 444.4   Downloading mmh3-5.3.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (106 kB)
+#8 446.2 Collecting multidict==7.1.0 (from -r /opt/mokio-requirements.txt (line 218))
+#8 446.3   Downloading multidict-7.1.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (477 kB)
+#8 448.5 Collecting mypy==2.4.0 (from -r /opt/mokio-requirements.txt (line 222))
+#8 448.8   Downloading mypy-2.4.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (14.4 MB)
+#8 495.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.4/14.4 MB 301.9 kB/s  0:00:46
+#8 495.5 Collecting mypy-extensions==1.1.0 (from -r /opt/mokio-requirements.txt (line 223))
+#8 495.8   Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+#8 497.1 Collecting numpy==2.5.4 (from -r /opt/mokio-requirements.txt (line 225))
+#8 497.1   Downloading numpy-2.5.4-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (15.7 MB)
+#8 543.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.7/15.7 MB 340.5 kB/s  0:00:46
+#8 543.6 Collecting oauthlib==4.0.0 (from -r /opt/mokio-requirements.txt (line 230))
+#8 543.7   Downloading oauthlib-4.0.0-py3-none-any.whl (159 kB)
+#8 544.2 Collecting onnxruntime==1.31.0 (from -r /opt/mokio-requirements.txt (line 234))
+#8 544.5   Downloading onnxruntime-1.31.0-cp313-cp313-manylinux_2_28_aarch64.whl (21.4 MB)
+#8 610.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 21.4/21.4 MB 341.6 kB/s  0:01:05
+#8 610.5 Collecting openai==2.36.0 (from -r /opt/mokio-requirements.txt (line 236))
+#8 610.6   Downloading openai-2.36.0-py3-none-any.whl (1.3 MB)
+#8 614.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 324.0 kB/s  0:00:04
+#8 614.8 Collecting openpyxl==3.1.5 (from -r /opt/mokio-requirements.txt (line 241))
+#8 614.9   Downloading openpyxl-3.1.5-py2.py3-none-any.whl (250 kB)
+#8 615.7 Collecting opentelemetry-api==1.45.1 (from -r /opt/mokio-requirements.txt (line 243))
+#8 615.7   Downloading opentelemetry_api-1.45.1-py3-none-any.whl (60 kB)
+#8 616.0 Collecting opentelemetry-exporter-http-transport==0.66b1 (from -r /opt/mokio-requirements.txt (line 253))
+#8 616.3   Downloading opentelemetry_exporter_http_transport-0.66b1-py3-none-any.whl (12 kB)
+#8 616.6 Collecting opentelemetry-exporter-otlp-common==0.66b1 (from -r /opt/mokio-requirements.txt (line 255))
+#8 616.9   Downloading opentelemetry_exporter_otlp_common-0.66b1-py3-none-any.whl (12 kB)
+#8 617.2 Collecting opentelemetry-exporter-otlp-proto-common==1.45.1 (from -r /opt/mokio-requirements.txt (line 259))
+#8 617.4   Downloading opentelemetry_exporter_otlp_proto_common-1.45.1-py3-none-any.whl (15 kB)
+#8 617.7 Collecting opentelemetry-exporter-otlp-proto-grpc==1.45.1 (from -r /opt/mokio-requirements.txt (line 263))
+#8 617.8   Downloading opentelemetry_exporter_otlp_proto_grpc-1.45.1-py3-none-any.whl (19 kB)
+#8 618.0 Collecting opentelemetry-exporter-otlp-proto-http==1.45.1 (from -r /opt/mokio-requirements.txt (line 265))
+#8 618.1   Downloading opentelemetry_exporter_otlp_proto_http-1.45.1-py3-none-any.whl (22 kB)
+#8 618.4 Collecting opentelemetry-proto==1.45.1 (from -r /opt/mokio-requirements.txt (line 269))
+#8 618.4   Downloading opentelemetry_proto-1.45.1-py3-none-any.whl (72 kB)
+#8 618.7 Collecting opentelemetry-sdk==1.45.1 (from -r /opt/mokio-requirements.txt (line 274))
+#8 618.7   Downloading opentelemetry_sdk-1.45.1-py3-none-any.whl (140 kB)
+#8 619.2 Collecting opentelemetry-semantic-conventions==0.66b1 (from -r /opt/mokio-requirements.txt (line 282))
+#8 619.2   Downloading opentelemetry_semantic_conventions-0.66b1-py3-none-any.whl (206 kB)
+#8 621.6 Collecting orjson==3.11.9 (from -r /opt/mokio-requirements.txt (line 284))
+#8 621.9   Downloading orjson-3.11.9-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (132 kB)
+#8 622.3 Collecting overrides==7.7.0 (from -r /opt/mokio-requirements.txt (line 288))
+#8 622.3   Downloading overrides-7.7.0-py3-none-any.whl (17 kB)
+#8 622.8 Collecting packaging==26.2 (from -r /opt/mokio-requirements.txt (line 290))
+#8 622.8   Downloading packaging-26.2-py3-none-any.whl (100 kB)
+#8 623.3 Collecting pathspec==1.1.1 (from -r /opt/mokio-requirements.txt (line 302))
+#8 623.4   Downloading pathspec-1.1.1-py3-none-any.whl (57 kB)
+#8 623.6 Collecting pdfminer-six==20260107 (from -r /opt/mokio-requirements.txt (line 306))
+#8 623.7   Downloading pdfminer_six-20260107-py3-none-any.whl (6.6 MB)
+#8 644.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 316.7 kB/s  0:00:20
+#8 644.8 Collecting pdfplumber==0.11.10 (from -r /opt/mokio-requirements.txt (line 308))
+#8 644.8   Downloading pdfplumber-0.11.10-py3-none-any.whl (60 kB)
+#8 644.9 Collecting pendulum==3.3.0 (from -r /opt/mokio-requirements.txt (line 310))
+#8 645.2   Downloading pendulum-3.3.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (335 kB)
+#8 647.3 Collecting pillow==12.2.0 (from -r /opt/mokio-requirements.txt (line 312))
+#8 647.4   Downloading pillow-12.2.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl (6.4 MB)
+#8 667.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.4/6.4 MB 324.7 kB/s  0:00:19
+#8 667.2 Collecting platformdirs==4.9.6 (from -r /opt/mokio-requirements.txt (line 316))
+#8 667.2   Downloading platformdirs-4.9.6-py3-none-any.whl (21 kB)
+#8 667.5 Collecting pluggy==1.6.0 (from -r /opt/mokio-requirements.txt (line 318))
+#8 667.5   Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+#8 667.8 Collecting portalocker==2.7.0 (from -r /opt/mokio-requirements.txt (line 320))
+#8 668.0   Downloading portalocker-2.7.0-py2.py3-none-any.whl (15 kB)
+#8 668.5 Collecting propcache==0.5.4 (from -r /opt/mokio-requirements.txt (line 324))
+#8 668.6   Downloading propcache-0.5.4-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (233 kB)
+#8 669.6 Collecting protobuf==7.36.2 (from -r /opt/mokio-requirements.txt (line 328))
+#8 669.6   Downloading protobuf-7.36.2-cp310-abi3-manylinux2014_aarch64.whl (344 kB)
+#8 670.6 Collecting pyarrow==26.0.0 (from -r /opt/mokio-requirements.txt (line 333))
+#8 670.7   Downloading pyarrow-26.0.0-cp313-cp313-manylinux_2_28_aarch64.whl (50.9 MB)
+#8 822.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.9/50.9 MB 358.9 kB/s  0:02:31
+#8 822.8 Collecting pybase64==1.5.1 (from -r /opt/mokio-requirements.txt (line 335))
+#8 822.9   Downloading pybase64-1.5.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (86 kB)
+#8 823.1 Collecting pycparser==3.11 (from -r /opt/mokio-requirements.txt (line 337))
+#8 823.1   Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+#8 823.5 Collecting pydantic==2.12.5 (from -r /opt/mokio-requirements.txt (line 339))
+#8 823.5   Downloading pydantic-2.12.5-py3-none-any.whl (463 kB)
+#8 828.3 Collecting pydantic-core==2.41.5 (from -r /opt/mokio-requirements.txt (line 353))
+#8 828.4   Downloading pydantic_core-2.41.5-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (1.9 MB)
+#8 833.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 400.3 kB/s  0:00:04
+#8 833.5 Collecting pydantic-settings==2.16.0 (from -r /opt/mokio-requirements.txt (line 357))
+#8 833.5   Downloading pydantic_settings-2.16.0-py3-none-any.whl (80 kB)
+#8 833.6 Collecting pygments==2.20.0 (from -r /opt/mokio-requirements.txt (line 363))
+#8 833.7   Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+#8 836.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 372.0 kB/s  0:00:03
+#8 837.2 Collecting pyjwt==2.15.1 (from -r /opt/mokio-requirements.txt (line 368))
+#8 837.2   Downloading pyjwt-2.15.1-py3-none-any.whl (33 kB)
+#8 837.5 Collecting pypdfium2==5.14.0 (from -r /opt/mokio-requirements.txt (line 374))
+#8 837.5   Downloading pypdfium2-5.14.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.7 MB)
+#8 848.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.7/3.7 MB 330.8 kB/s  0:00:11
+#8 848.7 Collecting pypika==0.51.1 (from -r /opt/mokio-requirements.txt (line 376))
+#8 848.7   Downloading pypika-0.51.1-py2.py3-none-any.whl (60 kB)
+#8 849.0 Collecting pyproject-hooks==1.3.3 (from -r /opt/mokio-requirements.txt (line 378))
+#8 849.2   Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+#8 849.3 Collecting pytest==9.0.3 (from -r /opt/mokio-requirements.txt (line 380))
+#8 849.3   Downloading pytest-9.0.3-py3-none-any.whl (375 kB)
+#8 850.9 Collecting python-dateutil==2.9.0.post0 (from -r /opt/mokio-requirements.txt (line 381))
+#8 850.9   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#8 851.8 Collecting python-dotenv==1.2.2 (from -r /opt/mokio-requirements.txt (line 386))
+#8 851.8   Downloading python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+#8 852.0 Collecting python-multipart==0.0.32 (from -r /opt/mokio-requirements.txt (line 393))
+#8 852.1   Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+#8 852.1 Collecting pyyaml==6.0.3 (from -r /opt/mokio-requirements.txt (line 399))
+#8 852.2   Downloading pyyaml-6.0.3-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (767 kB)
+#8 855.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 767.1/767.1 kB 256.0 kB/s  0:00:02
+#8 855.0 Collecting referencing==0.37.0 (from -r /opt/mokio-requirements.txt (line 409))
+#8 855.1   Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+#8 857.9 Collecting regex==2026.1.15 (from -r /opt/mokio-requirements.txt (line 413))
+#8 858.0   Downloading regex-2026.1.15-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (798 kB)
+#8 860.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 798.7/798.7 kB 268.7 kB/s  0:00:02
+#8 860.9 Collecting requests==2.34.1 (from -r /opt/mokio-requirements.txt (line 417))
+#8 860.9   Downloading requests-2.34.1-py3-none-any.whl (73 kB)
+#8 861.2 Collecting requests-oauthlib==2.0.0 (from -r /opt/mokio-requirements.txt (line 428))
+#8 861.2   Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+#8 861.5 Collecting requests-toolbelt==1.0.0 (from -r /opt/mokio-requirements.txt (line 430))
+#8 861.5   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+#8 861.6 Collecting rich==14.3.4 (from -r /opt/mokio-requirements.txt (line 432))
+#8 861.6   Downloading rich-14.3.4-py3-none-any.whl (310 kB)
+#8 864.5 Collecting rpds-py==2026.9.1 (from -r /opt/mokio-requirements.txt (line 440))
+#8 864.6   Downloading rpds_py-2026.9.1-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (372 kB)
+#8 867.9 Collecting ruff==0.17.0 (from -r /opt/mokio-requirements.txt (line 444))
+#8 868.1   Downloading ruff-0.17.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (10.0 MB)
+#8 895.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.0/10.0 MB 363.0 kB/s  0:00:27
+#8 895.8 Collecting shellingham==1.5.4 (from -r /opt/mokio-requirements.txt (line 445))
+#8 896.1   Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+#8 896.3 Collecting six==1.17.0 (from -r /opt/mokio-requirements.txt (line 447))
+#8 896.5   Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#8 896.8 Collecting sniffio==1.3.1 (from -r /opt/mokio-requirements.txt (line 451))
+#8 897.1   Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#8 897.3 Collecting sse-starlette==3.5.0 (from -r /opt/mokio-requirements.txt (line 453))
+#8 897.3   Downloading sse_starlette-3.5.0-py3-none-any.whl (17 kB)
+#8 897.4 Collecting starlette==1.7.0 (from -r /opt/mokio-requirements.txt (line 455))
+#8 897.4   Downloading starlette-1.7.0-py3-none-any.whl (78 kB)
+#8 897.8 Collecting tavily-python==0.7.24 (from -r /opt/mokio-requirements.txt (line 459))
+#8 897.8   Downloading tavily_python-0.7.24-py3-none-any.whl (20 kB)
+#8 898.0 Collecting tenacity==9.1.4 (from -r /opt/mokio-requirements.txt (line 461))
+#8 898.1   Downloading tenacity-9.1.4-py3-none-any.whl (28 kB)
+#8 898.2 Collecting textual==8.2.6 (from -r /opt/mokio-requirements.txt (line 466))
+#8 898.2   Downloading textual-8.2.6-py3-none-any.whl (729 kB)
+#8 900.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 729.9/729.9 kB 255.2 kB/s  0:00:02
+#8 901.0 Collecting tiktoken==0.12.0 (from -r /opt/mokio-requirements.txt (line 470))
+#8 901.1   Downloading tiktoken-0.12.0-cp313-cp313-manylinux_2_28_aarch64.whl (1.1 MB)
+#8 904.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 335.3 kB/s  0:00:03
+#8 905.0 Collecting tokenizers==0.23.3 (from -r /opt/mokio-requirements.txt (line 475))
+#8 905.1   Downloading tokenizers-0.23.3-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (3.5 MB)
+#8 915.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 347.1 kB/s  0:00:10
+#8 915.2 Collecting tomli==2.0.2 (from -r /opt/mokio-requirements.txt (line 479))
+#8 915.5   Downloading tomli-2.0.2-py3-none-any.whl (13 kB)
+#8 915.9 Collecting tomli-w==1.1.0 (from -r /opt/mokio-requirements.txt (line 484))
+#8 916.2   Downloading tomli_w-1.1.0-py3-none-any.whl (6.4 kB)
+#8 916.2 Collecting tqdm==4.67.3 (from -r /opt/mokio-requirements.txt (line 488))
+#8 916.3   Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
+#8 916.3 Collecting typer==0.25.1 (from -r /opt/mokio-requirements.txt (line 494))
+#8 916.3   Downloading typer-0.25.1-py3-none-any.whl (58 kB)
+#8 916.6 Collecting typing-extensions==4.15.0 (from -r /opt/mokio-requirements.txt (line 500))
+#8 916.6   Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+#8 916.9 Collecting typing-inspection==0.4.2 (from -r /opt/mokio-requirements.txt (line 522))
+#8 917.2   Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+#8 917.5 Collecting tzdata==2026.5 (from -r /opt/mokio-requirements.txt (line 527))
+#8 917.5   Downloading tzdata-2026.5-py2.py3-none-any.whl (347 kB)
+#8 918.7 Collecting uc-micro-py==2.0.0 (from -r /opt/mokio-requirements.txt (line 529))
+#8 918.9   Downloading uc_micro_py-2.0.0-py3-none-any.whl (6.4 kB)
+#8 918.9 Collecting urllib3==2.7.0 (from -r /opt/mokio-requirements.txt (line 531))
+#8 918.9   Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+#8 919.5 Collecting uuid-utils==0.15.0 (from -r /opt/mokio-requirements.txt (line 536))
+#8 919.7   Downloading uuid_utils-0.15.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (324 kB)
+#8 922.0 Collecting uv==0.11.33 (from -r /opt/mokio-requirements.txt (line 540))
+#8 922.3   Downloading uv-0.11.33-py3-none-manylinux_2_28_aarch64.whl (21.3 MB)
+#8 989.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 21.3/21.3 MB 276.5 kB/s  0:01:07
+#8 989.6 Collecting uvicorn==0.54.0 (from -r /opt/mokio-requirements.txt (line 542))
+#8 989.6   Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)
+#8 989.7 Collecting uvloop==0.23.0 (from -r /opt/mokio-requirements.txt (line 546))
+#8 989.8   Downloading uvloop-0.23.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (4.4 MB)
+#8 1012.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 199.9 kB/s  0:00:21
+#8 1012.8 Collecting watchfiles==1.3.0 (from -r /opt/mokio-requirements.txt (line 548))
+#8 1012.9   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (454 kB)
+#8 1014.0 Collecting websocket-client==1.9.2 (from -r /opt/mokio-requirements.txt (line 550))
+#8 1014.0   Downloading websocket_client-1.9.2-py3-none-any.whl (95 kB)
+#8 1014.5 Collecting websockets==17.2 (from -r /opt/mokio-requirements.txt (line 552))
+#8 1014.6   Downloading websockets-17.2-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (226 kB)
+#8 1015.9 Collecting xxhash==3.7.0 (from -r /opt/mokio-requirements.txt (line 554))
+#8 1016.1   Downloading xxhash-3.7.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (213 kB)
+#8 1017.6 Collecting yarl==1.25.1 (from -r /opt/mokio-requirements.txt (line 556))
+#8 1017.6   Downloading yarl-1.25.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl (115 kB)
+#8 1018.1 Collecting zstandard==0.25.0 (from -r /opt/mokio-requirements.txt (line 558))
+#8 1018.2   Downloading zstandard-0.25.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl (5.1 MB)
+#8 1032.7      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.1/5.1 MB 340.7 kB/s  0:00:14
+#8 1033.0 Installing collected packages: pypika, flatbuffers, durationpy, appdirs, zstandard, xxhash, websockets, websocket-client, uvloop, uv, uuid-utils, urllib3, uc-micro-py, tzdata, typing-extensions, tqdm, tomli-w, tomli, tenacity, sniffio, six, shellingham, ruff, rpds-py, regex, pyyaml, python-multipart, python-dotenv, pyproject-hooks, pypdfium2, pyjwt, pygments, pycparser, pybase64, pyarrow, protobuf, propcache, portalocker, pluggy, platformdirs, pillow, pathspec, packaging, overrides, orjson, oauthlib, numpy, mypy-extensions, multidict, mmh3, mdurl, markupsafe, librt, lark, jsonref, jsonpointer, json5, json-repair, jmespath, jiter, iniconfig, importlib-resources, idna, httpx-sse, httptools, hf-xet, h11, google-re2, fsspec, frozenlist, filelock, et-xmlfile, docstring-parser, distro, click, charset-normalizer, certifi, bcrypt, attrs, ast-serialize, annotated-types, annotated-doc, aiohappyeyeballs, aiofiles, yarl, uvicorn, typing-inspection, requests, referencing, python-dateutil, pytest, pydantic-core, opentelemetry-proto, opentelemetry-api, openpyxl, onnxruntime, mypy, markdown-it-py, linkify-it-py, langchain-protocol, jsonpatch, jinja2, httpcore, grpcio, googleapis-common-protos, deprecation, cffi, build, anyio, aiosqlite, aiosignal, watchfiles, tiktoken, starlette, rich, requests-toolbelt, requests-oauthlib, pydantic, pendulum, opentelemetry-semantic-conventions, opentelemetry-exporter-otlp-proto-common, opentelemetry-exporter-http-transport, mdit-py-plugins, jsonschema-specifications, httpx, cryptography, aiohttp, typer, textual, tavily-python, sse-starlette, pydantic-settings, pdfminer-six, opentelemetry-sdk, openai, langsmith, lance-namespace-urllib3-client, kubernetes, jsonschema, cel-python, pdfplumber, opentelemetry-exporter-otlp-common, mcp, langchain-core, lance-namespace, instructor, huggingface-hub, tokenizers, opentelemetry-exporter-otlp-proto-http, opentelemetry-exporter-otlp-proto-grpc, langchain-openai, lancedb, crewai-core, chromadb, crewai-cli, crewai
+#8 1043.9 
+#8 1043.9 Successfully installed aiofiles-24.1.0 aiohappyeyeballs-2.7.1 aiohttp-3.14.5 aiosignal-1.4.0 aiosqlite-0.21.0 annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 appdirs-1.4.4 ast-serialize-0.13.0 attrs-26.1.0 bcrypt-5.0.0 build-1.6.1 cel-python-0.5.0 certifi-2026.4.22 cffi-2.1.1 charset-normalizer-3.4.7 chromadb-1.5.9 click-8.3.3 crewai-1.15.28 crewai-cli-1.15.28 crewai-core-1.15.28 cryptography-50.0.2 deprecation-2.1.0 distro-1.9.0 docstring-parser-0.18.0 durationpy-0.11 et-xmlfile-2.0.0 filelock-4.2.4 flatbuffers-25.12.19 frozenlist-1.8.0 fsspec-2026.9.0 google-re2-1.1.20251105 googleapis-common-protos-1.75.5 grpcio-1.84.0 h11-0.16.0 hf-xet-1.7.0 httpcore-1.0.9 httptools-0.9.0 httpx-0.28.1 httpx-sse-0.4.3 huggingface-hub-1.16.1 idna-3.20 importlib-resources-7.1.0 iniconfig-2.3.0 instructor-1.15.4 jinja2-3.1.6 jiter-0.14.0 jmespath-1.1.0 json-repair-0.60.1 json5-0.10.0 jsonpatch-1.33 jsonpointer-3.1.1 jsonref-1.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 kubernetes-36.0.3 lance-namespace-0.13.0 lance-namespace-urllib3-client-0.13.0 lancedb-0.30.0 langchain-core-1.4.0 langchain-openai-1.2.1 langchain-protocol-0.0.15 langsmith-0.8.4 lark-1.3.1 librt-0.16.0 linkify-it-py-2.1.0 markdown-it-py-4.2.0 markupsafe-3.0.4 mcp-1.28.1 mdit-py-plugins-0.6.1 mdurl-0.1.2 mmh3-5.3.1 multidict-7.1.0 mypy-2.4.0 mypy-extensions-1.1.0 numpy-2.5.4 oauthlib-4.0.0 onnxruntime-1.31.0 openai-2.36.0 openpyxl-3.1.5 opentelemetry-api-1.45.1 opentelemetry-exporter-http-transport-0.66b1 opentelemetry-exporter-otlp-common-0.66b1 opentelemetry-exporter-otlp-proto-common-1.45.1 opentelemetry-exporter-otlp-proto-grpc-1.45.1 opentelemetry-exporter-otlp-proto-http-1.45.1 opentelemetry-proto-1.45.1 opentelemetry-sdk-1.45.1 opentelemetry-semantic-conventions-0.66b1 orjson-3.11.9 overrides-7.7.0 packaging-26.2 pathspec-1.1.1 pdfminer-six-20260107 pdfplumber-0.11.10 pendulum-3.3.0 pillow-12.2.0 platformdirs-4.9.6 pluggy-1.6.0 portalocker-2.7.0 propcache-0.5.4 protobuf-7.36.2 pyarrow-26.0.0 pybase64-1.5.1 pycparser-3.11 pydantic-2.12.5 pydantic-core-2.41.5 pydantic-settings-2.16.0 pygments-2.20.0 pyjwt-2.15.1 pypdfium2-5.14.0 pypika-0.51.1 pyproject-hooks-1.3.3 pytest-9.0.3 python-dateutil-2.9.0.post0 python-dotenv-1.2.2 python-multipart-0.0.32 pyyaml-6.0.3 referencing-0.37.0 regex-2026.1.15 requests-2.34.1 requests-oauthlib-2.0.0 requests-toolbelt-1.0.0 rich-14.3.4 rpds-py-2026.9.1 ruff-0.17.0 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 sse-starlette-3.5.0 starlette-1.7.0 tavily-python-0.7.24 tenacity-9.1.4 textual-8.2.6 tiktoken-0.12.0 tokenizers-0.23.3 tomli-2.0.2 tomli-w-1.1.0 tqdm-4.67.3 typer-0.25.1 typing-extensions-4.15.0 typing-inspection-0.4.2 tzdata-2026.5 uc-micro-py-2.0.0 urllib3-2.7.0 uuid-utils-0.15.0 uv-0.11.33 uvicorn-0.54.0 uvloop-0.23.0 watchfiles-1.3.0 websocket-client-1.9.2 websockets-17.2 xxhash-3.7.0 yarl-1.25.1 zstandard-0.25.0
+#8 1043.9 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#8 DONE 1044.4s
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 14.3s done
+#9 exporting manifest sha256:3d5be706d812d16bae24ccbb9f565e7ce8e9a56fd1d0cedf491999073175d46b 0.0s done
+#9 exporting config sha256:134cc13701114d68662217692582e4f3f2ef0d515642d007fad7141194a7fcf8 done
+#9 exporting attestation manifest sha256:be11daea3e54a910d39fd4f8b9e80cda593a5528db151f6f46abbbc0a5c4f90e 0.0s done
+#9 exporting manifest list sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609 done
+#9 naming to docker.io/library/mokioclaw-crewai-migration:20261020 done
+#9 unpacking to docker.io/library/mokioclaw-crewai-migration:20261020
+#9 unpacking to docker.io/library/mokioclaw-crewai-migration:20261020 2.9s done
+#9 DONE 17.3s

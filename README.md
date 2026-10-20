@@ -1,12 +1,12 @@
 # MokioAgent / MokioClaw
 
-面向本地代码任务的 Agent 工程学习项目。用 LangGraph 组织探索、规划、实现和验收，重点研究：**模型生成不完整时不执行工具、运行中纠正使旧调用失效、用独立测试区分产物与交付**。默认完整多 Agent 流程、local 执行；light/auto 与 Docker 均需显式配置。
+面向本地代码任务的 Agent 工程学习项目。用 CrewAI Flows 组织探索、规划、实现和验收，重点研究：**模型生成不完整时不执行工具、运行中纠正使旧调用失效、用独立测试区分产物与交付**。默认完整多 Agent 流程、local 执行；light/auto 与 Docker 均需显式配置。
 
 ```mermaid
 flowchart LR
     UI[CLI / TUI] --> D[daemon 与运行控制]
-    D --> R[路由 / planner]
-    R <--> S[repoAgent / codeAgent]
+    D --> R[CrewAI Flow: 路由 / planner]
+    R <--> S[repoAgent / codeAgent / testAgent]
     R --> V[模型 verifier]
     V -->|继续修改| R
     V --> F[最终汇报与运行终态]
@@ -30,9 +30,13 @@ flowchart LR
 
 [Context Compression A/B Benchmark](docs/experiments/context-compression-v1/README.md)提供相同 full 流程下的压缩开关对照，比较包含摘要开销的 token、独立交付率与延迟；未加 `--real-model` 只预览，不产生效果数据。
 
+当前编排已迁移为 CrewAI Flows；保留原有模型适配、Agent 工具循环和运行控制。[迁移设计与兼容边界](docs/crewai-migration.md)。上述历史真实实验与远程 CI 对应迁移前版本，不能视为 CrewAI 版本的新成绩。
+
+实现后自动进入独立 `testAgent`，执行相关检查并整理实际命令结果，再交给 Verifier 判断完整交付。测试失败或未完成不能被模型的成功回复覆盖。[职责、状态与离线演示](docs/testing-agent.md)。
+
 ## 快速体验（不需要模型凭证）
 
-需要 Python 3.13、uv。首次安装需要联网或已有依赖缓存；安装后的以下示例与回放不访问模型，也不需要 Docker：
+需要 Python 3.13（`>=3.13,<3.14`）、uv。首次安装需要联网或已有依赖缓存；安装后的以下示例与回放不访问模型，也不需要 Docker：
 
 ```sh
 uv sync --frozen

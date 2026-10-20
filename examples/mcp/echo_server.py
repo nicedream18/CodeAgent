@@ -27,15 +27,25 @@ async def call_tool(context, params) -> types.CallToolResult:
     del context
     if params.name != "echo":
         return types.CallToolResult(
-            content=[types.TextContent(text=f"unknown tool: {params.name}")],
+            content=[types.TextContent(type="text", text=f"unknown tool: {params.name}")],
             isError=True,
         )
     return types.CallToolResult(
-        content=[types.TextContent(text=f"echo: {params.arguments['text']}")]
+        content=[types.TextContent(type="text", text=f"echo: {params.arguments['text']}")]
     )
 
 
-server = Server("mokioclaw-example", on_list_tools=list_tools, on_call_tool=call_tool)
+server = Server("mokioclaw-example")
+
+
+@server.list_tools()
+async def sdk_list_tools():
+    return (await list_tools(None, None)).tools
+
+
+@server.call_tool()
+async def sdk_call_tool(name: str, arguments: dict):
+    return await call_tool(None, types.CallToolRequestParams(name=name, arguments=arguments))
 
 
 async def main() -> None:

@@ -255,7 +255,7 @@ if os.environ.get("TEST_DISCOVERY") == "protocol":
         sys.stderr.write("x" * (2 * 1024 * 1024) + "TAIL_MARK")
         sys.stderr.flush()
     if mode == "error":
-        return types.CallToolResult(content=[types.TextContent(text="tool rejected")], isError=True)
+        return types.CallToolResult(content=[types.TextContent(type="text", text="tool rejected")], isError=True)
 """,
     )
     server = tmp_path / "server.py"

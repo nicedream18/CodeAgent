@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "\n==================================== ERRORS ====================================\n_________________ ERROR collecting tests/test_eval_literal.py __________________\nImportError while importing test module '/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-grade-h66nv9ky/workspace/tests/test_eval_literal.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/local/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_eval_literal.py:2: in <module>\n    from mokioclaw.tools.grep_tool import grep\nsrc/mokioclaw/tools/__init__.py:1: in <module>\n    from mokioclaw.tools.registry import (\nsrc/mokioclaw/tools/registry.py:13: in <module>\n    from mokioclaw.tools.mcp_tools import build_mcp_tools, build_tool_search\nsrc/mokioclaw/tools/mcp_tools.py:15: in <module>\n    from mcp import Client\nE   ImportError: cannot import name 'Client' from 'mcp' (/usr/local/lib/python3.13/site-packages/mcp/__init__.py). Did you mean: 'client'?\n=========================== short test summary info ============================\nERROR tests/test_eval_literal.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.30s\n\n==================================== ERRORS ====================================\n_____________ ERROR collecting tests/test_project_optimization.py ______________\nImportError while importing test module '/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-grade-h66nv9ky/workspace/tests/test_project_optimization.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/local/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_project_optimization.py:19: in <module>\n    from mokioclaw.tools.execution import execute_tool\nsrc/mokioclaw/tools/__init__.py:1: in <module>\n    from mokioclaw.tools.registry import (\nsrc/mokioclaw/tools/registry.py:13: in <module>\n    from mokioclaw.tools.mcp_tools import build_mcp_tools, build_tool_search\nsrc/mokioclaw/tools/mcp_tools.py:15: in <module>\n    from mcp import Client\nE   ImportError: cannot import name 'Client' from 'mcp' (/usr/local/lib/python3.13/site-packages/mcp/__init__.py). Did you mean: 'client'?\n=========================== short test summary info ============================\nERROR tests/test_project_optimization.py\n1 error in 0.51s\n",
+  "stderr": "ERROR: found no collectors for /private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-grade-h66nv9ky/workspace/tests/test_project_optimization.py::test_search_backends_share_ignore_scope_unicode_and_symlink_boundary\n\nERROR: found no collectors for /private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/mokio-grade-h66nv9ky/workspace/tests/test_project_optimization.py::test_search_python_regex_fallback_and_limit\n\n",
+  "duration_ms": 2541,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": "bash-stdout-96b62e5fec3f4887b9611643632b1a50.log",
+    "stdout_output_bytes": 2608,
+    "stdout_retained_bytes": 2608,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": "bash-stderr-e8b9d74547b347b3ae69c8b64a81d235.log",
+    "stderr_output_bytes": 425,
+    "stderr_retained_bytes": 425,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609",
+    "container_id": "938e779df93eeb43468b09a0c03add8ea0d5d127e580e17f0eed156f53c2611b",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": "bash-stdout-96b62e5fec3f4887b9611643632b1a50.log",
+  "stdout_output_bytes": 2608,
+  "stdout_retained_bytes": 2608,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": "bash-stderr-e8b9d74547b347b3ae69c8b64a81d235.log",
+  "stderr_output_bytes": 425,
+  "stderr_retained_bytes": 425,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609",
+  "container_id": "938e779df93eeb43468b09a0c03add8ea0d5d127e580e17f0eed156f53c2611b",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true
+}

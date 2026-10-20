@@ -160,6 +160,7 @@ def _controlled_stream(stream, task, options, control, *, session, execution_con
                         "type": "custom_event",
                         "event": {
                             "type": "run_started",
+                            "orchestration_backend": "crewai",
                             "run_id": runtime.run_id,
                         },
                     }

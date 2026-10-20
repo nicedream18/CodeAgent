@@ -1,0 +1,18 @@
+{
+  "simulation": true,
+  "real_model": false,
+  "real_checks": true,
+  "execution_backend": "docker",
+  "outcomes": [
+    {
+      "fixed": false,
+      "status": "failed",
+      "exit_code": 1
+    },
+    {
+      "fixed": true,
+      "status": "passed",
+      "exit_code": 0
+    }
+  ]
+}

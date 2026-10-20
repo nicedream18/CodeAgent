@@ -11,7 +11,6 @@ import pytest
 import test_mcp_streaming as mcp_examples
 from langchain_core.messages import AIMessage
 from langchain_core.tools import StructuredTool
-from langgraph.graph import END, START, StateGraph
 
 from mokioclaw.core import hooks
 from mokioclaw.core.approval import ApprovalDecision
@@ -20,7 +19,7 @@ from mokioclaw.core.daemon import AgentDaemon
 from mokioclaw.core.hooks import HookDecision, register_hook
 from mokioclaw.core.instructions import inject_instructions, instructions
 from mokioclaw.core.state import RuntimeState
-from mokioclaw.graph.state import MokioGraphState
+from mokioclaw.orchestration.runtime import single_step_workflow
 from mokioclaw.tools.execution import execute_tool
 from mokioclaw.tools.file_tools import read_file, write_file
 from mokioclaw.tools.mcp_tools import search_mcp_tools
@@ -62,11 +61,7 @@ def request(daemon, method, **params):
 
 
 def graph(node):
-    builder = StateGraph(MokioGraphState)
-    builder.add_node("step", node)
-    builder.add_edge(START, "step")
-    builder.add_edge("step", END)
-    return builder.compile()
+    return single_step_workflow("step", node)
 
 
 def test_stdio_discovery_deferred_until_search_and_dynamically_bound(mcp_runtime, monkeypatch):
@@ -346,10 +341,10 @@ def test_checkpoint_restores_nested_rules_and_requires_reverification_after_rewi
 
 def test_custom_stream_event_does_not_clear_inbox_while_producer_still_runs(tmp_path):
     from langchain_core.messages import AIMessageChunk, HumanMessage
-    from langgraph.config import get_stream_writer
 
     from mokioclaw.core.agent import _graph_envelopes
     from mokioclaw.core.run_control import RunControl
+    from mokioclaw.orchestration.runtime import get_stream_writer
     from mokioclaw.providers.openai_provider import invoke_streaming
 
     control = RunControl()
@@ -413,12 +408,11 @@ def test_custom_stream_event_does_not_clear_inbox_while_producer_still_runs(tmp_
 def test_sync_subagent_correction_keeps_completed_write_and_closes_old_tool_group(
     tmp_path, monkeypatch
 ):
-    from langgraph.config import get_stream_writer
-
     from mokioclaw.agents import code_agent
     from mokioclaw.agents.registry import run_subagent
     from mokioclaw.core.agent import _graph_envelopes
     from mokioclaw.core.run_control import RunControl
+    from mokioclaw.orchestration.runtime import get_stream_writer
 
     control = RunControl()
     runtime = RuntimeState(workspace=tmp_path, run_control=control)

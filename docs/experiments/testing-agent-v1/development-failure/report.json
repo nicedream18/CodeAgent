@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "job": "check",
+  "status": "failed",
+  "metadata": {
+    "commit": "8df67d7e2caaa0ef04502563706d3b382585af99",
+    "source_and_checks_sha256": "d501497fd66abb2e92d3631c120a056b3ff9627f908971f4b996042390bcd7e7",
+    "lock_sha256": "68fc0a65d66931e0f465dae77db41e6155da4412909e4464381721a72002b05e",
+    "python": "3.13.9 (v3.13.9:8183fa5e3f7, Oct 14 2025, 10:27:13) [Clang 16.0.0 (clang-1600.0.26.6)]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "recorded_at": "2026-10-20T02:32:21.012090+00:00",
+    "workflow": null,
+    "job": null,
+    "run_id": null,
+    "run_attempt": null,
+    "run_url": null,
+    "dirty": true,
+    "real_model_calls": 0,
+    "log_limit_bytes": 1048576,
+    "total_report_limit_bytes": 16777216,
+    "uv": "uv 0.12.19 (bea138450 2026-09-24 aarch64-apple-darwin)"
+  },
+  "steps": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.044,
+      "output_bytes": 55,
+      "log_bytes": 55,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (bea138450 2026-09-24 aarch64-apple-darwin)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 52.372,
+      "output_bytes": 12246,
+      "log_bytes": 12246,
+      "log_truncated": false,
+      "tail": "local_models, mode):\n        (tmp_path / \"app.txt\").write_text(\"before\")\n        events = list(\n            stream_agent_events(\n                \"将 app.txt 的 before 改成 after\",\n                workspace=tmp_path,\n                workflow_mode=mode,\n                approval_mode=\"deny\",\n            )\n        )\n        assert (tmp_path / \"app.txt\").read_text() == \"after\"\n        terminal = [\n            row[\"event\"]\n            for row in events\n            if row.get(\"type\") == \"custom_event\" and row[\"event\"].get(\"type\") == \"run_finished\"\n        ][-1]\n        assert terminal[\"status\"] == \"finished\"\n        expected = \"full\" if mode == \"full\" else \"light\"\n        assert any(row.get(\"event\", {}).get(\"mode\") == expected for row in events)\n        metrics = terminal[\"model_metrics\"]\n>       assert metrics[\"roles\"][\"verifier\"][\"requests\"] == 2\nE       assert 6 == 2\n\ntests/test_optimization_workflows.py:131: AssertionError\n__________ test_real_workflow_modes_produce_same_verified_file[auto] ___________\n\ntmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-260/test_real_workflow_modes_produ2')\nlocal_models = None, mode = 'auto'\n\n    @pytest.mark.parametrize(\"mode\", [\"full\", \"light\", \"auto\"])\n    def test_real_workflow_modes_produce_same_verified_file(tmp_path, local_models, mode):\n        (tmp_path / \"app.txt\").write_text(\"before\")\n        events = list(\n            stream_agent_events(\n                \"将 app.txt 的 before 改成 after\",\n                workspace=tmp_path,\n                workflow_mode=mode,\n                approval_mode=\"deny\",\n            )\n        )\n        assert (tmp_path / \"app.txt\").read_text() == \"after\"\n        terminal = [\n            row[\"event\"]\n            for row in events\n            if row.get(\"type\") == \"custom_event\" and row[\"event\"].get(\"type\") == \"run_finished\"\n        ][-1]\n        assert terminal[\"status\"] == \"finished\"\n        expected = \"full\" if mode == \"full\" else \"light\"\n        assert any(row.get(\"event\", {}).get(\"mode\") == expected for row in events)\n        metrics = terminal[\"model_metrics\"]\n>       assert metrics[\"roles\"][\"verifier\"][\"requests\"] == 2\nE       assert 6 == 2\n\ntests/test_optimization_workflows.py:131: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[requests-request_headroom] - AssertionError: assert (not False and 'failed' == 'finished'\n  \n  - finished\n  + failed)\nFAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tokens-token_headroom] - AssertionError: assert (not False and 'failed' == 'finished'\n  \n  - finished\n  + failed)\nFAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tools-tool_headroom] - AssertionError: assert (not False and 'failed' == 'finished'\n  \n  - finished\n  + failed)\nFAILED tests/test_completion_reservation.py::test_failed_reserved_verification_stops_without_redelegation_or_synthetic_success - AssertionError: assert 2 == 1\n +  where 2 = len([{'from': 'planner', 'handoff_id': 'e99137ec-b0b7-41c4-88bd-77829cbc51ab', 'instruction': 'Fix a.py', 'run_in_backgrou... Report observed command outcomes and missing tests; delegate repairs to codeAgent.', 'run_in_background': False, ...}])\nFAILED tests/test_completion_reservation.py::test_real_stream_lifecycle_saves_completion_phase_and_terminal_trace[light-True] - AssertionError: assert 'failed' == 'finished'\n  \n  - finished\n  + failed\nFAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[full] - assert 6 == 2\nFAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[light] - assert 6 == 2\nFAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[auto] - assert 6 == 2\n8 failed, 502 passed, 2 skipped in 48.33s\nmake: *** [check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    }
+  ],
+  "planned_steps": [
+    "uv-version",
+    "make-check",
+    "commit-whitespace"
+  ],
+  "checks": [
+    {
+      "name": "uv-version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "log": "uv-version.log",
+      "timeout_seconds": 15,
+      "timed_out": false,
+      "seconds": 0.044,
+      "output_bytes": 55,
+      "log_bytes": 55,
+      "log_truncated": false,
+      "tail": "uv 0.12.19 (bea138450 2026-09-24 aarch64-apple-darwin)\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "make-check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "status": "failed",
+      "exit_code": 2,
+      "log": "make-check.log",
+      "timeout_seconds": 900,
+      "timed_out": false,
+      "seconds": 52.372,
+      "output_bytes": 12246,
+      "log_bytes": 12246,
+      "log_truncated": false,
+      "tail": "local_models, mode):\n        (tmp_path / \"app.txt\").write_text(\"before\")\n        events = list(\n            stream_agent_events(\n                \"将 app.txt 的 before 改成 after\",\n                workspace=tmp_path,\n                workflow_mode=mode,\n                approval_mode=\"deny\",\n            )\n        )\n        assert (tmp_path / \"app.txt\").read_text() == \"after\"\n        terminal = [\n            row[\"event\"]\n            for row in events\n            if row.get(\"type\") == \"custom_event\" and row[\"event\"].get(\"type\") == \"run_finished\"\n        ][-1]\n        assert terminal[\"status\"] == \"finished\"\n        expected = \"full\" if mode == \"full\" else \"light\"\n        assert any(row.get(\"event\", {}).get(\"mode\") == expected for row in events)\n        metrics = terminal[\"model_metrics\"]\n>       assert metrics[\"roles\"][\"verifier\"][\"requests\"] == 2\nE       assert 6 == 2\n\ntests/test_optimization_workflows.py:131: AssertionError\n__________ test_real_workflow_modes_produce_same_verified_file[auto] ___________\n\ntmp_path = PosixPath('/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-260/test_real_workflow_modes_produ2')\nlocal_models = None, mode = 'auto'\n\n    @pytest.mark.parametrize(\"mode\", [\"full\", \"light\", \"auto\"])\n    def test_real_workflow_modes_produce_same_verified_file(tmp_path, local_models, mode):\n        (tmp_path / \"app.txt\").write_text(\"before\")\n        events = list(\n            stream_agent_events(\n                \"将 app.txt 的 before 改成 after\",\n                workspace=tmp_path,\n                workflow_mode=mode,\n                approval_mode=\"deny\",\n            )\n        )\n        assert (tmp_path / \"app.txt\").read_text() == \"after\"\n        terminal = [\n            row[\"event\"]\n            for row in events\n            if row.get(\"type\") == \"custom_event\" and row[\"event\"].get(\"type\") == \"run_finished\"\n        ][-1]\n        assert terminal[\"status\"] == \"finished\"\n        expected = \"full\" if mode == \"full\" else \"light\"\n        assert any(row.get(\"event\", {}).get(\"mode\") == expected for row in events)\n        metrics = terminal[\"model_metrics\"]\n>       assert metrics[\"roles\"][\"verifier\"][\"requests\"] == 2\nE       assert 6 == 2\n\ntests/test_optimization_workflows.py:131: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[requests-request_headroom] - AssertionError: assert (not False and 'failed' == 'finished'\n  \n  - finished\n  + failed)\nFAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tokens-token_headroom] - AssertionError: assert (not False and 'failed' == 'finished'\n  \n  - finished\n  + failed)\nFAILED tests/test_completion_reservation.py::test_full_workflow_yields_synchronous_child_closes_batch_and_reaches_verifier[tools-tool_headroom] - AssertionError: assert (not False and 'failed' == 'finished'\n  \n  - finished\n  + failed)\nFAILED tests/test_completion_reservation.py::test_failed_reserved_verification_stops_without_redelegation_or_synthetic_success - AssertionError: assert 2 == 1\n +  where 2 = len([{'from': 'planner', 'handoff_id': 'e99137ec-b0b7-41c4-88bd-77829cbc51ab', 'instruction': 'Fix a.py', 'run_in_backgrou... Report observed command outcomes and missing tests; delegate repairs to codeAgent.', 'run_in_background': False, ...}])\nFAILED tests/test_completion_reservation.py::test_real_stream_lifecycle_saves_completion_phase_and_terminal_trace[light-True] - AssertionError: assert 'failed' == 'finished'\n  \n  - finished\n  + failed\nFAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[full] - assert 6 == 2\nFAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[light] - assert 6 == 2\nFAILED tests/test_optimization_workflows.py::test_real_workflow_modes_produce_same_verified_file[auto] - assert 6 == 2\n8 failed, 502 passed, 2 skipped in 48.33s\nmake: *** [check] Error 1\n",
+      "output_complete": true,
+      "output_errors": []
+    },
+    {
+      "name": "commit-whitespace",
+      "status": "not_started",
+      "exit_code": null,
+      "seconds": null
+    }
+  ],
+  "error": {
+    "type": "RuntimeError",
+    "message": "See sanitized step logs and explicit exit codes"
+  }
+}

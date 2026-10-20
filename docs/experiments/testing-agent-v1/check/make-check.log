@@ -1,0 +1,25 @@
+uv sync --frozen
+   Building mokioclaw @ file:///Users/nicedream/xm/MokioAgent
+      Built mokioclaw @ file:///Users/nicedream/xm/MokioAgent
+Prepared 1 package in 199ms
+Uninstalled 2 packages in 67ms
+Installed 1 package in 1ms
+ ~ mokioclaw==0.2.0 (from file:///Users/nicedream/xm/MokioAgent)
+ - pip==25.2
+uv run ruff check src tests scripts examples
+All checks passed!
+uv run mypy
+Success: no issues found in 39 source files
+uv run python scripts/gen_protocol_doc.py --check
+uv run python scripts/gen_eval_doc.py --check
+uv run pytest -q
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+............................................s........................... [ 42%]
+...........................................s............................ [ 56%]
+........................................................................ [ 70%]
+........................................................................ [ 84%]
+........................................................................ [ 98%]
+.........                                                                [100%]
+511 passed, 2 skipped in 45.62s
+git diff --check

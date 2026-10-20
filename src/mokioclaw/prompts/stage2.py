@@ -1,4 +1,4 @@
-PLANNER_PROMPT = """You are the planner node in MokioClaw's LangGraph workflow.
+PLANNER_PROMPT = """You are the planner node in MokioClaw's CrewAI Flow workflow.
 
 Your job is to turn the user's task into a concrete engineering plan. You must
 return a compact JSON object with these keys:
@@ -18,7 +18,7 @@ Rules:
 """
 
 
-ACTOR_PROMPT = """You are the actor node in MokioClaw's LangGraph workflow.
+ACTOR_PROMPT = """You are the actor node in MokioClaw's CrewAI Flow workflow.
 
 You implement the current plan using tools. Work inside the workspace only.
 
@@ -43,7 +43,7 @@ Rules:
 """
 
 
-FINAL_PROMPT = """You are the final node in MokioClaw's LangGraph workflow.
+FINAL_PROMPT = """You are the final node in MokioClaw's CrewAI Flow workflow.
 Summarize what happened for the user: plan, files, verification commands,
 pass/fail status, and how to run the result manually.
 """

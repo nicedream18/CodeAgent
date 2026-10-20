@@ -13,6 +13,7 @@ from uuid import uuid4
 from langchain_core.messages import BaseMessage, message_to_dict
 
 from mokioclaw.core.artifacts import DiagnosticArtifact
+from mokioclaw.orchestration import BACKEND, FRAMEWORK_VERSION
 
 VALID_TRACE_MODES = {"on", "off"}
 TRACE_ROOT = Path(".mokioclaw") / "traces"
@@ -117,6 +118,7 @@ class TraceRecorder:
             "run_start",
             {
                 "task": inputs.get("task", self.task),
+                "orchestration": {"backend": BACKEND, "version": FRAMEWORK_VERSION},
                 "workspace": str(self.workspace),
                 "resumed": resumed,
                 "resume": resume_event or {},
@@ -144,7 +146,7 @@ class TraceRecorder:
 
     @_serialized
     def record_emitted_event(self, event):
-        """Persist before LangGraph can discard queued events on cancellation."""
+        """Persist before a cancelled Flow stream releases queued events."""
         if not self.enabled:
             return
         self.record_custom_event(event)
@@ -430,6 +432,7 @@ class TraceRecorder:
                         "status": task.get("status", "unknown"),
                     }
         return {
+            "orchestration": {"backend": BACKEND, "version": FRAMEWORK_VERSION},
             "trace_id": self.trace_id,
             "status": self.status,
             "model_metrics": self.runtime.model_metrics,

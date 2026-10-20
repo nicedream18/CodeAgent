@@ -354,6 +354,8 @@ def deserialize_state(data: dict[str, Any], runtime: Any) -> dict[str, Any]:
     else:
         state["messages"] = []
     state["runtime"] = runtime
+    if state.get("code_agent_summary") or state.get("test_report"):
+        state.update(testing_required=True, passed=False)
     if (runtime.workspace / ".mokioclaw/changes/reverify.json").exists():
         state.update(passed=False, verification_results=[], context_next_node="verifier")
     from mokioclaw.core.instructions import restore_instructions
@@ -421,6 +423,8 @@ def state_summary(state: dict[str, Any]) -> dict[str, Any]:
             state.get("code_agent_summary", "") or state.get("last_actor_summary", ""),
             1600,
         ),
+        "test_report": json_safe(state.get("test_report", {})),
+        "testing_required": state.get("testing_required", False),
         "verifier_summary": trim_text(state.get("verifier_summary", ""), 1600),
         "last_error": trim_text(state.get("last_error", ""), 1600),
         "context_summary": trim_text(state.get("context_summary", ""), 1800),
@@ -640,11 +644,17 @@ def _copy_summary_fields(inputs: dict[str, Any], summary: dict[str, Any]) -> Non
         "sources",
         "research_notes",
         "code_agent_summary",
+        "test_report",
+        "testing_required",
         "verifier_summary",
         "last_error",
     ):
         if summary.get(key):
             inputs[key] = summary[key]
+    # Test outcomes are historical observations; workspace may have changed.
+    if inputs.get("code_agent_summary") or inputs.get("test_report"):
+        inputs["testing_required"] = True
+        inputs["passed"] = False
     runtime = inputs.get("runtime")
     if runtime is not None:
         from mokioclaw.core.instructions import restore_instructions

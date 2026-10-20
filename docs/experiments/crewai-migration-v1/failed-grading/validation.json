@@ -1,0 +1,31 @@
+{
+  "valid": false,
+  "base": {
+    "schema_version": 1,
+    "valid": false,
+    "solved": false,
+    "target_passed": 0,
+    "target_failed": 1,
+    "regression_failed": 1,
+    "tests_run": 2,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 2.709,
+    "report": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-256/test_real_grader_rejects_noop_0/validation/base"
+  },
+  "reference": {
+    "schema_version": 1,
+    "valid": false,
+    "solved": false,
+    "target_passed": 0,
+    "target_failed": 1,
+    "regression_failed": 1,
+    "tests_run": 2,
+    "out_of_scope": [],
+    "tampered_tests": [],
+    "infrastructure_error": null,
+    "seconds": 2.662,
+    "report": "/private/var/folders/l0/5yy0jkfd0f340xydx8np5pxc0000gn/T/pytest-of-nicedream/pytest-256/test_real_grader_rejects_noop_0/validation/reference"
+  }
+}

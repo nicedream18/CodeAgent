@@ -56,7 +56,7 @@ class MokioClawGroup(TyperGroup):
 
 app = typer.Typer(
     cls=MokioClawGroup,
-    help='mokioclaw: a teaching-first mini CodeAgent. Use `mokioclaw "task"` for Rich output or `mokioclaw tui` for Textual TUI.',
+    help='mokioclaw: a CrewAI Flow CodeAgent. Use `mokioclaw "task"` for Rich output or `mokioclaw tui` for Textual TUI.',
 )
 daemon_app = typer.Typer(help="Manage the local MokioClaw Agent daemon.")
 app.add_typer(daemon_app, name="daemon")
@@ -173,7 +173,7 @@ def main(
         raise typer.Exit()
 
     safe_secho(
-        "mokioclaw stage 5: MultiAgent + context/harness engineering",
+        "mokioclaw: CrewAI Flows + controlled MultiAgent execution",
         fg=typer.colors.MAGENTA,
     )
     approval_handler = _inline_approval_handler if approval_mode in {None, "inline"} else None

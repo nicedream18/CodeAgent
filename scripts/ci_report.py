@@ -17,7 +17,7 @@ REPOSITORY = Path(__file__).resolve().parents[1]
 PLANNED = {
     "check": ["uv-version", "make-check", "commit-whitespace"],
     "docker": ["uv-version", "frozen-install", "export-execution-lock", "engine",
-               "build-execution-image", "real-docker-tests"],
+               "build-execution-image", "build-grading-image", "real-docker-tests"],
     "wheel": ["uv-version", "frozen-install", "export-runtime-lock", "build-wheel",
               "fresh-environment", "install-locked-dependencies", "install-wheel",
               "dependency-consistency", "cli-entry", "module-entry", "installed-offline-probe"],
@@ -47,7 +47,11 @@ workspace.mkdir()
 (workspace / 'sample.txt').write_text('安装验证成功', encoding='utf-8')
 read = read_file(RuntimeState(workspace=workspace), 'sample.txt')
 assert read['ok'] and '安装验证成功' in str(read)
-value = {'ok': True, 'installed_from': str(package), 'prefix': sys.prefix,
+from mokioclaw.orchestration.runtime import single_step_workflow
+flow = single_step_workflow('probe', lambda _: {'final_answer': 'offline-flow-ok'})
+assert flow.backend == 'crewai'
+assert flow.invoke({})['final_answer'] == 'offline-flow-ok'
+value = {'crewai_flow_executed': True, 'ok': True, 'installed_from': str(package), 'prefix': sys.prefix,
  'python': sys.version, 'site_packages_verified': True, 'network_disabled': True,
  'sample_tokens': len(tokens), 'static_assets_verified': True,
  'credential_environment_empty': True,
@@ -140,16 +144,30 @@ def docker(checks: Checks, work: Path) -> None:
     checks.step("engine", ["docker", "info", "--format", "{{.ServerVersion}} {{.OSType}}/{{.Architecture}}"],
                 timeout=30)
     checks.step("build-execution-image", ["docker", "build", "--iidfile", str(work / "image-id"),
-                                         "-t", tag, "docker/execution"], timeout=900)
+                                         "-t", tag, "docker/execution"], timeout=1800)
     image = (work / "image-id").read_text().strip()
     if not image.startswith("sha256:"):
         raise ValueError("Build produced no immutable image ID")
     checks.report["docker_build"]["image_id"] = image
+    legacy = REPOSITORY / "docker/legacy-eval"
+    grading_tag = "mokioclaw-ci-grading:" + uuid4().hex[:16]
+    checks.report["grading_build"] = {
+        "dockerfile_sha256": sha(legacy / "Dockerfile"),
+        "requirements_sha256": sha(legacy / "requirements.txt"),
+        "tag": grading_tag, "published": False}
+    checks.step("build-grading-image", ["docker", "build", "--iidfile", str(work / "grading-id"),
+                                       "-t", grading_tag, "docker/legacy-eval"], timeout=900)
+    grading_image = (work / "grading-id").read_text().strip()
+    if not grading_image.startswith("sha256:"):
+        raise ValueError("Grading build produced no immutable image ID")
+    checks.report["grading_build"]["image_id"] = grading_image
+    checks.environment["MOKIO_EVAL_DOCKER_IMAGE"] = grading_image
     checks.environment["MOKIO_DOCKER_IMAGE"] = image
     checks.environment["MOKIO_DOCKER_REPORT"] = str(checks.output / "docker-detail")
     checks.step("real-docker-tests", ["make", "check-docker"], timeout=180)
     detail = json.loads((checks.output / "docker-detail/result.json").read_text())
-    if not detail["ok"] or detail["image_digest"] != image:
+    if (not detail["ok"] or detail["image_digest"] != image
+            or detail["grading_image"]["image_digest"] != grading_image):
         raise ValueError("Docker integration evidence does not match the freshly built image")
     checks.report["docker"] = detail
 

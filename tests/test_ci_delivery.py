@@ -156,3 +156,34 @@ def test_push_scan_does_not_claim_unexamined_archives_passed(monkeypatch):
     monkeypatch.setattr(review, "MAX_BLOB", 8)
     assert review.inspect_bytes(stream.getvalue(), "trace.tar.gz", []) == [
         {"path": "trace.tar.gz", "reason": "archive_quota_not_scanned"}]
+
+
+def test_unavailable_grading_image_does_not_start_pytest(tmp_path, monkeypatch):
+    monkeypatch.setenv("MOKIO_DOCKER_IMAGE", "current")
+    monkeypatch.setenv("MOKIO_EVAL_DOCKER_IMAGE", "missing-frozen")
+    monkeypatch.setattr(checks, "doctor", lambda _, image: {
+        "ok": image == "current", "image_digest": "sha256:current"})
+    monkeypatch.setattr(checks, "run_command", lambda *_a, **_k: pytest.fail("must not execute"))
+    result = checks.check(tmp_path)
+    assert not result["ok"] and not result["grading_image"]["ok"]
+
+
+def test_docker_checks_keep_execution_and_frozen_grading_images_separate(tmp_path, monkeypatch):
+    monkeypatch.setenv("MOKIO_DOCKER_IMAGE", "current")
+    monkeypatch.setenv("MOKIO_EVAL_DOCKER_IMAGE", "frozen")
+    monkeypatch.setattr(checks, "doctor", lambda _, image: {
+        "ok": True, "image_digest": "sha256:" + image})
+    monkeypatch.setattr(checks, "docker_cli", lambda *_: SimpleNamespace(stdout=""))
+
+    def run(_command, *, environment, **_kwargs):
+        assert environment["MOKIO_DOCKER_IMAGE"] == "sha256:current"
+        assert environment["MOKIO_EVAL_DOCKER_IMAGE"] == "sha256:frozen"
+        Path(environment["CI_PYTEST_REPORT"]).write_text(json.dumps({
+            "session_token": environment["CI_REPORT_TOKEN"], "exit_code": 0,
+            "passed_nodeids": sorted(checks.REQUIRED), "counts": {"passed": 2}}))
+        return {"status": "passed"}
+
+    monkeypatch.setattr(checks, "run_command", run)
+    result = checks.check(tmp_path)
+    assert result["ok"] and result["image_digest"] == "sha256:current"
+    assert result["grading_image"]["image_digest"] == "sha256:frozen"

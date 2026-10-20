@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
-from langgraph.graph.message import REMOVE_ALL_MESSAGES, add_messages
 
 from mokioclaw.core.state import RuntimeState
 from mokioclaw.graph.memory import (
@@ -30,6 +29,7 @@ from mokioclaw.graph.nodes import (
     verifier_route,
 )
 from mokioclaw.graph.workflow import build_workflow
+from mokioclaw.orchestration.messages import REMOVE_ALL_MESSAGES, add_messages
 
 
 def test_model_verifier_passes_from_json(monkeypatch, tmp_path: Path) -> None:

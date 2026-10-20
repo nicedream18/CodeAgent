@@ -1,17 +1,16 @@
 """An opt-in short path; uncertain or unsuccessful work escalates once."""
 
-from langgraph.graph import END, START, StateGraph
-
 from mokioclaw.agents.registry import run_subagent
-from mokioclaw.graph.nodes import _get_writer, final_node, verifier_node
-from mokioclaw.graph.state import MokioGraphState
+from mokioclaw.graph.nodes import _get_writer, final_node, test_agent_node, verifier_node
+from mokioclaw.orchestration.flows import LightFlow
+from mokioclaw.orchestration.runtime import CrewWorkflow, get_stream_writer
 
 
 def light_executor(state):
     runtime = state["runtime"]
     runtime.light_active = True
     runtime.light_escalation = False
-    working = dict(state)
+    working = {**state, "testing_required": True, "test_report": {}}
     runtime.foreground_state = working
     working.setdefault(
         "todos",
@@ -30,6 +29,8 @@ def light_executor(state):
             "todos": result.get("state_updates", {}).get("todos", working["todos"]),
             "acceptance_criteria": working["acceptance_criteria"],
             "workflow_escalate": runtime.light_escalation,
+            "testing_required": True,
+            "test_report": {},
         }
     finally:
         runtime.light_active = False
@@ -52,8 +53,6 @@ def full_executor(state):
     # A nested invoke consumes its custom stream without forwarding it to the
     # outer graph. Forward incrementally so upgraded runs keep their model/tool
     # events and acknowledge stream endings before lifecycle cleanup.
-    from langgraph.config import get_stream_writer
-
     parent_writer = get_stream_writer()
     result = {**state, "workflow_upgraded": True, "passed": False}
     for mode, event in build_complex_workflow().stream(
@@ -63,23 +62,20 @@ def full_executor(state):
             parent_writer(event)
         else:
             result = event
+    if "messages" in result:
+        from langchain_core.messages import RemoveMessage
+
+        from mokioclaw.orchestration.messages import REMOVE_ALL_MESSAGES
+
+        result["messages"] = [RemoveMessage(id=REMOVE_ALL_MESSAGES), *result["messages"]]
     return {key: value for key, value in result.items() if key != "runtime"}
 
 
 def build_light_workflow():
-    graph = StateGraph(MokioGraphState)
-    graph.add_node("light_executor", light_executor)
-    graph.add_node("verifier", verifier_node)
-    graph.add_node("full_executor", full_executor)
-    graph.add_node("final", final_node)
-    graph.add_edge(START, "light_executor")
-    graph.add_conditional_edges(
-        "light_executor",
-        lambda s: "full_executor" if s.get("workflow_escalate") else "verifier",
-    )
-    graph.add_conditional_edges(
-        "verifier", lambda s: "final" if s.get("passed") else "full_executor"
-    )
-    graph.add_edge("full_executor", END)
-    graph.add_edge("final", END)
-    return graph.compile()
+    return CrewWorkflow(LightFlow, {
+        "light_executor": light_executor,
+        "verifier": verifier_node,
+        "testAgent": test_agent_node,
+        "full_executor": full_executor,
+        "final": final_node,
+    })

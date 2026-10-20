@@ -10,7 +10,7 @@
 
 ## 项目主旨
 
-MokioClaw 是一个教学优先的 Mini CodeAgent 项目。它按 Agent 系统自然生长的路径推进：先从 ToolCall 触碰文件和命令行开始，再升级到 LangGraph 显式工作流，然后继续引入 MultiAgent、Context Engineering、Harness Engineering、Skill 和更完整的 Claw 产品壳。
+MokioClaw 是一个教学优先的 Mini CodeAgent 项目。它按 Agent 系统自然生长的路径推进：先从 ToolCall 触碰文件和命令行开始，再升级到显式工作流（历史版本使用 LangGraph，当前使用 CrewAI Flows），然后继续引入 MultiAgent、Context Engineering、Harness Engineering、Skill 和更完整的 Claw 产品壳。
 
 项目的核心不是“写一个神秘黑盒”，而是把 Agent 如何规划、调用工具、交接子 Agent、验证结果讲清楚。每个阶段都要能运行、能展示、能解释。
 
@@ -18,7 +18,7 @@ MokioClaw 是一个教学优先的 Mini CodeAgent 项目。它按 Agent 系统�
 
 当前已具备 Textual TUI、本机 daemon、可取消的模型流和 MCP stdio；本轮进一步加入项目规则、只读仓库探索、运行中补充指令、MCP 按需发现、hooks、文件回退及可选轻量流程。飞书 API 交互仍属于后续工作。
 
-第 3 阶段的图不再是固定的 `planner -> searchAgent -> codeAgent -> verifier` 顺序链路。现在外层 LangGraph 只有 supervisor 与验收循环：
+第 3 阶段的图不再是固定的 `planner -> searchAgent -> codeAgent -> verifier` 顺序链路。现在外层 CrewAI FullFlow 负责 supervisor 与验收循环：
 
 ```text
 User Task
@@ -78,11 +78,13 @@ uv run python examples/optimization_demo.py --output /tmp/mokio-optimization.jso
 
 各阶段数据流、故障处理和学习要点见 [设计与学习指南](../docs/optimization-design.md)，自动化与真实模型数据见 [验收记录](../docs/optimization-acceptance.md)。
 
+编排迁移的数据流、兼容范围和检查结果见 [CrewAI Flow 迁移说明](crewai-migration.md)。历史实验继续对应其冻结版本，不重新归因于当前框架。
+
 ## Context Engineering
 
 ### 自动压缩
 
-自动压缩不是简单追加一段摘要。`context_compressor` 会使用 LangGraph 的 `RemoveMessage(REMOVE_ALL_MESSAGES)` 真正清空旧 `messages`，再写入一条压缩后的上下文摘要 message。这样后续节点看到的是更小的窗口，而不是越来越长的 transcript。
+自动压缩不是简单追加一段摘要。`context_compressor` 会通过项目消息 reducer 的 `RemoveMessage(REMOVE_ALL_MESSAGES)` 真正清空旧 `messages`，再写入一条压缩后的上下文摘要 message。这样后续节点看到的是更小的窗口，而不是越来越长的 transcript。
 
 压缩会保留：
 
@@ -244,7 +246,7 @@ TUI 使用 `stream_session_events()` 维护一个持续 coding session：一次 
 - 默认多轮复用同一个 workspace；输入 `/new` 可以切换到一个全新的 session workspace。
 - 高风险 BashTool 命令会在 TUI 内弹出审批对话框，支持 `y` / Enter 批准，`n` / Esc 拒绝。
 
-为了避免“你好”这类输入也启动完整复杂流程，LangGraph 前面增加了一个模型路由节点 `intent_router`。它会先结合当前输入和 session context 判断应该走轻量 `chat_responder`，还是进入 planner / codeAgent / verifier 复杂工作流。寒暄、感谢、帮助说明和普通概念问答会直接通过 `chat_response` 回复，只写入 session 记录，不进入 planner，也不会写 checkpoint/trace。需要创建/修改文件、运行命令、搜索资料、验证结果、检查项目，或者“继续/修一下/运行测试”这类引用当前 workspace 的后续指令时，才进入完整 MultiAgent 工作流。
+为了避免“你好”这类输入也启动完整复杂流程，CrewAI EntryFlow 先执行模型路由节点 `intent_router`。它结合当前输入和 session context 判断应该走 `chat_responder`，还是进入 planner / codeAgent / verifier 工作流。寒暄、感谢、帮助说明和普通概念问答直接通过 `chat_response` 回复，保留会话与运行 trace，不进入 planner。需要创建/修改文件、运行命令、搜索资料、验证结果、检查项目，或者“继续/修一下/运行测试”这类引用当前 workspace 的后续指令时，才进入完整 MultiAgent 工作流。
 
 TUI 子命令支持和普通 CLI 相同的运行选项：
 
@@ -281,7 +283,7 @@ MokioAgent/
 │     │  ├─ event_summary.py    # Rich CLI / Textual TUI 共用事件摘要
 │     │  └─ tui/                # Textual 本地交互层
 │     ├─ core/
-│     │  ├─ agent.py            # LangGraph workflow 运行入口
+│     │  ├─ agent.py            # CrewAI Flow 运行协调入口
 │     │  ├─ checkpoint.py       # light / strict checkpoint 与 resume
 │     │  ├─ paths.py            # 项目根目录与 workspace 路径
 │     │  └─ state.py            # RuntimeState 与文件快照
@@ -289,7 +291,11 @@ MokioAgent/
 │     │  ├─ state.py            # Graph state
 │     │  ├─ memory.py           # rules / working memory / history summary-store
 │     │  ├─ nodes.py            # planner / context monitor / compressor / verifier / final
-│     │  └─ workflow.py         # StateGraph 组装与路由
+│     │  └─ workflow.py         # CrewAI Flow 兼容入口
+│     ├─ orchestration/
+│     │  ├─ flows.py           # CrewAI Entry / Full / Light Flows
+│     │  ├─ runtime.py         # 有界事件桥接与节点确认
+│     │  └─ messages.py        # 消息替换、删除及压缩重置
 │     ├─ providers/
 │     │  └─ openai_provider.py  # 从 .env 创建 ChatOpenAI
 │     ├─ prompts/

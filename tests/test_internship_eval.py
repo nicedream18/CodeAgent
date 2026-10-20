@@ -159,8 +159,8 @@ def test_real_grader_rejects_noop_test_edits_and_fake_success(tmp_path, monkeypa
     from mokioclaw.evaluation.grader import validate_task
     from mokioclaw.evaluation.prepare import apply_patch, copy_source, prepare_task
 
-    # Select this CI image without changing the frozen task recipe or evaluator.
-    selected_image = resolve_image(os.getenv("MOKIO_DOCKER_IMAGE", "mokioclaw-execution:0.2.0"))
+    # Historical source keeps its frozen MCP 2 / LangGraph dependencies.
+    selected_image = resolve_image(os.getenv("MOKIO_EVAL_DOCKER_IMAGE", "mokioclaw-execution:0.2.0"))
     monkeypatch.setattr("mokioclaw.evaluation.prepare.resolve_image", lambda _: selected_image)
     original_run = DockerBackend.run
 

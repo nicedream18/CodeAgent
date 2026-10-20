@@ -106,6 +106,8 @@ def planner_node(state: api.MokioGraphState) -> dict[str, api.Any]:
         "sources": working_state.get("sources", []),
         "agent_handoffs": working_state.get("agent_handoffs", []),
         "code_agent_summary": working_state.get("code_agent_summary", ""),
+        "testing_required": working_state.get("testing_required", False),
+        "test_report": working_state.get("test_report", {}),
         "last_actor_summary": working_state.get("code_agent_summary", ""),
         "messages": produced_messages,
         "memory_snapshot": final_memory,

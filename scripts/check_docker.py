@@ -36,11 +36,18 @@ def check(output: Path) -> dict[str, Any]:
     if not result["ok"]:
         write_json(output / "result.json", result)
         return result
+    grading = doctor("docker", os.getenv("MOKIO_EVAL_DOCKER_IMAGE", "mokioclaw-execution:0.2.0"))
+    result["grading_image"] = grading
+    if not grading["ok"]:
+        result["ok"] = False
+        write_json(output / "result.json", result)
+        return result
     owner, token = "ci-" + uuid4().hex, uuid4().hex
     with TemporaryDirectory(prefix="docker-check-home-") as temporary:
         environment = child_environment(Path(temporary), repository=Path(__file__).resolve().parents[1])
         environment.update(MOKIO_TEST_DOCKER="1", MOKIO_TEST_OWNER=owner,
                            MOKIO_DOCKER_IMAGE=result["image_digest"],
+                           MOKIO_EVAL_DOCKER_IMAGE=grading["image_digest"],
                            CI_PYTEST_REPORT=str((output / "pytest-summary.json").resolve()),
                            CI_REPORT_TOKEN=token, PYTEST_PLUGINS="ci_pytest_plugin")
         try:

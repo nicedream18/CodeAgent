@@ -16,7 +16,7 @@ class AgentProfile(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
     description: str
-    base: Literal["repoAgent", "codeAgent", "searchAgent"]
+    base: Literal["repoAgent", "codeAgent", "searchAgent", "testAgent"]
     system_prompt: str
     allowed_tools: list[str]
     max_tool_calls: int = Field(default=8, ge=1, le=50)
@@ -52,7 +52,7 @@ def load_agent_profiles(runtime: Any) -> None:
                     ):
                         raise ValueError(f"tool exceeds base capability: {tool}")
                 if (
-                    profile.name in {"repoAgent", "codeAgent", "searchAgent"}
+                    profile.name in {"repoAgent", "codeAgent", "searchAgent", "testAgent"}
                     and profile.base != profile.name
                 ):
                     raise ValueError("built-in role base cannot be changed")

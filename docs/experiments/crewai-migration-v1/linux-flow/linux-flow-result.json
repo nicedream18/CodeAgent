@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "timed_out": false,
+  "stdout": "...........                                                              [100%]\n11 passed in 1.67s\n",
+  "stderr": "",
+  "duration_ms": 3017,
+  "backend": "docker",
+  "metadata": {
+    "stdout_truncated": false,
+    "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-b15936f78b994b7e8c734aaff41f3964.log",
+    "stdout_output_bytes": 99,
+    "stdout_retained_bytes": 99,
+    "stdout_output_truncated": false,
+    "stderr_truncated": false,
+    "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-f92261d6a7a9439f86a2dec9e7d5a738.log",
+    "stderr_output_bytes": 0,
+    "stderr_retained_bytes": 0,
+    "stderr_output_truncated": false,
+    "image_digest": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609",
+    "container_id": "444fbc8c09ff59d63159ebd2c9d0ebc5b28609ab621407f6c2ab4fec93a813a0",
+    "limits": {
+      "cpus": 2,
+      "memory_mib": 2048,
+      "pids": 128
+    },
+    "network": "none",
+    "read_only_root": true
+  },
+  "stdout_truncated": false,
+  "stdout_full_output_path": ".mokioclaw/diagnostics/bash-stdout-b15936f78b994b7e8c734aaff41f3964.log",
+  "stdout_output_bytes": 99,
+  "stdout_retained_bytes": 99,
+  "stdout_output_truncated": false,
+  "stderr_truncated": false,
+  "stderr_full_output_path": ".mokioclaw/diagnostics/bash-stderr-f92261d6a7a9439f86a2dec9e7d5a738.log",
+  "stderr_output_bytes": 0,
+  "stderr_retained_bytes": 0,
+  "stderr_output_truncated": false,
+  "image_digest": "sha256:98528618fbe210796610fabfd3b80acf5645271109acb71d726d7b525b5c1609",
+  "container_id": "444fbc8c09ff59d63159ebd2c9d0ebc5b28609ab621407f6c2ab4fec93a813a0",
+  "limits": {
+    "cpus": 2,
+    "memory_mib": 2048,
+    "pids": 128
+  },
+  "network": "none",
+  "read_only_root": true,
+  "remaining_owned_containers": []
+}

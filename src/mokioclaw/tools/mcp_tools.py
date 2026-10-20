@@ -12,7 +12,7 @@ from typing import Any
 from uuid import uuid4
 
 from langchain_core.tools import StructuredTool
-from mcp import Client
+from mcp import ClientSession
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from pydantic import Field, create_model
 
@@ -231,12 +231,13 @@ def _make_mcp_tool(public_name, remote_name, server, schema, description, runtim
         for block in response.content:
             text = getattr(block, "text", None)
             content.append(text if text is not None else block.model_dump(mode="json"))
+        is_error = getattr(response, "isError", False)
         return {
-            "ok": not response.is_error,
+            "ok": not is_error,
             "content": content,
-            "structured_content": response.structured_content,
-            "error_type": "tool_error" if response.is_error else "",
-            "error": str(content)[:1000] if response.is_error else "",
+            "structured_content": response.structuredContent,
+            "error_type": "tool_error" if is_error else "",
+            "error": str(content)[:1000] if is_error else "",
             "retryable": False,
         }
 
@@ -316,13 +317,15 @@ def _operation(runtime, server, phase, operation):
 
     async def perform():
         async with asyncio.timeout(runtime.mcp_timeout_seconds):
-            async with Client(stdio_client(_server_params(server), errlog=errlog)) as client:
-                return await operation(client)
+            async with stdio_client(_server_params(server), errlog=errlog) as streams:
+                async with ClientSession(*streams) as client:
+                    await client.initialize()
+                    return await operation(client)
 
     try:
         response = control.run_async(perform)
-        diagnostic["status"] = "failed" if getattr(response, "is_error", False) else "finished"
-        diagnostic["reason"] = "server_error" if getattr(response, "is_error", False) else ""
+        diagnostic["status"] = "failed" if getattr(response, "isError", False) else "finished"
+        diagnostic["reason"] = "server_error" if getattr(response, "isError", False) else ""
         return response
     except (RunInterrupted, KeyboardInterrupt):
         diagnostic.update(status="interrupted", reason="cancelled")

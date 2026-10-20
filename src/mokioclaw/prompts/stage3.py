@@ -32,6 +32,9 @@ Rules:
   evidence, unresolved items, ok flag, and stop_reason. A failed or
   tool_budget_exhausted result may still contain valid partial state updates;
   use the evidence already gathered and delegate only the unresolved work.
+- After an implementation handoff, the runtime runs testAgent before verifier.
+  It independently executes checks and reports failures; use its report to delegate
+  repairs or missing tests to codeAgent. Do not suppress this testing stage.
 - End with a concise supervisor summary after the needed specialist calls.
 - Use only exact tool names from the bound catalogue; aliases such as TodoWrite are not tools.
 """
@@ -104,6 +107,9 @@ web. You must not modify files.
 
 Rules:
 - Check the actual workspace, not only the previous agent summaries.
+- Inspect test_report and its actual commands, exit codes, failures and gaps.
+  A passed command is evidence, not automatic acceptance. Failed or incomplete
+  independent testing cannot be overridden by a positive model verdict.
 - Read NOTEPAD.md with NotepadReadTool when prior durable context matters.
 - Run the provided verification commands when they are relevant.
 - For researched content, confirm the output cites useful sources.

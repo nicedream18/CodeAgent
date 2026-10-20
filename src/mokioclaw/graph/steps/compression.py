@@ -13,6 +13,8 @@ def context_monitor_node(state: api.MokioGraphState) -> dict[str, api.Any]:
     enabled = getattr(state.get("runtime"), "context_compression_enabled", True)
     should_compress = bool(enabled and token_count >= token_limit)
     next_node = state.get("context_next_node") or "verifier"
+    if next_node == "verifier" and state.get("testing_required"):
+        next_node = "testAgent"
     event = {
         "type": "context_monitor",
         "scope": "graph",

@@ -1,5 +1,23 @@
 # 求职交付收敛状态
 
+## 独立 testAgent：本地功能验收完成
+
+- 新增第四个内置子 Agent，full / light 实现后自动测试，再由 Verifier 验收；测试失败、未完成或必要测试缺失不能被成功回复覆盖。
+- 默认 8 次工具预算，复用审批、取消、纠正、上下文和 checkpoint；补测试与修复继续由 codeAgent 执行。预算收尾明确标为未运行，不冒充通过。
+- 实际工作区 511 passed / 2 skipped，Ruff、39 个严格 mypy 模块和文档/diff 检查通过；本地及真实 Docker 演示均识别错误/修正实现的退出 1/0。
+- 仅离线模型与真实本地/容器工具；未新增真实模型实验、推送或远程 CI。下方各归档保留原有版本与数字。
+
+证据：[测试角色说明](../testing-agent.md)、[验收记录](../experiments/testing-agent-v1/README.md)。
+
+## CrewAI Flow 迁移：本地验收完成
+
+- 使用真实 CrewAI Entry / Full / Light Flows 替换 LangGraph 编排，保留原有模型—工具循环、审批、取消、纠正、checkpoint、trace 与后台隔离。
+- 固定 CrewAI 1.15.28、MCP SDK 1.28.1；移除 LangGraph 运行依赖，消息 reducer 继续兼容旧压缩标记。
+- 本地 macOS ARM64 全量为 496 passed / 2 skipped；Ruff、38 个严格 mypy 模块与文档检查通过。新执行镜像与旧冻结评分镜像分别验收，真实容器 33 passed / 0 skipped，清理确认；wheel 仓库外安装和禁网 Flow 通过。
+- 离线端到端文件修复通过；没有新增真实模型请求、推送、发布或远程 CI。下列历史成功率、延迟、演示与 Linux CI 保留其原版本，不能视为 CrewAI 成绩。
+
+证据：[设计和复现](../crewai-migration.md)、[本地验收](../experiments/crewai-migration-v1/README.md)。
+
 ## Context Compression A/B：框架与 18 次真实开关对照已完成，实际压缩效果未确定
 
 - 冻结运行时 `d3d9521`，D01 / M07-v2 / M08-v2 × 开关 × 三次，共 18/18 次；419 次请求、2,804,909 个 API 返回 Token，计量核对通过，无估算或缺失 usage。

@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Annotated, Any, TypedDict
 
 from langchain_core.messages import BaseMessage
-from langgraph.graph import add_messages
 
 from mokioclaw.core.state import RuntimeState
+from mokioclaw.orchestration.messages import add_messages
 
 
 class TodoItem(TypedDict):
@@ -97,6 +97,8 @@ class MokioGraphState(TypedDict, total=False):
     sources: list[SourceItem]
     agent_handoffs: list[AgentHandoff]
     code_agent_summary: str
+    testing_required: bool
+    test_report: dict[str, Any]
     verifier_summary: str
     verification_checks: list[VerificationCheck]
     context_summary: str
